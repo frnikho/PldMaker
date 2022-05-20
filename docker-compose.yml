@@ -1,0 +1,42 @@
+version: "3"
+services:
+  pld_backend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: backend
+    ports:
+      - "3333:3333"
+  pld_frontend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: frontend
+    container_name: pld_frontend
+    ports:
+      - "4200:4200"
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    restart: always
+    container_name: mongodb
+    ports:
+      - "27017-27019:27017-27019"
+    networks:
+      - pld
+    volumes:
+    #   - mongodb:/data/db
+        - ./initdb.d/:/docker-entrypoint-initdb.d/
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DOCKER_MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DOCKER_MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DB}
+      MONGODB_USER: ${MONGODB_USER}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
+      MONGODB_DB: ${MONGODB_DB}
+networks:
+  pld:
+    driver: bridge
+volumes:
+  mongodb:
