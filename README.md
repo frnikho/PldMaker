@@ -1,5 +1,7 @@
 # PLD
 
+### Epitech EIP PLD Maker
+
 ### description
 
 le but de ce projet est de simplifier le suivi et la création de PLD avec son équipe. la création du PLD se fera via une interface web ou l'utilisateur devras se connecter afin de pouvoir retrouver son organisation.
@@ -57,5 +59,5 @@ Le tableau des révisions var récuperer les anciennes versions du PLD pour les 
 
 #### l'état du PLD
 
-a la fin du PLD, il serat possible de le sauvegarder ou bien de le signé.
+a la fin du PLD, il sera possible de le sauvegarder ou bien de le signé.
 signé un PLD signifie qu'il a été verifier et qu'il ne serat plus modifiable dans le temps
