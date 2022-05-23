@@ -1,4 +1,4 @@
-import {DattedObject} from "./DattedObject";
+import {DattedObject} from "../DattedObject";
 
 export type User = {
   uuid?: string;

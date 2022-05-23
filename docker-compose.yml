@@ -22,7 +22,7 @@ services:
     restart: always
     container_name: mongodb
     ports:
-      - "27017-27019:27017-27019"
+      - "${MONGODB_PORT}:${MONGODB_PORT}"
     networks:
       - pld
     volumes:
