@@ -11,6 +11,9 @@ import { DATABASE_CONFIG_LABEL } from "./config/database";
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
+import { SettingsController } from './settings/settings.controller';
+import { SettingsModule } from './settings/settings.module';
+import { OrganizationModule } from './organization/organization.module';
 
 @Module({
   imports: [
@@ -27,9 +30,11 @@ import { UserModule } from './user/user.module';
         };
       }
     }),
-    UserModule
+    UserModule,
+    SettingsModule,
+    OrganizationModule
   ],
-  controllers: [AppController, UserController],
-  providers: [AppService, UserService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

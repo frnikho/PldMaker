@@ -1,17 +1,19 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
-import {DattedObject} from "../utility/datted_object.utility";
+import {DattedObjectSchema} from "../utility/datted_object.utility";
+
+export type UserDocument = User & Document;
 
 @Schema({versionKey: false})
-export class User extends DattedObject {
-
-  @Prop()
-  uuid: string;
+export class User extends DattedObjectSchema {
 
   @Prop()
   email: string;
 
   @Prop()
   password: string;
+
+  @Prop()
+  roles: string[];
 
 }
 

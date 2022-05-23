@@ -1,6 +1,6 @@
 import {Prop} from "@nestjs/mongoose";
 
-export class DattedObject {
+export class DattedObjectSchema {
 
   @Prop()
   created_date: Date;
