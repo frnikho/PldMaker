@@ -6,5 +6,5 @@ import { registerAs } from "@nestjs/config";
 const CONFIG_FILE = "./assets/config/server.yaml"
 
 export default registerAs('server', () => {
-  return yaml.load(readFileSync(join(__dirname, CONFIG_FILE), 'utf-8')) as Record<string, any>
+  return yaml.load(readFileSync(join(__dirname, CONFIG_FILE), 'utf-8')) as Record<string, unknown>
 });

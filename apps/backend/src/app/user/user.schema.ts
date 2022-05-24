@@ -1,18 +1,20 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
-import {DattedObjectSchema} from "../utility/datted_object.utility";
+import {DatedObjectSchema} from "../utility/datted_object.utility";
+import {Document} from "mongoose";
 
 export type UserDocument = User & Document;
 
-@Schema({versionKey: false})
-export class User extends DattedObjectSchema {
+@Schema()
+export class User extends DatedObjectSchema {
 
-  @Prop()
+  @Prop({required: true, validators: {validator: (value) => Promise.resolve(value.length > 4),
+      message: 'Password validation failed'}})
   email: string;
 
-  @Prop()
+  @Prop({select: false, required: true, minlength: 5})
   password: string;
 
-  @Prop()
+  @Prop({required: true})
   roles: string[];
 
 }

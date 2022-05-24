@@ -1,0 +1,3 @@
+auth:
+  userAlreadyRegistered: "User already registered with this email address !"
+  userNotFound: "User not found"

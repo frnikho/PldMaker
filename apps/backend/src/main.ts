@@ -1,8 +1,9 @@
-import {Logger, VersioningType} from '@nestjs/common';
+import {ValidationPipe, VersioningType} from '@nestjs/common';
 import {NestFactory} from '@nestjs/core';
 
 import {AppModule} from './app/app.module';
 import {NestExpressApplication} from "@nestjs/platform-express";
+import {Logger} from "./app/logger/logger";
 
 class Server {
 
@@ -14,9 +15,10 @@ class Server {
     this.onServerOpened = this.onServerOpened.bind(this);
   }
 
-
   public async start(): Promise<void> {
-    this.app = await NestFactory.create<NestExpressApplication>(AppModule);
+    this.app = await NestFactory.create<NestExpressApplication>(AppModule, {
+      logger: new Logger(),
+    });
     await this.config();
     await this.app.listen(this.port, this.onServerOpened);
   }
@@ -25,14 +27,15 @@ class Server {
     this.app.enableVersioning({
       defaultVersion: '1',
       type: VersioningType.URI,
-    })
+    });
+    this.app.useGlobalPipes(new ValidationPipe());
   }
 
   private onServerOpened() {
-    Logger.log(
-      `🚀 Application is running on: http://localhost:${this.port}/`
-    );
+    new Logger(
+    ).log(`Application is running on: http://localhost:${this.port}/`);
   }
 }
 
-new Server().start();
+new Server().start().then(() => {
+  console.log('');});

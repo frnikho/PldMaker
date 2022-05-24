@@ -1,22 +1,27 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose from "mongoose";
+import mongoose, {Document} from "mongoose";
 import { User } from "../user/user.schema";
-import { DattedObjectSchema } from "../utility/datted_object.utility";
+import { DatedObjectSchema } from "../utility/datted_object.utility";
 
-@Schema({versionKey: false})
-export class Organization extends DattedObjectSchema {
+export type OrganizationDocument = Organization & Document;
 
-    @Prop()
-    name: string;
+@Schema()
+export class Organization extends DatedObjectSchema {
 
-    @Prop()
-    description: string;
+  @Prop({required: true})
+  name: string;
 
-    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]})
-    members: User[];
+  @Prop({required: false, default: ''})
+  description: string;
 
-    @Prop({type: {type: mongoose.Schema.Types.ObjectId}, ref: 'User'})
-    owner: User;
+  @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}], default: []})
+  members: User[];
+
+  @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true})
+  owner: User;
+
+  @Prop({default: 1.0})
+  versionShifting?: number;
 
 }
 
