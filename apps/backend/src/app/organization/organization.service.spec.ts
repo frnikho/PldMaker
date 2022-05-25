@@ -5,7 +5,7 @@ import {OrganizationMock} from "../factory/organization.mock";
 import {rootMongooseTestModule} from "../utility/mongoose_memory.testmodule";
 import {MongooseModule} from "@nestjs/mongoose";
 import {UserMock} from "../factory/user.mock";
-import {User, UserSchema} from "../user/user.schema";
+import {User, UserDocument, UserSchema} from "../user/user.schema";
 import {UserService} from "../user/user.service";
 import {CreateOrganizationBody} from "../../../../../libs/data-access/organization/CreateOrganizationBody";
 
@@ -51,7 +51,7 @@ describe('OrganizationService', () => {
     });
 
     describe('Manager members of a Organization', () => {
-      let ownerUser: User;
+      let ownerUser: UserDocument;
       let org: OrganizationDocument;
 
       beforeEach(async () => {
@@ -61,13 +61,13 @@ describe('OrganizationService', () => {
 
       it('Add a members', async () => {
         const newMember = await userService.create(UserMock.createUser({email: 'abcd'}));
-        const updatedOrg = await service.addMember(org._id, newMember._id);
+        const updatedOrg = await service.addMembers(org._id, ownerUser._id, [newMember._id]);
         expect(updatedOrg.members.some(m => m.email === 'abcd')).toBe(true);
       });
 
       it('Throw a error when adding a non existing user', async () => {
         try {
-          await service.addMember(org._id, 'random');
+          await service.addMembers(org._id, ownerUser._id, ['random']);
           expect(true).toBe(false);
         } catch (ex) {
           expect(ex).not.toBeNull();
@@ -76,28 +76,28 @@ describe('OrganizationService', () => {
 
       it('Add the same member x times', async () => {
         const newMember = await userService.create(UserMock.createUser({email: 'abcd'}));
-        await service.addMember(org._id, newMember._id);
-        await service.addMember(org._id, newMember._id);
-        await service.addMember(org._id, newMember._id);
-        await service.addMember(org._id, newMember._id);
-        const updatedOrg = await service.addMember(org._id, newMember._id);
+        await service.addMembers(org._id, ownerUser._id, [newMember._id]);
+        await service.addMembers(org._id, ownerUser._id, [newMember._id]);
+        await service.addMembers(org._id, ownerUser._id, [newMember._id]);
+        await service.addMembers(org._id, ownerUser._id, [newMember._id]);
+        const updatedOrg = await service.addMembers(org._id, ownerUser._id, [newMember._id]);
         expect(updatedOrg.members.length).toBe(1);
       });
 
       it('Remove a member', async () => {
         const newMember = await userService.create(UserMock.createUser({email: 'abcd'}));
-        let updatedOrg = await service.addMember(org._id, newMember._id);
+        let updatedOrg = await service.addMembers(org._id, ownerUser._id, [newMember._id]);
         expect(updatedOrg.members.length).toBe(1);
-        updatedOrg = await service.removeMember(org._id, newMember._id);
+        updatedOrg = await service.removeMembers(org._id, ownerUser._id, [newMember._id]);
         expect(updatedOrg.members.length).toBe(0);
       });
 
       it('Throw a error when adding a non existing user', async () => {
         const newMember = await userService.create(UserMock.createUser({email: 'abcd'}));
-        const updatedOrg = await service.addMember(org._id, newMember._id);
+        const updatedOrg = await service.addMembers(org._id, ownerUser._id, [newMember._id]);
         expect(updatedOrg.members.length).toBe(1);
         try {
-          await service.removeMember(org._id, 'abc');
+          await service.removeMembers(org._id, ownerUser._id, ['abc']);
           expect(true).toBe(false);
         } catch (ex) {
           expect(ex).not.toBeNull();
@@ -106,13 +106,35 @@ describe('OrganizationService', () => {
 
       it('Remove the same user X time', async () => {
         const newMember = await userService.create(UserMock.createUser({email: 'abcd'}));
-        let updatedOrg = await service.addMember(org._id, newMember._id);
+        let updatedOrg = await service.addMembers(org._id, ownerUser._id, [newMember._id]);
         expect(updatedOrg.members.length).toBe(1);
-        await service.removeMember(org._id, newMember._id);
-        await service.removeMember(org._id, newMember._id);
-        updatedOrg = await service.removeMember(org._id, newMember._id);
+        await service.removeMembers(org._id, ownerUser._id, [newMember._id]);
+        await service.removeMembers(org._id, ownerUser._id, [newMember._id]);
+        updatedOrg = await service.removeMembers(org._id, ownerUser._id, [newMember._id]);
         expect(updatedOrg.members.length).toBe(0);
+      })
 
+      it(`Should not remove an user if i'm not the organization owner`, async () => {
+        const newMember = await userService.create(UserMock.createUser({email: 'abcd'}));
+        let updatedOrg = await service.addMembers(org._id, ownerUser._id, [newMember._id]);
+        expect(updatedOrg.members.length).toBe(1);
+        updatedOrg = await service.removeMembers(org._id, newMember._id, [newMember._id]);
+        expect(updatedOrg).toBe(null);
+      })
+
+      it(`Should remove multi user in the same time`, async () => {
+        const newMember = await userService.create(UserMock.createUser({email: 'abcd'}));
+        const newMember1 = await userService.create(UserMock.createUser({email: 'abcd'}));
+        const newMember2 = await userService.create(UserMock.createUser({email: 'abcd'}));
+        const newMember3 = await userService.create(UserMock.createUser({email: 'abcd'}));
+        const newMember4 = await userService.create(UserMock.createUser({email: 'abcd'}));
+        const membersToUpdate = [newMember, newMember1, newMember2, newMember3, newMember4];
+        let updatedOrg = await service.addMembers(org._id, ownerUser._id, membersToUpdate);
+        expect(updatedOrg.members.length).toBe(5);
+        updatedOrg = await service.removeMembers(org._id, ownerUser._id, [newMember, newMember2]);
+        expect(updatedOrg.members.length).toBe(3);
+        updatedOrg = await service.removeMembers(org._id, ownerUser._id, [newMember1, newMember3]);
+        expect(updatedOrg.members.length).toBe(1);
       })
 
     });

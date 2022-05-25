@@ -15,6 +15,8 @@ import { AuthModule } from './auth/auth.module';
 import * as autoPopulate from 'mongoose-autopopulate';
 import {JwtAuthGuard} from "./auth/guard/jwt-auth.guard";
 import {LoggerModule} from "./logger/logger.module";
+import { PldModule } from './pld/pld.module';
+import { TemplateModule } from './template/template.module';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import {LoggerModule} from "./logger/logger.module";
     AuthModule,
     ConfigModule,
     LoggerModule,
+    PldModule,
+    TemplateModule,
   ],
   controllers: [AppController],
   providers: [AppService, {
