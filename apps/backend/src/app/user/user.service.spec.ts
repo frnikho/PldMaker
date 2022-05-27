@@ -2,7 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import {closeInMongoConnection, rootMongooseTestModule} from "../utility/mongoose_memory.testmodule";
 import {MongooseModule} from "@nestjs/mongoose";
-import {User, UserSchema} from "./user.schema";
+import {User, UserDocument, UserSchema} from "./user.schema";
+import {UserMock} from "../factory/user.mock";
 
 describe('UserService', () => {
   let service: UserService;
@@ -43,6 +44,24 @@ describe('UserService', () => {
         expect(ex).not.toBeNull();
       }
     });
+
+  });
+
+  describe('find users', () => {
+
+    const users: UserDocument[] = [];
+
+    beforeEach(async () => {
+      for (let i = 0; i < 10; i++) {
+        users.push(await service.create(UserMock.createUser({email: `abc${i}@test.com`})));
+      }
+    });
+
+    it('finds multiple users', async () => {
+      const findUsers: UserDocument[] = await service.finds([users[0]._id, users[1]._id, users[2]._id]);
+      expect(findUsers.length).toBe(3);
+      expect(findUsers[1]._id).toStrictEqual(users[1]._id);
+    })
 
   });
 

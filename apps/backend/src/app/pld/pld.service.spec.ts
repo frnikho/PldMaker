@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PldService } from './pld.service';
 import {rootMongooseTestModule} from "../utility/mongoose_memory.testmodule";
 import {MongooseModule} from "@nestjs/mongoose";
-import {Pld, PldDocument, PldSchema} from "./pld.schema";
+import {Pld, PldDocument, PldSchema, RevisionUpdate} from "./pld.schema";
 import {UserService} from "../user/user.service";
 import {OrganizationService} from "../organization/organization.service";
 import {User, UserDocument, UserSchema} from "../user/user.schema";
@@ -44,21 +44,21 @@ describe('PldService', () => {
     });
 
     it('Create a PLD', async () => {
-      const createdPld: Pld = await service.create(PldMock.createPldWithUserOwner({owner: ownerUser, description: 'abc', version: 1.0, name: 'Hello World'}));
+      const createdPld: Pld = await service.create(PldMock.createPldWithUserOwner({owner: ownerUser, description: 'abc', version: 1.0, title: 'Hello World'}));
       expect(createdPld).not.toBeNull();
       expect((createdPld.owner as User)).toBe(ownerUser);
     });
 
     it('Update a PLD', async () => {
-      const createdPld: PldDocument = await service.create(PldMock.createPldWithUserOwner({owner: ownerUser, description: 'abc', version: 1.0, name: 'Hello World'}));
-      createdPld.name = 'Test #1';
+      const createdPld: PldDocument = await service.create(PldMock.createPldWithUserOwner({owner: ownerUser, description: 'abc', version: 1.0, title: 'Hello World'}));
+      createdPld.title = 'Test #1';
       const updatedPld: PldDocument = await service.update(createdPld._id, ownerUser._id, createdPld);
-      expect(updatedPld.name).toBe('Test #1');
+      expect(updatedPld.title).toBe('Test #1');
       expect(updatedPld.description).toBe('abc');
     })
 
     it('Delete a PLD', async () => {
-      const createdPld: PldDocument = await service.create(PldMock.createPldWithUserOwner({owner: ownerUser, description: 'abc', version: 1.0, name: 'Hello World'}));
+      const createdPld: PldDocument = await service.create(PldMock.createPldWithUserOwner({owner: ownerUser, description: 'abc', version: 1.0, title: 'Hello World'}));
       const deletedPld: PldDocument = await service.delete(createdPld._id, ownerUser._id);
       expect(await service.find(deletedPld._id)).toBe(null);
     });
@@ -67,14 +67,24 @@ describe('PldService', () => {
   describe('Create an "Organization" PLD', () => {
     let org: OrganizationDocument;
     let ownerUser: UserDocument;
+    let managerUser: UserDocument;
 
     beforeEach(async () => {
       ownerUser = await userService.create(UserMock.createUser({email: 'hello@hello.com'}));
+      managerUser = await userService.create(UserMock.createUser({email: 'manager@hello.com'}));
       org = await orgService.create(OrganizationMock.createOrg({owner: ownerUser, name: 'Hello World'}));
     });
 
     it('Create a PLD', async () => {
-      const createdPld: Pld = await service.create(PldMock.createPldWithOrgOwner({owner: org, description: 'abc', version: 1.0, name: 'Hello World'}));
+      const revisionUpdate: RevisionUpdate[] = [
+        {
+          owner: ownerUser,
+          version: 1.0,
+          created_date: new Date(),
+          sections: ['Toutes'],
+        }
+      ];
+      const createdPld: PldDocument = await service.create(PldMock.createPldWithOrgOwner({owner: org, revisionsUpdated: revisionUpdate, manager: managerUser, description: 'abc', version: 1.0, title: 'Hello World'}));
       expect(createdPld).not.toBeNull();
       expect((createdPld.owner as Organization).owner).toBe(ownerUser);
     });
