@@ -88,5 +88,35 @@ describe('PldService', () => {
       expect(createdPld).not.toBeNull();
       expect((createdPld.owner as Organization).owner).toBe(ownerUser);
     });
+  });
+
+  describe('Create a PLD with Outside context', () => {
+
+    let org: OrganizationDocument;
+    const users = {
+      justin: undefined,
+      victor: undefined,
+      baptiste: undefined,
+      theo: undefined,
+      corentin: undefined,
+      clement: undefined,
+      van: undefined,
+    }
+
+    beforeAll(async () => {
+      users.victor = await userService.create(UserMock.createUser({email: 'victor.sauvaget@epitech.eu'}));
+      users.justin = await userService.create(UserMock.createUser({email: 'justin.menard@epitech.eu'}));
+      users.baptiste = await userService.create(UserMock.createUser({email: 'baptiste.renouf@epitech.eu'}));
+      users.theo = await userService.create(UserMock.createUser({email: 'theo.fargeas@epitech.eu'}));
+      users.corentin = await userService.create(UserMock.createUser({email: 'corentin.bourdeaux@epitech.eu'}));
+      users.clement = await userService.create(UserMock.createUser({email: 'clement.boulay@epitech.eu'}));
+      users.van = await userService.create(UserMock.createUser({email: 'van.jspquoi@epitech.eu'}));
+      org = await orgService.create(OrganizationMock.createOrg({owner: users.victor, name: 'Outside', members: [users.van, users.clement, users.theo, users.justin, users.baptiste, users.corentin]}));
+    })
+
+    it('test org not null', () => {
+      expect(org).not.toBeNull();
+      console.log(org);
+    })
   })
 });

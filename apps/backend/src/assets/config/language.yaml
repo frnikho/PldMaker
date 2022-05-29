@@ -1,3 +1,8 @@
 auth:
   userAlreadyRegistered: "User already registered with this email address !"
   userNotFound: "User not found"
+  wrongPassword: "Incorrect password"
+dodStatus:
+  todo: 'A faire'
+  in_progress: 'En cours'
+  done: 'Fini'
