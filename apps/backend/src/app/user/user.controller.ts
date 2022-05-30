@@ -1,13 +1,14 @@
 import {Body, Controller, Get, Param, Post, Request} from '@nestjs/common';
 import {UpdateUserBody} from "../../../../../libs/data-access/user/UpdateUserBody";
 import {UserService} from "./user.service";
+import {UserDocument} from "./user.schema";
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get(['', 'get'])
-  public async find(@Request() req) {
+  public async find(@Request() req): Promise<UserDocument> {
     return this.userService.find(req.user._id);
   }
 

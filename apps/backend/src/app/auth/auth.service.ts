@@ -6,6 +6,7 @@ import {UserDocument} from "../user/user.schema";
 import {RegisterUserBody} from "../../../../../libs/data-access/auth/RegisterUserBody";
 import {ConfigService} from "@nestjs/config";
 import {LANGUAGE_CONFIG_LABEL, LanguageConfig} from "../config/language";
+import {RegisterResponse} from "../../../../../libs/data-access/auth/RegisterResponse";
 @Injectable()
 export class AuthService {
 
@@ -32,18 +33,27 @@ export class AuthService {
     }
   }
 
-  public async register(body: RegisterUserBody) {
+  public async register(body: RegisterUserBody): Promise<RegisterResponse> {
     const user = await this.usersService.findByEmail(body.email);
     if (user !== null && user.email === body.email) {
       throw new BadRequestException(this.config.get<LanguageConfig>(LANGUAGE_CONFIG_LABEL).auth.userAlreadyRegistered);
     }
     const hashedPassword = await bcrypt.hash(body.password, 10);
-    return this.usersService.create({
+    const createdUser: UserDocument = await this.usersService.create({
       email: body.email,
       password: hashedPassword,
       roles: ['user'],
       updated_date: new Date(),
       created_date: new Date()
     });
+    return {
+      accessToken: this.login(createdUser).access_token,
+      user: {
+        email: createdUser.email,
+        created_date: createdUser.created_date,
+        updated_date: createdUser.updated_date,
+        uuid: createdUser._id,
+      }
+    };
   }
 }

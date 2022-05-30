@@ -28,6 +28,9 @@ class Server {
       defaultVersion: '1',
       type: VersioningType.URI,
     });
+    this.app.enableCors({
+      origin: process.env.NX_CLIENT_HOST,
+    });
     this.app.useGlobalPipes(new ValidationPipe());
   }
 

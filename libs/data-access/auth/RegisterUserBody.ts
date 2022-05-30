@@ -7,5 +7,10 @@ export class RegisterUserBody {
 
   @IsNotEmpty()
   @Length(5, 32)
-  public password: string;
+  public password: string ;
+
+  constructor(email: string, password: string) {
+    this.email = email;
+    this.password = password;
+  }
 }
