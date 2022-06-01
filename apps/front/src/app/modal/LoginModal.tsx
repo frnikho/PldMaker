@@ -1,16 +1,19 @@
 import React from "react";
 import {
   Form,
-  InlineLoading,
+  InlineLoading, Link,
   Modal,
-  TextInput
+  TextInput, Tile
 } from "carbon-components-react";
 import {Stack} from '@carbon/react';
 import {UserContext, UserContextProps} from "../context/UserContext";
+import {User} from "../../../../../libs/data-access/user/User";
 
 type LoginModalProps = {
   open: boolean;
   onDismiss: () => void;
+  onUserLogged: (user: User) => void;
+  switchToRegister: () => void;
 }
 
 type LoginModalState = {
@@ -34,17 +37,19 @@ export class LoginModal extends React.Component<LoginModalProps, LoginModalState
   public onClickCreate(authContext: UserContextProps) {
     if (this.state.email === undefined || this.state.password === undefined)
       return;
-    authContext.login(this.state.email, this.state.password).then((response) => {
+    this.setState({loading: true});
+    authContext.login(this.state.email, this.state.password, (user, error) => {
       this.setState({
         loading: false,
       });
-      if (response === null) {
-        // TODO create notification error
+      if (user !== null && error === undefined) {
+        this.props.onUserLogged(user);
       } else {
-        console.log("Connected !");
+        // TODO create notification error
+        console.log("Error login: ", error);
       }
     });
-    this.setState({loading: true});
+
   }
 
   override render() {
@@ -70,6 +75,9 @@ export class LoginModal extends React.Component<LoginModalProps, LoginModalState
                 <TextInput id="mdp" type={"password"} labelText="Mot de passe" onChange={(event) => this.setState({password: event.target.value})}/>
               </Stack>
             </Form>
+            <br />
+            <br />
+            Pas encore de compte ? <Link onClick={() => this.props.switchToRegister()}>Inscrivez vous ici !</Link>
           </Modal>
         }}
       </UserContext.Consumer>

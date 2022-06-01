@@ -1,13 +1,12 @@
 import React from "react";
-import {Test} from "../app";
-import {Button} from "carbon-components-react";
-import {LoginModal} from "../modal/LoginModal";
-import {RegisterModal} from "../modal/RegisterModal";
+import {UserContext} from "../context/UserContext";
+import {OrganizationHomeDashboard} from "../component/OrganizationHomeDashboard";
+import {Content, SkeletonPlaceholder} from "carbon-components-react";
 
 export type HomePageProps = unknown;
+
 export type HomePageState = {
-  loginOpenModal: boolean;
-  registerOpenModal: boolean;
+  loading: boolean;
 };
 
 export class HomePage extends React.Component<HomePageProps, HomePageState> {
@@ -15,30 +14,24 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
   constructor(props: HomePageProps) {
     super(props);
     this.state = {
-      loginOpenModal: false,
-      registerOpenModal: false,
+      loading: true
     }
   }
 
-  override componentDidMount() {
-    console.log("Homepage");
-  }
-
-
-
   override render() {
     return (
-        <>
-          <Button onClick={() => this.setState({loginOpenModal: true})}>
-            Login
-          </Button>
-          <Button onClick={() => this.setState({registerOpenModal: true})}>
-            Register
-          </Button>
-          <LoginModal open={this.state.loginOpenModal} onDismiss={() => this.setState({loginOpenModal: false})}/>
-          <RegisterModal open={this.state.registerOpenModal} onDismiss={() => this.setState({registerOpenModal: false})}/>
-          <Test/>
-        </>
+      <>
+        <Content>
+          <UserContext.Consumer>
+            {userContext => {
+              return (
+                <>
+                  {!userContext.isLogged ? <SkeletonPlaceholder style={{height: '20px', width: '20%'}}/> : <h1>Hello WorldHello WorldHello World</h1>}
+                </>);
+            }}
+          </UserContext.Consumer>
+        </Content>
+      </>
     );
   }
 

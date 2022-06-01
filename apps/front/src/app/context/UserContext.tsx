@@ -1,27 +1,31 @@
 import React from "react";
 import {Cookies, ReactCookieProps, withCookies} from "react-cookie";
-import api from "../util/api";
+import api from "../util/Api";
 import {User} from "../../../../../libs/data-access/user/User";
 import {LoginToken} from "../../../../../libs/data-access/auth/LoginToken";
-import {AxiosError, AxiosResponse} from "axios";
+import {AxiosError} from "axios";
 import {LoginBody} from "../../../../../libs/data-access/auth/LoginBody";
 import {RegisterUserBody} from "../../../../../libs/data-access/auth/RegisterUserBody";
-import {RegisterResponse} from "../../../../../libs/data-access/auth/RegisterResponse";
+import {RegisterError, RegisterResponse} from "../../../../../libs/data-access/auth/RegisterResponse";
+import {LoginError} from "../../../../../libs/data-access/auth/LoginResponse";
+import {UserApiController} from "../controller/UserApiController";
 
 export const ACCESS_TOKEN_COOKIE_NS = 'access_token';
 
 export type UserContextProps = {
-  login: (email: string, password: string) => Promise<User | null>;
-  register: (email: string, password: string) => Promise<unknown | null>;
+  login: (email: string, password: string, callback: (user: User | null , error?: LoginError) => unknown) => void;
+  register: (email: string, password: string, callback: (user: User | null , error?: RegisterError) => unknown) => void;
   logout: () => void;
   isLogged: boolean;
   user?: User;
   accessToken?: string;
+  init: boolean;
 }
 
 export const UserContext = React.createContext<UserContextProps>({
-  login: async () => null,
-  register: async () => null,
+  init: false,
+  login: () => null,
+  register: () => null,
   logout: () => null,
   isLogged: false,
 });
@@ -34,78 +38,139 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   constructor(props: UserContextProviderProps) {
     super(props);
     this.state = {
+      init: false,
       logout: this.logout.bind(this),
       login: this.login.bind(this),
       register: this.register.bind(this),
       isLogged: false,
     }
-  }
-
-  override componentDidMount() {
+    this.login = this.login.bind(this);
+    this.register = this.register.bind(this);
+    this.logout = this.logout.bind(this);
     if (this.props.cookies !== undefined) {
-      this.loadUserFromCookies(this.props.cookies).then((data) => {
-        if (data?.user !== undefined) {
-          this.setState({
-            user: data.user,
-            accessToken: data.accessToken
-          })
-        }
+      this.loadUserFromCookies(this.props.cookies, (data, error) => {
+        setTimeout(() => { //TODO remove this later to remove reload interval between each save
+          if (data?.user !== undefined && error === undefined) {
+            this.setState({
+              isLogged: true,
+              user: data.user,
+              accessToken: data.accessToken,
+              init: true
+            })
+          } else {
+            this.setState({
+              isLogged: false,
+              init: true,
+            })
+          }
+        }, 1000);
       });
     }
   }
 
-  public async loadUserFromCookies(cookies: Cookies): Promise<{ user: User, accessToken: string } | null> {
+  override shouldComponentUpdate(nextProps: Readonly<UserContextProviderProps>, nextState: Readonly<UserContextProviderState>, nextContext: any): boolean {
+    console.log("=============");
+    console.log(nextProps);
+    console.log(this.props);
+    console.log("---------------");
+    console.log(nextState);
+    console.log(this.state);
+    console.log("=============");
+    return true;
+  }
+
+  public loadUserFromCookies(cookies: Cookies, callback: ({user, accessToken}: {user: User, accessToken: string}, error?: string) => void): void {
     const access_token = cookies.get(ACCESS_TOKEN_COOKIE_NS);
     if (access_token !== undefined) {
       const loginBody: LoginToken = {access_token};
-      const response: AxiosResponse | AxiosError = await api.post(`user`, loginBody);
-      console.log(response);
+      UserApiController.getMe(loginBody.access_token, (user, error) => {
+        if (user !== null && error === undefined) {
+          callback({user, accessToken: loginBody.access_token});
+        }
+      });
+    } else {
+      //TODO generate error
     }
-    return null;
+  }
+
+  public saveTokenFromCookies(accessToken: string, cookies: Cookies): void {
+    cookies.set(ACCESS_TOKEN_COOKIE_NS, accessToken, {path: '/'});
+  }
+
+  public clearTokenFromCookies(cookies: Cookies): void {
+    cookies.remove(ACCESS_TOKEN_COOKIE_NS, {path: '/'});
   }
 
   public logout() {
+    if (this.props.cookies === undefined)
+      return;
+    this.clearTokenFromCookies(this.props.cookies);
     this.setState({
       user: undefined,
       isLogged: false,
-    })
+    });
   }
 
-  public async login(email: string, password: string): Promise<User | null> {
+  public login(email: string, password: string, callback: (user: User | null, error?: LoginError) => unknown): void {
     const loginBody: LoginBody = {email, password};
-    try {
-      const response: AxiosResponse<LoginToken> = await api.post(`auth/login`, loginBody);
-      console.log(response);
-    } catch (ex) {
-      console.log(ex);
-      return null;
+    if (this.props.cookies === undefined) {
+      // TODO check error
+      console.log("error cookies")
+      callback(null);
+      return;
     }
-    return null;
+    api.post<LoginToken>(`auth/login`, loginBody).then((response) => {
+      if (response.data !== undefined) {
+        UserApiController.getMe(response.data.access_token, (user, error) => {
+          if (user !== null && error === undefined && this.props?.cookies !== undefined) {
+            this.saveTokenFromCookies(response.data.access_token, this.props.cookies);
+            this.setState({
+              user: user,
+              accessToken: response.data.access_token,
+              isLogged: true
+            })
+            return callback(user);
+          } else {
+            console.log('Error login:', error);
+          }
+        });
+      } else {
+        console.log("Response is undefined ");
+      }
+    }).catch((err: AxiosError<LoginError>) => {
+      if (err?.response?.data !== undefined) {
+        callback(null, err.response.data);
+      } else {
+        console.log("Error Axios", err);
+      }
+    });
   }
 
-  public async register(email: string, password: string): Promise<User | null> {
+  public register(email: string, password: string, callback: (user: User | null , error?: RegisterError) => unknown): void {
     const registerBody: RegisterUserBody = {password, email};
-    try {
-      const response: AxiosResponse<RegisterResponse> = await api.post(`auth/register`, registerBody);
+    api.post<RegisterResponse>(`auth/register`, registerBody).then((response) => {
       this.setState({
         isLogged: true,
         user: response.data.user,
         accessToken: response.data.accessToken
       });
-      return response.data.user;
-    } catch (ex) {
-      console.log(ex);
-      return null;
-    }
+    }).catch((error: AxiosError<RegisterError>) => {
+      if (error?.response?.data !== undefined)
+        return callback(null, error.response.data);
+    });
   }
 
   override render() {
     return (
-      <UserContext.Provider value={this.state}>
+      <UserContext.Provider value={{...this.state}}>
         {this.props.children}
       </UserContext.Provider>
     );
   }
+}
+
+export type RequiredUserContextProps = {
+  userContext: UserContextProps
 }
 
 export default withCookies(UserContextProvider);

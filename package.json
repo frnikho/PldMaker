@@ -9,6 +9,7 @@
   },
   "private": true,
   "dependencies": {
+    "@carbon/icons-react": "^11.4.0",
     "@carbon/react": "latest",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.0.1",
@@ -27,6 +28,7 @@
     "core-js": "^3.6.5",
     "js-yaml": "^4.1.0",
     "log4js": "^6.5.1",
+    "lottie-react": "^2.2.1",
     "mongodb-memory-server": "^8.5.2",
     "mongoose": "^6.3.4",
     "mongoose-autopopulate": "^0.16.1",
