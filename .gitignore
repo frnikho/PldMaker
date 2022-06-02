@@ -41,3 +41,5 @@ Thumbs.db
 **/*.env
 .vscode
 .idea
+yarn.lock
+**/package-lock.json

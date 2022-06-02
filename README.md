@@ -73,3 +73,53 @@ signé un PLD signifie qu'il a été verifier et qu'il ne serat plus modifiable 
 - avoir une roadmap permettant de savoir dans le temps ou se situe l'avancement des Dods
 - permettre la duplication de Dod
 - avoir une todo list partagé dans l'organization (pourquoi pas la linker aux issue de github ?)
+
+## Installation
+
+### Docker et Docker compose
+
+prérequis: 
+- installer docker et docker compose pour pouvoir lancer les commandes suivantes
+- créer un fichier .env (prenez comme example le .env.example)
+
+```shell
+$ ~/PLD/ docker compose up
+```
+
+### NX 
+
+prérequis:
+- avoir une database NoSQL mongodb
+- créer un fichier .env (prenez comme example le .env.example)
+- installer NX:
+
+```shell
+$ ~/PLD/ sudo npm i -g nx
+```
+
+puis installer les dépendances via npm:
+
+```shell
+$ ~/PLD/ npm i
+```
+
+ou via pnpm
+
+```shell
+$ ~/PLD/ pnpm i 
+```
+
+```shell
+$ ~/PLD/ nx build backend
+$ ~/PLD/ nx build front
+```
+
+```shell
+$ ~/PLD/ nx server backend
+$ ~/PLD/ nx server front
+```
+
+```shell
+$ ~/PLD/ nx test backend
+$ ~/PLD/ nx test front
+```

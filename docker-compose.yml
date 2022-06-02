@@ -5,16 +5,21 @@ services:
       context: ./
       dockerfile: Dockerfile
       target: backend
+    container_name: pld_backend
+    networks:
+      - pld
     ports:
-      - "3333:3333"
+      - "${SERVER_PORT}:${SERVER_PORT}"
   pld_frontend:
     build:
       context: ./
       dockerfile: Dockerfile
       target: frontend
     container_name: pld_frontend
+    networks:
+      - pld
     ports:
-      - "4200:4200"
+      - "${CLIENT_PORT}:${CLIENT_PORT}"
     depends_on:
       - mongo
   mongo:
@@ -22,7 +27,7 @@ services:
     restart: always
     container_name: mongodb
     ports:
-      - "27017-27019:27017-27019"
+      - "${MONGODB_PORT}:${MONGODB_PORT}"
     networks:
       - pld
     volumes:
