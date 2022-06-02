@@ -1,5 +1,7 @@
 # PLD
 
+### Epitech EIP PLD Maker
+
 ### description
 
 le but de ce projet est de simplifier le suivi et la création de PLD avec son équipe. la création du PLD se fera via une interface web ou l'utilisateur devras se connecter afin de pouvoir retrouver son organisation.
@@ -57,5 +59,17 @@ Le tableau des révisions var récuperer les anciennes versions du PLD pour les 
 
 #### l'état du PLD
 
-a la fin du PLD, il serat possible de le sauvegarder ou bien de le signé.
+a la fin du PLD, il sera possible de le sauvegarder ou bien de le signé.
 signé un PLD signifie qu'il a été verifier et qu'il ne serat plus modifiable dans le temps
+
+### Features a faire en Build
+
+- Créer un pld dans une organization, suivre son avancement et permettre la completion de différents champs (Dod, Description, Reste a faire)
+- Generer un docx du pld, les dods séparement et suivre leur version dans le temps
+
+### Features a faire en Run
+
+- création d'un system de socket pour les notifications en temps réel, modification du même document, voir les members en ligne d'une organization, 
+- avoir une roadmap permettant de savoir dans le temps ou se situe l'avancement des Dods
+- permettre la duplication de Dod
+- avoir une todo list partagé dans l'organization (pourquoi pas la linker aux issue de github ?)
