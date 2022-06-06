@@ -18,16 +18,15 @@ export type UserContextProps = {
   logout: () => void;
   isLogged: boolean;
   user?: User;
-  accessToken?: string;
-  init: boolean;
+  accessToken: string;
 }
 
 export const UserContext = React.createContext<UserContextProps>({
-  init: false,
   login: () => null,
   register: () => null,
   logout: () => null,
   isLogged: false,
+  accessToken: '',
 });
 
 export type UserContextProviderState = UserContextProps
@@ -38,15 +37,20 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   constructor(props: UserContextProviderProps) {
     super(props);
     this.state = {
-      init: false,
       logout: this.logout.bind(this),
       login: this.login.bind(this),
       register: this.register.bind(this),
       isLogged: false,
+      user: undefined,
+      accessToken: ''
     }
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
     this.logout = this.logout.bind(this);
+  }
+
+  override componentDidMount() {
+    console.log("UserContext mounted");
     if (this.props.cookies !== undefined) {
       this.loadUserFromCookies(this.props.cookies, (data, error) => {
         setTimeout(() => { //TODO remove this later to remove reload interval between each save
@@ -55,28 +59,15 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
               isLogged: true,
               user: data.user,
               accessToken: data.accessToken,
-              init: true
             })
           } else {
             this.setState({
               isLogged: false,
-              init: true,
             })
           }
         }, 1000);
       });
     }
-  }
-
-  override shouldComponentUpdate(nextProps: Readonly<UserContextProviderProps>, nextState: Readonly<UserContextProviderState>, nextContext: any): boolean {
-    console.log("=============");
-    console.log(nextProps);
-    console.log(this.props);
-    console.log("---------------");
-    console.log(nextState);
-    console.log(this.state);
-    console.log("=============");
-    return true;
   }
 
   public loadUserFromCookies(cookies: Cookies, callback: ({user, accessToken}: {user: User, accessToken: string}, error?: string) => void): void {
@@ -161,6 +152,7 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   }
 
   override render() {
+    console.log("render user context");
     return (
       <UserContext.Provider value={{...this.state}}>
         {this.props.children}

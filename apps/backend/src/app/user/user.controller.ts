@@ -17,9 +17,14 @@ export class UserController {
     return this.userService.updateByBody(req.user._id, updateBody);
   }
 
-  @Get('get/:userId')
+  @Get('find/id/:userId')
   public async findUser(@Param('userId') userId: string) {
     return this.userService.find(userId);
+  }
+
+  @Get('find/email/:email')
+  public async findUserByEmail(@Param('email') email: string) {
+    return this.userService.findByEmail(email);
   }
 
   @Get('gets')

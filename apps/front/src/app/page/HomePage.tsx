@@ -1,7 +1,8 @@
 import React from "react";
 import {UserContext} from "../context/UserContext";
-import {OrganizationHomeDashboard} from "../component/OrganizationHomeDashboard";
+import {OrganizationHomeDashboard} from "../component/home/OrganizationHomeDashboard";
 import {Content, SkeletonPlaceholder} from "carbon-components-react";
+import {PldHomeDashboard} from "../component/home/PldHomeDashboard";
 
 export type HomePageProps = unknown;
 
@@ -26,7 +27,8 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
             {userContext => {
               return (
                 <>
-                  {!userContext.isLogged ? <SkeletonPlaceholder style={{height: '20px', width: '20%'}}/> : <h1>Hello WorldHello WorldHello World</h1>}
+                  {!userContext.isLogged ? <SkeletonPlaceholder style={{height: '20px', width: '20%'}}/> : <OrganizationHomeDashboard userContext={userContext}/>}
+                  {!userContext.isLogged ? <SkeletonPlaceholder style={{marginTop: '50px', height: '20px', width: '20%'}}/> : <PldHomeDashboard userContext={userContext}/>}
                 </>);
             }}
           </UserContext.Consumer>

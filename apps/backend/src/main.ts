@@ -4,6 +4,9 @@ import {NestFactory} from '@nestjs/core';
 import {AppModule} from './app/app.module';
 import {NestExpressApplication} from "@nestjs/platform-express";
 import {Logger} from "./app/logger/logger";
+import {Transform} from "stream";
+import {TransformInterceptor} from "./app/transform.interceptor";
+import {MongoExceptionFilter} from "./app/mongo.exceptionfilter";
 
 class Server {
 
@@ -32,6 +35,7 @@ class Server {
       origin: process.env.NX_CLIENT_HOST,
     });
     this.app.useGlobalPipes(new ValidationPipe());
+    this.app.useGlobalInterceptors(new TransformInterceptor());
   }
 
   private onServerOpened() {

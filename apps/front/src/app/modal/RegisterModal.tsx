@@ -32,9 +32,15 @@ export class RegisterModal extends React.Component<RegisterModalProps, RegisterM
   constructor(props: RegisterModalProps) {
     super(props);
     this.state = {
-      password: {},
-      verifiedPassword: {},
-      email: {},
+      password: {
+        value: ''
+      },
+      verifiedPassword: {
+        value: ''
+      },
+      email: {
+        value: ''
+      },
       loading: false,
     }
     this.onClickRegister = this.onClickRegister.bind(this);

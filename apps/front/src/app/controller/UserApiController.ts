@@ -1,16 +1,34 @@
-import api, {authorize} from "../util/Api";
+import api, {ApiError, authorize, ErrorType} from "../util/Api";
 import {User} from "../../../../../libs/data-access/user/User";
-import {AxiosError} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
+
+export type CallbackUser = (user: User | null, error?: ApiError) => void;
 
 export class UserApiController {
 
-  public static getMe(accessToken: string, callback: (user: User | null, error?: string) => unknown) {
+  public static getMe(accessToken: string, callback: CallbackUser) {
     api.get<User>('user', authorize(accessToken)).then((response) => {
-      if (response.data) {
-        callback(response.data);
-      }
-    }).catch((err: AxiosError<any>) => {
-      callback(null, 'TBD');
+      callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      callback(null, err.response?.data);
+    });
+  }
+
+  public static findUserByEmail(accessToken: string, userEmail: string, callback: CallbackUser) {
+    api.get<User | null>(`user/find/email/${userEmail}`, authorize(accessToken)).then((response: AxiosResponse<User | null>) => {
+      if (response.data?._id === undefined)
+        return callback(null, {error: 'Aucun utilisateur trouvé avec cette adresse email', type: ErrorType.NO_USER_FOUND_EMAIL});
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data);
+    });
+  }
+
+  public static findUserById(userId: string, callback: CallbackUser) {
+    api.get<User>(`user/find/id/${userId}`).then((response: AxiosResponse<User>) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data)
     });
   }
 

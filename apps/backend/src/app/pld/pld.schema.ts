@@ -47,7 +47,7 @@ export class Pld extends DatedObjectSchema {
    * joue également sur le champ email
    */
 
-  @Prop({required: true})
+  @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true})
   manager: User;
 
   /**

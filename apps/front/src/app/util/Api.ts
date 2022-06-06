@@ -21,3 +21,20 @@ export const authorize = (accessToken: string) => {
 export const getHeaders = () => {
   return '';
 };
+
+export type ApiError = {
+  statusCode: number;
+  message: string[];
+  error: string;
+  type: ErrorType.API_ERROR,
+} | Error
+
+export type Error = {
+  error: string,
+  type: ErrorType
+}
+
+export enum ErrorType {
+  API_ERROR = '',
+  NO_USER_FOUND_EMAIL = 'NO_USER_FOUND_EMAIL',
+}

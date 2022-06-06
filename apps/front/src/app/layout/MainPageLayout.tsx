@@ -1,17 +1,17 @@
 import React from "react";
 import {Outlet} from "react-router-dom";
 import {
-  Button, ButtonSkeleton, Content,
+  Column, Content, Grid,
   Header,
-  HeaderContainer, HeaderGlobalAction, HeaderGlobalBar, HeaderMenu,
-  HeaderMenuButton, HeaderMenuItem,
-  HeaderName, HeaderNavigation,
+  HeaderContainer, HeaderGlobalAction, HeaderGlobalBar,
+  HeaderMenuButton,
+  HeaderName,
   SideNav,
-  SideNavItems, SideNavLink, SideNavMenu, SideNavMenuItem,
+  SideNavItems, SideNavLink,
   SkipToContent
 } from "carbon-components-react";
 
-import {Bee, Notification, Login, Dashboard, Events} from '@carbon/icons-react'
+import {Bee, Login, Dashboard, Events} from '@carbon/icons-react'
 
 import {UserContext, UserContextProps} from "../context/UserContext";
 import {AuthModalComponent} from "../component/AuthModalComponent";
@@ -124,7 +124,11 @@ export class MainPageLayout extends React.Component<unknown, MainPageLayoutState
             </SideNav>
           </Header>
           <Content id="main-content">
-            <Outlet/>
+            <Grid>
+              <Column sm={4} md={8} lg={16}>
+                <Outlet/>
+              </Column>
+            </Grid>
           </Content>
         </>
        )}

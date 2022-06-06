@@ -1,7 +1,7 @@
-import {DattedObject} from "../DattedObject";
+import {DatedObject} from "../DatedObject";
 
 export type User = {
-  uuid?: string;
+  _id: string;
   email: string;
   password?: string;
-} & DattedObject
+} & DatedObject

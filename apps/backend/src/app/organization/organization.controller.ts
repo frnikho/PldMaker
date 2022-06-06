@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Post, Request} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Request, UseFilters} from '@nestjs/common';
 import {OrganizationService} from "./organization.service";
 import {CreateOrganizationBody} from "../../../../../libs/data-access/organization/CreateOrganizationBody";
 import {
@@ -6,6 +6,8 @@ import {
 } from "../../../../../libs/data-access/organization/ManageMembersOrganizationBody";
 import {UpdateOrganizationBody} from "../../../../../libs/data-access/organization/UpdateOrganizationBody";
 import {DeleteOrganizationBody} from "../../../../../libs/data-access/organization/DeleteOrganizationBody";
+import {MongoExceptionFilter} from "../mongo.exceptionfilter";
+import {ObjectIDPipe} from "../ObjectID.pipe";
 
 @Controller('organization')
 export class OrganizationController {
@@ -33,9 +35,14 @@ export class OrganizationController {
     return this.orgService.findOrgsByAuthor(req.user._id);
   }
 
-  @Get('get/:orgId')
-  public async getOrg(@Request() req, @Param('orgId') orgId: string) {
+  @Get('find/id/:orgId')
+  public async getOrg(@Request() req, @Param('orgId', new ObjectIDPipe()) orgId: string) {
     return this.orgService.find(orgId);
+  }
+
+  @Get('find/name/:orgName')
+  public async findOrgName(@Request() req, @Param('orgName') orgName: string) {
+    //TODO finish function controller
   }
 
   @Post('addMembers')

@@ -8,16 +8,22 @@ export type DodDocument = Dod & Document;
 @Schema()
 export class Dod extends DatedObjectSchema {
 
-  @Prop()
+  @Prop({required: true})
   version: number;
 
-  @Prop()
+  @Prop({required: true})
   title: string;
 
-  @Prop()
+  @Prop({required: true})
+  skinOf: string;
+
+  @Prop({required: true})
+  want: string;
+
+  @Prop({required: true})
   description: string;
 
-  @Prop()
+  @Prop({required: true})
   descriptionOfDone: string[];
 
   estimatedWorkTime: EstimatedWorkTime[];

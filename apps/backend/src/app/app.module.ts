@@ -37,10 +37,10 @@ import { TemplateModule } from './template/template.module';
         };
       }
     }),
+    AuthModule,
     SettingsModule,
     UserModule,
     OrganizationModule,
-    AuthModule,
     ConfigModule,
     LoggerModule,
     PldModule,

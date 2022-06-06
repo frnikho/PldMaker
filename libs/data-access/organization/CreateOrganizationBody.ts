@@ -9,8 +9,18 @@ export class CreateOrganizationBody {
   @IsOptional()
   public description?: string;
 
-  @Min(0.01)
-  @Max(1.00)
+  @Min(0)
+  @Max(2.00)
   public versionShifting: number;
+
+  @IsOptional()
+  public invitedMembers: string[];
+
+  constructor(name: string, versionShifting: number, invitedMembers: string[]) {
+    this.name = name;
+    this.versionShifting = versionShifting;
+    this.invitedMembers = invitedMembers;
+  }
+
 
 }
