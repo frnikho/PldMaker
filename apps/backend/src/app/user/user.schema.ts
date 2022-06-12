@@ -17,6 +17,12 @@ export class User extends DatedObjectSchema {
   @Prop({required: true})
   roles: string[];
 
+  @Prop({required: false, default: undefined})
+  firstname?: string;
+
+  @Prop({required: false, default: undefined})
+  lastname?: string;
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

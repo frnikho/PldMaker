@@ -42,6 +42,7 @@ describe('OrganizationService', () => {
       const body: CreateOrganizationBody = {
         name: 'abc',
         versionShifting: 1.0,
+        invitedMembers: []
       }
       try {
         await service.createByBody(body, 'abc123');

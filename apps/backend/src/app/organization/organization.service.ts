@@ -1,23 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import {BadRequestException, Injectable} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
-import {Organization, OrganizationDocument} from "./organization.schema";
+import {Organization, OrganizationDocument, OrganizationPreferences} from "./organization.schema";
 import {Model, ObjectId} from "mongoose";
 import {CreateOrganizationBody} from "../../../../../libs/data-access/organization/CreateOrganizationBody";
 import {UserDocument} from "../user/user.schema";
 import {UpdateOrganizationBody} from "../../../../../libs/data-access/organization/UpdateOrganizationBody";
 import {DeleteOrganizationBody} from "../../../../../libs/data-access/organization/DeleteOrganizationBody";
+import {UserService} from "../user/user.service";
+import {InviteUserOrgBody} from "../../../../../libs/data-access/organization/ManageMembersOrganizationBody";
 
 export type MemberUpdateObjects = UserDocument[] | string[] | ObjectId[];
 
 @Injectable()
 export class OrganizationService {
 
-  constructor(@InjectModel(Organization.name) private organizationModel: Model<Organization>) {}
+  constructor(@InjectModel(Organization.name) private organizationModel: Model<Organization>, private userService: UserService) {}
 
   public find(orgObjectId: string): Promise<OrganizationDocument | null> {
     return this.organizationModel.findOne({_id: orgObjectId})
-      .populate('owner')
-      .populate('members')
+      .populate(['owner', 'members'])
       .exec();
   }
 
@@ -46,8 +47,7 @@ export class OrganizationService {
 
   public update(orgObjectId: string, ownerId: string, org: Organization): Promise<OrganizationDocument | null> {
     return this.organizationModel.findOneAndUpdate({_id: orgObjectId, owner: ownerId}, org, {new: true})
-      .populate('owner')
-      .populate('members')
+      .populate(['owner', 'members'])
       .exec();
   }
 
@@ -55,22 +55,19 @@ export class OrganizationService {
     const orgId = body.orgId;
     delete body.orgId;
     return this.organizationModel.findOneAndUpdate({_id: orgId, owner: ownerId}, {...body, updated_date: new Date()}, {new: true})
-      .populate('owner')
-      .populate('members')
+      .populate(['owner', 'members'])
       .exec();
   }
 
   public findOrgsByAuthor(userObjectId: string): Promise<OrganizationDocument[] | null> {
     return this.organizationModel.find({owner: userObjectId})
-      .populate('owner')
-      .populate('members')
+      .populate(['owner', 'members'])
       .exec();
   }
 
   public findOrgsContainingMember(userObjectId: string): Promise<OrganizationDocument[] | null> {
     return this.organizationModel.find({members: userObjectId})
-      .populate('owner')
-      .populate('members')
+      .populate(['owner', 'members'])
       .exec();
   }
 
@@ -79,8 +76,21 @@ export class OrganizationService {
       .exec();
   }
 
-  public async removeMembers(orgId: string, ownerId:string, userId: MemberUpdateObjects): Promise<OrganizationDocument | null> {
+  public async addMembersByEmail(ownerId: string, body: InviteUserOrgBody): Promise<OrganizationDocument | null> {
+    const user: UserDocument | null = await this.userService.findByEmail(body.memberEmail);
+    if (user === null)
+      throw new BadRequestException(`can't found user email !`);
+    return this.organizationModel.findOneAndUpdate({_id: body.orgId, owner: ownerId}, {$addToSet: {members: user._id}}, {new: true, populate: ['members', 'owner']})
+      .exec();
+  }
+
+  public async removeMembers(orgId: string, ownerId: string, userId: MemberUpdateObjects): Promise<OrganizationDocument | null> {
     return this.organizationModel.findOneAndUpdate({_id: orgId, owner: ownerId}, {$pull: {members: {$in: userId}}}, {new: true, populate: ['members', 'owner']})
+      .exec();
+  }
+
+  public async updatePreferences(orgId: string, pref: OrganizationPreferences) {
+    return this.organizationModel.findOneAndUpdate({_id: orgId}, {preferences: pref}, {new: true, populate: ['owner', 'members']})
       .exec();
   }
 

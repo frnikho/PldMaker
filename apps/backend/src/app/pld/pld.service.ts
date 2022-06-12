@@ -5,6 +5,9 @@ import {Model} from "mongoose";
 import {PldOwnerType} from "../../../../../libs/data-access/pld/PldOwnerType";
 import {PldOrgCreateBody} from "../../../../../libs/data-access/pld/PldBody";
 import {PldStatus} from "../../../../../libs/data-access/pld/PldStatus";
+import {CreatePldRevisionBody} from "../../../../../libs/data-access/pld/Pld";
+import {User} from "../user/user.schema";
+import {PldUpdateBody} from "../../../../../libs/data-access/pld/PldUpdateBody";
 
 @Injectable()
 export class PldService {
@@ -32,21 +35,40 @@ export class PldService {
 
   public async find(pldId: string): Promise<PldDocument | null> {
     return this.pldModel.findOne({_id: pldId})
-      .populate('owner')
+      .populate(['owner', 'manager'])
       .exec();
   }
 
   public async findByOrganizationOwner(orgId: string): Promise<PldDocument[] | null> {
-    return this.pldModel.find({ownerType: PldOwnerType.Organization, owner: orgId});
+    return this.pldModel.find({ownerType: PldOwnerType.Organization, owner: orgId})
+      .populate(['owner', 'manager'])
+      .exec();
+  }
+
+  public async updateWithBody(body: PldUpdateBody) {
+    return this.pldModel.findOneAndUpdate({_id: body.pldId}, {updated_date: new Date(), title: body.title, description: body.description, manager: body.manager, promotion: body.promotion}, {new: true, populate: ['owner', 'manager']})
+      .exec();
   }
 
   public async update(pldId: string, ownerId: string, pld: PldDocument): Promise<PldDocument | null> {
-    return this.pldModel.findOneAndUpdate({_id: pldId, owner: ownerId}, pld, {new: true, populate: 'owner'})
+    return this.pldModel.findOneAndUpdate({_id: pldId, owner: ownerId}, {...pld, updated_date: new Date()}, {new: true, populate: ['owner', 'manager']})
       .exec();
   }
 
   public async delete(pldId: string, ownerId: string): Promise<PldDocument | null> {
-    return this.pldModel.findOneAndDelete({_id: pldId, owner: ownerId}, {populate: 'owner'})
+    return this.pldModel.findOneAndDelete({_id: pldId, owner: ownerId}, {populate: ['owner', 'manager']})
+      .exec();
+  }
+
+  public async addRevision(pldId: string, body: CreatePldRevisionBody) {
+    return this.pldModel.findOneAndUpdate({_id: pldId}, {$addToSet: {revisions: body}, version: body.version, updated_date: new Date()}, {new: true, populate: ['owner', 'manager']})
+      .populate({
+        path: 'revisions',
+        populate: {
+          path: 'owner',
+          model: User.name
+        },
+      })
       .exec();
   }
 

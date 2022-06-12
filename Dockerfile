@@ -13,7 +13,7 @@ COPY .env /app/
 WORKDIR "/app/"
 
 RUN npm i -g nx
-RUN npm i
+RUN npm i --force
 
 FROM base as backend
 WORKDIR "/app/"

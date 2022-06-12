@@ -1,12 +1,12 @@
-import {Body, Controller, Get, Param, Post, Request, UseFilters} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Request} from '@nestjs/common';
 import {OrganizationService} from "./organization.service";
 import {CreateOrganizationBody} from "../../../../../libs/data-access/organization/CreateOrganizationBody";
 import {
+  InviteUserOrgBody,
   ManageMembersOrganizationBody
 } from "../../../../../libs/data-access/organization/ManageMembersOrganizationBody";
 import {UpdateOrganizationBody} from "../../../../../libs/data-access/organization/UpdateOrganizationBody";
 import {DeleteOrganizationBody} from "../../../../../libs/data-access/organization/DeleteOrganizationBody";
-import {MongoExceptionFilter} from "../mongo.exceptionfilter";
 import {ObjectIDPipe} from "../ObjectID.pipe";
 
 @Controller('organization')
@@ -41,16 +41,16 @@ export class OrganizationController {
   }
 
   @Get('find/name/:orgName')
-  public async findOrgName(@Request() req, @Param('orgName') orgName: string) {
+  public async findOrgName(@Param('orgName') orgName: string) {
     //TODO finish function controller
   }
 
-  @Post('addMembers')
-  public async addMember(@Request() req, @Body() orgBody: ManageMembersOrganizationBody) {
-    return this.orgService.addMembers(orgBody.orgId, req.user._id, orgBody.membersId);
+  @Post('invite')
+  public async addMember(@Request() req, @Body() orgBody: InviteUserOrgBody) {
+    return this.orgService.addMembersByEmail(req.user._id, orgBody);
   }
 
-  @Post('removeMembers')
+  @Post('revoke')
   public async removeMember(@Request() req, @Body() orgBody: ManageMembersOrganizationBody) {
     return this.orgService.removeMembers(orgBody.orgId, req.user._id, orgBody.membersId);
   }

@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Post, Request} from '@nestjs/common';
+import {Body, Controller, Get, Param, Patch, Request} from '@nestjs/common';
 import {UpdateUserBody} from "../../../../../libs/data-access/user/UpdateUserBody";
 import {UserService} from "./user.service";
 import {UserDocument} from "./user.schema";
@@ -12,7 +12,7 @@ export class UserController {
     return this.userService.find(req.user._id);
   }
 
-  @Post('/update')
+  @Patch('/update')
   public async update(@Request() req, @Body() updateBody: UpdateUserBody) {
     return this.userService.updateByBody(req.user._id, updateBody);
   }

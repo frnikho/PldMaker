@@ -9,21 +9,21 @@ export type PldMockUserOwner = {
   title: string;
   description: string;
   version: number;
-  revisionsUpdated?: RevisionUpdate[];
+  revisions?: RevisionUpdate[];
 }
 
 export type PldMockUserOrg = {
-  owner: Organization;
-  title: string;
-  description: string;
-  version: number;
-  manager: User;
-  revisionsUpdated?: RevisionUpdate[];
+  owner?: Organization;
+  title?: string;
+  description?: string;
+  version?: number;
+  manager?: User;
+  revisions?: RevisionUpdate[];
 }
 
 export class PldMock {
 
-  public static createPldWithUserOwner({owner, revisionsUpdated = [], title = '', description = '', version = 1.0}: PldMockUserOwner): Pld {
+  public static createPldWithUserOwner({owner, revisions = [], title = '', description = '', version = 1.0}: PldMockUserOwner): Pld {
     return {
       title,
       owner,
@@ -33,11 +33,11 @@ export class PldMock {
       status: PldStatus.edition,
       manager: owner,
       promotion: 2024,
-      revisionsUpdated,
+      revisions,
     }
   }
 
-  public static createPldWithOrgOwner({owner, manager, revisionsUpdated = [], title = '', description = '', version = 1.0}: PldMockUserOrg): Pld {
+  public static createPldWithOrgOwner({owner, manager, revisions = [], title = 'Hello World', description = 'Abc', version = 1.0}: PldMockUserOrg): Pld {
     return {
       title,
       owner,
@@ -47,7 +47,7 @@ export class PldMock {
       status: PldStatus.edition,
       manager,
       promotion: 2024,
-      revisionsUpdated: revisionsUpdated
+      revisions,
     }
   }
 

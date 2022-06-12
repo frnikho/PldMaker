@@ -8,14 +8,22 @@ import {PldStatus} from "../../../../../libs/data-access/pld/PldStatus";
 
 export type PldDocument = Pld & Document;
 
-export type RevisionUpdate = {
+@Schema()
+export class RevisionUpdate {
+  @Prop({required: false, default: new Date()})
   created_date: Date;
 
-  version: number;
+  @Prop({required: true})
+  version: string;
 
+  @Prop({required: true, type: mongoose.Schema.Types.ObjectId, ref: User.name})
   owner: mongoose.Schema.Types.ObjectId | User;
 
+  @Prop({required: false, default: ['Toutes']})
   sections: string[];
+
+  @Prop({required: false, default: ''})
+  comments: string;
 }
 
 @Schema()
@@ -69,19 +77,17 @@ export class Pld extends DatedObjectSchema {
   @Prop({required: false, default: 1.0})
   version: number;
 
-  @Prop({required: true, enum: PldStatus})
+  /**
+   * 'Status'
+   */
+  @Prop({required: false, enum: PldStatus, default: PldStatus.edition})
   status: string;
 
+  /**
+   * 'Tableau des révisions'
+   */
   @Prop({required: false, default: []})
-  revisionsUpdated?: RevisionUpdate[];
-
-  // tableau des revisions
-
-
-  // table des matières
-  // documents
-  // DoD
-  // Rapport d'avancement
+  revisions: RevisionUpdate[];
 
 }
 

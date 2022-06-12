@@ -38,8 +38,7 @@ export class UserService {
     }
 
     public updateByBody(userObjectId: string, userBody: UpdateUserBody): Promise<UserDocument | null> {
-      console.log(userObjectId, userBody);
-      return null; // Todo finish the function user -> updateByBody
+      return this.userModel.findOneAndUpdate({_id: userObjectId}, userBody, {new: true}).exec();
     }
 
 }

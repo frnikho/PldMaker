@@ -4,15 +4,16 @@ import {Pld} from "../../../../../../../libs/data-access/pld/Pld";
 import {Button} from "carbon-components-react";
 
 import * as docx from 'docx';
+import {PldGenerator} from "../../../docx/PldGenerator";
+import {Dod} from "../../../../../../../libs/data-access/pld/dod/Dod";
 
 export type GenerateComponentProps = {
   org: Organization;
   pld: Pld;
+  dod: Dod[]
 }
 
-export type GenerateComponentState = {
-
-}
+export type GenerateComponentState = unknown
 
 function generate() {
   const doc = new docx.Document({
@@ -54,13 +55,22 @@ export class GenerateComponent extends React.Component<GenerateComponentProps, G
   }
 
   private onClickCreatePreview() {
-    generate();
+    const generator: PldGenerator = new PldGenerator(this.props.pld, this.props.dod, this.props.org);
+    PldGenerator.getBlobFromDoc(generator.generate(), (blob) => {
+      window.open(URL.createObjectURL(blob));
+    });
   }
 
   override render() {
     return (
       <>
+        <br/>
+        <br/>
+        <br/>
        <Button onClick={this.onClickCreatePreview}>Générer un preview du PLD </Button>
+        <br/>
+        <br/>
+        <br/>
       </>
     );
   }

@@ -2,6 +2,10 @@ import api, {ApiError, authorize, ErrorType} from "../util/Api";
 import {CreateOrganizationBody} from "../../../../../libs/data-access/organization/CreateOrganizationBody";
 import {AxiosError} from "axios";
 import {Organization} from "../../../../../libs/data-access/organization/Organization";
+import {
+  InviteUserOrgBody,
+  ManageMembersOrganizationBody
+} from "../../../../../libs/data-access/organization/ManageMembersOrganizationBody";
 
 export type CallbackOrganizations = (orgs: Organization[], error?: ApiError) => void;
 export type CallbackOrganization = (org: Organization | null, error?: ApiError) => void;
@@ -16,8 +20,24 @@ export class OrganizationApiController {
     });
   }
 
-  public static getUserOrganizations(accessToken: string, userId: string, callback: CallbackOrganizations) {
+  public static inviteUser(accessToken: string, inviteBody: InviteUserOrgBody, callback: CallbackOrganization) {
+    api.post<Organization>('organization/invite', inviteBody, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      callback(null, err.response?.data);
+    });
+  }
 
+  public static revokeUser(accessToken: string, revokeBody: ManageMembersOrganizationBody, callback: CallbackOrganization) {
+    api.post<Organization>('organization/revoke', revokeBody, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      callback(null, err.response?.data);
+    });
+  }
+
+  public static getUserOrganizations(accessToken: string, userId: string, callback: CallbackOrganizations) {
+    return null;
   }
 
   public static findOrganizationById(accessToken: string, orgId: string, callback: CallbackOrganization) {

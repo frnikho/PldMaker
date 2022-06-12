@@ -1,7 +1,8 @@
 import {PldOrgCreateBody} from "../../../../../libs/data-access/pld/PldBody";
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
 import {AxiosError} from "axios";
-import {Pld} from "../../../../../libs/data-access/pld/Pld";
+import {CreatePldRevisionBody, Pld} from "../../../../../libs/data-access/pld/Pld";
+import {PldUpdateBody} from "../../../../../libs/data-access/pld/PldUpdateBody";
 
 export type PldCallback = (pld: Pld | null, error?: ApiError) => void
 export type PldsCallback = (pld: Pld[], error?: ApiError) => void
@@ -36,6 +37,26 @@ export class PldApiController {
         return callback(null, err.response.data);
       return callback(null, {type: ErrorType.API_ERROR, error: 'An error occurred !'});
     });
+  }
+
+  public static addRevision(accessToken: string, pldId: string, body: CreatePldRevisionBody, callback: PldCallback) {
+    api.post(`pld/${pldId}/revision`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      if (err.response?.data !== undefined)
+        return callback(null, err.response.data);
+      return callback(null, {type: ErrorType.API_ERROR, error: 'An error occurred !'});
+    })
+  }
+
+  public static updatePld(accessToken: string, body: PldUpdateBody, callback: PldCallback) {
+    api.post<Pld>(`pld/update`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      if (err.response?.data !== undefined)
+        return callback(null, err.response.data);
+      return callback(null, {type: ErrorType.API_ERROR, error: 'An error occurred !'});
+    })
   }
 
 }

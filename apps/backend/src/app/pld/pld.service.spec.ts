@@ -79,12 +79,13 @@ describe('PldService', () => {
       const revisionUpdate: RevisionUpdate[] = [
         {
           owner: ownerUser,
-          version: 1.0,
+          version: '1.0',
           created_date: new Date(),
           sections: ['Toutes'],
+          comments: ''
         }
       ];
-      const createdPld: PldDocument = await service.create(PldMock.createPldWithOrgOwner({owner: org, revisionsUpdated: revisionUpdate, manager: managerUser, description: 'abc', version: 1.0, title: 'Hello World'}));
+      const createdPld: PldDocument = await service.create(PldMock.createPldWithOrgOwner({owner: org, revisions: revisionUpdate, manager: managerUser, description: 'abc', version: 1.0, title: 'Hello World'}));
       expect(createdPld).not.toBeNull();
       expect((createdPld.owner as Organization).owner).toBe(ownerUser);
     });
@@ -116,7 +117,46 @@ describe('PldService', () => {
 
     it('test org not null', () => {
       expect(org).not.toBeNull();
-      console.log(org);
     })
   })
+
+  describe('adding revision to pld', () => {
+
+    let user: UserDocument;
+    let org: OrganizationDocument;
+    let pld: PldDocument;
+
+    beforeEach(async () => {
+      user = await userService.create(UserMock.createUser({}));
+      org = await orgService.create(OrganizationMock.createOrg({owner: user, name: 'abc'}));
+      pld = await service.create(PldMock.createPldWithOrgOwner({owner: org, manager: user}));
+    })
+
+    it('Adding revisions to a existing pld', async () => {
+      await service.addRevision(pld._id, {
+        owner: user._id,
+        version: '1.0.1',
+        created_date: new Date(),
+        sections: [''],
+      });
+      const newPld = await service.addRevision(pld._id, {
+        owner: user._id,
+        version: '1.0.2',
+        created_date: new Date(),
+        sections: [''],
+      });
+      expect(newPld.revisions.length).toBe(2)
+    })
+
+    it('Adding revisions to a non existing pld', async () => {
+      const newPld: Pld = await service.addRevision(pld._id, {
+        owner: user._id,
+        version: '1.0.1',
+        created_date: new Date(),
+        sections: [''],
+      });
+      expect(newPld).not.toBeNull();
+    })
+
+  });
 });

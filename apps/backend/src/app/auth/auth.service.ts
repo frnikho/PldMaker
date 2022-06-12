@@ -52,7 +52,7 @@ export class AuthService {
         email: createdUser.email,
         created_date: createdUser.created_date,
         updated_date: createdUser.updated_date,
-        uuid: createdUser._id,
+        _id: createdUser._id,
       }
     };
   }
