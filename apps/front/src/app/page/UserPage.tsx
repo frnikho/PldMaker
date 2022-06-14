@@ -1,5 +1,5 @@
 import React from "react";
-import {UserContext} from "../context/UserContext";
+import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
 import {CircularProgress} from "../component/utils/CircularProgress";
 import {UserComponent} from "../component/UserComponent";
 
@@ -13,16 +13,19 @@ export class UserPage extends React.Component<UserPageProps, UserPageState> {
     super(props);
   }
 
+  private showState(authContext: UserContextProps) {
+    if (authContext.isLogged === LoginState.not_logged) {
+      return (<h1>Not logged</h1>)
+    } else if (authContext.isLogged === LoginState.logged) {
+      return (<UserComponent userContext={authContext}/>)
+    }
+    return (<CircularProgress/>)
+  }
+
   override render() {
     return (
       <UserContext.Consumer>
-        {(userAuth) => {
-          if (userAuth.isLogged) {
-            return (<UserComponent userContext={userAuth}/>)
-          } else {
-            return <CircularProgress/>
-          }
-        }}
+        {(userAuth) => this.showState(userAuth)}
       </UserContext.Consumer>
     );
   }

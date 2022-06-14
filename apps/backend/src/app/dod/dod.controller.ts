@@ -1,19 +1,22 @@
 import {Body, Controller, Delete, Get, Param, Post, Request} from '@nestjs/common';
-import {DodCreateBody} from "../../../../../libs/data-access/pld/dod/DodBody";
+import {DodCreateBody} from "../../../../../libs/data-access/dod/DodBody";
 import {DodService} from "./dod.service";
 import {ObjectIDPipe} from "../ObjectID.pipe";
-import {UpdateDodStatusBody} from "../../../../../libs/data-access/pld/dod/UpdateDodStatusBody";
-import {DodStatus} from "../../../../../libs/data-access/pld/dod/Dod";
+import {UpdateDodStatusBody} from "../../../../../libs/data-access/dod/UpdateDodStatusBody";
+import {DodStatus} from "../../../../../libs/data-access/dod/Dod";
+import {EventEmitter2} from "@nestjs/event-emitter";
+import {PldDocument} from "../pld/pld.schema";
 
 @Controller('dod')
 export class DodController {
 
-  constructor(private dodService: DodService) {
-  }
+  constructor(private dodService: DodService, private eventEmitter: EventEmitter2) {}
 
   @Post('create')
   public async createDod(@Request() req, @Body() dodBody: DodCreateBody) {
-    return this.dodService.createFromBody(dodBody);
+    const dodCreated = await this.dodService.createFromBody(dodBody);
+    this.eventEmitter.emit('Dod:Update', (dodCreated.pldOwner as PldDocument)._id);
+    return dodCreated;
   }
 
   @Get('find/pld/:pldId')
@@ -28,12 +31,16 @@ export class DodController {
 
   @Delete('delete/id/:id')
   public async delete(@Request() req, @Param('id') id: string) {
-    return this.dodService.delete(id);
+    const dod = await this.dodService.delete(id);
+    this.eventEmitter.emit('Dod:Update', (dod.pldOwner as PldDocument)._id);
+    return dod;
   }
 
   @Post('update/status')
   public async updateStatus(@Body() body: UpdateDodStatusBody) {
-    return this.dodService.updateStatus(body.dodId, body.status as DodStatus);
+    const dod = await this.dodService.updateStatus(body.dodId, body.status as DodStatus);
+    this.eventEmitter.emit('Dod:Update', (dod.pldOwner as PldDocument)._id);
+    return dod;
   }
 
 }

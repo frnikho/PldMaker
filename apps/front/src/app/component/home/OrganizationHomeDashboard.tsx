@@ -51,7 +51,6 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
         //TODO check error
       }
     });
-    console.log(this.props.userContext?.user);
   }
 
   private onClickCreateOrganization() {

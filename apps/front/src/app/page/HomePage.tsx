@@ -1,40 +1,50 @@
 import React from "react";
-import {UserContext} from "../context/UserContext";
+import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
 import {OrganizationHomeDashboard} from "../component/home/OrganizationHomeDashboard";
-import {Content, SkeletonPlaceholder} from "carbon-components-react";
+import {Button, Content, SkeletonPlaceholder} from "carbon-components-react";
 import {PldHomeDashboard} from "../component/home/PldHomeDashboard";
+import {SocketContext} from "../context/SocketContext";
 
 export type HomePageProps = unknown;
-
-export type HomePageState = {
-  loading: boolean;
-};
+export type HomePageState = unknown;
 
 export class HomePage extends React.Component<HomePageProps, HomePageState> {
 
+  static override contextType = SocketContext;
+  override context!: React.ContextType<typeof SocketContext>;
+
   constructor(props: HomePageProps) {
     super(props);
-    this.state = {
-      loading: true
+  }
+
+  private showState(authContext: UserContextProps) {
+    if (authContext.isLogged === LoginState.not_logged) {
+      return (<h1>Not logged</h1>)
+    } else if (authContext.isLogged === LoginState.logged) {
+      return (
+        <>
+          <OrganizationHomeDashboard userContext={authContext}/>
+          <PldHomeDashboard userContext={authContext}/>
+        </>
+      )
     }
+    return (
+      <>
+        <SkeletonPlaceholder style={{height: '20px', width: '20%'}}/>
+        <SkeletonPlaceholder style={{marginTop: '50px', height: '20px', width: '20%'}}/>
+      </>
+    )
   }
 
   override render() {
     return (
       <>
-        <Content>
-          <UserContext.Consumer>
-            {userContext => {
-              return (
-                <>
-                  {!userContext.isLogged ? <SkeletonPlaceholder style={{height: '20px', width: '20%'}}/> : <OrganizationHomeDashboard userContext={userContext}/>}
-                  {!userContext.isLogged ? <SkeletonPlaceholder style={{marginTop: '50px', height: '20px', width: '20%'}}/> : <PldHomeDashboard userContext={userContext}/>}
-                </>);
-            }}
-          </UserContext.Consumer>
-        </Content>
+        <UserContext.Consumer>
+          {userContext => this.showState(userContext)}
+        </UserContext.Consumer>
       </>
     );
   }
 
 }
+

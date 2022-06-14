@@ -52,6 +52,7 @@ export class AddRevisionPldModal extends React.Component<AddRevisionPldModalProp
       version: this.state.version.value,
       sections: this.state.sections.value,
       created_date: new Date(),
+      currentStep: this.props.pld.currentStep,
     }, (pld, error) => {
       if (error) {
         toast(error.error, {type: 'error'});

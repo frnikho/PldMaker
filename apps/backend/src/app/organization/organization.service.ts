@@ -1,6 +1,6 @@
 import {BadRequestException, Injectable} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
-import {Organization, OrganizationDocument, OrganizationPreferences} from "./organization.schema";
+import {Organization, OrganizationDocument} from "./organization.schema";
 import {Model, ObjectId} from "mongoose";
 import {CreateOrganizationBody} from "../../../../../libs/data-access/organization/CreateOrganizationBody";
 import {UserDocument} from "../user/user.schema";
@@ -65,6 +65,12 @@ export class OrganizationService {
       .exec();
   }
 
+  public findOrgsByAuthorAndMembers(userObjectId: string): Promise<OrganizationDocument[] | null> {
+    return this.organizationModel.find({$or: [{owner: userObjectId}, {members: {$gt: userObjectId}}]})
+      .populate(['owner', 'members'])
+      .exec();
+  }
+
   public findOrgsContainingMember(userObjectId: string): Promise<OrganizationDocument[] | null> {
     return this.organizationModel.find({members: userObjectId})
       .populate(['owner', 'members'])
@@ -86,11 +92,6 @@ export class OrganizationService {
 
   public async removeMembers(orgId: string, ownerId: string, userId: MemberUpdateObjects): Promise<OrganizationDocument | null> {
     return this.organizationModel.findOneAndUpdate({_id: orgId, owner: ownerId}, {$pull: {members: {$in: userId}}}, {new: true, populate: ['members', 'owner']})
-      .exec();
-  }
-
-  public async updatePreferences(orgId: string, pref: OrganizationPreferences) {
-    return this.organizationModel.findOneAndUpdate({_id: orgId}, {preferences: pref}, {new: true, populate: ['owner', 'members']})
       .exec();
   }
 

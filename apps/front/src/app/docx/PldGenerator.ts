@@ -1,5 +1,5 @@
 import {Pld} from "../../../../../libs/data-access/pld/Pld";
-import {Dod} from "../../../../../libs/data-access/pld/dod/Dod";
+import {Dod} from "../../../../../libs/data-access/dod/Dod";
 import {AlignmentType, Document, Footer, Header, Packer, PageNumber, Paragraph, TextRun, WidthType} from "docx";
 import {DodDocx} from "./DodDocx";
 import {Organization} from "../../../../../libs/data-access/organization/Organization";
@@ -132,7 +132,7 @@ export class PldGenerator {
           Title('Tableau des révisions'),
           Space(),
           ...this.dod.map((dod) => {
-            return [new DodDocx(dod).generateTable(), Space()];
+            return [new DodDocx(dod, this.org).generateTable(), Space()];
           }).flat(),
           Space(),
           Title('Rapport d’avancement'),

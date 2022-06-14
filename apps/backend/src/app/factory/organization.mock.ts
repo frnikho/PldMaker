@@ -12,9 +12,6 @@ export class OrganizationMock {
         members,
         name,
         owner,
-        preferences: {
-          dodColors: []
-        },
         versionShifting: 1.0
       };
     }

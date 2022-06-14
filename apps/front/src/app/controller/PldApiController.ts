@@ -15,7 +15,7 @@ export class PldApiController {
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)
         callback(null, err.response.data);
-      callback(null, {type: ErrorType.API_ERROR, error: 'An error occurred !'});
+      callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
     });
   }
 
@@ -25,7 +25,7 @@ export class PldApiController {
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)
         return callback([], err.response.data);
-      return callback([], {type: ErrorType.API_ERROR, error: 'An error occurred !'});
+      return callback([], {type: ErrorType.API_ERROR, message: ['An error occurred !']});
     });
   }
 
@@ -35,7 +35,7 @@ export class PldApiController {
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)
         return callback(null, err.response.data);
-      return callback(null, {type: ErrorType.API_ERROR, error: 'An error occurred !'});
+      return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
     });
   }
 
@@ -45,7 +45,7 @@ export class PldApiController {
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)
         return callback(null, err.response.data);
-      return callback(null, {type: ErrorType.API_ERROR, error: 'An error occurred !'});
+      return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
     })
   }
 
@@ -55,7 +55,7 @@ export class PldApiController {
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)
         return callback(null, err.response.data);
-      return callback(null, {type: ErrorType.API_ERROR, error: 'An error occurred !'});
+      return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
     })
   }
 

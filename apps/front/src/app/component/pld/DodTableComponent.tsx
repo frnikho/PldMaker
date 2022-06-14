@@ -1,8 +1,8 @@
 import React from "react";
-import {RequiredUserContextProps} from "../../../context/UserContext";
+import {RequiredUserContextProps} from "../../context/UserContext";
 import {
   Button,
-  DataTableSkeleton, Select, SelectItem,
+  Select, SelectItem,
   Table,
   TableBatchAction,
   TableBatchActions,
@@ -21,15 +21,15 @@ import {
 
 import {DataTable} from '@carbon/react'
 
-import {NewDodModal} from "../../../modal/dod/NewDodModal";
-import {Dod, DodStatus} from "../../../../../../../libs/data-access/pld/dod/Dod";
-import {Pld} from "../../../../../../../libs/data-access/pld/Pld";
-import {Organization} from "../../../../../../../libs/data-access/organization/Organization";
-import {DodApiController} from "../../../controller/DodApiController";
-import {PldGenerator} from "../../../docx/PldGenerator";
+import {NewDodModal} from "../../modal/dod/NewDodModal";
+import {Dod} from "../../../../../../libs/data-access/dod/Dod";
+import {Pld} from "../../../../../../libs/data-access/pld/Pld";
+import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {DodApiController} from "../../controller/DodApiController";
+import {PldGenerator} from "../../docx/PldGenerator";
 
-import {TrashCan, Download, Filter, Edit} from '@carbon/icons-react'
-import {User} from "../../../../../../../libs/data-access/user/User";
+import {TrashCan, Download, Edit, ImportExport} from '@carbon/icons-react'
+import {User} from "../../../../../../libs/data-access/user/User";
 import {toast} from "react-toastify";
 
 export type DodTableComponentProps = {
@@ -93,7 +93,9 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
 
   private onClickDeleteDod(dodId: string) {
     DodApiController.deleteDod(this.props.userContext.accessToken, dodId, (dod, error) => {
-      console.log(dod, error);
+      if (error) {
+        this.props.onDeleteDod();
+      }
     });
   }
 
@@ -241,22 +243,24 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
               </TableBatchActions>
               <TableToolbarContent>
                 <TableToolbarSearch
+                  placeholder={"1.0.5, CI/CD ..."}
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                   onChange={onInputChange}
                 />
                 <TableToolbarMenu
-                  renderIcon={Filter}
+                  renderIcon={ImportExport}
                   iconDescription={"Filter"}
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                 >
-                  <TableToolbarAction primaryFocus onClick={() => alert('Alert 1')}>
-                    Action 1
+                  <TableToolbarAction onClick={() => {
+                    //TODO import data
+                  }}>
+                    Importer des données
                   </TableToolbarAction>
-                  <TableToolbarAction onClick={() => alert('Alert 2')}>
-                    Action 2
-                  </TableToolbarAction>
-                  <TableToolbarAction onClick={() => alert('Alert 3')}>
-                    Action 3
+                  <TableToolbarAction onClick={() => {
+                    //TODO export data
+                  }}>
+                    Exporter les données
                   </TableToolbarAction>
                 </TableToolbarMenu>
                 <Button

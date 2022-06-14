@@ -1,27 +1,48 @@
 import React from "react";
-import {RequiredUserContextProps} from "../../../context/UserContext";
-import {OrganizationApiController} from "../../../controller/OrganizationApiController";
-import {PldApiController} from "../../../controller/PldApiController";
-import {Organization} from "../../../../../../../libs/data-access/organization/Organization";
-import {Pld} from "../../../../../../../libs/data-access/pld/Pld";
+import {RequiredUserContextProps} from "../../context/UserContext";
+import {OrganizationApiController} from "../../controller/OrganizationApiController";
+import {PldApiController} from "../../controller/PldApiController";
+import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 import {
-  Accordion, AccordionItem,
-  Button,
-  Column, Grid, NumberInput, Select, SelectItem, SkeletonPlaceholder,
-  SkeletonText, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TextArea,
+  Accordion,
+  AccordionItem,
+  Button, ButtonSet,
+  Column,
+  Grid,
+  NumberInput,
+  ProgressIndicator,
+  ProgressStep,
+  Select,
+  SelectItem,
+  SkeletonPlaceholder,
+  SkeletonText,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TextArea,
   TextInput,
   Tile,
 } from "carbon-components-react";
 
 import {Stack} from '@carbon/react';
-import {User} from "../../../../../../../libs/data-access/user/User";
+
+import {DocumentAdd, DocumentTasks, Classification} from '@carbon/icons-react';
+
+import {User} from "../../../../../../libs/data-access/user/User";
 import {DodTableComponent} from "./DodTableComponent";
 import {GenerateComponent} from "./GenerateComponent";
-import {DodApiController} from "../../../controller/DodApiController";
-import {Dod} from "../../../../../../../libs/data-access/pld/dod/Dod";
-import {SignPldModal} from "../../../modal/pld/SignPldModal";
-import {AddRevisionPldModal} from "../../../modal/pld/AddRevisionPldModal";
+import {DodApiController} from "../../controller/DodApiController";
+import {Dod} from "../../../../../../libs/data-access/dod/Dod";
+import {SignPldModal} from "../../modal/pld/SignPldModal";
+import {AddRevisionPldModal} from "../../modal/pld/AddRevisionPldModal";
 import {toast} from "react-toastify";
+import {PldStatus} from "../../../../../../libs/data-access/pld/PldStatus";
+import {SocketContext} from "../../context/SocketContext";
+import {ChangePldTypeModal} from "../../modal/pld/ChangePldTypeModal";
 
 export type PldComponentProps = {
   pldId: string;
@@ -34,6 +55,7 @@ export type PldComponentState = {
   dod: Dod[];
   openSignModal: boolean;
   openAddRevisionModal: boolean;
+  openChangePldType: boolean;
 }
 
 const formatDate = (date: Date): string => {
@@ -43,6 +65,9 @@ const formatDate = (date: Date): string => {
 
 export class PldComponent extends React.Component<PldComponentProps, PldComponentState> {
 
+  static override contextType = SocketContext;
+  override context!: React.ContextType<typeof SocketContext>;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -51,17 +76,34 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
       pld: undefined,
       openAddRevisionModal: false,
       openSignModal: false,
+      openChangePldType: false,
     }
     this.onClickUpdatePld = this.onClickUpdatePld.bind(this);
     this.onDodUpdated = this.onDodUpdated.bind(this);
     this.onDodDeleted = this.onDodDeleted.bind(this);
     this.onDodCreated = this.onDodCreated.bind(this);
+    this.onPldTypeUpdated = this.onPldTypeUpdated.bind(this);
+  }
+
+  private registerListeners() {
+    const socket = this.context;
+    socket.on('Pld:Update', ({pldId}: { pldId: string }) => {
+      if (this.props.pldId === pldId) {
+        this.loadPld();
+      }
+    });
+    socket.on('Dod:Update', ({pldId}: { pldId: string }) => {
+      if (this.props.pldId === pldId) {
+        this.loadDod();
+      }
+    });
   }
 
   override componentDidMount() {
     this.loadOrg();
     this.loadPld();
     this.loadDod();
+    this.registerListeners();
   }
 
   private loadOrg() {
@@ -83,11 +125,9 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
         toast(error.error, {type: 'error'});
       }
       if (pld !== null) {
-       setTimeout(() => {
-         this.setState({
-           pld: pld,
-         })
-       }, 1000);
+       this.setState({
+         pld: pld,
+       })
       }
     });
   }
@@ -116,8 +156,7 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
         toast(error.error, {type: 'error'});
       }
       if (pld !== null) {
-        toast('Pld mit a jour 👍 !', {type: 'success'});
-        this.loadPld();
+        toast('Pld mis à jour 👍', {type: 'success'});
       }
     });
   }
@@ -126,8 +165,7 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
     if (this.state.pld === undefined)
       return;
     if (this.state.pld?.revisions.length > 0) {
-      console.log(this.state.pld.revisions[this.state.pld.revisions.length-1]);
-      return this.state.pld.revisions[this.state.pld.revisions.length-1].owner;
+      return this.state.pld.revisions[this.state.pld.revisions.length-1].owner.email;
     } else {
       return ((this.state.org?.owner as User).email);
     }
@@ -135,7 +173,7 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
 
   private showPldState() {
     return (
-      <Tile style={{marginTop: '20px'}}>
+      <Tile>
         <Stack gap={6}>
           <div>
             <h4>Status du PLD:</h4>
@@ -259,7 +297,8 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
       )
     }
     return (
-      <AccordionItem title="Dernieres révisions du documents">
+      <Stack gap={5}>
+        <h4>Tableau des révisions</h4>
         <Table>
           <TableHead>
             <TableRow>
@@ -268,6 +307,7 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
               <TableHeader id={"auteur"} key={"auteur"}>Auteur</TableHeader>
               <TableHeader id={"sections"} key={"sections"}>Section(s)</TableHeader>
               <TableHeader id={"comments"} key={"comments"}>Commentaires</TableHeader>
+              <TableHeader id={"statusPld"} key={"statusPld"}>Status du Pld</TableHeader>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -279,12 +319,13 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
                   <TableCell key={index + ':auteur'}>{this.state.org?.name}</TableCell>
                   <TableCell key={index + ':sections'}>{revision.sections.join(', ')}</TableCell>
                   <TableCell key={index + ':comments'}>{revision.comments ?? 'Non-défini'}</TableCell>
+                  <TableCell key={index + ':statusPld'}>{revision.currentStep}</TableCell>
                 </TableRow>
               )
             })}
           </TableBody>
         </Table>
-      </AccordionItem>
+      </Stack>
     )
   }
 
@@ -293,8 +334,24 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
       return (<SkeletonPlaceholder style={{width: '100%'}}/>)
     } else {
       return (<GenerateComponent org={this.state.org} pld={this.state.pld} dod={this.state.dod}/>)
-
     }
+  }
+
+  private onPldTypeUpdated(step) {
+    PldApiController.updatePld(this.props.userContext.accessToken, {
+      pldId: this.props.pldId,
+      currentStep: step
+    }, (pld, error) => {
+      if (error) {
+        toast(error.error, {type: 'error'});
+      }
+      if (pld !== null) {
+        toast('Pld mis à jour 👍', {type: 'success'});
+      }
+    });
+    this.setState({
+      openChangePldType: false,
+    });
   }
 
   private onDodCreated() {
@@ -347,7 +404,44 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
             toast('Révision ajoutée avec succés 👍 !', {type: 'success'})
             this.loadPld();
           }}/>
+        <ChangePldTypeModal
+          pld={this.state.pld}
+          open={this.state.openChangePldType}
+          onDismiss={() => this.setState({openChangePldType: false})}
+          onSuccess={(a) => this.onPldTypeUpdated(a)}/>
       </>
+    )
+  }
+
+  private showStepOfPld() {
+    if (this.state.pld === undefined)
+      return;
+    return (
+      <Tile>
+        <h4>Etat d'avancement du PDL</h4>
+        <ProgressIndicator style={{marginTop: '20px'}} vertical>
+          <ProgressStep
+            complete
+            label="Création du PLD"
+          />
+
+          {this.state.pld.steps.map((step, index) => {
+            if (this.state.pld === undefined)
+              return;
+            const currentIndex = this.state.pld.steps.findIndex((step) => step === this.state.pld?.currentStep);
+            return (<ProgressStep
+              key={index}
+              complete={index < currentIndex}
+              current={currentIndex === index}
+              label={`Edition du PLD (${step})`}
+            />);
+          })}
+          <ProgressStep
+            complete={this.state.pld.status === PldStatus.signed}
+            label="PLD Signé"
+          />
+        </ProgressIndicator>
+      </Tile>
     )
   }
 
@@ -355,7 +449,7 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
     return (
         <Grid>
           {this.showModals()}
-          <Column lg={12} md={8}>
+          <Column lg={12} md={8} sm={4}>
             <Stack gap={6}>
             <Tile>
               <h1 style={{marginBottom: '20px'}}>Informations du pld</h1>
@@ -368,20 +462,20 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
             <Tile>
               <h1>Documents du pld</h1>
             </Tile>
-            <Tile>
-              <h1>Génération du DOCX/PDF</h1>
-              {this.showGeneratePanel()}
-            </Tile>
-              <Tile>
-                <h1>Actions</h1>
-                <Button onClick={() => {this.setState({openAddRevisionModal: true})}}>Ajouter une révision</Button>
-                <Button onClick={() => {this.setState({openSignModal: true})}}>Signer le PLD</Button>
-              </Tile>
+              <ButtonSet style={{marginBottom: '20px'}}>
+                <Button renderIcon={DocumentAdd} onClick={() => this.setState({openAddRevisionModal: true})}>Ajouter une révision</Button>
+                <Button renderIcon={DocumentTasks} onClick={() => this.setState({openSignModal: true})}>Signer le PLD</Button>
+                <Button renderIcon={Classification} onClick={() => this.setState({openChangePldType: true})}>Changer l'etat d'avancement</Button>
+                {this.showGeneratePanel()}
+              </ButtonSet>
             </Stack>
           </Column>
-          <Column lg={4} md={8}>
-            {this.showQuickInformationPanel()}
-            {this.showPldState()}
+          <Column lg={4} md={8} sm={4}>
+            <Stack gap={6}>
+              {this.showQuickInformationPanel()}
+              {this.showPldState()}
+              {this.showStepOfPld()}
+            </Stack>
           </Column>
         </Grid>
     );

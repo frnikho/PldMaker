@@ -18,7 +18,7 @@ export class UserApiController {
   public static findUserByEmail(accessToken: string, userEmail: string, callback: CallbackUser) {
     api.get<User | null>(`user/find/email/${userEmail}`, authorize(accessToken)).then((response: AxiosResponse<User | null>) => {
       if (response.data?._id === undefined)
-        return callback(null, {error: 'Aucun utilisateur trouvé avec cette adresse email', type: ErrorType.NO_USER_FOUND_EMAIL});
+        return callback(null, {message: ['Aucun utilisateur trouvé avec cette adresse email'], type: ErrorType.NO_USER_FOUND_EMAIL});
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       return callback(null, err.response?.data);

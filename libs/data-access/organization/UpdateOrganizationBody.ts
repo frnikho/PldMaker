@@ -1,11 +1,9 @@
-export class UpdateOrganizationBody {
+import {DodColor} from "./Organization";
 
-  public orgId: string;
-
-  public name?: String;
-
-  public description?: String;
-
-  public versionShifting?: number;
-
+export type UpdateOrganizationBody = {
+  orgId: string;
+  name?: String;
+  description?: String;
+  versionShifting?: number;
+  dodColors?: DodColor[];
 }

@@ -1,0 +1,6 @@
+websocket:
+  refreshPldOnChange: true
+  refreshOrgOnChange: true
+  refreshDodOnChange: true
+  refreshDodOnDeleted: true
+  refreshDodOnCreated: true

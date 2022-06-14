@@ -9,6 +9,7 @@ import {RegisterUserBody} from "../../../../../libs/data-access/auth/RegisterUse
 import {RegisterError, RegisterResponse} from "../../../../../libs/data-access/auth/RegisterResponse";
 import {LoginError} from "../../../../../libs/data-access/auth/LoginResponse";
 import {UserApiController} from "../controller/UserApiController";
+import {emitBody, SocketContext} from "./SocketContext";
 
 export const ACCESS_TOKEN_COOKIE_NS = 'access_token';
 
@@ -16,8 +17,19 @@ export type UserContextProps = {
   login: (email: string, password: string, callback: (user: User | null , error?: LoginError) => unknown) => void;
   register: (email: string, password: string, callback: (user: User | null , error?: RegisterError) => unknown) => void;
   logout: () => void;
-  isLogged: boolean;
+  isLogged: LoginState;
   user?: User;
+  accessToken: string;
+}
+
+export enum LoginState {
+  logged,
+  not_logged,
+  loading,
+}
+
+type UserToken = {
+  user: User;
   accessToken: string;
 }
 
@@ -25,7 +37,7 @@ export const UserContext = React.createContext<UserContextProps>({
   login: () => null,
   register: () => null,
   logout: () => null,
-  isLogged: false,
+  isLogged: LoginState.loading,
   accessToken: '',
 });
 
@@ -34,13 +46,16 @@ export type UserContextProviderProps = React.PropsWithChildren<unknown> & ReactC
 
 class UserContextProvider extends React.Component<UserContextProviderProps, UserContextProviderState> {
 
+  static override contextType = SocketContext;
+  override context!: React.ContextType<typeof SocketContext>;
+
   constructor(props: UserContextProviderProps) {
     super(props);
     this.state = {
       logout: this.logout.bind(this),
       login: this.login.bind(this),
       register: this.register.bind(this),
-      isLogged: false,
+      isLogged: LoginState.loading,
       user: undefined,
       accessToken: ''
     }
@@ -50,37 +65,35 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   }
 
   override componentDidMount() {
-    console.log("UserContext mounted");
     if (this.props.cookies !== undefined) {
       this.loadUserFromCookies(this.props.cookies, (data, error) => {
-        setTimeout(() => { //TODO remove this later to remove reload interval between each save
-          if (data?.user !== undefined && error === undefined) {
-            this.setState({
-              isLogged: true,
-              user: data.user,
-              accessToken: data.accessToken,
-            })
-          } else {
-            this.setState({
-              isLogged: false,
-            })
-          }
-        }, 1000);
+        if (data?.user !== undefined && error === undefined) {
+          this.setState({
+            isLogged: LoginState.logged,
+            user: data.user,
+            accessToken: data.accessToken,
+          })
+        } else {
+          this.setState({
+            isLogged: LoginState.not_logged,
+          })
+        }
       });
     }
   }
 
-  public loadUserFromCookies(cookies: Cookies, callback: ({user, accessToken}: {user: User, accessToken: string}, error?: string) => void): void {
+  public loadUserFromCookies(cookies: Cookies, callback: (token?: UserToken, error?: string) => void): void {
     const access_token = cookies.get(ACCESS_TOKEN_COOKIE_NS);
     if (access_token !== undefined) {
       const loginBody: LoginToken = {access_token};
       UserApiController.getMe(loginBody.access_token, (user, error) => {
         if (user !== null && error === undefined) {
-          callback({user, accessToken: loginBody.access_token});
+          this.context.emit('LoggedUser:New', ...emitBody(loginBody.access_token));
+          return callback({user, accessToken: loginBody.access_token});
         }
       });
     } else {
-      //TODO generate error
+      return callback(undefined, 'no cookies !');
     }
   }
 
@@ -98,7 +111,7 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
     this.clearTokenFromCookies(this.props.cookies);
     this.setState({
       user: undefined,
-      isLogged: false,
+      isLogged: LoginState.not_logged,
     });
   }
 
@@ -118,8 +131,9 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
             this.setState({
               user: user,
               accessToken: response.data.access_token,
-              isLogged: true
+              isLogged: LoginState.logged
             })
+            this.context.emit('LoggedUser:New', ...emitBody(response.data.access_token));
             return callback(user);
           } else {
             console.log('Error login:', error);
@@ -141,7 +155,7 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
     const registerBody: RegisterUserBody = {password, email};
     api.post<RegisterResponse>(`auth/register`, registerBody).then((response) => {
       this.setState({
-        isLogged: true,
+        isLogged: LoginState.logged,
         user: response.data.user,
         accessToken: response.data.accessToken
       });
@@ -152,7 +166,6 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   }
 
   override render() {
-    console.log("render user context");
     return (
       <UserContext.Provider value={{...this.state}}>
         {this.props.children}

@@ -6,4 +6,12 @@ export type User = {
   password?: string;
   firstname?: string;
   lastname?: string;
+  domain?: string[];
 } & DatedObject
+
+export enum UserDomain {
+  MOBILE = 'Mobile',
+  SERVER = 'Server',
+  WEB = 'Web',
+  OTHER = 'Autre',
+}

@@ -1,6 +1,6 @@
-import {DatedObject} from "../../DatedObject";
-import {Pld} from "../Pld";
-import {User} from "../../user/User";
+import {DatedObject} from "../DatedObject";
+import {Pld} from "../pld/Pld";
+import {User} from "../user/User";
 
 export type Dod = {
   _id: string;

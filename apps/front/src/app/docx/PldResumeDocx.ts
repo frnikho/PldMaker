@@ -3,7 +3,7 @@ import {Pld} from "../../../../../libs/data-access/pld/Pld";
 import {AlignmentType, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
 import {User} from "../../../../../libs/data-access/user/User";
-import {Dod} from "../../../../../libs/data-access/pld/dod/Dod";
+import {Dod} from "../../../../../libs/data-access/dod/Dod";
 
 const UserAdv = (): TableRow => {
   return new TableRow({
@@ -106,7 +106,6 @@ export class PldResumeDocx {
 
     const userDod = this.dod.filter((dod) => dod.estimatedWorkTime.some((wt) => wt.users.some((user) => user === member._id)));
     const dodDones = userDod.filter((dod) => {
-      console.log(dod.status)
       return dod.status === 'En cours';
     });
     const dodInProgress = userDod.filter((dod) => dod.status === 'Fini');
@@ -144,7 +143,7 @@ export class PldResumeDocx {
                     break: 1,
                     font: 'Roboto',
                     size: '13pt',
-                    text: '\t - \t ' + dod.title,
+                    text: '\t - ' + dod.version + ' ' + dod.title,
                   })
                 }),
                 new TextRun({
@@ -158,7 +157,7 @@ export class PldResumeDocx {
                     break: 1,
                     font: 'Roboto',
                     size: '13pt',
-                    text: '\t - \t ' + dod.version + ' ' + dod.title,
+                    text: '\t - ' + dod.version + ' ' + dod.title,
                   })
                 })
               ]

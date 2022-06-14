@@ -2,17 +2,13 @@ import React from "react";
 import {RouteMatch} from "react-router/lib/router";
 import {PageState} from "../util/Page";
 import {redirectNavigation, withParams} from "../util/Navigation";
-import {UserContext} from "../context/UserContext";
+import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
 import {OrganizationComponent} from "../component/org/OrganizationComponent";
 import {ApiError} from "../util/Api";
+import {SkeletonPlaceholder} from "carbon-components-react";
 
-export type OrganizationPageProps = {
-
-} & RouteMatch;
-
-export type OrganizationPageState = {
-
-} & PageState;
+export type OrganizationPageProps = unknown & RouteMatch;
+export type OrganizationPageState = unknown & PageState;
 
 class OrganizationPage extends React.Component<OrganizationPageProps, OrganizationPageState>{
 
@@ -24,14 +20,25 @@ class OrganizationPage extends React.Component<OrganizationPageProps, Organizati
     this.onError = this.onError.bind(this);
   }
 
-  override componentDidMount() {
-
-  }
-
   onError(error: ApiError) {
     this.setState({
       navigateUrl: '/'
     })
+  }
+
+  private showState(authContext: UserContextProps) {
+    if (authContext.isLogged === LoginState.not_logged) {
+      return (<h1>Not logged</h1>)
+    } else if (authContext.isLogged === LoginState.logged) {
+      return (
+        <OrganizationComponent onError={this.onError} orgId={this.props.params['id']}  userContext={authContext}/>
+      )
+    }
+    return (
+      <>
+        <SkeletonPlaceholder style={{height: '20px', width: '20%'}}/>
+      </>
+    )
   }
 
   override render() {
@@ -39,13 +46,7 @@ class OrganizationPage extends React.Component<OrganizationPageProps, Organizati
       <>
         {redirectNavigation(this.state.navigateUrl)}
         <UserContext.Consumer>
-          {(auth) => {
-            return (
-              <>
-                {auth.isLogged ? <OrganizationComponent onError={this.onError} orgId={this.props.params['id']}  userContext={auth}/> : ''}
-              </>
-            )
-          }}
+          {(auth) => this.showState(auth)}
         </UserContext.Consumer></>
     );
   }

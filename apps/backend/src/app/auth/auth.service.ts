@@ -44,7 +44,8 @@ export class AuthService {
       password: hashedPassword,
       roles: ['user'],
       updated_date: new Date(),
-      created_date: new Date()
+      created_date: new Date(),
+      domain: [''],
     });
     return {
       accessToken: this.login(createdUser).access_token,

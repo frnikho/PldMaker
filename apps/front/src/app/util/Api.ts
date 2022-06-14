@@ -30,8 +30,9 @@ export type ApiError = {
 } | Error
 
 export type Error = {
-  error: string,
-  type: ErrorType
+  error?: string,
+  type: ErrorType,
+  message: string[]
 }
 
 export enum ErrorType {

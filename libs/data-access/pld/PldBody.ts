@@ -1,13 +1,14 @@
-import {IsNotEmpty, Max, Min} from "class-validator";
+import {IsNotEmpty, Length, Min} from "class-validator";
 
 export class PldOrgCreateBody {
   @IsNotEmpty()
+  @Length(5, 64)
   title: string;
 
-  @IsNotEmpty()
   description: string;
 
   @IsNotEmpty()
+  @Length(24, 24)
   owner: string;
 
   @IsNotEmpty()
@@ -23,8 +24,16 @@ export class PldOrgCreateBody {
   @Min(0)
   version: number;
 
+  @IsNotEmpty()
+  startingDate: Date;
 
-  constructor(title: string, description: string, owner: string, manager: string, tags: string[], promotion: number, version: number) {
+  @IsNotEmpty()
+  endingDate: Date;
+
+  @IsNotEmpty()
+  steps: string[];
+
+  constructor(title: string, description: string, owner: string, manager: string, tags: string[], promotion: number, version: number, startingDate: Date, endingDate: Date, steps: string[]) {
     this.title = title;
     this.description = description;
     this.owner = owner;
@@ -32,5 +41,8 @@ export class PldOrgCreateBody {
     this.tags = tags;
     this.promotion = promotion;
     this.version = version;
+    this.startingDate = startingDate;
+    this.endingDate = endingDate;
+    this.steps = steps;
   }
 }

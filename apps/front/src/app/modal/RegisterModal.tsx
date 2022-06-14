@@ -47,7 +47,7 @@ export class RegisterModal extends React.Component<RegisterModalProps, RegisterM
   }
 
   public manageError(error: RegisterError) {
-    console.log("ABC", error);
+    //TODO check error
   }
 
   public onClickRegister(authContext: UserContextProps) {

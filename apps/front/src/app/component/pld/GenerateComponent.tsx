@@ -1,11 +1,13 @@
 import React from "react";
-import {Organization} from "../../../../../../../libs/data-access/organization/Organization";
-import {Pld} from "../../../../../../../libs/data-access/pld/Pld";
+import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 import {Button} from "carbon-components-react";
 
 import * as docx from 'docx';
-import {PldGenerator} from "../../../docx/PldGenerator";
-import {Dod} from "../../../../../../../libs/data-access/pld/dod/Dod";
+import {PldGenerator} from "../../docx/PldGenerator";
+import {Dod} from "../../../../../../libs/data-access/dod/Dod";
+
+import {DocumentView} from '@carbon/icons-react'
 
 export type GenerateComponentProps = {
   org: Organization;
@@ -42,7 +44,6 @@ function generate() {
   docx.Packer.toBlob(doc).then((blob) => {
     console.log(blob);
     console.log(URL.createObjectURL(blob));
-    console.log("Document created successfully");
   });
 }
 
@@ -63,15 +64,7 @@ export class GenerateComponent extends React.Component<GenerateComponentProps, G
 
   override render() {
     return (
-      <>
-        <br/>
-        <br/>
-        <br/>
-       <Button onClick={this.onClickCreatePreview}>Générer un preview du PLD </Button>
-        <br/>
-        <br/>
-        <br/>
-      </>
+     <Button renderIcon={DocumentView} onClick={this.onClickCreatePreview}>Générer un preview du PLD </Button>
     );
   }
 

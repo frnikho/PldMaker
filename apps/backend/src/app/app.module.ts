@@ -17,6 +17,8 @@ import {JwtAuthGuard} from "./auth/guard/jwt-auth.guard";
 import {LoggerModule} from "./logger/logger.module";
 import { PldModule } from './pld/pld.module';
 import { TemplateModule } from './template/template.module';
+import { GatewayModule } from './socket/gateway.module';
+import {EventEmitterModule} from "@nestjs/event-emitter";
 
 @Module({
   imports: [
@@ -37,6 +39,7 @@ import { TemplateModule } from './template/template.module';
         };
       }
     }),
+    EventEmitterModule.forRoot(),
     AuthModule,
     SettingsModule,
     UserModule,
@@ -45,6 +48,7 @@ import { TemplateModule } from './template/template.module';
     LoggerModule,
     PldModule,
     TemplateModule,
+    GatewayModule,
   ],
   controllers: [AppController],
   providers: [AppService, {

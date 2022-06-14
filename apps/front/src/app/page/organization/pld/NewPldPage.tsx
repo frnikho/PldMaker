@@ -1,18 +1,13 @@
 import React from "react";
-import {UserContext} from "../../../context/UserContext";
-import {NewPldComponent} from "../../../component/org/pld/NewPldComponent";
+import {LoginState, UserContext, UserContextProps} from "../../../context/UserContext";
+import {NewPldComponent} from "../../../component/pld/NewPldComponent";
 import {CircularProgress} from "../../../component/utils/CircularProgress";
 import {RouteMatch} from "react-router/lib/router";
 import {redirectNavigation, withParams} from "../../../util/Navigation";
 import {PageState} from "../../../util/Page";
 
-export type NewPldPageProps = {
-
-} & RouteMatch;
-
-export type NewPldPageState = {
-
-} & PageState;
+export type NewPldPageProps = unknown & RouteMatch;
+export type NewPldPageState = unknown & PageState;
 
 class NewPldPage extends React.Component<NewPldPageProps, NewPldPageState> {
 
@@ -31,18 +26,21 @@ class NewPldPage extends React.Component<NewPldPageProps, NewPldPageState> {
     })
   }
 
+  private showState(authContext: UserContextProps) {
+    if (authContext.isLogged === LoginState.not_logged) {
+      return (<h1>Not logged</h1>)
+    } else if (authContext.isLogged === LoginState.logged) {
+      return (<NewPldComponent onPldCreated={this.onPldCreated} orgId={this.props.params['id']} userContext={authContext}/>)
+    }
+    return (<CircularProgress style={{margin: 'auto'}}/>)
+  }
+
   override render() {
     return (
       <>
         {redirectNavigation(this.state.navigateUrl)}
         <UserContext.Consumer>
-          {(auth) => {
-            if (auth.isLogged) {
-              return <NewPldComponent onPldCreated={this.onPldCreated} orgId={this.props.params['id']} userContext={auth}/>
-            } else {
-              return <CircularProgress style={{margin: 'auto'}}/>
-            }
-          }}
+          {(auth) => this.showState(auth)}
         </UserContext.Consumer></>
     );
   }

@@ -5,6 +5,7 @@ import {User} from "../user/user.schema";
 import {Organization} from "../organization/organization.schema";
 import {PldOwnerType} from "../../../../../libs/data-access/pld/PldOwnerType";
 import {PldStatus} from "../../../../../libs/data-access/pld/PldStatus";
+import {PldStep} from "../../../../../libs/data-access/pld/PldStep";
 
 export type PldDocument = Pld & Document;
 
@@ -88,6 +89,18 @@ export class Pld extends DatedObjectSchema {
    */
   @Prop({required: false, default: []})
   revisions: RevisionUpdate[];
+
+  @Prop({required: true, default: [PldStep.KickOff, PldStep.FollowUp, PldStep.Delivery]})
+  steps: string[];
+
+  @Prop({required: false, default: PldStep.KickOff})
+  currentStep?: string;
+
+  @Prop({required: true})
+  startingDate: Date;
+
+  @Prop({required: true})
+  endingDate: Date;
 
 }
 

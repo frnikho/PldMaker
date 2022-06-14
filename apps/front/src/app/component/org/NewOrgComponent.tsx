@@ -128,7 +128,7 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
       if (org !== null && error === undefined) {
         this.props.onOrgCreated(org);
       } else {
-        console.log(error);
+        //TODO error
       }
     });
   }
@@ -151,10 +151,10 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
               <StructuredListCell>
                 <Button
                   size={"sm"}
-                  kind={"danger"}
+                  kind={"tertiary"}
                   onClick={() => this.onClickRemoveUser(user, index)}
                   renderIcon={Subtract}
-                  iconDescription="remove user"
+                  iconDescription="Retirer l'utilisateur"
                   hasIconOnly/>
               </StructuredListCell>
             </StructuredListRow>)

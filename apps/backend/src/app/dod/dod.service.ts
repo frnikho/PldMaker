@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import {Dod} from "./dod.schema";
 import {Model} from "mongoose";
-import {DodCreateBody} from "../../../../../libs/data-access/pld/dod/DodBody";
-import {DodStatus} from "../../../../../libs/data-access/pld/dod/Dod";
+import {DodCreateBody} from "../../../../../libs/data-access/dod/DodBody";
+import {DodStatus} from "../../../../../libs/data-access/dod/Dod";
 
 @Injectable()
 export class DodService {

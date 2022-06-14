@@ -1,6 +1,5 @@
 import {DatedObject} from "../DatedObject";
 import {User} from "../user/User";
-import {DodStatus} from "../pld/dod/Dod";
 
 export type Organization = {
   members: User[],
@@ -9,18 +8,10 @@ export type Organization = {
   description: string;
   versionShifting: number;
   _id: string;
-  preferences: OrganizationPreferences;
+  dodColors: DodColor[];
 } & DatedObject
 
-export type DodColorPref = {
-  type: DodStatus,
-  color: string
-}
-
-export class OrganizationPreferences {
-  dodColors: DodColorPref[];
-
-  constructor(dodColors: DodColorPref[]) {
-    this.dodColors = dodColors;
-  }
+export type DodColor = {
+  name: string;
+  color: string;
 }

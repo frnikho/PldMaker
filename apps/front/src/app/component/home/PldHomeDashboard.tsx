@@ -18,7 +18,6 @@ export class PldHomeDashboard extends React.Component<PldHomeDashboardProps, Pld
   override componentDidMount() {
     if (this.props.userContext.accessToken === undefined)
       return;
-    console.log(this.props.userContext?.user);
   }
 
   override render() {

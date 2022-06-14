@@ -15,7 +15,7 @@ import {
 import {FieldData} from "../../util/FieldData";
 
 import {Add, Close} from '@carbon/icons-react';
-import {Dod} from "../../../../../../libs/data-access/pld/dod/Dod";
+import {Dod} from "../../../../../../libs/data-access/dod/Dod";
 import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 import {Organization} from "../../../../../../libs/data-access/organization/Organization";
 import {User} from "../../../../../../libs/data-access/user/User";
@@ -179,8 +179,6 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
 
   private onClickCreate() {
     //TODO check each field
-    console.log(this.state);
-
     DodApiController.createDod(this.props.authContext.accessToken, {
       owner: this.props.authContext.user?._id ?? '',
       descriptionOfDone: this.state.descriptionOfDoneInput.value,

@@ -1,6 +1,7 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
 import {Document} from "mongoose";
+import {UserDomain} from "../../../../../libs/data-access/user/User";
 
 export type UserDocument = User & Document;
 
@@ -22,6 +23,9 @@ export class User extends DatedObjectSchema {
 
   @Prop({required: false, default: undefined})
   lastname?: string;
+
+  @Prop({required: false, default: UserDomain.MOBILE})
+  domain?: string[];
 
 }
 

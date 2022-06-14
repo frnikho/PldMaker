@@ -4,9 +4,8 @@ import {NestFactory} from '@nestjs/core';
 import {AppModule} from './app/app.module';
 import {NestExpressApplication} from "@nestjs/platform-express";
 import {Logger} from "./app/logger/logger";
-import {Transform} from "stream";
 import {TransformInterceptor} from "./app/transform.interceptor";
-import {MongoExceptionFilter} from "./app/mongo.exceptionfilter";
+import * as io from 'socket.io-client';
 
 class Server {
 
@@ -41,6 +40,11 @@ class Server {
   private onServerOpened() {
     new Logger(
     ).log(`Application is running on: http://localhost:${this.port}/`);
+    const socket = io.io('http://localhost:3333/', {path: '/ws', host: 'http://localhost/', transports: ['websocket']});
+    socket.on('connect_error', (err) => {
+      console.log('error', err);
+    })
+    socket.emit('events', 'abc');
   }
 }
 

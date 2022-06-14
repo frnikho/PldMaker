@@ -34,6 +34,9 @@ export class PldMock {
       manager: owner,
       promotion: 2024,
       revisions,
+      steps: [],
+      startingDate: new Date(),
+      endingDate: new Date(),
     }
   }
 
@@ -48,6 +51,9 @@ export class PldMock {
       manager,
       promotion: 2024,
       revisions,
+      steps: [],
+      startingDate: new Date(),
+      endingDate: new Date(),
     }
   }
 

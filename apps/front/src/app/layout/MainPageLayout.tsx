@@ -1,21 +1,28 @@
 import React from "react";
 import {Outlet} from "react-router-dom";
 import {
-  Column, Content, Dropdown, Grid,
+  Column,
+  Content,
+  Grid,
   Header,
-  HeaderContainer, HeaderGlobalAction, HeaderGlobalBar,
+  HeaderContainer,
+  HeaderGlobalAction,
+  HeaderGlobalBar,
   HeaderMenuButton,
-  HeaderName, OverflowMenu, OverflowMenuItem,
+  HeaderName,
+  OverflowMenu,
+  OverflowMenuItem,
   SideNav,
-  SideNavItems, SideNavLink,
-  SkipToContent, Tile
+  SideNavItems,
+  SideNavLink,
+  SkipToContent
 } from "carbon-components-react";
 
 import {Layer} from '@carbon/react';
 
-import {Bee, Login, Dashboard, Events, UserAvatar, Notification} from '@carbon/icons-react'
+import {Bee, Dashboard, Events, Login, Notification, UserAvatar} from '@carbon/icons-react'
 
-import {UserContext, UserContextProps} from "../context/UserContext";
+import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
 import {AuthModalComponent} from "../component/AuthModalComponent";
 import {NavigationState} from "../util/Navigation";
 
@@ -95,7 +102,6 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
         <OverflowMenuItem itemText="Mon profile" onClick={(e) => {
           this.props.onRedirectUrl('/profile')
         }} />
-        <OverflowMenuItem itemText="Settings" />
         <OverflowMenuItem hasDivider itemText="Se déconnecter" onClick={(e) => {
           auth.logout();
           this.props.onRedirectUrl('/');
@@ -103,6 +109,15 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
       </OverflowMenu>
     </>)
   }
+
+  private showState(auth: UserContextProps) {
+    if (auth.isLogged === LoginState.not_logged) {
+      return this.showLoginButton(auth);
+    } else {
+      return this.showLoginAvatar(auth);
+    }
+  }
+
   override render() {
     return (
       <HeaderContainer
@@ -124,13 +139,7 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
              </Layer>
             <HeaderGlobalBar>
               <UserContext.Consumer>
-                {(auth) => {
-                  if (!auth.isLogged) {
-                    return this.showLoginButton(auth);
-                  } else {
-                    return this.showLoginAvatar(auth);
-                  }
-                }}
+                {(auth) => this.showState(auth)}
               </UserContext.Consumer>
             </HeaderGlobalBar>
             <SideNav

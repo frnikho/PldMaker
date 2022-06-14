@@ -1,7 +1,7 @@
 import {NewOrgComponent} from "../../component/org/NewOrgComponent";
 import React from "react";
 import {Loading} from "carbon-components-react";
-import {UserContext} from "../../context/UserContext";
+import {LoginState, UserContext, UserContextProps} from "../../context/UserContext";
 import {NavigationState, redirectNavigation} from "../../util/Navigation";
 import {Organization} from "../../../../../../libs/data-access/organization/Organization";
 
@@ -24,18 +24,21 @@ export class NewOrganizationPage extends React.Component<NewOrganizationPageProp
     })
   }
 
+  private showState(authContext: UserContextProps) {
+    if (authContext.isLogged === LoginState.not_logged) {
+      return (<h1>Not logged</h1>)
+    } else if (authContext.isLogged === LoginState.logged) {
+      return (<NewOrgComponent userContext={authContext} onOrgCreated={this.onOrgCreate}/>)
+    }
+    return (<Loading style={{margin: 'auto'}} withOverlay={false}/>)
+  }
+
   override render() {
     return (
       <>
         {redirectNavigation(this.state.navigateUrl)}
         <UserContext.Consumer>
-          {(auth) => {
-            if (!auth.isLogged) {
-              return <Loading style={{margin: 'auto'}} withOverlay={false}/>
-            } else {
-              return (<NewOrgComponent userContext={auth} onOrgCreated={this.onOrgCreate}/>);
-            }
-          }}
+          {(auth) => this.showState(auth)}
         </UserContext.Consumer></>
     );
   }

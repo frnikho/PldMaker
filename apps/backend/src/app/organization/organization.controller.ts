@@ -8,11 +8,12 @@ import {
 import {UpdateOrganizationBody} from "../../../../../libs/data-access/organization/UpdateOrganizationBody";
 import {DeleteOrganizationBody} from "../../../../../libs/data-access/organization/DeleteOrganizationBody";
 import {ObjectIDPipe} from "../ObjectID.pipe";
+import {EventEmitter2} from "@nestjs/event-emitter";
 
 @Controller('organization')
 export class OrganizationController {
 
-  constructor(private orgService: OrganizationService) {
+  constructor(private orgService: OrganizationService, private eventEmitter: EventEmitter2) {
   }
 
   @Post('create')
@@ -22,6 +23,7 @@ export class OrganizationController {
 
   @Post('update')
   public async update(@Request() req, @Body() body: UpdateOrganizationBody) {
+    this.eventEmitter.emit('Org:Update', body.orgId);
     return this.orgService.updateByBody(req.user._id, body);
   }
 
@@ -32,7 +34,7 @@ export class OrganizationController {
 
   @Get(['', 'get'])
   public async get(@Request() req) {
-    return this.orgService.findOrgsByAuthor(req.user._id);
+    return this.orgService.findOrgsByAuthorAndMembers(req.user._id);
   }
 
   @Get('find/id/:orgId')
@@ -47,11 +49,13 @@ export class OrganizationController {
 
   @Post('invite')
   public async addMember(@Request() req, @Body() orgBody: InviteUserOrgBody) {
+    this.eventEmitter.emit('Org:Update', orgBody.orgId);
     return this.orgService.addMembersByEmail(req.user._id, orgBody);
   }
 
   @Post('revoke')
   public async removeMember(@Request() req, @Body() orgBody: ManageMembersOrganizationBody) {
+    this.eventEmitter.emit('Org:Update', orgBody.orgId);
     return this.orgService.removeMembers(orgBody.orgId, req.user._id, orgBody.membersId);
   }
 

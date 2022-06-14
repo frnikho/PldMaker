@@ -1,12 +1,10 @@
-import {Dod, UserWorkTime} from "../../../../../libs/data-access/pld/dod/Dod";
+import {Dod, UserWorkTime} from "../../../../../libs/data-access/dod/Dod";
 import {Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
+import {Organization} from "../../../../../libs/data-access/organization/Organization";
+import {getDodStatusColor} from "../util/Preferences";
 
 const colors = {
-  status: {
-    done: 'fac710',
-    todo: '',
-  },
   cellBackground: [
     'dcdcdc',
     'ffffff'
@@ -95,7 +93,7 @@ const EstimatedCharge = (charges: UserWorkTime[]) => {
 
 export class DodDocx {
 
-  constructor(private dod: Dod) {}
+  constructor(private dod: Dod, private org: Organization) {}
 
   public generateTable() {
     return new Table({
@@ -110,7 +108,7 @@ export class DodDocx {
             margins,
             shading: {
               type: ShadingType.SOLID,
-              color: colors.status.done,
+              color: getDodStatusColor(this.org.dodColors, this.dod.status)
             },
             children: [Title(this.dod.version + ' ' + this.dod.title)],
             width: {

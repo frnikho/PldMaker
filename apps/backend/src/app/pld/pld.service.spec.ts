@@ -135,13 +135,13 @@ describe('PldService', () => {
     it('Adding revisions to a existing pld', async () => {
       await service.addRevision(pld._id, {
         owner: user._id,
-        version: '1.0.1',
+        version: 1.1,
         created_date: new Date(),
         sections: [''],
       });
       const newPld = await service.addRevision(pld._id, {
         owner: user._id,
-        version: '1.0.2',
+        version: 1.1,
         created_date: new Date(),
         sections: [''],
       });
@@ -151,7 +151,7 @@ describe('PldService', () => {
     it('Adding revisions to a non existing pld', async () => {
       const newPld: Pld = await service.addRevision(pld._id, {
         owner: user._id,
-        version: '1.0.1',
+        version: 1.1,
         created_date: new Date(),
         sections: [''],
       });

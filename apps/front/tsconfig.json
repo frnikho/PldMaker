@@ -5,6 +5,7 @@
     "jsx": "react-jsx",
     "resolveJsonModule": true,
     "allowJs": true,
+    "experimentalDecorators": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,

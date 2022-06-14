@@ -30,23 +30,40 @@ export class PldService {
       description: pldBody.description,
       title: pldBody.title,
       tags: pldBody.tags,
+      steps: pldBody.steps,
+      endingDate: pldBody.endingDate,
+      startingDate: pldBody.startingDate,
     })
   }
 
   public async find(pldId: string): Promise<PldDocument | null> {
     return this.pldModel.findOne({_id: pldId})
       .populate(['owner', 'manager'])
+      .populate({
+        path: 'revisions',
+        populate: {
+          path: 'owner',
+          model: User.name
+        },
+      })
       .exec();
   }
 
   public async findByOrganizationOwner(orgId: string): Promise<PldDocument[] | null> {
     return this.pldModel.find({ownerType: PldOwnerType.Organization, owner: orgId})
       .populate(['owner', 'manager'])
+      .populate({
+        path: 'revisions',
+        populate: {
+          path: 'owner',
+          model: User.name
+        },
+      })
       .exec();
   }
 
   public async updateWithBody(body: PldUpdateBody) {
-    return this.pldModel.findOneAndUpdate({_id: body.pldId}, {updated_date: new Date(), title: body.title, description: body.description, manager: body.manager, promotion: body.promotion}, {new: true, populate: ['owner', 'manager']})
+    return this.pldModel.findOneAndUpdate({_id: body.pldId}, {updated_date: new Date(), title: body.title, description: body.description, manager: body.manager, promotion: body.promotion, currentStep: body.currentStep}, {new: true, populate: ['owner', 'manager']})
       .exec();
   }
 
