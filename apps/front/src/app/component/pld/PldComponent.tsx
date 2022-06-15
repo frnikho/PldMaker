@@ -162,12 +162,12 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
   }
 
   private showLastAuthorPld() {
-    if (this.state.pld === undefined)
+    if (this.state.pld === undefined || this.state.org?.owner === undefined)
       return;
-    if (this.state.pld?.revisions.length > 0) {
+    if (this.state.pld.revisions.length > 0) {
       return this.state.pld.revisions[this.state.pld.revisions.length-1].owner.email;
     } else {
-      return ((this.state.org?.owner as User).email);
+      return ((this.state.org.owner as User).email);
     }
   }
 
@@ -219,70 +219,68 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
     if (this.state.pld === undefined || this.state.org === undefined)
       return;
     return (
-      <>
-        <Stack gap={6}>
-          <TextInput id={"pld-title"} value={this.state.pld.title} labelText={"Titre du pld"} onChange={(e) => {
-            if (this.state.pld !== undefined) {
-              this.setState({
-                pld: {
-                  ...this.state.pld,
-                  title: e.currentTarget.value,
-                }
-              })
-            }
-          }}/>
-          <TextArea rows={4} id={"pld-description"} labelText={"Description"} value={this.state.pld.description} onChange={(e) => {
-            if (this.state.pld !== undefined) {
-              this.setState({
-                pld: {
-                  ...this.state.pld,
-                  description: e.currentTarget.value,
-                }
-              })
-            }
-          }}/>
+      <Stack gap={6}>
+        <TextInput id={"pld-title"} value={this.state.pld.title} labelText={"Titre du pld"} onChange={(e) => {
+          if (this.state.pld !== undefined) {
+            this.setState({
+              pld: {
+                ...this.state.pld,
+                title: e.currentTarget.value,
+              }
+            })
+          }
+        }}/>
+        <TextArea rows={4} id={"pld-description"} labelText={"Description"} value={this.state.pld.description} onChange={(e) => {
+          if (this.state.pld !== undefined) {
+            this.setState({
+              pld: {
+                ...this.state.pld,
+                description: e.currentTarget.value,
+              }
+            })
+          }
+        }}/>
 
-          <NumberInput id={"promotion"} iconDescription={""} label={"Promotion"} value={this.state.pld.promotion} onChange={(e) => {
-            if (this.state.pld !== undefined) {
-              this.setState({
-                pld: {
-                  ...this.state.pld,
-                  promotion: parseFloat(e.imaginaryTarget.value),
-                }
-              })
-            }
-          }}/>
+        <NumberInput id={"promotion"} iconDescription={""} label={"Promotion"} value={this.state.pld.promotion} onChange={(e) => {
+          if (this.state.pld !== undefined) {
+            this.setState({
+              pld: {
+                ...this.state.pld,
+                promotion: parseFloat(e.imaginaryTarget.value),
+              }
+            })
+          }
+        }}/>
 
-          <Select
-            id="new-pld-manager"
-            onChange={(e) => {
-              if (this.state.pld === undefined || this.state.org === undefined)
-                return;
-              const selectedManager = ([...this.state.org.members, this.state.org.owner]).find((member) => member._id === e.currentTarget.value);
-              if (selectedManager === undefined)
-                return;
-              this.setState({
-                pld: {
-                  ...this.state.pld,
-                  manager: selectedManager,
-                }
-              })
-            }}
-            labelText="Manager"
-            value={(this.state.pld.manager as User)._id}>
-            <SelectItem text={(this.state.org.owner as User).email} value={(this.state.org.owner as User)._id} />
-            {(this.state.org.members as User[]).map((user, index) => {
-              return (<SelectItem key={index} value={user._id} text={user.email}/>)
-            })}
-          </Select>
+        <Select
+          id="new-pld-manager"
+          onChange={(e) => {
+            if (this.state.pld === undefined || this.state.org === undefined)
+              return;
+            const selectedManager = ([...this.state.org.members, this.state.org.owner]).find((member) => member._id === e.currentTarget.value);
+            if (selectedManager === undefined)
+              return;
+            this.setState({
+              pld: {
+                ...this.state.pld,
+                manager: selectedManager,
+              }
+            })
+          }}
+          labelText="Manager"
+          value={(this.state.pld.manager as User)._id}>
+          <SelectItem text={(this.state.org.owner as User).email} value={(this.state.org.owner as User)._id} />
+          {(this.state.org.members as User[]).map((user, index) => {
+            return (<SelectItem key={index} value={user._id} text={user.email}/>)
+          })}
+        </Select>
 
-          <Button onClick={this.onClickUpdatePld}>Mettre a jour</Button>
+        <Button onClick={this.onClickUpdatePld}>Mettre a jour</Button>
 
-          <Accordion>
-            {this.showRevisions()}
-          </Accordion>
-        </Stack>
-      </>
+        <Accordion>
+          {this.showRevisions()}
+        </Accordion>
+      </Stack>
     )
   }
 
@@ -427,7 +425,7 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
 
           {this.state.pld.steps.map((step, index) => {
             if (this.state.pld === undefined)
-              return;
+              return null;
             const currentIndex = this.state.pld.steps.findIndex((step) => step === this.state.pld?.currentStep);
             return (<ProgressStep
               key={index}
@@ -435,7 +433,7 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
               current={currentIndex === index}
               label={`Edition du PLD (${step})`}
             />);
-          })}
+          }).filter((e) => e !== null)}
           <ProgressStep
             complete={this.state.pld.status === PldStatus.signed}
             label="PLD Signé"

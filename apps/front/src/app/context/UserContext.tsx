@@ -154,11 +154,14 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   public register(email: string, password: string, callback: (user: User | null , error?: RegisterError) => unknown): void {
     const registerBody: RegisterUserBody = {password, email};
     api.post<RegisterResponse>(`auth/register`, registerBody).then((response) => {
+      if (this.props.cookies !== undefined)
+        this.saveTokenFromCookies(response.data.accessToken, this.props.cookies);
       this.setState({
         isLogged: LoginState.logged,
         user: response.data.user,
         accessToken: response.data.accessToken
       });
+      return callback(response.data.user);
     }).catch((error: AxiosError<RegisterError>) => {
       if (error?.response?.data !== undefined)
         return callback(null, error.response.data);

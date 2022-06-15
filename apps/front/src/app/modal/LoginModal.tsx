@@ -3,10 +3,10 @@ import {
   Form,
   InlineLoading, Link,
   Modal,
-  TextInput, Tile
+  TextInput,
 } from "carbon-components-react";
 import {Stack} from '@carbon/react';
-import {UserContext, UserContextProps} from "../context/UserContext";
+import {RequiredUserContextProps, UserContextProps} from "../context/UserContext";
 import {User} from "../../../../../libs/data-access/user/User";
 
 type LoginModalProps = {
@@ -14,7 +14,7 @@ type LoginModalProps = {
   onDismiss: () => void;
   onUserLogged: (user: User) => void;
   switchToRegister: () => void;
-}
+} & RequiredUserContextProps;
 
 type LoginModalState = {
   email?: string;
@@ -53,35 +53,29 @@ export class LoginModal extends React.Component<LoginModalProps, LoginModalState
   }
 
   override render() {
-    return (
-      <UserContext.Consumer>
-        {(authContext) => {
-          return <Modal
-            open={this.props.open}
-            onRequestClose={this.props.onDismiss}
-            onRequestSubmit={() => this.onClickCreate(authContext)}
-            modalHeading="Se connecter"
-            modalLabel="Login"
-            shouldSubmitOnEnter={true}
-            primaryButtonText={this.state.loading ? <InlineLoading
-              description={"Chargement ..."}
-              status={this.state.loading ? 'active' : 'finished'}/> : "Connexion"}
-            primaryButtonDisabled={this.state.loading}
-            secondaryButtonText="Annuler"
-            size={"md"}>
-            <Form>
-              <Stack gap={7}>
-                <TextInput id="email" type={"email"} labelText="Adresse email" onChange={(event) => this.setState({email: event.target.value})}/>
-                <TextInput id="mdp" type={"password"} labelText="Mot de passe" onChange={(event) => this.setState({password: event.target.value})}/>
-              </Stack>
-            </Form>
-            <br />
-            <br />
-            Pas encore de compte ? <Link onClick={() => this.props.switchToRegister()}>Inscrivez vous ici !</Link>
-          </Modal>
-        }}
-      </UserContext.Consumer>
-    );
+      return (<Modal
+        open={this.props.open}
+        onRequestClose={this.props.onDismiss}
+        onRequestSubmit={() => this.onClickCreate(this.props.userContext)}
+        modalHeading="Se connecter"
+        modalLabel="Login"
+        shouldSubmitOnEnter={true}
+        primaryButtonText={this.state.loading ? <InlineLoading
+          description={"Chargement ..."}
+          status={this.state.loading ? 'active' : 'finished'}/> : "Connexion"}
+        primaryButtonDisabled={this.state.loading}
+        secondaryButtonText="Annuler"
+        size={"md"}>
+        <Form>
+          <Stack gap={7}>
+            <TextInput id="email" type={"email"} labelText="Adresse email" onChange={(event) => this.setState({email: event.target.value})}/>
+            <TextInput id="mdp" type={"password"} labelText="Mot de passe" onChange={(event) => this.setState({password: event.target.value})}/>
+          </Stack>
+        </Form>
+        <br />
+        <br />
+        Pas encore de compte ? <Link onClick={() => this.props.switchToRegister()}>Inscrivez vous ici !</Link>
+      </Modal>);
   }
 
 }

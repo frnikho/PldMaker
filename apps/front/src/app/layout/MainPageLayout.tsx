@@ -23,18 +23,16 @@ import {Layer} from '@carbon/react';
 import {Bee, Dashboard, Events, Login, Notification, UserAvatar} from '@carbon/icons-react'
 
 import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
-import {AuthModalComponent} from "../component/AuthModalComponent";
 import {NavigationState} from "../util/Navigation";
+import {AuthModalComponent} from "../component/AuthModalComponent";
 
 export type MainPageLayoutProps = {
   onRedirectUrl: (url: string) => void;
 };
 
 export type MainPageLayoutState = {
-  modal: {
-    login: boolean;
-    register: boolean;
-  }
+  login: boolean;
+  register: boolean;
 } & NavigationState;
 
 export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPageLayoutState> {
@@ -42,33 +40,66 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
   constructor(props: MainPageLayoutProps) {
     super(props);
     this.state = {
-      modal: {
-        login: false,
-        register: false,
-      },
+      login: false,
+      register: false,
       navigateUrl: undefined,
     }
+    this.switchModal = this.switchModal.bind(this);
+    this.onUserRegistered = this.onUserLogged.bind(this);
+    this.onUserLogged = this.onUserLogged.bind(this);
+    this.onDismissModal = this.onDismissModal.bind(this);
   }
 
   public openLoginModal() {
     this.setState({
-      modal: {
-        login: true,
-        register: false
-      }
+      login: true,
+      register: false
     })
   }
 
   public openRegisterModal() {
     this.setState({
-      modal: {
-        login: false,
-        register: true
-      }
+      login: false,
+      register: true
     })
   }
 
-  public showLoginButton(auth: UserContextProps): JSX.Element {
+  public onUserRegistered() {
+    this.setState({
+      register: false,
+      login: false,
+    });
+  }
+
+  public onUserLogged() {
+    this.setState({
+      register: false,
+      login: false,
+    });
+  }
+
+  public switchModal() {
+    if (this.state.login) {
+      this.setState({
+        login: false,
+        register: true
+      });
+    } else {
+      this.setState({
+        login: true,
+        register: false
+      });
+    }
+  }
+
+  public onDismissModal() {
+    this.setState({
+      login: false,
+      register: false,
+    })
+  }
+
+  public showLoginButton(): JSX.Element {
     return (
       <>
         <HeaderGlobalAction
@@ -99,10 +130,10 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
       </HeaderGlobalAction>
       <OverflowMenu ariaLabel="overflow-menu" style={{marginTop: 'auto', marginBottom: 'auto'}} menuOffset={{left: -60}} renderIcon={UserAvatar}>
         <OverflowMenuItem itemText={title} requireTitle disabled/>
-        <OverflowMenuItem itemText="Mon profile" onClick={(e) => {
+        <OverflowMenuItem itemText="Mon profile" onClick={() => {
           this.props.onRedirectUrl('/profile')
         }} />
-        <OverflowMenuItem hasDivider itemText="Se déconnecter" onClick={(e) => {
+        <OverflowMenuItem hasDivider itemText="Se déconnecter" onClick={() => {
           auth.logout();
           this.props.onRedirectUrl('/');
         }} />
@@ -112,7 +143,7 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
 
   private showState(auth: UserContextProps) {
     if (auth.isLogged === LoginState.not_logged) {
-      return this.showLoginButton(auth);
+      return this.showLoginButton();
     } else {
       return this.showLoginAvatar(auth);
     }
@@ -120,55 +151,57 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
 
   override render() {
     return (
-      <HeaderContainer
-        render={({ isSideNavExpanded, onClickSideNavExpand }) => (
-         <>
-           <AuthModalComponent openLoginModal={this.state.modal.login} openRegisterModal={this.state.modal.register}/>
-           <Header aria-label="IBM Platform Name">
-             <SkipToContent />
-             <HeaderMenuButton
-             aria-label="Open menu"
-             isCollapsible
-              onClick={onClickSideNavExpand}
-              isActive={isSideNavExpanded}
-            />
-             <Layer onClick={() => this.props.onRedirectUrl('/')}>
-               <HeaderName prefix="PLD">
-                 [Maker]
-               </HeaderName>
-             </Layer>
-            <HeaderGlobalBar>
-              <UserContext.Consumer>
-                {(auth) => this.showState(auth)}
-              </UserContext.Consumer>
-            </HeaderGlobalBar>
-            <SideNav
-              aria-label="Side navigation"
-              isRail
-              expanded={isSideNavExpanded}
-              onOverlayClick={onClickSideNavExpand}>
-                <SideNavItems>
-                <SideNavLink
-                  renderIcon={Dashboard}>
-                    Dashboard
-                </SideNavLink>
-                <SideNavLink
-                  renderIcon={Events}>
-                    Organisation
-                </SideNavLink>
-              </SideNavItems>
-            </SideNav>
-          </Header>
-          <Content id="main-content">
-            <Grid>
-              <Column sm={4} md={8} lg={16}>
-                <Outlet/>
-              </Column>
-            </Grid>
-          </Content>
-        </>
-       )}
-     />
+      <>
+        <AuthModalComponent onDismiss={this.onDismissModal} openLoginModal={this.state.login} openRegisterModal={this.state.register} switchModal={this.switchModal} onUserRegistered={this.onUserRegistered} onUserLogged={this.onUserLogged}/>
+        <HeaderContainer
+          render={({ isSideNavExpanded, onClickSideNavExpand }) => (
+            <>
+              <Header aria-label="IBM Platform Name">
+                <SkipToContent />
+                <HeaderMenuButton
+                  aria-label="Open menu"
+                  isCollapsible
+                  onClick={onClickSideNavExpand}
+                  isActive={isSideNavExpanded}
+                />
+                <Layer onClick={() => this.props.onRedirectUrl('/')}>
+                  <HeaderName prefix="PLD">
+                    [Maker]
+                  </HeaderName>
+                </Layer>
+                <HeaderGlobalBar>
+                  <UserContext.Consumer>
+                    {(auth) => this.showState(auth)}
+                  </UserContext.Consumer>
+                </HeaderGlobalBar>
+                <SideNav
+                  aria-label="Side navigation"
+                  isRail
+                  expanded={isSideNavExpanded}
+                  onOverlayClick={onClickSideNavExpand}>
+                  <SideNavItems>
+                    <SideNavLink
+                      renderIcon={Dashboard}>
+                      Dashboard
+                    </SideNavLink>
+                    <SideNavLink
+                      renderIcon={Events}>
+                      Organisation
+                    </SideNavLink>
+                  </SideNavItems>
+                </SideNav>
+              </Header>
+              <Content id="main-content">
+                <Grid>
+                  <Column sm={4} md={8} lg={16}>
+                    <Outlet/>
+                  </Column>
+                </Grid>
+              </Content>
+            </>
+          )}
+        />
+      </>
     )
   }
 
