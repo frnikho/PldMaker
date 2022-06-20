@@ -2,7 +2,7 @@ import {Body, Controller, HttpCode, Post, Request, UseGuards} from '@nestjs/comm
 import {LocalAuthGuard} from "./guard/local-auth.guard";
 import {AuthService} from "./auth.service";
 import {Public} from "./public.decorator";
-import {RegisterUserBody} from "../../../../../libs/data-access/auth/RegisterUserBody";
+import {RegisterBody} from "../../../../../libs/data-access/auth/RegisterBody";
 
 @Controller('auth')
 export class AuthController {
@@ -20,7 +20,7 @@ export class AuthController {
   @Post('register')
   @Public()
   @HttpCode(201)
-  public async register(@Body() body: RegisterUserBody) {
+  public async register(@Body() body: RegisterBody) {
     return this.authService.register(body);
   }
 

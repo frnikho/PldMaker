@@ -1,21 +1,20 @@
 import React from "react";
 import {Cookies, ReactCookieProps, withCookies} from "react-cookie";
-import api from "../util/Api";
+import api, {ApiError} from "../util/Api";
 import {User} from "../../../../../libs/data-access/user/User";
 import {LoginToken} from "../../../../../libs/data-access/auth/LoginToken";
 import {AxiosError} from "axios";
 import {LoginBody} from "../../../../../libs/data-access/auth/LoginBody";
-import {RegisterUserBody} from "../../../../../libs/data-access/auth/RegisterUserBody";
-import {RegisterError, RegisterResponse} from "../../../../../libs/data-access/auth/RegisterResponse";
-import {LoginError} from "../../../../../libs/data-access/auth/LoginResponse";
+import {RegisterBody} from "../../../../../libs/data-access/auth/RegisterBody";
+import {RegisterResponse} from "../../../../../libs/data-access/auth/RegisterResponse";
 import {UserApiController} from "../controller/UserApiController";
 import {emitBody, SocketContext} from "./SocketContext";
 
 export const ACCESS_TOKEN_COOKIE_NS = 'access_token';
 
 export type UserContextProps = {
-  login: (email: string, password: string, callback: (user: User | null , error?: LoginError) => unknown) => void;
-  register: (email: string, password: string, callback: (user: User | null , error?: RegisterError) => unknown) => void;
+  login: (loginBody: LoginBody, callback: (user: User | null , error?: ApiError) => unknown) => void;
+  register: (registerBody: RegisterBody, callback: (user: User | null , error?: ApiError) => unknown) => void;
   logout: () => void;
   isLogged: LoginState;
   user?: User;
@@ -115,8 +114,7 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
     });
   }
 
-  public login(email: string, password: string, callback: (user: User | null, error?: LoginError) => unknown): void {
-    const loginBody: LoginBody = {email, password};
+  public login(loginBody: LoginBody, callback: (user: User | null, error?: ApiError) => unknown): void {
     if (this.props.cookies === undefined) {
       // TODO check error
       console.log("error cookies")
@@ -142,17 +140,16 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
       } else {
         console.log("Response is undefined ");
       }
-    }).catch((err: AxiosError<LoginError>) => {
+    }).catch((err: AxiosError<ApiError>) => {
       if (err?.response?.data !== undefined) {
-        callback(null, err.response.data);
+        callback(null, err?.response?.data);
       } else {
         console.log("Error Axios", err);
       }
     });
   }
 
-  public register(email: string, password: string, callback: (user: User | null , error?: RegisterError) => unknown): void {
-    const registerBody: RegisterUserBody = {password, email};
+  public register(registerBody: RegisterBody, callback: (user: User | null , error?: ApiError) => unknown): void {
     api.post<RegisterResponse>(`auth/register`, registerBody).then((response) => {
       if (this.props.cookies !== undefined)
         this.saveTokenFromCookies(response.data.accessToken, this.props.cookies);
@@ -162,9 +159,9 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
         accessToken: response.data.accessToken
       });
       return callback(response.data.user);
-    }).catch((error: AxiosError<RegisterError>) => {
+    }).catch((error: AxiosError<ApiError>) => {
       if (error?.response?.data !== undefined)
-        return callback(null, error.response.data);
+        return callback(null, error?.response?.data);
     });
   }
 

@@ -1,4 +1,22 @@
-export type LoginBody = {
+import {IsEmail, MaxLength, MinLength} from "class-validator";
+
+export class LoginBody {
+
+  @IsEmail({}, {
+    message: "l'email doit être au format hello@hello.com"
+  })
   email: string;
+
+  @MinLength(5, {
+    message: 'Le mot de passe doit être supérieur a 5 de longueur'
+  })
+  @MaxLength(64, {
+    message: 'Le mot de passe ne poit pas être supérieur a 64 de longeur',
+  })
   password: string;
+
+  constructor(email: string, password: string) {
+    this.email = email;
+    this.password = password;
+  }
 }

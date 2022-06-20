@@ -1,9 +1,12 @@
-import {DodStatus} from "../../../../../libs/data-access/dod/Dod";
 import {DodColor} from "../../../../../libs/data-access/organization/Organization";
 
-export const getDodStatusColor = (dodColors: DodColor[], status: DodStatus) => { //TODO REWORK THIS !!!
-  const color: DodColor | undefined = dodColors.find((dodColor) => dodColor.name === status);
-  if (color === undefined)
-    return '';
+export const getDodStatusColor = (dodColors: DodColor[], status: string) => {
+  const color: DodColor | undefined = dodColors.find((dodColor) => {
+    return dodColor.name === status
+  });
+  if (color === undefined) {
+    console.log(status);
+    return 'ababab';
+  }
   return color.color;
 }

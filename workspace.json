@@ -5,5 +5,6 @@
     "backend": "apps/backend",
     "front": "apps/front",
     "front-e2e": "apps/front-e2e"
-  }
+  },
+  "webpackConfig": "@nrwl/react/plugins/babel"
 }

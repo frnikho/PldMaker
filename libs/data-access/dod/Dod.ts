@@ -15,7 +15,7 @@ export type Dod = {
   estimatedWorkTime: UserWorkTime[];
   pldOwner: Pld | string;
   owner: User | string;
-  status: DodStatus;
+  status: DodStatus | string;
   revisions: DodRevision[]
 } & DatedObject;
 

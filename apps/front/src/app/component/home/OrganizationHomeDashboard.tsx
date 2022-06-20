@@ -2,9 +2,9 @@ import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {
-  Button, ButtonSet, ContentSwitcher, DataTableSkeleton,
+  Button, ButtonSet, DataTableSkeleton,
   Row,
-  SkeletonPlaceholder, Switch,
+  SkeletonPlaceholder,
   Table,
   TableBody, TableCell,
   TableHead,
@@ -16,11 +16,13 @@ import {FlexGrid} from '@carbon/react'
 import {NavigationState, redirectNavigation} from "../../util/Navigation";
 import {Organization} from "../../../../../../libs/data-access/organization/Organization";
 
-import {View, Add, QHintonPlot} from '@carbon/icons-react'
+import {View, Add} from '@carbon/icons-react'
 
-type OrganizationHomeDashboardProps = {
+const formatDate = (date: Date): string => {
+  return date.toLocaleDateString("fr");
+}
 
-} & RequiredUserContextProps
+type OrganizationHomeDashboardProps = unknown & RequiredUserContextProps
 
 type OrganizationHomeDashboardState = {
   loading: boolean;
@@ -37,6 +39,8 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
     }
     this.onClickCreateOrganization = this.onClickCreateOrganization.bind(this);
   }
+
+
 
   override componentDidMount() {
     if (this.props.userContext.accessToken === undefined)
@@ -75,23 +79,24 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
     if (this.state.organization.length <= 0) {
       return;
     }
-
     return (
       <Table style={{marginTop: '20px'}}>
         <TableHead>
           <TableRow>
             <TableHeader id={"name"} key={"name"}>Nom de l'organisation</TableHeader>
-            <TableHeader id={"name"} key={"description"}>Description</TableHeader>
-            <TableHeader id={"name"} key={"created_date"}>Date de création</TableHeader>
-            <TableHeader id={"name"} key={"action"}>Action</TableHeader>
+            <TableHeader id={"description"} key={"description"}>Description</TableHeader>
+            <TableHeader id={"created_date"} key={"created_date"}>Date de création</TableHeader>
+            <TableHeader id={"author"} key={"author"}>Manager</TableHeader>
+            <TableHeader id={"action"} key={"action"}>Action</TableHeader>
           </TableRow>
         </TableHead>
         <TableBody>
           {this.state.organization.map((org, index) => (
             <TableRow key={index}>
-              <TableCell key={index}>abc {org.name}</TableCell>
+              <TableCell>{org.name}</TableCell>
               <TableCell>{org.description}</TableCell>
-              <TableCell>TODO</TableCell>
+              <TableCell>{formatDate(new Date(org.created_date ?? new Date()))}</TableCell>
+              <TableCell>{org.owner.email}</TableCell>
               <TableCell>
                 <ButtonSet>
                   <Button
@@ -112,15 +117,14 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
     if (this.state.organization.length !== 0 || this.state.loading) {
       return;
     }
-    return (<>
+    return (
       <FlexGrid>
         <Row>
           <h4>Vous n'avez pas rejoin ou créer d'organisation</h4>
           <Lottie animationData={require('../../../assets/animations/organization.json')} loop={true} style={{width: '300px'}}/>
           <h4><Button onClick={this.onClickCreateOrganization}>Cliquez ici pour en créer une !</Button></h4>
         </Row>
-      </FlexGrid>
-    </>)
+      </FlexGrid>)
   }
 
   override render() {

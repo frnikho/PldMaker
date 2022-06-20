@@ -1,7 +1,7 @@
 auth:
-  userAlreadyRegistered: "User already registered with this email address !"
-  userNotFound: "User not found"
-  wrongPassword: "Incorrect password"
+  userAlreadyRegistered: "un utilisateur existe déja avec cette adresse email !"
+  userNotFound: "Utilisateur non trouvé !"
+  wrongPassword: "Mot de passe incorrect !"
 dodStatus:
   todo: 'A faire'
   in_progress: 'En cours'

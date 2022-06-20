@@ -6,9 +6,9 @@ import {Organization} from "../../../../../../libs/data-access/organization/Orga
 import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 import {
   Accordion,
-  AccordionItem,
-  Button, ButtonSet,
-  Column,
+  AccordionItem, Breadcrumb, BreadcrumbItem, BreadcrumbSkeleton,
+  Button, ButtonSet, ButtonSkeleton,
+  Column, ExpandableTile,
   Grid,
   NumberInput,
   ProgressIndicator,
@@ -25,15 +25,17 @@ import {
   TableRow,
   TextArea,
   TextInput,
-  Tile,
+  Tile, TileAboveTheFoldContent, TileBelowTheFoldContent,
 } from "carbon-components-react";
 
 import {Stack} from '@carbon/react';
 
-import {DocumentAdd, DocumentTasks, Classification} from '@carbon/icons-react';
+import Lottie from "lottie-react";
+
+import {DocumentAdd, DocumentTasks, Classification, RecentlyViewed} from '@carbon/icons-react';
 
 import {User} from "../../../../../../libs/data-access/user/User";
-import {DodTableComponent} from "./DodTableComponent";
+import {DodTableComponent} from "../dod/DodTableComponent";
 import {GenerateComponent} from "./GenerateComponent";
 import {DodApiController} from "../../controller/DodApiController";
 import {Dod} from "../../../../../../libs/data-access/dod/Dod";
@@ -43,11 +45,13 @@ import {toast} from "react-toastify";
 import {PldStatus} from "../../../../../../libs/data-access/pld/PldStatus";
 import {SocketContext} from "../../context/SocketContext";
 import {ChangePldTypeModal} from "../../modal/pld/ChangePldTypeModal";
+import {OnlineOrgMembersComponent} from "./OnlineOrgMembersComponent";
+import {NavProps, withNav} from "../../util/Navigation";
 
 export type PldComponentProps = {
   pldId: string;
   orgId: string;
-} & RequiredUserContextProps;
+} & RequiredUserContextProps & NavProps;
 
 export type PldComponentState = {
   org?: Organization;
@@ -63,7 +67,7 @@ const formatDate = (date: Date): string => {
 }
 
 
-export class PldComponent extends React.Component<PldComponentProps, PldComponentState> {
+class PldComponent extends React.Component<PldComponentProps, PldComponentState> {
 
   static override contextType = SocketContext;
   override context!: React.ContextType<typeof SocketContext>;
@@ -114,7 +118,7 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
       if (org !== null) {
         this.setState({
           org: org,
-        })
+        });
       }
     });
   }
@@ -290,7 +294,7 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
     if (this.state.pld.revisions.length <= 0) {
       return (
         <AccordionItem title={"Dernieres révisions du documents"}>
-          <h4>Aucune révisions disponible, vous pouvez en créer dans les "Actions" en bas de page.</h4>
+          <h4 style={{margin: '10px'}}>Aucune révisions disponible, vous pouvez en créer dans les "Actions" en bas de page.</h4>
         </AccordionItem>
       )
     }
@@ -327,11 +331,43 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
     )
   }
 
-  private showGeneratePanel() {
+  private showAddRevisionButton() {
     if (this.state.org === undefined || this.state.pld === undefined) {
-      return (<SkeletonPlaceholder style={{width: '100%'}}/>)
+      return (<ButtonSkeleton/>)
+    } else {
+      return (<Button renderIcon={DocumentAdd} onClick={() => this.setState({openAddRevisionModal: true})}>Ajouter une révision</Button>)
+    }
+  }
+
+  private showSignButton() {
+   if (this.state.org === undefined || this.state.pld === undefined) {
+     return (<ButtonSkeleton/>)
+   } else {
+     return (<Button renderIcon={DocumentTasks} onClick={() => this.setState({openSignModal: true})}>Signer le PLD</Button>);
+   }
+  }
+
+  private showChangeStepButton() {
+    if (this.state.org === undefined || this.state.pld === undefined) {
+      return (<ButtonSkeleton/>)
+    } else {
+      return (<Button renderIcon={Classification} onClick={() => this.setState({openChangePldType: true})}>Changer l'etat d'avancement</Button>)
+    }
+  }
+
+  private showGenerateButton() {
+    if (this.state.org === undefined || this.state.pld === undefined) {
+      return (<ButtonSkeleton/>)
     } else {
       return (<GenerateComponent org={this.state.org} pld={this.state.pld} dod={this.state.dod}/>)
+    }
+  }
+
+  private showHistoryButton() {
+    if (this.state.org === undefined || this.state.pld === undefined) {
+      return (<ButtonSkeleton/>)
+    } else {
+      return (<Button disabled renderIcon={RecentlyViewed} iconDescription="">Voir tout les changements</Button>)
     }
   }
 
@@ -411,6 +447,12 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
     )
   }
 
+  private showOnlineMembers() {
+    if (this.state.org === undefined)
+      return;
+    return (<OnlineOrgMembersComponent org={this.state.org} userContext={this.props.userContext}/>)
+  }
+
   private showStepOfPld() {
     if (this.state.pld === undefined)
       return;
@@ -443,28 +485,61 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
     )
   }
 
+  private showBreadcrumb() {
+    const item = (
+      <>
+        <BreadcrumbItem onClick={() => this.props.navigate('/')}>Dashboard</BreadcrumbItem>
+        <BreadcrumbItem onClick={() => {this.props.navigate(`/organization/${this.props.orgId}`);}}>{this.state.org?.name ?? "Organisation"}</BreadcrumbItem>
+        <BreadcrumbItem onClick={() => null} isCurrentPage>{this.state.pld?.title ?? 'PLD'}</BreadcrumbItem>
+      </>);
+    if (this.state.org === undefined) {
+      return (
+        <BreadcrumbSkeleton style={{marginBottom: '40px'}}>
+          {item}
+        </BreadcrumbSkeleton>
+      )
+    } else {
+      return (
+        <Breadcrumb style={{marginBottom: '40px'}}>
+          {item}
+        </Breadcrumb>
+      )
+    }
+  }
+
   override render() {
     return (
+      <>
+        {this.showBreadcrumb()}
         <Grid>
           {this.showModals()}
           <Column lg={12} md={8} sm={4}>
             <Stack gap={6}>
-            <Tile>
-              <h1 style={{marginBottom: '20px'}}>Informations du pld</h1>
-              {this.showInfoPanel()}
-            </Tile>
-            <Tile>
-              <h1>Dod</h1>
-              {this.showDataTable()}
-            </Tile>
-            <Tile>
-              <h1>Documents du pld</h1>
-            </Tile>
+              <Tile>
+                <h1 style={{marginBottom: '20px'}}>Informations du pld</h1>
+                {this.showInfoPanel()}
+              </Tile>
+              <Tile>
+                <h1>Dod</h1>
+                {this.showDataTable()}
+              </Tile>
+              <ExpandableTile>
+                <TileAboveTheFoldContent>
+                  <h1>Documents du pld</h1>
+                  <p>Pour le moments, les documents ne sont pas encore disponible </p>
+                </TileAboveTheFoldContent>
+                <TileBelowTheFoldContent>
+                  <Lottie>
+                    <Lottie animationData={require('../../../assets/animations/wip.json')} loop={true} style={{width: '300px'}}/>
+                  </Lottie>
+                </TileBelowTheFoldContent>
+              </ExpandableTile>
               <ButtonSet style={{marginBottom: '20px'}}>
-                <Button renderIcon={DocumentAdd} onClick={() => this.setState({openAddRevisionModal: true})}>Ajouter une révision</Button>
-                <Button renderIcon={DocumentTasks} onClick={() => this.setState({openSignModal: true})}>Signer le PLD</Button>
-                <Button renderIcon={Classification} onClick={() => this.setState({openChangePldType: true})}>Changer l'etat d'avancement</Button>
-                {this.showGeneratePanel()}
+                {this.showAddRevisionButton()}
+                {this.showChangeStepButton()}
+                {this.showGenerateButton()}
+                {this.showHistoryButton()}
+                {this.showSignButton()}
               </ButtonSet>
             </Stack>
           </Column>
@@ -473,9 +548,13 @@ export class PldComponent extends React.Component<PldComponentProps, PldComponen
               {this.showQuickInformationPanel()}
               {this.showPldState()}
               {this.showStepOfPld()}
+              {this.showOnlineMembers()}
             </Stack>
           </Column>
         </Grid>
+      </>
     );
   }
 }
+
+export default withNav(PldComponent);

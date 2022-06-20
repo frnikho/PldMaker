@@ -192,7 +192,7 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
                 </SideNav>
               </Header>
               <Content id="main-content">
-                <Grid>
+                <Grid condensed={false}>
                   <Column sm={4} md={8} lg={16}>
                     <Outlet/>
                   </Column>

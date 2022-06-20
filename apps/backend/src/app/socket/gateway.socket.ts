@@ -8,24 +8,22 @@ import {
 import { Server } from 'socket.io';
 import {UseGuards} from "@nestjs/common";
 import {AuthWsGuard} from "../auth/socket/authws.guard";
-import {User} from "../user/user.schema";
+import {User, UserDocument} from "../user/user.schema";
 import {Socket} from "net";
 import {OnEvent} from "@nestjs/event-emitter";
+import {GatewayService} from "./gateway.service";
 
 @WebSocketGateway({transports: 'websocket', path: '/ws', pingInterval: 4000})
 export class Gateway {
+
+  constructor(private service: GatewayService) {}
+
   @WebSocketServer()
   server: Server;
 
-  private registerListeners(client: Socket) {
-    client.on('packet', function (packet) {
-      if (packet.type === 'ping') console.log('received ping');
-    });
-
-    client.on('packetCreate', function (packet) {
-      if (packet.type === 'pong') console.log('sending pong');
-    });
+  private registerListeners(client: Socket, user: UserDocument) {
     client.on('disconnect', () => {
+      this.service.disconnectedUser(user)
       console.log('Disconnected !');
     })
   }
@@ -38,15 +36,17 @@ export class Gateway {
 
   @UseGuards(AuthWsGuard)
   @SubscribeMessage('LoggedUser:New')
-  public onNewUserLogged(@MessageBody('0') user: User, @ConnectedSocket() client: Socket) {
-    this.registerListeners(client);
+  public onNewUserLogged(@MessageBody('0') user: UserDocument, @ConnectedSocket() client: Socket) {
+    this.registerListeners(client, user);
+
+    this.service.connectedUser(user);
     console.log('New:LoggedUser: user:');
   }
 
   @UseGuards(AuthWsGuard)
   @SubscribeMessage('LoggedUser:Logout')
   public onUserLogout(@MessageBody('0') user: User) {
-
+    console.log('Logout');
   }
 
   @OnEvent('Pld:Update')
@@ -65,9 +65,9 @@ export class Gateway {
   }
 
   @UseGuards(AuthWsGuard)
-  @SubscribeMessage('Pld:GetOnlineMembers')
-  public getOnlineMembers() {
-
+  @SubscribeMessage('Org:GetOnlineMembers')
+  public async getOnlineMembers(@MessageBody('0') user: User, @MessageBody('1',) orgId: string[]) {
+    this.server.emit('Org:GetOnlineMembers', await this.service.getMembers(orgId[0]));
   }
 
 }

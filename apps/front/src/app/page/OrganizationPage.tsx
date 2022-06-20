@@ -3,9 +3,10 @@ import {RouteMatch} from "react-router/lib/router";
 import {PageState} from "../util/Page";
 import {redirectNavigation, withParams} from "../util/Navigation";
 import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
-import {OrganizationComponent} from "../component/org/OrganizationComponent";
+import OrganizationComponent from "../component/org/OrganizationComponent";
 import {ApiError} from "../util/Api";
 import {SkeletonPlaceholder} from "carbon-components-react";
+
 
 export type OrganizationPageProps = unknown & RouteMatch;
 export type OrganizationPageState = unknown & PageState;
@@ -35,9 +36,7 @@ class OrganizationPage extends React.Component<OrganizationPageProps, Organizati
       )
     }
     return (
-      <>
-        <SkeletonPlaceholder style={{height: '20px', width: '20%'}}/>
-      </>
+      <SkeletonPlaceholder style={{height: '20px', width: '20%'}}/>
     )
   }
 

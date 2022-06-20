@@ -32,7 +32,8 @@ export type ApiError = {
 export type Error = {
   error?: string,
   type: ErrorType,
-  message: string[]
+  message: string[],
+  statusCode?: 400,
 }
 
 export enum ErrorType {

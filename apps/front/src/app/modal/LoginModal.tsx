@@ -8,6 +8,12 @@ import {
 import {Stack} from '@carbon/react';
 import {RequiredUserContextProps, UserContextProps} from "../context/UserContext";
 import {User} from "../../../../../libs/data-access/user/User";
+import ErrorManager from "../manager/ErrorManager";
+import {toast} from "react-toastify";
+import {LoginBody} from "../../../../../libs/data-access/auth/LoginBody";
+import {validate} from "class-validator";
+import {FieldData} from "../util/FieldData";
+import {ReactPage} from "../util/Page";
 
 type LoginModalProps = {
   open: boolean;
@@ -17,18 +23,22 @@ type LoginModalProps = {
 } & RequiredUserContextProps;
 
 type LoginModalState = {
-  email?: string;
-  password?: string;
+  email: FieldData<string>;
+  password: FieldData<string>;
   loading: boolean;
 }
 
-export class LoginModal extends React.Component<LoginModalProps, LoginModalState> {
+export class LoginModal extends ReactPage<LoginModalProps, LoginModalState> {
 
   constructor(props: LoginModalProps) {
     super(props);
     this.state = {
-      password: undefined,
-      email: undefined,
+      password: {
+        value: ''
+      },
+      email: {
+        value: ''
+      },
       loading: false,
     }
     this.onClickCreate = this.onClickCreate.bind(this);
@@ -37,19 +47,29 @@ export class LoginModal extends React.Component<LoginModalProps, LoginModalState
   public onClickCreate(authContext: UserContextProps) {
     if (this.state.email === undefined || this.state.password === undefined)
       return;
+    const loginBody = new LoginBody(this.state.email.value, this.state.password.value);
     this.setState({loading: true});
-    authContext.login(this.state.email, this.state.password, (user, error) => {
-      this.setState({
-        loading: false,
+    validate(loginBody).then((errors) => {
+      if (errors.length <= 0)
+        return true;
+      errors.forEach((error) => {
+        const msg = Object.entries(error.constraints ?? {}).map((a) => a[1]);
+        this.updateFormField(error.property, '', msg.join(', '));
+      })
+      return false;
+    }).then((valid) => {
+      if (!valid)
+        return;
+      authContext.login(loginBody, (user, error) => {
+        if (error) {
+          toast(ErrorManager.LoginError(error.statusCode ?? -1).message, {type: 'error'});
+        } else if (user !== null) {
+          this.props.onUserLogged(user);
+        }
       });
-      if (user !== null && error === undefined) {
-        this.props.onUserLogged(user);
-      } else {
-        // TODO create notification error
-        console.log("Error login: ", error);
-      }
+    }).then(() => {
+      this.setState({loading: false})
     });
-
   }
 
   override render() {
@@ -68,8 +88,12 @@ export class LoginModal extends React.Component<LoginModalProps, LoginModalState
         size={"md"}>
         <Form>
           <Stack gap={7}>
-            <TextInput id="email" type={"email"} labelText="Adresse email" onChange={(event) => this.setState({email: event.target.value})}/>
-            <TextInput id="mdp" type={"password"} labelText="Mot de passe" onChange={(event) => this.setState({password: event.target.value})}/>
+            <TextInput id="email" type={"email"} invalidText={this.state.email.error} invalid={this.state.email.error !== undefined} labelText="Adresse email" onChange={(event) => this.setState({email: {
+              value: event.target.value
+              }})}/>
+            <TextInput id="mdp" type={"password"} invalidText={this.state.password.error} invalid={this.state.password.error !== undefined} labelText="Mot de passe" onChange={(event) => this.setState({password: {
+              value: event.target.value}
+            })}/>
           </Stack>
         </Form>
         <br />

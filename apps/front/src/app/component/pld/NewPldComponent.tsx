@@ -1,10 +1,9 @@
 import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {
-  Button, Checkbox,
+  Button, Column,
   DatePicker,
-  DatePickerInput,
-  MultiSelect,
+  DatePickerInput, Grid,
   NumberInput,
   Select,
   SelectItem,
@@ -19,12 +18,11 @@ import {User} from "../../../../../../libs/data-access/user/User";
 
 import {Stack, Tag} from '@carbon/react';
 
-import {Close} from '@carbon/icons-react';
+import {Close, ArrowUp, ArrowDown, TrashCan, Add} from '@carbon/icons-react';
 import {PldApiController} from "../../controller/PldApiController";
 import {PldOrgCreateBody} from "../../../../../../libs/data-access/pld/PldBody";
 import {Pld} from "../../../../../../libs/data-access/pld/Pld";
-import {PldStep} from "../../../../../../libs/data-access/pld/PldStep";
-import {validate} from "class-validator";
+import {HelperText} from "../../util/HelperText";
 
 export type NewPldComponentProps = {
   orgId?: string;
@@ -46,7 +44,6 @@ export type NewPldForm = {
   tagsInput: FieldData<string>;
   promotion: FieldData<number>;
   version: FieldData<number>;
-  multiFollowup: FieldData<boolean>;
   steps: FieldData<string[]>;
 }
 
@@ -83,15 +80,16 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
           value: [],
         },
         steps: {
-          value: []
+          value: ['Kick-Off', 'Follow-Up', 'Delivery']
         },
-        multiFollowup: {
-          value: false,
-        }
       }
     }
     this.onClickCreate = this.onClickCreate.bind(this);
     this.updateField = this.updateField.bind(this);
+    this.addStatus = this.addStatus.bind(this);
+    this.deleteStatus = this.deleteStatus.bind(this);
+    this.upStatus = this.upStatus.bind(this);
+    this.downStatus = this.downStatus.bind(this);
   }
 
   override componentDidMount() {
@@ -195,80 +193,117 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
     )
   }
 
+  private showSteps() {
+    return <>
+      {this.state.form.steps.value.map((step, index) => {
+        return (
+          <Grid key={index}>
+            <Column lg={11}>
+              <TextInput id={"step"} labelText={`${index+1}:`} value={step} onChange={(e) => {
+                this.state.form.steps.value[index] = e.currentTarget.value;
+                this.setState({});
+              }}/>
+            </Column>
+            <Column lg={4}>
+              <Button hasIconOnly iconDescription={"Faire monter"} renderIcon={ArrowUp} kind={"ghost"} disabled={index === 0} onClick={() => this.downStatus(index)}/>
+              <Button hasIconOnly iconDescription={"Faire descendre"} renderIcon={ArrowDown} kind={"ghost"} disabled={index === this.state.form.steps.value.length-1} onClick={() => this.upStatus(index)}/>
+              <Button hasIconOnly iconDescription={"Supprimer"} renderIcon={TrashCan} kind={"ghost"} onClick={() => this.deleteStatus(index)}/>
+            </Column>
+          </Grid>
+        )
+      })}
+      <Button hasIconOnly renderIcon={Add} iconDescription={"Ajouter un status"} onClick={this.addStatus}/>
+    </>
+  }
+
+  private upStatus(index: number) {
+    const status = this.state.form.steps.value[index];
+    this.state.form.steps.value.splice(index, 1);
+    this.state.form.steps.value.splice(index+1, 0, status);
+    this.setState({});
+  }
+
+  private downStatus(index: number) {
+    const status = this.state.form.steps.value[index];
+    this.state.form.steps.value.splice(index, 1);
+    this.state.form.steps.value.splice(index-1, 0, status);
+    this.setState({});
+  }
+
+  private deleteStatus(index: number) {
+    this.state.form.steps.value.splice(index, 1);
+    this.setState({});
+  }
+
+  private addStatus() {
+    this.state.form.steps.value.push('Nouveau Status')
+    this.setState({});
+  }
+
   override render() {
     return (
-      <>
-        <Stack gap={4}>
-          <h1>Création d'un nouveau PLD</h1>
-          <TextInput id={"pld-name"} labelText={"Nom du pld"}
+      <Stack gap={4}>
+        <h1>Création d'un nouveau PLD</h1>
+        <h4>Informations de base</h4>
+        <TextInput id={"pld-name"} labelText={"Nom du pld"}
+                   required
+                   onChange={(e) => this.updateField('name', e.currentTarget.value)}
+                   invalid={this.state.form.name?.error !== undefined}
+                   invalidText={this.state.form.name?.error}
+        />
+        <TextArea rows={4} id={"pld-description"} labelText={"Description du pld"}
+                  required
+                  invalid={this.state.form.description?.error !== undefined}
+                  invalidText={this.state.form.description?.error}
+                  onChange={(e) => this.updateField('description', e.currentTarget.value)}/>
+        {this.showManagerSelect()}
+        {this.showTag()}
+        <NumberInput id={"pld-promotion"}
                      required
-                     onChange={(e) => this.updateField('name', e.currentTarget.value)}
-                     invalid={this.state.form.name?.error !== undefined}
-                     invalidText={this.state.form.name?.error}
+                     iconDescription={"Promotion"}
+                     label={"Promotion"}
+                     onChange={(e) => {
+                       if (e.imaginaryTarget.value === '')
+                         return;
+                       this.updateField('promotion', parseInt(e.imaginaryTarget.value));}}
+                     value={this.state.form.promotion?.value ?? 0}/>
+        <NumberInput id={"pld-version"}
+                     required
+                     iconDescription={"Version"}
+                     label={"Version du pld"}
+                     value={this.state.form.version?.value ?? 0}
+                     min={0}
+                     onChange={(e) => {
+                       if (e.imaginaryTarget.value === '')
+                         return;
+                       this.updateField('version', parseFloat(e.imaginaryTarget.value));}}/>
+
+        <h4>Info du Sprint</h4>
+
+        <DatePicker locale={"fr"} datePickerType="range" onChange={(dates) => {
+          if (dates.length < 2)
+            return;
+          this.updateField('sprintDates', dates);
+        }}>
+          <DatePickerInput
+            id="date-picker-input-id-start"
+            placeholder="mm/dd/yyyy"
+            labelText="Début du sprint"
           />
-          <TextArea rows={4} id={"pld-description"} labelText={"Description du pld"}
-                    required
-                    invalid={this.state.form.description?.error !== undefined}
-                    invalidText={this.state.form.description?.error}
-                    onChange={(e) => this.updateField('description', e.currentTarget.value)}/>
-          {this.showManagerSelect()}
-          {this.showTag()}
-          <NumberInput id={"pld-promotion"}
-                       required
-                       iconDescription={"Promotion"}
-                       label={"Promotion"}
-                       onChange={(e) => {
-                         if (e.imaginaryTarget.value === '')
-                           return;
-                         this.updateField('promotion', parseInt(e.imaginaryTarget.value));}}
-                       value={this.state.form.promotion?.value ?? 0}/>
-          <NumberInput id={"pld-version"}
-                       required
-                       iconDescription={"Version"}
-                       label={"Version du pld"}
-                       value={this.state.form.version?.value ?? 0}
-                       min={0}
-                       onChange={(e) => {
-                         if (e.imaginaryTarget.value === '')
-                           return;
-                         this.updateField('version', parseFloat(e.imaginaryTarget.value));}}/>
-
-          <DatePicker locale={"fr"} datePickerType="range" onChange={(dates) => {
-            if (dates.length < 2)
-              return;
-            this.updateField('sprintDates', dates);
-          }}>
-            <DatePickerInput
-              id="date-picker-input-id-start"
-              placeholder="mm/dd/yyyy"
-              labelText="Début du sprint"
-            />
-            <DatePickerInput
-              id="date-picker-input-id-finish"
-              placeholder="mm/dd/yyyy"
-              labelText="Fin du sprint"
-            />
-          </DatePicker>
-
-          <Checkbox labelText={"Plusieurs Follow-up ?"} id="multi-followup" onChange={(e, {checked}) => {
-            this.updateField('multiFollowup', checked);
-          }}/>
-
-          <MultiSelect
-            label="Etapes du PLD"
-            id="steps-list"
-            invalid={this.state.form.steps.error !== undefined}
-            selectedItems={this.state.form.steps.value.map((step) => ({label: step}))}
-            invalidText={this.state.form.steps.error}
-            items={(this.state.form.multiFollowup.value ? [PldStep.KickOff, PldStep.FirstFollowUp, PldStep.SecondFollowUp, PldStep.ThirdFollowUp, PldStep.Delivery] : [PldStep.KickOff, PldStep.FollowUp, PldStep.Delivery]).map((step) => ({label: step}))}
-            onChange={(e) => {
-              this.updateField('steps', e.selectedItems.map((item) => item.label));
-            }}
+          <DatePickerInput
+            id="date-picker-input-id-finish"
+            placeholder="mm/dd/yyyy"
+            labelText="Fin du sprint"
           />
-
-          <Button onClick={this.onClickCreate}>Créer</Button>
-        </Stack>
-      </>
+        </DatePicker>
+        <HelperText type={'help'} title={<h4>Status possible du PLD</h4>}
+                    helpMessage={<>
+                      <p>"Le Pld peut avoir plusieurs états lors de sa conception (ex: Kick-Off, Follow-up...)"</p>
+                      <p>Veuillez noté que l'ordre des status est important !</p>
+                      </>} logoSize={14}/>
+        {this.showSteps()}
+        <Button onClick={this.onClickCreate}>Créer</Button>
+      </Stack>
     );
   }
 }
