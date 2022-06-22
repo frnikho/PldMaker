@@ -2,8 +2,10 @@ import api, {ApiError, authorize, ErrorType} from "../util/Api";
 import {User} from "../../../../../libs/data-access/user/User";
 import {AxiosError, AxiosResponse} from "axios";
 import {UpdateUserBody} from "../../../../../libs/data-access/user/UpdateUserBody";
+import {AddFavourBody, Favour, RemoveFavourBody} from "../../../../../libs/data-access/user/Favour";
 
 export type CallbackUser = (user: User | null, error?: ApiError) => void;
+export type CallbackFavour = (favour: Favour | null, error?: ApiError) => void;
 
 export class UserApiController {
 
@@ -33,12 +35,37 @@ export class UserApiController {
     });
   }
 
+  public static getFavour(accessToken: string, callback: CallbackFavour) {
+    api.get<Favour>(`user/favours/`, authorize(accessToken)).then((response: AxiosResponse<Favour>) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data)
+    });
+  }
+
   public static updateUser(accessToken: string, userBody: UpdateUserBody, callback: CallbackUser) {
     api.patch<User>(`user/update`, userBody, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err) => {
       return callback(null, err.response?.data);
     })
+  }
+
+  public static addFavour(accessToken: string, body: AddFavourBody, callback: CallbackUser) {
+    api.post(`user/favours/add`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data);
+    });
+  }
+
+
+  public static removeFavour(accessToken: string, body: RemoveFavourBody, callback: CallbackUser) {
+    api.post(`user/favours/remove`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data);
+    });
   }
 
 }

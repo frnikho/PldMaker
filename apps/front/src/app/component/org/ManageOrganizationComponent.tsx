@@ -136,10 +136,11 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
       memberEmail: this.state.newUserInput.value
     }, (org, error) => {
       if (error) {
+        console.log(error.message);
         this.setState({
           newUserInput: {
             value: '',
-            error: error['message'][0],
+            error: error.message as string,
           }
         })
       }
@@ -149,6 +150,10 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
   private onClickDelete(index: number) {
     this.state.org?.dodColors.splice(index, 1);
     this.onUpdateDodColor();
+  }
+
+  private isOwner(): boolean {
+    return this.state.org?.owner ._id === this.props.auth.user?._id;
   }
 
   private showParameters() {
@@ -196,13 +201,16 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
                   <TableCell key={key + ":names"}>{user.firstname} {user.lastname?.toUpperCase()}</TableCell>
                   <TableCell key={key + ":origin"}>{user.domain?.join(', ')}</TableCell>
                   <TableCell key={key + ":actions"}>
-                    <Button hasIconOnly renderIcon={TrashCan} iconDescription={"Supprimer l'utilisateur"} kind={'ghost'} onClick={() => this.onClickRevokeUser(user._id)}/>
+                    {this.isOwner() ? <Button hasIconOnly renderIcon={TrashCan} iconDescription={"Supprimer l'utilisateur"} kind={'ghost'} onClick={() => this.onClickRevokeUser(user._id)}/> : null}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-          <TextInput id={"org-invite-user"} labelText={"Ajouter un utilisateur à l'organisation"} onChange={(e) => {
+          <TextInput
+            disabled={!this.isOwner()}
+            helperText={!this.isOwner() ? "Seulement le créateur peut ajouter des utilisateurs dans l'organisation !" : null}
+            id={"org-invite-user"} labelText={"Ajouter un utilisateur à l'organisation"} onChange={(e) => {
             this.setState({
               newUserInput: {
                 value: e.currentTarget.value,
@@ -262,7 +270,6 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
       <NewOrgDodColorModal
         open={this.state.openDodColor}
         onSuccess={(...args: unknown[]) => {
-          console.log(args);
           this.state.org?.dodColors.push({
             name: args[0] as string,
             color: args[1] as string,
@@ -296,7 +303,7 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
         <h2>Préférences</h2>
         <Tile style={{padding: '18px'}}>
           <Stack orientation={"horizontal"}>
-            <h4 style={{margin: 'auto'}}>Etats des dod</h4>
+            <h4 style={{margin: 'auto'}}>États des dods</h4>
             <Button hasIconOnly iconDescription={"Nouveau"} renderIcon={Add} kind={"ghost"} onClick={() => this.setState({
               openDodColor: true
             })}/>

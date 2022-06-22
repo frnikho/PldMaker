@@ -22,5 +22,5 @@
     [
       "@babel/plugin-transform-runtime"
     ]
-  ]
+  ],
 }

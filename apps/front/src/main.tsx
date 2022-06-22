@@ -17,6 +17,7 @@ root.render(
       <SocketContextProvider>
         <App />
         <ToastContainer position="bottom-left"
+                        style={{width: '350px'}}
                         autoClose={5000}
                         hideProgressBar
                         newestOnTop

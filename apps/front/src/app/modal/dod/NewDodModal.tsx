@@ -14,6 +14,8 @@ import {
 } from "carbon-components-react";
 import {FieldData} from "../../util/FieldData";
 
+import {Stack} from '@carbon/react';
+
 import {Add, Close} from '@carbon/icons-react';
 import {Dod} from "../../../../../../libs/data-access/dod/Dod";
 import {Pld} from "../../../../../../libs/data-access/pld/Pld";
@@ -21,6 +23,7 @@ import {Organization} from "../../../../../../libs/data-access/organization/Orga
 import {User} from "../../../../../../libs/data-access/user/User";
 import {DodApiController} from "../../controller/DodApiController";
 import {UserContextProps} from "../../context/UserContext";
+import {RequiredLabel} from "../../util/Label";
 
 export type UserWorkTime = {
   users: string[];
@@ -121,7 +124,11 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
         value: ['']
       },
       estimatedWorkOfTimeInput: {
-        value: []
+        value: [{
+          value: 0,
+          users: [],
+          format: EstimatedWorkTimeFormat.JOUR_HOMME
+        }]
       },
       skinOfInput: {
         value: ''
@@ -267,7 +274,7 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
       return (
         <Grid key={index} style={{marginTop: '12px'}}>
           <Column lg={11} md={7}>
-            <TextInput id={"dod-"} labelText={""} value={dod} onChange={(e) => {
+            <TextInput required id={"dod-"} labelText={""} hideLabel={true} value={dod} onChange={(e) => {
               const value = this.state.descriptionOfDoneInput.value;
               value[index] = e.currentTarget.value;
               this.setState({
@@ -356,10 +363,10 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
     if (this.state.preview)
       return;
     return (
-      <>
+      <Stack gap={4}>
         <Grid>
           <Column lg={3} md={3}>
-            <TextInput id={"dod-version"} labelText={"Version"} min={0} value={this.state.versionInput.value} onChange={(e) => {
+            <TextInput required id={"dod-version"} labelText={<RequiredLabel message={"Version"}/>} min={0} value={this.state.versionInput.value} onChange={(e) => {
               this.setState({
                 versionInput: {
                   value: e.currentTarget.value,
@@ -368,7 +375,7 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
             }}/>
           </Column>
           <Column lg={8} md={5}>
-            <TextInput id={"dod-title"} labelText={"Nom du dod"} value={this.state.titleInput.value} onChange={(e) => {
+            <TextInput required={true} id={"dod-title"}  labelText={<RequiredLabel message={"Nom du DoD"}/>} value={this.state.titleInput.value} onChange={(e) => {
               this.setState({
                 titleInput: {
                   value: e.currentTarget.value
@@ -379,7 +386,7 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
         </Grid>
         <Grid>
           <Column lg={3} md={3}>
-            <TextInput id={"dod-skinOf"} labelText={"En tant que..."} value={this.state.skinOfInput.value} onChange={(e) => {
+            <TextInput id={"dod-skinOf"} labelText={<RequiredLabel message={"En tant que ..."}/>} value={this.state.skinOfInput.value} onChange={(e) => {
               this.setState({
                 skinOfInput: {
                   value: e.currentTarget.value,
@@ -388,7 +395,7 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
             }}/>
           </Column>
           <Column lg={8} md={5}>
-            <TextInput id={"dod-want"} labelText={"Je veut pouvoir..."} value={this.state.wantInput.value} onChange={(e) => {
+            <TextInput id={"dod-want"} labelText={<RequiredLabel message={"Je veux ..."}/>} value={this.state.wantInput.value} onChange={(e) => {
               this.setState({
                 wantInput: {
                   value: e.currentTarget.value
@@ -397,25 +404,24 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
             }}/>
           </Column>
         </Grid>
-        <TextArea id={"dod-description"} labelText={"Description"} value={this.state.descriptionInput.value} onChange={(e) => {
+        <TextArea id={"dod-description"} labelText={<RequiredLabel message={"Description"}/>} value={this.state.descriptionInput.value} onChange={(e) => {
           this.setState({
             descriptionInput: {
               value: e.currentTarget.value
             }
           });
         }}/>
-        <p style={{marginTop: '10px'}}>Définition of Done</p>
-        <Tile>
+        <div>
+          <RequiredLabel message={"Définition of Done"}/>
           {this.showDefinitionsOfDoneText()}
           <Button style={{marginTop: '20px'}} size={"sm"} iconDescription={"Ajouter une définition"} kind={"secondary"}  onClick={this.onClickAddDefinitionOfDone} hasIconOnly renderIcon={Add}/>
-        </Tile>
-
-        <p style={{marginTop: '10px'}}>temps estimé</p>
-        <Tile>
+        </div>
+        <div>
+          <RequiredLabel message={"Temps estimé"}/>
           {this.showEstimatedWorkTime()}
           <Button style={{marginTop: '20px'}} size={"sm"} iconDescription={"Ajouter une définition"} kind={"secondary"}  onClick={this.onClickAddEstimatedWorkTime} hasIconOnly renderIcon={Add}/>
-        </Tile>
-      </>
+        </div>
+      </Stack>
     )
   }
 
@@ -428,7 +434,7 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
         onRequestSubmit={this.onClickCreate}
         secondaryButtonText={"Fermer"}
         onRequestClose={this.props.onDismiss}
-        modalHeading="Créer un nouveau dod">
+        modalHeading="Créer un nouveau DoD">
 
         {this.showPreview()}
         {this.showEdit()}

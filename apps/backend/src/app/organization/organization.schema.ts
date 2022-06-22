@@ -2,10 +2,30 @@ import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import mongoose, {Document} from "mongoose";
 import {User} from "../user/user.schema";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
-import {DodStatus} from "../../../../../libs/data-access/dod/Dod";
 import {DodColor} from "../../../../../libs/data-access/organization/Organization";
+import {Dod} from "../dod/dod.schema";
+import {Pld} from "../pld/pld.schema";
 
 export type OrganizationDocument = Organization & Document;
+
+@Schema()
+export class OrgHistory {
+  @Prop({enum: [Dod.name, Pld.name]})
+  type: string;
+
+  @Prop({type: mongoose.Schema.Types.ObjectId, refPath: 'type'})
+  data: Dod | Pld;
+
+  @Prop({default: new Date()})
+  date: Date;
+
+  @Prop({required: true, ref: User.name, type: mongoose.Schema.Types.ObjectId})
+  owner: User;
+
+  @Prop({required: true})
+  action: string;
+}
+
 
 const defaultDodColors: DodColor[] = [
   {
@@ -13,7 +33,7 @@ const defaultDodColors: DodColor[] = [
     color: 'FBBC04'
   },
   {
-    name: 'A faire',
+    name: 'À faire',
     color: '2D9BF0'
   },
   {
@@ -25,11 +45,6 @@ const defaultDodColors: DodColor[] = [
     color: 'F08080'
   }
 ];
-
-export type DodColorPref = {
-  type: DodStatus,
-  color: string
-}
 
 @Schema()
 export class Organization extends DatedObjectSchema {
@@ -51,6 +66,9 @@ export class Organization extends DatedObjectSchema {
 
   @Prop({required: false, default: defaultDodColors})
   dodColors?: DodColor[];
+
+  @Prop({default: []})
+  history?: OrgHistory[]
 
 }
 

@@ -22,13 +22,13 @@ export class SignPldModal extends React.Component<SignPldModalProps, SignPldModa
         onRequestClose={this.props.onDismiss}
         modalHeading="Signer le pld ?">
 
-        <p>Par la suite, il ne serra plus possible de modifier le PLD ainsi que ses informations (Dod, état, révisions..)</p>
-        <p>Cependant vous aurez toujours la possibilité de générer les documents word de celui-ci</p>
+        <p>Par la suite, il ne sera plus possible de modifier le PLD ainsi que ses informations (DoDs, états, révisions ..)</p>
+        <p>Cependant, vous aurez toujours la possibilité de générer les documents Word de celui-ci</p>
         <br/>
         <br/>
         <ButtonSet>
           <Button kind={"ghost"}>Annuler</Button>
-          <Button kind={"ghost"}>Signée le PLD</Button>
+          <Button kind={"ghost"}>Signer</Button>
         </ButtonSet>
       </Modal>
     );

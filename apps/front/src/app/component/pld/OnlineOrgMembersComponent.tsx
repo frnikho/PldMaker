@@ -93,11 +93,9 @@ export class OnlineOrgMembersComponent extends React.Component<OnlineOrgMembersC
       <StructuredListWrapper selection>
         <StructuredListBody>
           {members.map((member, index) => {
-
             const user: OnlineUser | undefined = this.state.members.find((m) => m.data.memberUuid === member._id);
             if (user?.data?.connected)
               return undefined;
-            console.log(user);
             return (
               <StructuredListRow key={index}>
                 <StructuredListCell><Asleep/></StructuredListCell>

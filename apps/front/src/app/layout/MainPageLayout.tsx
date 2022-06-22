@@ -12,15 +12,15 @@ import {
   HeaderName,
   OverflowMenu,
   OverflowMenuItem,
-  SideNav,
+  SideNav, SideNavDivider,
   SideNavItems,
-  SideNavLink,
+  SideNavLink, SideNavMenu, SideNavMenuItem,
   SkipToContent
 } from "carbon-components-react";
 
 import {Layer} from '@carbon/react';
 
-import {Bee, Dashboard, Events, Login, Notification, UserAvatar} from '@carbon/icons-react'
+import {Bee, Dashboard, Events, Login, Notification, UserAvatar, Account} from '@carbon/icons-react'
 
 import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
 import {NavigationState} from "../util/Navigation";
@@ -149,6 +149,32 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
     }
   }
 
+  private showFavoursPld(auth: UserContextProps, onClickSideNavExpand: () => void) {
+    return auth.favours?.pld.map((pld, index) => {
+      return (
+        <SideNavLink key={index} onClick={() => {
+          onClickSideNavExpand();
+          this.props.onRedirectUrl(`/organization/${pld.owner}/pld/${pld._id}`)
+        }}>
+          {pld.title}
+        </SideNavLink>
+      )
+    })
+  }
+
+  private showFavoursOrg(auth: UserContextProps, onClickSideNavExpand: () => void) {
+    return auth.favours?.org.map((org, index) => {
+      return (
+        <SideNavMenuItem key={index} onClick={() => {
+          onClickSideNavExpand();
+          this.props.onRedirectUrl(`/organization/${org._id}`)
+        }}>
+          {org.name}
+        </SideNavMenuItem>
+      )
+    })
+  }
+
   override render() {
     return (
       <>
@@ -177,21 +203,59 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
                 <SideNav
                   aria-label="Side navigation"
                   isRail
+                  isFixedNav
                   expanded={isSideNavExpanded}
                   onOverlayClick={onClickSideNavExpand}>
                   <SideNavItems>
                     <SideNavLink
+                      large
                       renderIcon={Dashboard}>
                       Dashboard
                     </SideNavLink>
                     <SideNavLink
+                      large
+                      renderIcon={Account}>
+                      Organisations
+                    </SideNavLink>
+                    <SideNavDivider/>
+
+                    <SideNavMenu title="Organisation" large>
+                      <UserContext.Consumer>
+                        {(auth) => this.showFavoursOrg(auth, onClickSideNavExpand)}
+                      </UserContext.Consumer>
+                    </SideNavMenu>
+
+                    <SideNavMenu title="PLD" large>
+                      <UserContext.Consumer>
+                        {(auth) => this.showFavoursPld(auth, onClickSideNavExpand)}
+                      </UserContext.Consumer>
+                    </SideNavMenu>
+
+
+{/*                    <SideNavLink
+                      large
                       renderIcon={Events}>
                       Organisation
                     </SideNavLink>
+                    <UserContext.Consumer>
+                      {(auth) => this.showFavoursPld(auth, onClickSideNavExpand)}
+                    </UserContext.Consumer>
+                    <SideNavLink
+                      large
+                      renderIcon={DocumentBlank}>
+                      PLD
+                    </SideNavLink>
+                    <UserContext.Consumer>
+                      {(auth) => this.showFavoursPld(auth, onClickSideNavExpand)}
+                    </UserContext.Consumer>*/}
                   </SideNavItems>
                 </SideNav>
               </Header>
-              <Content id="main-content">
+              <Content id="main-content"
+                   onClick={() => {
+                     if (isSideNavExpanded)
+                      onClickSideNavExpand();
+                   }}>
                 <Grid condensed={false}>
                   <Column sm={4} md={8} lg={16}>
                     <Outlet/>

@@ -6,9 +6,15 @@ import {Organization} from "../../../../../../libs/data-access/organization/Orga
 import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 import {
   Accordion,
-  AccordionItem, Breadcrumb, BreadcrumbItem, BreadcrumbSkeleton,
-  Button, ButtonSet, ButtonSkeleton,
-  Column, ExpandableTile,
+  AccordionItem,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbSkeleton,
+  Button,
+  ButtonSet,
+  ButtonSkeleton,
+  Column,
+  ExpandableTile,
   Grid,
   NumberInput,
   ProgressIndicator,
@@ -25,15 +31,16 @@ import {
   TableRow,
   TextArea,
   TextInput,
-  Tile, TileAboveTheFoldContent, TileBelowTheFoldContent,
+  Tile,
+  TileAboveTheFoldContent,
+  TileBelowTheFoldContent,
 } from "carbon-components-react";
 
-import {Stack} from '@carbon/react';
+import {Stack, Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react';
+
+import {Classification, DocumentAdd, DocumentTasks, RecentlyViewed, Information, CheckmarkOutline, Incomplete} from '@carbon/icons-react';
 
 import Lottie from "lottie-react";
-
-import {DocumentAdd, DocumentTasks, Classification, RecentlyViewed} from '@carbon/icons-react';
-
 import {User} from "../../../../../../libs/data-access/user/User";
 import {DodTableComponent} from "../dod/DodTableComponent";
 import {GenerateComponent} from "./GenerateComponent";
@@ -47,6 +54,10 @@ import {SocketContext} from "../../context/SocketContext";
 import {ChangePldTypeModal} from "../../modal/pld/ChangePldTypeModal";
 import {OnlineOrgMembersComponent} from "./OnlineOrgMembersComponent";
 import {NavProps, withNav} from "../../util/Navigation";
+import {ShowFavourIcon} from "../../util/User";
+import {FavourType} from "../../../../../../libs/data-access/user/Favour";
+import {IncompleteStatusIcon} from "../../icon/IncompleteStatusIcon";
+import {RequiredLabel} from "../../util/Label";
 
 export type PldComponentProps = {
   pldId: string;
@@ -179,10 +190,8 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     return (
       <Tile>
         <Stack gap={6}>
-          <div>
-            <h4>Status du PLD:</h4>
-            {this.state.pld === undefined ? <SkeletonText/> : <h4>{this.state.pld?.status.toUpperCase() ?? ""}</h4>}
-          </div>
+          <h4>Status : {this.state.pld?.status.toUpperCase() ?? ""}</h4>
+          {this.showSignButton()}
         </Stack>
       </Tile>
     )
@@ -193,11 +202,11 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
       <Tile>
         <Stack gap={6}>
           <div>
-            <h4>Date de création:</h4>
+            <h4>Date de création :</h4>
             {this.state.pld === undefined ? <SkeletonText/> : <p>{formatDate(new Date(this.state.pld?.created_date ?? ""))}</p>}
           </div>
           <div>
-            <h4 style={{}}>Dernière mise a jour: </h4>
+            <h4 style={{}}>Dernière mise à jour :</h4>
             {this.state.pld === undefined ? <SkeletonText/> : <p>{formatDate(new Date(this.state.pld?.updated_date ?? ""))}</p>}
             {this.state.pld === undefined ? <SkeletonText/> : <p>par <b>{this.showLastAuthorPld()}</b></p>}
 
@@ -224,7 +233,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
       return;
     return (
       <Stack gap={6}>
-        <TextInput id={"pld-title"} value={this.state.pld.title} labelText={"Titre du pld"} onChange={(e) => {
+        <TextInput id={"pld-title"} value={this.state.pld.title} labelText={<RequiredLabel message={"Titre"}/>} onChange={(e) => {
           if (this.state.pld !== undefined) {
             this.setState({
               pld: {
@@ -234,7 +243,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
             })
           }
         }}/>
-        <TextArea rows={4} id={"pld-description"} labelText={"Description"} value={this.state.pld.description} onChange={(e) => {
+        <TextArea rows={4} id={"pld-description"} labelText={<RequiredLabel message={"Description"}/>} value={this.state.pld.description} onChange={(e) => {
           if (this.state.pld !== undefined) {
             this.setState({
               pld: {
@@ -245,7 +254,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           }
         }}/>
 
-        <NumberInput id={"promotion"} iconDescription={""} label={"Promotion"} value={this.state.pld.promotion} onChange={(e) => {
+        <NumberInput id={"promotion"} iconDescription={""} label={<RequiredLabel message={"Promotion"}/>} value={this.state.pld.promotion} onChange={(e) => {
           if (this.state.pld !== undefined) {
             this.setState({
               pld: {
@@ -271,7 +280,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
               }
             })
           }}
-          labelText="Manager"
+          labelText={<RequiredLabel message={"Manager"}/>}
           value={(this.state.pld.manager as User)._id}>
           <SelectItem text={(this.state.org.owner as User).email} value={(this.state.org.owner as User)._id} />
           {(this.state.org.members as User[]).map((user, index) => {
@@ -279,11 +288,12 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           })}
         </Select>
 
-        <Button onClick={this.onClickUpdatePld}>Mettre a jour</Button>
+        <Button onClick={this.onClickUpdatePld}>Mettre à jour</Button>
 
         <Accordion>
           {this.showRevisions()}
         </Accordion>
+        {this.showAddRevisionButton()}
       </Stack>
     )
   }
@@ -309,7 +319,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
               <TableHeader id={"auteur"} key={"auteur"}>Auteur</TableHeader>
               <TableHeader id={"sections"} key={"sections"}>Section(s)</TableHeader>
               <TableHeader id={"comments"} key={"comments"}>Commentaires</TableHeader>
-              <TableHeader id={"statusPld"} key={"statusPld"}>Status du Pld</TableHeader>
+              <TableHeader id={"statusPld"} key={"statusPld"}>Status</TableHeader>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -351,7 +361,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.org === undefined || this.state.pld === undefined) {
       return (<ButtonSkeleton/>)
     } else {
-      return (<Button renderIcon={Classification} onClick={() => this.setState({openChangePldType: true})}>Changer l'etat d'avancement</Button>)
+      return (<Button renderIcon={Classification} onClick={() => this.setState({openChangePldType: true})}>Changer l'état d'avancement</Button>)
     }
   }
 
@@ -380,7 +390,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
         toast(error.error, {type: 'error'});
       }
       if (pld !== null) {
-        toast('Pld mis à jour 👍', {type: 'success'});
+        toast('PLD mis à jour 👍', {type: 'success'});
       }
     });
     this.setState({
@@ -458,11 +468,34 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
       return;
     return (
       <Tile>
-        <h4>Etat d'avancement du PDL</h4>
+        <div style={{display: 'flex'}}>
+          <h4>État d'avancement</h4>
+          <div style={{marginLeft: 'auto', marginTop:'auto', marginBottom: 'auto', display: 'flex', justifyContent: 'center'}}>
+            <Toggletip>
+              <ToggletipButton>
+                <Information size={16} />
+              </ToggletipButton>
+              <ToggletipContent>
+                <div style={{display: 'flex'}}>
+                  <CheckmarkOutline size={14} style={{marginRight: '14px', marginTop: 'auto', marginBottom: 'auto'}}/>
+                  <p>Completer</p>
+                </div>
+                <div style={{display: 'flex'}}>
+                  <Incomplete size={14} style={{marginRight: '14px', marginTop: 'auto', marginBottom: 'auto'}}/>
+                  <p>En cours</p>
+                </div>
+                <div style={{display: 'flex'}}>
+                  <IncompleteStatusIcon size={14} style={{marginRight: '14px', marginTop: 'auto', marginBottom: 'auto'}}/>
+                  <p>Pas commencer</p>
+                </div>
+              </ToggletipContent>
+            </Toggletip>
+          </div>
+        </div>
         <ProgressIndicator style={{marginTop: '20px'}} vertical>
           <ProgressStep
             complete
-            label="Création du PLD"
+            label="Création"
           />
 
           {this.state.pld.steps.map((step, index) => {
@@ -473,12 +506,12 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
               key={index}
               complete={index < currentIndex}
               current={currentIndex === index}
-              label={`Edition du PLD (${step})`}
+              label={`Édition (${step})`}
             />);
           }).filter((e) => e !== null)}
           <ProgressStep
             complete={this.state.pld.status === PldStatus.signed}
-            label="PLD Signé"
+            label="Signé"
           />
         </ProgressIndicator>
       </Tile>
@@ -516,17 +549,22 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           <Column lg={12} md={8} sm={4}>
             <Stack gap={6}>
               <Tile>
-                <h1 style={{marginBottom: '20px'}}>Informations du pld</h1>
+                  <div style={{display: 'flex'}}>
+                    <h1 style={{marginBottom: '20px'}}>Informations</h1>
+                    <div style={{marginLeft: 'auto', marginRight: '0px', textAlign: 'end', marginTop:'auto', marginBottom: 'auto'}}>
+                      {this.state.pld !== undefined  ? <ShowFavourIcon type={FavourType.PLD} data={this.state.pld}/> : null}
+                    </div>
+                  </div>
                 {this.showInfoPanel()}
               </Tile>
               <Tile>
-                <h1>Dod</h1>
+                <h1>DoDs</h1>
                 {this.showDataTable()}
               </Tile>
               <ExpandableTile>
                 <TileAboveTheFoldContent>
-                  <h1>Documents du pld</h1>
-                  <p>Pour le moments, les documents ne sont pas encore disponible </p>
+                  <h1>Documents</h1>
+                  <p>Pour le moments, les documents ne sont pas encore disponible.</p>
                 </TileAboveTheFoldContent>
                 <TileBelowTheFoldContent>
                   <Lottie>
@@ -535,11 +573,9 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
                 </TileBelowTheFoldContent>
               </ExpandableTile>
               <ButtonSet style={{marginBottom: '20px'}}>
-                {this.showAddRevisionButton()}
                 {this.showChangeStepButton()}
                 {this.showGenerateButton()}
                 {this.showHistoryButton()}
-                {this.showSignButton()}
               </ButtonSet>
             </Stack>
           </Column>

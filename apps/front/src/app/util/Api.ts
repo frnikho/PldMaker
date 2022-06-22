@@ -24,7 +24,7 @@ export const getHeaders = () => {
 
 export type ApiError = {
   statusCode: number;
-  message: string[];
+  message: string | string[];
   error: string;
   type: ErrorType.API_ERROR,
 } | Error

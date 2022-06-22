@@ -4,8 +4,10 @@ import {OrganizationApiController} from "../../controller/OrganizationApiControl
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {ApiError} from "../../util/Api";
 import {
-  Breadcrumb, BreadcrumbItem,
-  Button, ButtonSet,
+  Breadcrumb,
+  BreadcrumbItem,
+  Button,
+  ButtonSet,
   ClickableTile,
   Column,
   Grid,
@@ -14,13 +16,19 @@ import {
 
 import {Stack} from '@carbon/react';
 
-import {Add, Settings} from '@carbon/icons-react'
+import {Add, Settings, Star} from '@carbon/icons-react'
 import {NavProps, redirectNavigation, withNav} from "../../util/Navigation";
 import {PageState} from "../../util/Page";
 import {PldApiController} from "../../controller/PldApiController";
 import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 import {FieldData} from "../../util/FieldData";
 import {SocketContext} from "../../context/SocketContext";
+import {ShowFavourIcon} from "../../util/User";
+import {FavourType} from "../../../../../../libs/data-access/user/Favour";
+
+const formatDate = (date: Date): string => {
+  return date.toLocaleDateString("fr");
+}
 
 export type OrganizationComponentProps = {
   orgId?: string;
@@ -93,11 +101,15 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
   }
 
   private onClickCreateDocument() {
-    return undefined;
+/*    this.setState({
+      navigateUrl: 'document'
+    })*/
   }
 
   private onClickCreateTemplate() {
-    return undefined;
+    this.setState({
+      navigateUrl: 'template/new'
+    })
   }
 
   private showPld() {
@@ -112,7 +124,18 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
           return (
             <Column key={index} sm={4} md={8} lg={4}>
               <ClickableTile onClick={() => {this.setState({navigateUrl: `pld/${pld._id}`})}}>
-                {pld.title}
+                <h4>{pld.title}</h4>
+                <p>{pld.description}</p>
+                <p>{pld.version}</p>
+                <p>{pld.currentStep}</p>
+                <br/>
+                <p style={{fontStyle: 'italic'}}>Création</p>
+                <p>{formatDate(new Date(pld.created_date ?? new Date()))}</p>
+                <p style={{fontStyle: 'italic'}}>Dernière mise a jour</p>
+                <p>{formatDate(new Date(pld.created_date ?? new Date()))}</p>
+                <div style={{marginLeft: 'auto', marginRight: '0px', textAlign: 'end'}}>
+                  <ShowFavourIcon type={FavourType.PLD} data={pld} clickable={false}/>
+                </div>
               </ClickableTile>
             </Column>
           )
@@ -128,6 +151,12 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
           <BreadcrumbItem onClick={() => this.props.navigate(`/`)}>Dashboard</BreadcrumbItem>
           <BreadcrumbItem isCurrentPage>{this.state.org?.name ?? "Organisation"}</BreadcrumbItem>
         </Breadcrumb>
+          <h1>{this.state.org?.name}</h1>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
         <Stack gap={3}>
           {redirectNavigation(this.state.navigateUrl)}
           <h2>Pld <Button kind={"ghost"} onClick={this.onClickCreatePld} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>

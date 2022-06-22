@@ -9,15 +9,20 @@ import {RegisterBody} from "../../../../../libs/data-access/auth/RegisterBody";
 import {RegisterResponse} from "../../../../../libs/data-access/auth/RegisterResponse";
 import {UserApiController} from "../controller/UserApiController";
 import {emitBody, SocketContext} from "./SocketContext";
+import {toast} from "react-toastify";
+import {Favour} from "../../../../../libs/data-access/user/Favour";
 
 export const ACCESS_TOKEN_COOKIE_NS = 'access_token';
 
 export type UserContextProps = {
   login: (loginBody: LoginBody, callback: (user: User | null , error?: ApiError) => unknown) => void;
   register: (registerBody: RegisterBody, callback: (user: User | null , error?: ApiError) => unknown) => void;
+  refreshUser: () => void;
+  refreshFavours: () => void;
   logout: () => void;
   isLogged: LoginState;
   user?: User;
+  favours?: Favour;
   accessToken: string;
 }
 
@@ -37,6 +42,8 @@ export const UserContext = React.createContext<UserContextProps>({
   register: () => null,
   logout: () => null,
   isLogged: LoginState.loading,
+  refreshUser: () => null,
+  refreshFavours: () => null,
   accessToken: '',
 });
 
@@ -56,7 +63,9 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
       register: this.register.bind(this),
       isLogged: LoginState.loading,
       user: undefined,
-      accessToken: ''
+      accessToken: '',
+      refreshUser: this.refreshUser.bind(this),
+      refreshFavours: this.refreshFavours.bind(this),
     }
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
@@ -71,7 +80,8 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
             isLogged: LoginState.logged,
             user: data.user,
             accessToken: data.accessToken,
-          })
+          });
+          this.loadFavour(data.accessToken);
         } else {
           this.setState({
             isLogged: LoginState.not_logged,
@@ -79,6 +89,36 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
         }
       });
     }
+  }
+
+  public refreshFavours() {
+    this.loadFavour();
+  }
+
+  public refreshUser() {
+    UserApiController.getMe(this.state.accessToken, (user, error) => {
+      if (error) {
+        toast(error.message, {type: 'error'});
+      }
+      if (user !== null) {
+        this.setState({
+          user: user,
+        })
+      }
+    });
+  }
+
+  public loadFavour(accessToken?: string) {
+    UserApiController.getFavour(accessToken ?? this.state.accessToken, (favours, error) => {
+      if (error) {
+        console.log(error);
+      }
+      if (favours !== null) {
+        this.setState({
+          favours: favours,
+        })
+      }
+    });
   }
 
   public loadUserFromCookies(cookies: Cookies, callback: (token?: UserToken, error?: string) => void): void {

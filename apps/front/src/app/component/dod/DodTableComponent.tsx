@@ -1,7 +1,7 @@
 import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {
-  Button,
+  Button, ButtonSet, Link,
   Select, SelectItem,
   Table,
   TableBatchAction,
@@ -19,7 +19,7 @@ import {
   TableToolbarSearch,
 } from "carbon-components-react";
 
-import {DataTable} from '@carbon/react'
+import {DataTable, IconButton} from '@carbon/react';
 
 import {NewDodModal} from "../../modal/dod/NewDodModal";
 import {Dod} from "../../../../../../libs/data-access/dod/Dod";
@@ -28,7 +28,7 @@ import {Organization} from "../../../../../../libs/data-access/organization/Orga
 import {DodApiController} from "../../controller/DodApiController";
 import {PldGenerator} from "../../docx/PldGenerator";
 
-import {TrashCan, Download, Edit, ImportExport} from '@carbon/icons-react'
+import {TrashCan, Download, Edit, ImportExport, View} from '@carbon/icons-react'
 import {User} from "../../../../../../libs/data-access/user/User";
 import {toast} from "react-toastify";
 
@@ -126,11 +126,21 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
   }
 
   private showSelectStatus(dodId: string): JSX.Element {
+    const currentDod = this.props.dod.find((dod) => dod._id === dodId);
+    if (currentDod === undefined)
+      return <></>;
+    const dodColor = this.props.org.dodColors.find((d) => d.name === currentDod.status);
     return (
       <Select
         inline
         id="dod select"
-        labelText=""
+        labelText={<div className="square" style={{
+          height: '20px',
+          width: '20px',
+          backgroundColor: `#${dodColor?.color}`,
+          borderRadius: '50%',
+          display: 'inline-block',
+        }}/>}
         onChange={(e) => {
 
           DodApiController.updateDodStatus(this.props.userContext.accessToken, {
@@ -144,18 +154,16 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
               toast('Status de la DOD mit à jour 👍 !');
             }
           });
-
         }}
         helperText="">
         <SelectItem
           hidden
           value={""}
           text={this.showStatusSelect(dodId)}/>
-        <SelectItem text={"A faire"} value={"A faire"}/>
-        <SelectItem text={"En cours"} value={"En cours"}/>
-        <SelectItem text={"A tester"} value={"A tester"}/>
-        <SelectItem text={"Fini"} value={"Fini"}/>
-        <SelectItem text={"Non fini"} value={"Non fini"}/>
+
+        {this.props.org.dodColors.map((status, index) => {
+          return (<SelectItem key={index} text={status.name} value={status.name}/>);
+        })}
       </Select>
     );
   }
@@ -175,7 +183,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
         created_date: formatDate(new Date(dod.created_date))
       }));
     return (
-      <DataTable rows={rowData} headers={headerData} isSortable>
+      <DataTable rows={rowData} headers={headerData} isSortable locale={"fr"}>
         {({
             rows,
             headers,
@@ -187,7 +195,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
             selectedRows,
           }) => (
           <TableContainer>
-            <TableToolbar>
+            <TableToolbar size={"lg"}>
               <TableBatchActions {...getBatchActionProps()}>
                 <TableBatchAction
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
@@ -255,12 +263,12 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                   <TableToolbarAction onClick={() => {
                     //TODO import data
                   }}>
-                    Importer des données
+                    Importer
                   </TableToolbarAction>
                   <TableToolbarAction onClick={() => {
                     //TODO export data
                   }}>
-                    Exporter les données
+                    Exporter
                   </TableToolbarAction>
                 </TableToolbarMenu>
                 <Button
@@ -269,7 +277,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                   size="sm"
                   kind="primary"
                 >
-                  Créer un dod
+                  Créer une DoD
                 </Button>
               </TableToolbarContent>
             </TableToolbar>
@@ -278,7 +286,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                 <TableRow>
                   <TableSelectAll {...getSelectionProps()} />
                   {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>
+                    <TableHeader style={{whiteSpace: 'nowrap'}} {...getHeaderProps({ header })}>
                       {header.header}
                     </TableHeader>
                   ))}
@@ -297,9 +305,8 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                       {this.showSelectStatus(row.id)}
                     </TableCell>
                     <TableCell key={"actions"}>
-                      <Button kind={"ghost"} iconDescription={"Voir"} renderIcon={Edit} onClick={() => {
-                        this.onClickUpdateDod(this.props.dod.find((dod) => dod._id === row.id));
-                      }}>Modifier/Editer</Button>
+                      <Link renderIcon={Edit} onClick={() => this.onClickUpdateDod(this.props.dod.find((dod) => dod._id === row.id))}/>
+                      <Link renderIcon={View} disabled onClick={() => null}/>
                     </TableCell>
                   </TableRow>
                 ))}

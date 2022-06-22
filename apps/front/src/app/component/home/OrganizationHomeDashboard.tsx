@@ -138,6 +138,4 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
       </>
     );
   }
-
-
 }

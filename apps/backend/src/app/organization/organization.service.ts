@@ -54,7 +54,7 @@ export class OrganizationService {
   public updateByBody(ownerId: string, body: UpdateOrganizationBody) {
     const orgId = body.orgId;
     delete body.orgId;
-    return this.organizationModel.findOneAndUpdate({_id: orgId, owner: ownerId}, {...body, updated_date: new Date()}, {new: true})
+    return this.organizationModel.findOneAndUpdate({_id: orgId}, {...body, updated_date: new Date()}, {new: true})
       .populate(['owner', 'members'])
       .exec();
   }
@@ -66,7 +66,7 @@ export class OrganizationService {
   }
 
   public findOrgsByAuthorAndMembers(userObjectId: string): Promise<OrganizationDocument[] | null> {
-    return this.organizationModel.find({$or: [{owner: userObjectId}, {members: {$gt: userObjectId}}]})
+    return this.organizationModel.find({$or: [{owner: userObjectId}, {members: {$in: userObjectId}}]})
       .populate(['owner', 'members'])
       .exec();
   }
