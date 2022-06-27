@@ -12,7 +12,6 @@ import { UserModule } from './user/user.module';
 import { SettingsModule } from './settings/settings.module';
 import { OrganizationModule } from './organization/organization.module';
 import { AuthModule } from './auth/auth.module';
-import * as autoPopulate from 'mongoose-autopopulate';
 import {JwtAuthGuard} from "./auth/guard/jwt-auth.guard";
 import {LoggerModule} from "./logger/logger.module";
 import { PldModule } from './pld/pld.module';
@@ -30,10 +29,6 @@ import {EventEmitterModule} from "@nestjs/event-emitter";
       inject: [ConfigService],
       useFactory: (configService: ConfigService): MongooseModuleFactoryOptions => {
         return {
-          connectionFactory: (connection) => {
-            connection.plugin(autoPopulate);
-            return connection;
-          },
           ...configService.get<DatabaseConfig>(DATABASE_CONFIG_LABEL),
           uri: `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_HOST}:${process.env.MONGODB_PORT}/${process.env.MONGODB_DB}`
         };
@@ -54,6 +49,6 @@ import {EventEmitterModule} from "@nestjs/event-emitter";
   providers: [AppService, {
     provide: 'APP_GUARD',
     useClass: JwtAuthGuard,
-  },],
+  }],
 })
 export class AppModule {}

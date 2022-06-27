@@ -34,7 +34,6 @@ class Server {
       origin: process.env.NX_CLIENT_HOST,
     });
     this.app.useGlobalPipes(new ValidationPipe());
-    this.app.useGlobalInterceptors(new TransformInterceptor());
   }
 
   private onServerOpened() {

@@ -58,6 +58,8 @@ import {ShowFavourIcon} from "../../util/User";
 import {FavourType} from "../../../../../../libs/data-access/user/Favour";
 import {IncompleteStatusIcon} from "../../icon/IncompleteStatusIcon";
 import {RequiredLabel} from "../../util/Label";
+import {formatLongDate} from "../../../../../../libs/utility/DateUtility";
+import {PldHistoryModal} from "../../modal/pld/PldHistoryModal";
 
 export type PldComponentProps = {
   pldId: string;
@@ -69,14 +71,10 @@ export type PldComponentState = {
   pld?: Pld;
   dod: Dod[];
   openSignModal: boolean;
+  openHistoryModal: boolean;
   openAddRevisionModal: boolean;
   openChangePldType: boolean;
 }
-
-const formatDate = (date: Date): string => {
-  return date.toLocaleDateString("fr") + " à " + date.toLocaleTimeString("fr");
-}
-
 
 class PldComponent extends React.Component<PldComponentProps, PldComponentState> {
 
@@ -92,6 +90,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
       openAddRevisionModal: false,
       openSignModal: false,
       openChangePldType: false,
+      openHistoryModal: false,
     }
     this.onClickUpdatePld = this.onClickUpdatePld.bind(this);
     this.onDodUpdated = this.onDodUpdated.bind(this);
@@ -203,11 +202,11 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
         <Stack gap={6}>
           <div>
             <h4>Date de création :</h4>
-            {this.state.pld === undefined ? <SkeletonText/> : <p>{formatDate(new Date(this.state.pld?.created_date ?? ""))}</p>}
+            {this.state.pld === undefined ? <SkeletonText/> : <p>{formatLongDate(new Date(this.state.pld?.created_date ?? ""))}</p>}
           </div>
           <div>
             <h4 style={{}}>Dernière mise à jour :</h4>
-            {this.state.pld === undefined ? <SkeletonText/> : <p>{formatDate(new Date(this.state.pld?.updated_date ?? ""))}</p>}
+            {this.state.pld === undefined ? <SkeletonText/> : <p>{formatLongDate(new Date(this.state.pld?.updated_date ?? ""))}</p>}
             {this.state.pld === undefined ? <SkeletonText/> : <p>par <b>{this.showLastAuthorPld()}</b></p>}
 
           </div>
@@ -326,7 +325,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
             {this.state.pld.revisions.map((revision, index) => {
               return (
                 <TableRow key={index}>
-                  <TableCell key={index + ':date'}>{formatDate(new Date(revision.created_date))}</TableCell>
+                  <TableCell key={index + ':date'}>{formatLongDate(new Date(revision.created_date))}</TableCell>
                   <TableCell key={index + ':revision'}>{revision.version}</TableCell>
                   <TableCell key={index + ':auteur'}>{this.state.org?.name}</TableCell>
                   <TableCell key={index + ':sections'}>{revision.sections.join(', ')}</TableCell>
@@ -377,7 +376,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.org === undefined || this.state.pld === undefined) {
       return (<ButtonSkeleton/>)
     } else {
-      return (<Button disabled renderIcon={RecentlyViewed} iconDescription="">Voir tout les changements</Button>)
+      return (<Button onClick={() => this.setState({openHistoryModal: true})} renderIcon={RecentlyViewed} iconDescription="">Voir tout les changements</Button>)
     }
   }
 
@@ -421,6 +420,12 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
       return;
     return (
       <>
+        <PldHistoryModal
+          pld={this.state.pld}
+          org={this.state.org}
+          dod={this.state.dod}
+          open={this.state.openHistoryModal} onDismiss={() => this.setState({openHistoryModal: false})} onSuccess={() => {}}
+        />
         <SignPldModal
           open={this.state.openSignModal}
           onDismiss={() => {

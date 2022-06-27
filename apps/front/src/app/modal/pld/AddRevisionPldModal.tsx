@@ -10,6 +10,7 @@ import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 
 import {Stack} from '@carbon/react'
 import {RequiredLabel} from "../../util/Label";
+import {formatLongDate} from "../../../../../../libs/utility/DateUtility";
 
 export type AddRevisionPldModalProps = {
   version: number;
@@ -23,10 +24,6 @@ export type AddRevisionPldModalState = {
   sections: FieldData<string[]>;
   version: FieldData<number>;
 };
-
-const formatDate = (date: Date): string => {
-  return date.toLocaleDateString("fr") + " à " + date.toLocaleTimeString("fr");
-}
 
 export class AddRevisionPldModal extends React.Component<AddRevisionPldModalProps, AddRevisionPldModalState> {
 
@@ -76,7 +73,7 @@ export class AddRevisionPldModal extends React.Component<AddRevisionPldModalProp
         modalHeading="Ajouter une révision">
 
         <Stack gap={6}>
-          <TextInput id={"date"} labelText={<RequiredLabel message={"Date"}/>} value={formatDate(new Date())}/>
+          <TextInput id={"date"} labelText={<RequiredLabel message={"Date"}/>} value={formatLongDate(new Date())}/>
           <NumberInput
             invalid={this.state.version.error !== undefined}
             invalidText={this.state.version.error}

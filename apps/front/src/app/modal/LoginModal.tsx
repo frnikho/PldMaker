@@ -13,7 +13,7 @@ import {toast} from "react-toastify";
 import {LoginBody} from "../../../../../libs/data-access/auth/LoginBody";
 import {validate} from "class-validator";
 import {FieldData} from "../util/FieldData";
-import {ReactPage} from "../util/Page";
+import {ReactFormValidation} from "../util/Page";
 
 type LoginModalProps = {
   open: boolean;
@@ -28,7 +28,7 @@ type LoginModalState = {
   loading: boolean;
 }
 
-export class LoginModal extends ReactPage<LoginModalProps, LoginModalState> {
+export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalState> {
 
   constructor(props: LoginModalProps) {
     super(props);
@@ -45,8 +45,6 @@ export class LoginModal extends ReactPage<LoginModalProps, LoginModalState> {
   }
 
   public onClickCreate(authContext: UserContextProps) {
-    if (this.state.email === undefined || this.state.password === undefined)
-      return;
     const loginBody = new LoginBody(this.state.email.value, this.state.password.value);
     this.setState({loading: true});
     validate(loginBody).then((errors) => {

@@ -1,6 +1,7 @@
 import {DatedObject} from "../DatedObject";
 import {Pld} from "../pld/Pld";
 import {User} from "../user/User";
+import {DodHistoryAction} from "./DodHistory";
 
 export type Dod = {
   _id: string;
@@ -16,11 +17,11 @@ export type Dod = {
   pldOwner: Pld | string;
   owner: User | string;
   status: DodStatus | string;
-  revisions: DodRevision[]
+  history: DodHistory[]
 } & DatedObject;
 
 export type UserWorkTime = {
-  users: string[];
+  users: string[] | User[];
   value: number;
   format: string,
 }
@@ -33,13 +34,15 @@ export enum DodStatus {
   NOT_FINISH = 'Non fini'
 }
 
-export type DodRevision = {
-  updated_by: User | string;
-  version: number;
-  title: string;
-  skinOf: string;
-  want: string;
-  description: string;
-  descriptionOfDone: string[];
-  estimatedWorkTime: UserWorkTime[];
-} & DatedObject
+export type EditedField = {
+  name: string;
+  lastValue: string;
+  value: string;
+}
+
+export type DodHistory = {
+  date: Date;
+  editedFields: EditedField[]
+  owner: User;
+  action: DodHistoryAction;
+}

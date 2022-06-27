@@ -1,20 +1,21 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
-import mongoose, {Document} from "mongoose";
+import mongoose, {Document, ObjectId} from "mongoose";
 import {User} from "../user/user.schema";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
 import {DodColor} from "../../../../../libs/data-access/organization/Organization";
-import {Dod} from "../dod/dod.schema";
-import {Pld} from "../pld/pld.schema";
+import {OrgHistoryAction} from "../../../../../libs/data-access/organization/OrgHistory";
 
 export type OrganizationDocument = Organization & Document;
 
+export type NewOrgHistory = {
+  date: Date;
+  owner: string | ObjectId;
+  action: string;
+  member?: string | ObjectId;
+}
+
 @Schema()
 export class OrgHistory {
-  @Prop({enum: [Dod.name, Pld.name]})
-  type: string;
-
-  @Prop({type: mongoose.Schema.Types.ObjectId, refPath: 'type'})
-  data: Dod | Pld;
 
   @Prop({default: new Date()})
   date: Date;
@@ -22,10 +23,12 @@ export class OrgHistory {
   @Prop({required: true, ref: User.name, type: mongoose.Schema.Types.ObjectId})
   owner: User;
 
-  @Prop({required: true})
+  @Prop({required: true, enum: OrgHistoryAction})
   action: string;
-}
 
+  @Prop({required: false, ref: User.name, type: mongoose.Schema.Types.ObjectId})
+  member?: User;
+}
 
 const defaultDodColors: DodColor[] = [
   {
@@ -68,7 +71,7 @@ export class Organization extends DatedObjectSchema {
   dodColors?: DodColor[];
 
   @Prop({default: []})
-  history?: OrgHistory[]
+  history: OrgHistory[]
 
 }
 

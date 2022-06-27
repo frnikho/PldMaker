@@ -1,13 +1,24 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
-import mongoose, {Document} from "mongoose";
+import mongoose, {Document, ObjectId} from "mongoose";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
 import {User} from "../user/user.schema";
 import {Organization} from "../organization/organization.schema";
 import {PldOwnerType} from "../../../../../libs/data-access/pld/PldOwnerType";
 import {PldStatus} from "../../../../../libs/data-access/pld/PldStatus";
 import {PldStep} from "../../../../../libs/data-access/pld/PldStep";
+import {PldHistoryAction} from "../../../../../libs/data-access/pld/PldHistory";
+import {EditedField} from "../../../../../libs/data-access/dod/Dod";
 
 export type PldDocument = Pld & Document;
+
+
+export type NewPldHistory = {
+  pldId: string;
+  action: string;
+  revision?: RevisionUpdate;
+  dod?:string | ObjectId;
+  editedFields: EditedField[];
+}
 
 @Schema()
 export class RevisionUpdate {
@@ -25,6 +36,28 @@ export class RevisionUpdate {
 
   @Prop({required: false, default: ''})
   comments: string;
+}
+
+@Schema()
+export class PldHistory {
+
+  @Prop({default: new Date()})
+  date: Date;
+
+  @Prop({required: true, ref: User.name, type: mongoose.Schema.Types.ObjectId})
+  owner: User;
+
+  @Prop({required: true, enum: PldHistoryAction})
+  action: string;
+
+  @Prop({required: false, ref: User.name, type: mongoose.Schema.Types.ObjectId})
+  dod?: any;
+
+  @Prop({required: false, default: undefined})
+  revision?: RevisionUpdate;
+
+  @Prop({required: false, default: []})
+  editedFields: EditedField[];
 }
 
 @Schema()
@@ -101,6 +134,9 @@ export class Pld extends DatedObjectSchema {
 
   @Prop({required: true})
   endingDate: Date;
+
+  @Prop({required: false, default: []})
+  history: PldHistory[];
 
 }
 

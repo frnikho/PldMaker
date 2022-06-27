@@ -24,9 +24,12 @@ import {User} from "../../../../../../libs/data-access/user/User";
 import {DodApiController} from "../../controller/DodApiController";
 import {UserContextProps} from "../../context/UserContext";
 import {RequiredLabel} from "../../util/Label";
+import {DodCreateBody} from "../../../../../../libs/data-access/dod/DodBody";
+import {validate} from "class-validator";
+import {ReactFormValidation} from "../../util/Page";
 
 export type UserWorkTime = {
-  users: string[];
+  users: string[] | User[];
   value: number;
   format: EstimatedWorkTimeFormat,
 }
@@ -49,40 +52,44 @@ export type NewDodModalProps = {
 
 export type NewDodModalState = {
   preview: boolean;
-  versionInput: FieldData<string>;
-  titleInput: FieldData<string>;
-  skinOfInput: FieldData<string>;
-  wantInput: FieldData<string>;
-  descriptionInput: FieldData<string>;
-  descriptionOfDoneInput: FieldData<string[]>;
-  estimatedWorkOfTimeInput: FieldData<UserWorkTime[]>
+  version: FieldData<string>;
+  title: FieldData<string>;
+  skinOf: FieldData<string>;
+  want: FieldData<string>;
+  description: FieldData<string>;
+  descriptionOfDone: FieldData<string[]>;
+  estimatedWorkOfTime: FieldData<UserWorkTime[]>
 }
 
-export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalState> {
+export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodModalState> {
 
   constructor(props) {
     super(props);
     this.state = {
       preview: false,
-      versionInput: {
+      version: {
         value: ''
       },
-      descriptionInput: {
+      description: {
         value: ''
       },
-      descriptionOfDoneInput: {
+      descriptionOfDone: {
         value: ['']
       },
-      estimatedWorkOfTimeInput: {
-        value: []
+      estimatedWorkOfTime: {
+        value: [{
+          value: 0,
+          users: [],
+          format: EstimatedWorkTimeFormat.JOUR_HOMME,
+        }]
       },
-      skinOfInput: {
+      skinOf: {
         value: ''
       },
-      titleInput: {
+      title: {
         value: ''
       },
-      wantInput: {
+      want: {
         value: ''
       }
     };
@@ -100,13 +107,13 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
     if (this.props.lastDod.length > 0) {
       this.props.lastDod.sort((dodA, dodB) => dodB.created_date.getDate() - dodA.created_date.getDate());
     }
-    this.state.estimatedWorkOfTimeInput.value.push({
+    this.state.estimatedWorkOfTime.value.push({
       format: EstimatedWorkTimeFormat.JOUR_HOMME,
       users: [(this.props.org.owner as User)._id],
       value: 0
     });
     this.setState({
-      estimatedWorkOfTimeInput: this.state.estimatedWorkOfTimeInput
+      estimatedWorkOfTime: this.state.estimatedWorkOfTime
     });
     this.prefillField();
   }
@@ -114,59 +121,63 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
   private clearField() {
     this.setState({
       preview: false,
-      versionInput: {
+      version: {
         value: ''
       },
-      descriptionInput: {
+      description: {
         value: ''
       },
-      descriptionOfDoneInput: {
+      descriptionOfDone: {
         value: ['']
       },
-      estimatedWorkOfTimeInput: {
+      estimatedWorkOfTime: {
         value: [{
           value: 0,
           users: [],
           format: EstimatedWorkTimeFormat.JOUR_HOMME
         }]
       },
-      skinOfInput: {
+      skinOf: {
         value: ''
       },
-      titleInput: {
+      title: {
         value: ''
       },
-      wantInput: {
+      want: {
         value: ''
       }
     });
   }
 
   private prefillField() {
+
     if (this.props.editionDod === undefined) {
       this.clearField();
       return;
     }
+
+    console.log(this.props.editionDod.estimatedWorkTime);
+
     this.setState({
-      titleInput: {
+      title: {
         value: this.props.editionDod.title,
       },
-      versionInput: {
+      version: {
         value: this.props.editionDod.version,
       },
-      descriptionInput: {
+      description: {
         value: this.props.editionDod.description,
       },
-      wantInput: {
+      want: {
         value: this.props.editionDod.want,
       },
-      skinOfInput: {
+      skinOf: {
         value: this.props.editionDod.skinOf
       },
-      descriptionOfDoneInput: {
+      descriptionOfDone: {
         value: this.props.editionDod.descriptionOfDone,
       },
-      estimatedWorkOfTimeInput: {
+      estimatedWorkOfTime: {
         value: this.props.editionDod.estimatedWorkTime.map((wt) => {
           return {
             value: wt.value,
@@ -186,31 +197,50 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
 
   private onClickCreate() {
     //TODO check each field
-    DodApiController.createDod(this.props.authContext.accessToken, {
-      owner: this.props.authContext.user?._id ?? '',
-      descriptionOfDone: this.state.descriptionOfDoneInput.value,
-      pldOwner: this.props.pld._id,
-      skinOf: this.state.skinOfInput.value,
-      title: this.state.titleInput.value,
-      version: this.state.versionInput.value,
-      want: this.state.wantInput.value,
-      description: this.state.descriptionInput.value,
-      estimatedWorkTime: this.state.estimatedWorkOfTimeInput.value.map((wt) => (
-        {
-          value: wt.value,
-          users: wt.users,
-          format: wt.format,
+    const body: DodCreateBody = new DodCreateBody(this.state.version.value, this.state.title.value, this.state.skinOf.value, this.state.want.value,
+      this.state.description.value,
+      this.props.pld._id,
+      this.props.authContext.user?._id ?? '',
+      this.state.descriptionOfDone.value,
+      this.state.estimatedWorkOfTime.value
+    );
+    validate(body).then((errors) => {
+      if (errors.length <= 0)
+        return true;
+      errors.forEach((error) => {
+        const msg = Object.entries(error.constraints ?? {}).map((a) => a[1]);
+        if (error.property === 'estimatedWorkTime') {
+          this.updateFormField(error.property, [{value: 0, users: [''], format: EstimatedWorkTimeFormat.JOUR_HOMME}], msg.join(', '));
+        } else if (error.property === 'descriptionOfDone') {
+          this.updateFormField(error.property, [''], msg.join(', '));
+        } else {
+          this.updateFormField(error.property, '', msg.join(', '));
         }
-      )),
-    }, (dod, error) => {
-      if (!error && dod !== null) {
-        this.props.onCreatedDod(dod);
-      }
-      if (dod === null) {
-        console.error(error);
+      })
+      return false;
+    }).then((valid) => {
+      if (!valid)
+        return;
+      if (this.props.editionDod !== undefined) {
+        DodApiController.updateDod(this.props.authContext.accessToken, this.props.editionDod._id, body, (dod, error) => {
+          if (!error && dod !== null) {
+            this.props.onCreatedDod(dod);
+          }
+          if (dod === null) {
+            console.error(error);
+          }
+        });
+      } else {
+        DodApiController.createDod(this.props.authContext.accessToken, body, (dod, error) => {
+          if (!error && dod !== null) {
+            this.props.onCreatedDod(dod);
+          }
+          if (dod === null) {
+            console.error(error);
+          }
+        });
       }
     });
-
   }
 
   private onClickPreview() {
@@ -226,59 +256,62 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
   }
 
   private onClickAddDefinitionOfDone() {
-    const values: string[] = this.state.descriptionOfDoneInput.value;
+    const values: string[] = this.state.descriptionOfDone.value;
     values.push('');
     this.setState({
-      descriptionOfDoneInput: {
+      descriptionOfDone: {
         value: values
       }
     })
   }
 
   private onClickAddEstimatedWorkTime() {
-    const values: UserWorkTime[] = this.state.estimatedWorkOfTimeInput.value;
+    const values: UserWorkTime[] = this.state.estimatedWorkOfTime.value;
     values.push({
       format: EstimatedWorkTimeFormat.JOUR_HOMME,
       users: [(this.props.org.owner as User)._id],
       value: 0
     });
     this.setState({
-      estimatedWorkOfTimeInput: {
+      estimatedWorkOfTime: {
         value: values
       }
     })
   }
 
   private onClickDeleteDefinitionOfDone(index: number) {
-    const values: string[] = this.state.descriptionOfDoneInput.value;
+    const values: string[] = this.state.descriptionOfDone.value;
     values.splice(index, 1);
     this.setState({
-      descriptionOfDoneInput: {
+      descriptionOfDone: {
         value: values,
       }
     })
   }
 
   private onClickDeleteEstimatedWorkTime(index: number) {
-    const values: UserWorkTime[] = this.state.estimatedWorkOfTimeInput.value;
+    const values: UserWorkTime[] = this.state.estimatedWorkOfTime.value;
     values.splice(index, 1);
     this.setState({
-      estimatedWorkOfTimeInput: {
+      estimatedWorkOfTime: {
         value: values,
       }
     })
   }
 
   private showDefinitionsOfDoneText() {
-    return this.state.descriptionOfDoneInput.value.map((dod, index) => {
+    return this.state.descriptionOfDone.value.map((dod, index) => {
       return (
         <Grid key={index} style={{marginTop: '12px'}}>
           <Column lg={11} md={7}>
-            <TextInput required id={"dod-"} labelText={""} hideLabel={true} value={dod} onChange={(e) => {
-              const value = this.state.descriptionOfDoneInput.value;
+            <TextInput
+              invalid={this.state.descriptionOfDone.error !== undefined}
+              invalidText={this.state.descriptionOfDone.error}
+              required id={"dod-"} labelText={""} hideLabel={true} value={dod} onChange={(e) => {
+              const value = this.state.descriptionOfDone.value;
               value[index] = e.currentTarget.value;
               this.setState({
-                descriptionOfDoneInput: {
+                descriptionOfDone: {
                   value: value,
                 }
               })
@@ -293,20 +326,22 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
   }
 
   private showEstimatedWorkTime() {
-    return this.state.estimatedWorkOfTimeInput.value.map((dod, index) => {
+    return this.state.estimatedWorkOfTime.value.map((dod, index) => {
       return (
         <Grid key={index} style={{marginTop: '12px', alignItems: 'center'}}>
           <Column lg={5} md={3}>
             <FilterableMultiSelect
+              invalid={this.state.estimatedWorkOfTime.error !== undefined}
+              invalidText={this.state.estimatedWorkOfTime.error}
               items={(this.props.org.members as User[]).concat([this.props.org.owner as User]).map((user) => ({label: user.email, value: user._id}))}
               placeholder={"Email de l'utilisateur..."}
               id="dod-estimated-work-time-user"
               selectedItems={dod.users.map((user) => {return {label: user, value: user}})}
               onChange={(e) => {
-                const value = this.state.estimatedWorkOfTimeInput.value;
+                const value = this.state.estimatedWorkOfTime.value;
                 value[index].users = e.selectedItems.map((item) => (item.value));
                 this.setState({
-                  estimatedWorkOfTimeInput: {
+                  estimatedWorkOfTime: {
                     value: value
                   }
                 })
@@ -314,11 +349,11 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
               selectionFeedback="top-after-reopen"/>
           </Column>
           <Column lg={3} md={2}>
-            <NumberInput id={"dod-estimated-work-time-time"} iconDescription={""} value={this.state.estimatedWorkOfTimeInput.value[index].value} onChange={(e) => {
-              const value = this.state.estimatedWorkOfTimeInput.value;
+            <NumberInput id={"dod-estimated-work-time-time"} iconDescription={""} value={this.state.estimatedWorkOfTime.value[index].value} onChange={(e) => {
+              const value = this.state.estimatedWorkOfTime.value;
               value[index].value = e.imaginaryTarget.value;
               this.setState({
-                estimatedWorkOfTimeInput: {
+                estimatedWorkOfTime: {
                   value: value
                 }
               })
@@ -329,10 +364,10 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
               style={{marginBottom: '10px'}}
               id="dod-estimated-work-time-format"
               onChange={(e) => {
-                const value = this.state.estimatedWorkOfTimeInput.value;
+                const value = this.state.estimatedWorkOfTime.value;
                 value[index].format = EstimatedWorkTimeFormat[e.currentTarget.value];
                 this.setState({
-                  estimatedWorkOfTimeInput: {
+                  estimatedWorkOfTime: {
                     value: value,
                   }
                 })
@@ -352,7 +387,7 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
 
   private showPreview() {
     if (!this.state.preview) {
-     return;
+      return;
     }
     return (
       <Button hasIconOnly renderIcon={Close} iconDescription={"Close"} onClick={this.onClickBackPreview}/>
@@ -366,18 +401,24 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
       <Stack gap={4}>
         <Grid>
           <Column lg={3} md={3}>
-            <TextInput required id={"dod-version"} labelText={<RequiredLabel message={"Version"}/>} min={0} value={this.state.versionInput.value} onChange={(e) => {
+            <TextInput
+              invalid={this.state.version.error !== undefined}
+              invalidText={this.state.version.error}
+              id={"dod-version"} labelText={<RequiredLabel message={"Version"}/>} min={0} value={this.state.version.value} onChange={(e) => {
               this.setState({
-                versionInput: {
+                version: {
                   value: e.currentTarget.value,
                 }
               })
             }}/>
           </Column>
           <Column lg={8} md={5}>
-            <TextInput required={true} id={"dod-title"}  labelText={<RequiredLabel message={"Nom du DoD"}/>} value={this.state.titleInput.value} onChange={(e) => {
+            <TextInput
+              invalid={this.state.title.error !== undefined}
+              invalidText={this.state.title.error}
+              id={"dod-title"} labelText={<RequiredLabel message={"Nom du DoD"}/>} value={this.state.title.value} onChange={(e) => {
               this.setState({
-                titleInput: {
+                title: {
                   value: e.currentTarget.value
                 }
               })
@@ -386,27 +427,36 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
         </Grid>
         <Grid>
           <Column lg={3} md={3}>
-            <TextInput id={"dod-skinOf"} labelText={<RequiredLabel message={"En tant que ..."}/>} value={this.state.skinOfInput.value} onChange={(e) => {
+            <TextInput
+              invalid={this.state.skinOf.error !== undefined}
+              invalidText={this.state.skinOf.error}
+              id={"dod-skinOf"} labelText={<RequiredLabel message={"En tant que ..."}/>} value={this.state.skinOf.value} onChange={(e) => {
               this.setState({
-                skinOfInput: {
+                skinOf: {
                   value: e.currentTarget.value,
                 }
               })
             }}/>
           </Column>
           <Column lg={8} md={5}>
-            <TextInput id={"dod-want"} labelText={<RequiredLabel message={"Je veux ..."}/>} value={this.state.wantInput.value} onChange={(e) => {
+            <TextInput
+              invalid={this.state.want.error !== undefined}
+              invalidText={this.state.want.error}
+              id={"dod-want"} labelText={<RequiredLabel message={"Je veux ..."}/>} value={this.state.want.value} onChange={(e) => {
               this.setState({
-                wantInput: {
+                want: {
                   value: e.currentTarget.value
                 }
               })
             }}/>
           </Column>
         </Grid>
-        <TextArea id={"dod-description"} labelText={<RequiredLabel message={"Description"}/>} value={this.state.descriptionInput.value} onChange={(e) => {
+        <TextArea
+          invalid={this.state.description.error !== undefined}
+          invalidText={this.state.description.error}
+          id={"dod-description"} labelText={<RequiredLabel message={"Description"}/>} value={this.state.description.value} onChange={(e) => {
           this.setState({
-            descriptionInput: {
+            description: {
               value: e.currentTarget.value
             }
           });
@@ -430,11 +480,11 @@ export class NewDodModal extends React.Component<NewDodModalProps, NewDodModalSt
       <Modal
         size={"md"}
         open={this.props.open}
-        primaryButtonText={"Créer"}
+        primaryButtonText={this.props.editionDod !== undefined ? 'Mettre à jour' : "Créer"}
         onRequestSubmit={this.onClickCreate}
         secondaryButtonText={"Fermer"}
         onRequestClose={this.props.onDismiss}
-        modalHeading="Créer un nouveau DoD">
+        modalHeading={this.props.editionDod !== undefined ? 'Modification du dod' : "Créer un nouveau DoD"}>
 
         {this.showPreview()}
         {this.showEdit()}

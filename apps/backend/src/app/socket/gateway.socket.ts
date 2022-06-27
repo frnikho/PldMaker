@@ -36,16 +36,16 @@ export class Gateway {
 
   @UseGuards(AuthWsGuard)
   @SubscribeMessage('LoggedUser:New')
-  public onNewUserLogged(@MessageBody('0') user: UserDocument, @ConnectedSocket() client: Socket) {
-    this.registerListeners(client, user);
+  public onNewUserLogged(@MessageBody() body, @ConnectedSocket() client: Socket) {
+    this.registerListeners(client, body[0]);
 
-    this.service.connectedUser(user);
+    this.service.connectedUser(body[0]);
     console.log('New:LoggedUser: user:');
   }
 
   @UseGuards(AuthWsGuard)
   @SubscribeMessage('LoggedUser:Logout')
-  public onUserLogout(@MessageBody('0') user: User) {
+  public onUserLogout(@MessageBody() user) {
     console.log('Logout');
   }
 
@@ -66,7 +66,9 @@ export class Gateway {
 
   @UseGuards(AuthWsGuard)
   @SubscribeMessage('Org:GetOnlineMembers')
-  public async getOnlineMembers(@MessageBody('0') user: User, @MessageBody('1',) orgId: string[]) {
+  public async getOnlineMembers(@MessageBody() body) {
+    const user: User = body[0];
+    const orgId = body[1] as string[];
     this.server.emit('Org:GetOnlineMembers', await this.service.getMembers(orgId[0]));
   }
 

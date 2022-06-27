@@ -49,8 +49,24 @@ export class UserService {
 
     public findFavour(ownerId: string) {
       return this.favourModel.findOne({owner: ownerId})
-        .populate('pld')
-        .populate('org')
+        .populate({
+          path: 'pld',
+          populate: [
+            {
+              path: 'owner',
+            },
+            {
+              path: 'manager'
+            }]
+        })
+        .populate({
+          path: 'org',
+          populate: [
+            {
+              path: 'owner'
+            },
+          ]
+        })
         .exec();
     }
 
@@ -62,16 +78,48 @@ export class UserService {
         query = this.favourModel.findOneAndUpdate({owner: userId}, {$addToSet: {pld: body.data_id}}, {new: true});
       }
       return query
-        .populate('pld')
-        .populate('org')
+        .populate({
+          path: 'pld',
+          populate: [
+            {
+              path: 'owner',
+            },
+            {
+              path: 'manager'
+            }]
+        })
+        .populate({
+          path: 'org',
+          populate: [
+            {
+              path: 'owner'
+            },
+          ]
+        })
         .exec();
     }
 
     public removeFavour(userId: string, favourId: string) {
       console.log(favourId);
       return this.favourModel.findOneAndUpdate({owner: userId}, {$pull: {org: favourId, pld: favourId}}, {new: true})
-        .populate('pld')
-        .populate('org')
+        .populate({
+          path: 'pld',
+          populate: [
+            {
+              path: 'owner',
+            },
+            {
+              path: 'manager'
+            }]
+        })
+        .populate({
+          path: 'org',
+          populate: [
+            {
+              path: 'owner'
+            },
+          ]
+        })
         .exec();
     }
 

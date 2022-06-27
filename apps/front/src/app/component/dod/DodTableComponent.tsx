@@ -1,7 +1,7 @@
 import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {
-  Button, ButtonSet, Link,
+  Button, Link,
   Select, SelectItem,
   Table,
   TableBatchAction,
@@ -19,7 +19,7 @@ import {
   TableToolbarSearch,
 } from "carbon-components-react";
 
-import {DataTable, IconButton} from '@carbon/react';
+import {DataTable} from '@carbon/react';
 
 import {NewDodModal} from "../../modal/dod/NewDodModal";
 import {Dod} from "../../../../../../libs/data-access/dod/Dod";
@@ -31,6 +31,8 @@ import {PldGenerator} from "../../docx/PldGenerator";
 import {TrashCan, Download, Edit, ImportExport, View} from '@carbon/icons-react'
 import {User} from "../../../../../../libs/data-access/user/User";
 import {toast} from "react-toastify";
+import {formatShortDate} from "../../../../../../libs/utility/DateUtility";
+import {PreviewDodModal} from "../../modal/dod/PreviewDodModal";
 
 export type DodTableComponentProps = {
   onUpdateDod: () => void;
@@ -44,10 +46,7 @@ export type DodTableComponentProps = {
 export type DodTableComponentState = {
   openCreateModal: boolean;
   editionDod?: Dod;
-}
-
-const formatDate = (date: Date): string => {
-  return date.toLocaleDateString("fr");
+  openPreviewModal: boolean;
 }
 
 export const headerData = [
@@ -76,6 +75,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
     super(props);
     this.state = {
       openCreateModal: false,
+      openPreviewModal: false,
       editionDod: undefined,
     }
     this.onClickCreateDod = this.onClickCreateDod.bind(this);
@@ -110,9 +110,21 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
     }
   }
 
+  private onClickPreviewDod(dod?: Dod) {
+    if (dod === undefined) {
+      toast('Impossible de preview la DoD !', {type: 'error'})
+      return;
+    }
+    this.setState({
+      openPreviewModal: true,
+      editionDod: dod
+    });
+  }
+
   private onDismissDodModal() {
     this.setState({
       openCreateModal: false,
+      openPreviewModal: false,
       editionDod: undefined,
     });
   }
@@ -180,7 +192,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
       ({
         ...dod,
         id: dod._id,
-        created_date: formatDate(new Date(dod.created_date))
+        created_date: formatShortDate(new Date(dod.created_date))
       }));
     return (
       <DataTable rows={rowData} headers={headerData} isSortable locale={"fr"}>
@@ -222,12 +234,12 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                         estimatedWorkTime: dod.estimatedWorkTime.map((workTime) => {
                           return {
                             ...workTime,
-                            users: workTime.users.map((userId) => {
-                              const u1 = (this.props.org.members as User[]).find((user) => user._id === userId);
+                            users: workTime.users.map((wtUser) => {
+                              const u1 = (this.props.org.members as User[]).find((user) => user._id === wtUser._id);
                               if (u1 !== undefined) {
                                 return u1.email;
                               }
-                              if (userId === (this.props.org.owner as User)._id)
+                              if (wtUser._id === (this.props.org.owner as User)._id)
                                 return (this.props.org.owner as User).email;
                               return undefined;
                             }).filter((a) => a !== undefined) as string[],
@@ -304,9 +316,9 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                     <TableCell>
                       {this.showSelectStatus(row.id)}
                     </TableCell>
-                    <TableCell key={"actions"}>
+                    <TableCell key={"actions"} style={{minWidth: '100px'}}>
                       <Link renderIcon={Edit} onClick={() => this.onClickUpdateDod(this.props.dod.find((dod) => dod._id === row.id))}/>
-                      <Link renderIcon={View} disabled onClick={() => null}/>
+                      <Link renderIcon={View} onClick={() => this.onClickPreviewDod(this.props.dod.find((dod) => dod._id === row.id))}/>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -323,6 +335,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
     return (
       <>
         <NewDodModal editionDod={this.state.editionDod} authContext={this.props.userContext} open={this.state.openCreateModal} onDismiss={this.onDismissDodModal} onCreatedDod={this.onCreateDod} lastDod={[]} pld={this.props.pld} org={this.props.org}/>
+        {this.state.editionDod !== undefined ? <PreviewDodModal dod={this.state.editionDod} open={this.state.openPreviewModal} onDismiss={this.onDismissDodModal} onSuccess={() => null}/> : null}
         {this.showDatatable()}
       </>
     );

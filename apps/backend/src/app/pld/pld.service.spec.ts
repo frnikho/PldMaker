@@ -138,12 +138,14 @@ describe('PldService', () => {
         version: 1.1,
         created_date: new Date(),
         sections: [''],
+        currentStep: ''
       });
       const newPld = await service.addRevision(pld._id, {
         owner: user._id,
         version: 1.1,
         created_date: new Date(),
         sections: [''],
+        currentStep: ''
       });
       expect(newPld.revisions.length).toBe(2)
     })
@@ -154,6 +156,7 @@ describe('PldService', () => {
         version: 1.1,
         created_date: new Date(),
         sections: [''],
+        currentStep: ''
       });
       expect(newPld).not.toBeNull();
     })

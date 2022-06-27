@@ -9,9 +9,9 @@ import {
   Button,
   ButtonSet,
   ClickableTile,
-  Column,
+  Column, Form,
   Grid,
-  SkeletonPlaceholder,
+  SkeletonPlaceholder, SkeletonText, TextInput, Tile,
 } from "carbon-components-react";
 
 import {Stack} from '@carbon/react';
@@ -25,10 +25,11 @@ import {FieldData} from "../../util/FieldData";
 import {SocketContext} from "../../context/SocketContext";
 import {ShowFavourIcon} from "../../util/User";
 import {FavourType} from "../../../../../../libs/data-access/user/Favour";
+import {formatLongDate, formatShortDate} from "../../../../../../libs/utility/DateUtility";
+import {OrgHistoryModal} from "../../modal/org/OrgHistoryModal";
 
-const formatDate = (date: Date): string => {
-  return date.toLocaleDateString("fr");
-}
+import { ResponsiveCalendar } from "@nivo/calendar";
+import {RequiredLabel} from "../../util/Label";
 
 export type OrganizationComponentProps = {
   orgId?: string;
@@ -38,6 +39,7 @@ export type OrganizationComponentProps = {
 export type OrganizationComponentState = {
   org?: Organization;
   pld: FieldData<Pld[]>;
+  openHistoryDialog: boolean;
 } & PageState;
 
 class OrganizationComponent extends React.Component<OrganizationComponentProps, OrganizationComponentState> {
@@ -48,6 +50,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
   constructor(props: OrganizationComponentProps) {
     super(props);
     this.state = {
+      openHistoryDialog: false,
       org: undefined,
       loading: false,
       navigateUrl: undefined,
@@ -112,6 +115,44 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     })
   }
 
+  private showModals() {
+    if (this.state.org === undefined) {
+      return undefined;
+    }
+    return (
+      <>
+        <OrgHistoryModal org={this.state.org} open={this.state.openHistoryDialog} onDismiss={() => {this.setState({openHistoryDialog: false})}} onSuccess={() => {}}/>
+      </>
+    )
+  }
+
+  private showEditableInfo() {
+    if (this.state.org === undefined)
+      return;
+    return (
+      <Form>
+        <Stack gap={6}>
+          <h4>Informations</h4>
+          <TextInput id={"description"} labelText={<RequiredLabel message={"Description"}/>}/>
+          <Button>Mettre à jour</Button>
+        </Stack>
+      </Form>
+    )
+  }
+
+  private showInfo() {
+    if (this.state.org === undefined)
+      return;
+    return (
+      <Tile>
+        <Stack gap={3}>
+            <h4>Date de création :</h4>
+            {this.state.pld === undefined ? <SkeletonText/> : <p>{formatLongDate(new Date(this.state.org?.created_date ?? ""))}</p>}
+        </Stack>
+      </Tile>
+    )
+  }
+
   private showPld() {
     if (this.state.pld.loading) {
       return (
@@ -130,9 +171,9 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
                 <p>{pld.currentStep}</p>
                 <br/>
                 <p style={{fontStyle: 'italic'}}>Création</p>
-                <p>{formatDate(new Date(pld.created_date ?? new Date()))}</p>
+                <p>{formatShortDate(new Date(pld.created_date ?? new Date()))}</p>
                 <p style={{fontStyle: 'italic'}}>Dernière mise a jour</p>
-                <p>{formatDate(new Date(pld.created_date ?? new Date()))}</p>
+                <p>{formatShortDate(new Date(pld.created_date ?? new Date()))}</p>
                 <div style={{marginLeft: 'auto', marginRight: '0px', textAlign: 'end'}}>
                   <ShowFavourIcon type={FavourType.PLD} data={pld} clickable={false}/>
                 </div>
@@ -144,27 +185,66 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     )
   }
 
+  private showCharts() {
+    return (
+      <div>
+        {/*<ResponsiveCalendar
+          data={data}
+          from={new Date(this.state.org?.created_date ?? new Date())}
+          to={new Date()}
+          emptyColor="#eeeeee"
+          colors={[ '#61cdbb', '#97e3d5', '#e8c1a0', '#f47560' ]}
+          margin={{ right: 40, left: 40 }}
+          yearSpacing={20}
+          monthBorderColor="#ffffff"
+          dayBorderWidth={1}
+          dayBorderColor="#ffffff"
+          legends={[
+            {
+              anchor: 'bottom-right',
+              direction: 'row',
+              translateY: 36,
+              itemCount: 4,
+              itemWidth: 42,
+              itemHeight: 36,
+              itemsSpacing: 14,
+              itemDirection: 'right-to-left'
+            }
+          ]}
+        />*/}
+      </div>
+    )
+  }
+
   override render() {
     return (
       <>
+        {this.showModals()}
         <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
           <BreadcrumbItem onClick={() => this.props.navigate(`/`)}>Dashboard</BreadcrumbItem>
           <BreadcrumbItem isCurrentPage>{this.state.org?.name ?? "Organisation"}</BreadcrumbItem>
         </Breadcrumb>
-          <h1>{this.state.org?.name}</h1>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-        <Stack gap={3}>
+        {this.showCharts()}
+        <Stack gap={4}>
           {redirectNavigation(this.state.navigateUrl)}
+          <h1>{this.state.org?.name}</h1>
+          <Grid>
+            <Column lg={12}>
+              <Tile>
+                {this.showEditableInfo()}
+              </Tile>
+            </Column>
+            <Column lg={4}>
+              {this.showInfo()}
+            </Column>
+          </Grid>
           <h2>Pld <Button kind={"ghost"} onClick={this.onClickCreatePld} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
           {this.showPld()}
           <h2>Templates <Button kind={"ghost"} onClick={this.onClickCreateTemplate} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
           <h2>Documents <Button kind={"ghost"} onClick={this.onClickCreateDocument} hasIconOnly renderIcon={Add} iconDescription={"Créer/Ajouter un document"}/></h2>
           <ButtonSet style={{marginBottom: '20px'}}>
             <Button onClick={() => this.props.navigate('manage')}><Settings size={24}/> Gérer</Button>
+            <Button onClick={() => this.setState({openHistoryDialog: true})}>Historique</Button>
           </ButtonSet>
         </Stack>
       </>

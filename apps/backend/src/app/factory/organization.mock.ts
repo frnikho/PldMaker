@@ -12,7 +12,8 @@ export class OrganizationMock {
         members,
         name,
         owner,
-        versionShifting: 1.0
+        versionShifting: 1.0,
+        history: []
       };
     }
 

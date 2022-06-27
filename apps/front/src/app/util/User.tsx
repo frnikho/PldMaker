@@ -49,7 +49,6 @@ export class ShowFavourIcon extends React.Component<ShowFavourIconProps, any> {
   }
 
   private showIcon() {
-    console.log(this.context.favours);
     if (this.context?.favours?.pld?.some((pld) => {
       return pld._id === this.props.data._id
     })) {

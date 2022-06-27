@@ -1,8 +1,9 @@
-import {DodCreateBody} from "../../../../../libs/data-access/dod/DodBody";
+import {DodCreateBody, DodFindPldBody} from "../../../../../libs/data-access/dod/DodBody";
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
 import {Dod} from "../../../../../libs/data-access/dod/Dod";
 import {AxiosError} from "axios";
 import {UpdateDodStatusBody} from "../../../../../libs/data-access/dod/UpdateDodStatusBody";
+import {PldOrgFindsBody} from "../../../../../libs/data-access/pld/PldBody";
 
 export type CallbackDod = (dod: Dod | null, error?: ApiError) => void;
 export type CallbackDods = (dod: Dod[], error?: ApiError) => void;
@@ -19,8 +20,28 @@ export class DodApiController {
     })
   }
 
+  public static updateDod(accessToken: string, dodId: string, dodBody: DodCreateBody, callback: CallbackDod) {
+    api.post(`dod/${dodId}/update`, dodBody, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      if (err.response?.data !== undefined)
+        return callback(null, err.response.data)
+      return callback(null, {message: ['An error occurred '], type: ErrorType.API_ERROR});
+    });
+  }
+
   public static findDodWithPld(accessToken: string, pldId: string, callback: CallbackDods) {
     api.get<Dod[]>(`dod/find/pld/${pldId}`, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      if (err.response?.data !== undefined)
+        return callback([], err.response.data)
+      return callback([], {message: ['An error occurred '], type: ErrorType.API_ERROR});
+    })
+  }
+
+  public static findDods(accessToken: string, pldId: string[], callback: CallbackDods) {
+    api.post<Dod[]>(`dod/finds`, new DodFindPldBody(pldId), authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)

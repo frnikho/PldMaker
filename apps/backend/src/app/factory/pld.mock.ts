@@ -37,6 +37,7 @@ export class PldMock {
       steps: [],
       startingDate: new Date(),
       endingDate: new Date(),
+      history: [],
     }
   }
 
@@ -54,6 +55,7 @@ export class PldMock {
       steps: [],
       startingDate: new Date(),
       endingDate: new Date(),
+      history: [],
     }
   }
 

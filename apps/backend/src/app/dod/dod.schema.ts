@@ -3,7 +3,8 @@ import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import mongoose, {Document} from "mongoose";
 import {User} from "../user/user.schema";
 import {Pld} from "../pld/pld.schema";
-import {DodRevision, DodStatus} from "../../../../../libs/data-access/dod/Dod";
+import {DodStatus} from "../../../../../libs/data-access/dod/Dod";
+import {DodHistoryAction} from "../../../../../libs/data-access/dod/DodHistory";
 
 export type DodDocument = Dod & Document;
 
@@ -19,6 +20,34 @@ export type EstimatedWorkTime = {
 export enum EstimatedWorkTimeFormat {
   JOUR_HOMME = 'J/H',
   HOURS = 'Heures',
+}
+
+export type EditedField = {
+  name: string;
+  lastValue: string;
+  value: string;
+}
+
+export type NewDodHistory = {
+  dodId: string;
+  editedFields: EditedField[];
+  owner: string;
+  action: DodHistoryAction;
+}
+
+@Schema()
+export class DodHistory {
+  @Prop({required: true})
+  date: Date;
+
+  @Prop({required: false, default: []})
+  editedFields: EditedField[]
+
+  @Prop({required: true, type: mongoose.Schema.Types.ObjectId, ref: User.name})
+  owner: User;
+
+  @Prop({required: true, enum: DodHistoryAction})
+  action: string;
 }
 
 @Schema()
@@ -54,8 +83,8 @@ export class Dod extends DatedObjectSchema {
   @Prop({required: true, type: mongoose.Schema.Types.ObjectId, ref: User.name})
   owner: User;
 
-  @Prop({default: []})
-  revisions: DodRevision[]
+  @Prop({required: false, default: []})
+  history: DodHistory[];
 
 }
 

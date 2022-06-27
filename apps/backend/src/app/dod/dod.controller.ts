@@ -1,5 +1,5 @@
 import {Body, Controller, Delete, Get, Param, Post, Request} from '@nestjs/common';
-import {DodCreateBody} from "../../../../../libs/data-access/dod/DodBody";
+import {DodCreateBody, DodFindPldBody} from "../../../../../libs/data-access/dod/DodBody";
 import {DodService} from "./dod.service";
 import {ObjectIDPipe} from "../ObjectID.pipe";
 import {UpdateDodStatusBody} from "../../../../../libs/data-access/dod/UpdateDodStatusBody";
@@ -21,7 +21,7 @@ export class DodController {
 
   @Get('find/pld/:pldId')
   public async findByPld(@Request() req, @Param('pldId', new ObjectIDPipe()) pldId: string) {
-    return this.dodService.findByPldId(pldId);
+    return this.dodService.findByPldId([pldId]);
   }
 
   @Get('find/id/:id')
@@ -37,10 +37,22 @@ export class DodController {
   }
 
   @Post('update/status')
-  public async updateStatus(@Body() body: UpdateDodStatusBody) {
-    const dod = await this.dodService.updateStatus(body.dodId, body.status as DodStatus);
+  public async updateStatus(@Request() req, @Body() body: UpdateDodStatusBody) {
+    const dod = await this.dodService.updateStatus(req.user._id, body.dodId, body.status as DodStatus);
     this.eventEmitter.emit('Dod:Update', (dod.pldOwner as PldDocument)._id);
     return dod;
+  }
+
+  @Post(':id/update')
+  public async updateDod(@Request() req, @Param('id') dodId: string, @Body() body: DodCreateBody) {
+    const dod = await this.dodService.update(req.user._id, dodId, body);
+    this.eventEmitter.emit('Dod:Update', (dod.pldOwner as PldDocument)._id);
+    return dod;
+  }
+
+  @Post('finds')
+  public async getDod(@Request() req, @Body() body: DodFindPldBody) {
+    return this.dodService.findByPldId(body.plds);
   }
 
 }

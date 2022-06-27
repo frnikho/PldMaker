@@ -1,4 +1,4 @@
-import {PldOrgCreateBody} from "../../../../../libs/data-access/pld/PldBody";
+import {PldOrgCreateBody, PldOrgFindsBody} from "../../../../../libs/data-access/pld/PldBody";
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
 import {AxiosError} from "axios";
 import {CreatePldRevisionBody, Pld} from "../../../../../libs/data-access/pld/Pld";
@@ -21,6 +21,16 @@ export class PldApiController {
 
   public static findOrgPld(accessToken: string, orgId: string, callback: PldsCallback) {
     api.get<Pld[]>(`pld/organization/find/${orgId}`, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      if (err.response?.data !== undefined)
+        return callback([], err.response.data);
+      return callback([], {type: ErrorType.API_ERROR, message: ['An error occurred !']});
+    });
+  }
+
+  public static getAllOrgPld(accessToken: string, orgId: string[], callback: PldsCallback) {
+    api.post<Pld[]>(`pld/finds/`, new PldOrgFindsBody(orgId), authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)

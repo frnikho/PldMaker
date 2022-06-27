@@ -10,9 +10,9 @@ export type LoadingState = {
   loading: boolean;
 }
 
-export class ReactPage<T, Z> extends React.Component<T, Z> {
+export class ReactFormValidation<T, Z> extends React.Component<T, Z> {
 
-  public updateFormField(name: string, value: string, error: string) {
+  public updateFormField<X>(name: string, value: X, error: string) {
     const newState = {[name]: {value, error}} as unknown as Pick<any, any>;
     this.setState(newState);
   }

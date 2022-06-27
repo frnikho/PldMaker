@@ -1,5 +1,6 @@
 import {DatedObject} from "../DatedObject";
 import {User} from "../user/User";
+import {OrgHistory} from "./OrgHistory";
 
 export type Organization = {
   members: User[],
@@ -9,6 +10,7 @@ export type Organization = {
   versionShifting: number;
   _id: string;
   dodColors: DodColor[];
+  history: OrgHistory[];
 } & DatedObject
 
 export type DodColor = {

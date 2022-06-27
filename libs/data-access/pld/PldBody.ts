@@ -1,5 +1,13 @@
 import {IsNotEmpty, Length, Min} from "class-validator";
 
+export class PldOrgFindsBody {
+  organizations: string[];
+
+  constructor(organizations: string[]) {
+    this.organizations = organizations;
+  }
+}
+
 export class PldOrgCreateBody {
   @IsNotEmpty()
   @Length(5, 64)

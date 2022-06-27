@@ -2,6 +2,7 @@ import {DatedObject} from "../DatedObject";
 import {PldOwnerType} from "./PldOwnerType";
 import {User} from "../user/User";
 import {Organization} from "../organization/Organization";
+import {PldHistory} from "./PldHistory";
 
 export type Pld = {
   description: string;
@@ -21,6 +22,8 @@ export type Pld = {
   endingDate: Date;
 
   currentStep: string;
+
+  history: PldHistory[];
 
 } & DatedObject
 

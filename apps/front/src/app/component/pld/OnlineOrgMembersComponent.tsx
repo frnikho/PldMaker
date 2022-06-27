@@ -15,10 +15,9 @@ import {PageState} from "../../util/Page";
 import {RequiredUserContextProps} from "../../context/UserContext";
 
 import {UserOnline, Asleep} from '@carbon/icons-react'
+import {formatLongDate} from "../../../../../../libs/utility/DateUtility";
 
-const formatDate = (date: Date): string => {
-  return date.toLocaleDateString("fr") + " à " + date.toLocaleTimeString("fr");
-}
+
 
 export const defaultRefreshTime = 10 * 1000;
 
@@ -102,7 +101,7 @@ export class OnlineOrgMembersComponent extends React.Component<OnlineOrgMembersC
                 <StructuredListCell>
                   {member.firstname} {member.lastname?.toUpperCase()}
                 </StructuredListCell>
-                <StructuredListCell>{user !== undefined ? formatDate(new Date(user.data.lastConnectionDate)) : null}</StructuredListCell>
+                <StructuredListCell>{user !== undefined ? formatLongDate(new Date(user.data.lastConnectionDate)) : null}</StructuredListCell>
               </StructuredListRow>)
           })}
         </StructuredListBody>

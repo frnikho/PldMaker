@@ -11,7 +11,7 @@ import {User} from "../../../../../libs/data-access/user/User";
 import {FieldData} from "../util/FieldData";
 import {toast} from "react-toastify";
 import {validate} from "class-validator";
-import {ReactPage} from "../util/Page";
+import {ReactFormValidation} from "../util/Page";
 import {RegisterBody} from "../../../../../libs/data-access/auth/RegisterBody";
 
 type RegisterModalProps = {
@@ -29,7 +29,7 @@ type RegisterModalState = {
   loading: boolean;
 }
 
-export class RegisterModal extends ReactPage<RegisterModalProps, RegisterModalState> {
+export class RegisterModal extends ReactFormValidation<RegisterModalProps, RegisterModalState> {
 
   constructor(props: RegisterModalProps) {
     super(props);

@@ -5,6 +5,8 @@ import {Button, Content, SkeletonPlaceholder} from "carbon-components-react";
 import {PldHomeDashboard} from "../component/home/PldHomeDashboard";
 import {SocketContext} from "../context/SocketContext";
 
+import {Stack} from '@carbon/react';
+
 export type HomePageProps = unknown;
 export type HomePageState = unknown;
 
@@ -22,10 +24,10 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
       return (<h1>Not logged</h1>)
     } else if (authContext.isLogged === LoginState.logged) {
       return (
-        <>
+        <Stack gap={4}>
           <OrganizationHomeDashboard userContext={authContext}/>
           <PldHomeDashboard userContext={authContext}/>
-        </>
+        </Stack>
       )
     }
     return (

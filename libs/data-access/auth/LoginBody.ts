@@ -11,7 +11,7 @@ export class LoginBody {
     message: 'Le mot de passe doit être supérieur a 5 de longueur'
   })
   @MaxLength(64, {
-    message: 'Le mot de passe ne poit pas être supérieur a 64 de longeur',
+    message: 'Le mot de passe ne doit pas être supérieur a 64 de longueur',
   })
   password: string;
 

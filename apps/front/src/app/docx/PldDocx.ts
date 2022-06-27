@@ -2,14 +2,7 @@ import {Pld, PldRevision} from "../../../../../libs/data-access/pld/Pld";
 import {Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
 import {Organization} from "../../../../../libs/data-access/organization/Organization";
-
-const formatDate = (date: Date): string => {
-  return date.toLocaleString('fr', { day: 'numeric', month: 'long', year: 'numeric'})
-}
-
-const formatDateRev = (date: Date): string => {
-  return date.toLocaleString('fr', {day: 'numeric', month: 'numeric', year: 'numeric'});
-}
+import {formatDateNumeric} from "../../../../../libs/utility/DateUtility";
 
 const HeaderRevisionCell = (title: string, size: string) => {
   return new TableCell({
@@ -52,7 +45,7 @@ const RevisionCell = (value: string): TableCell => {
 const RevisionRow = (revision: PldRevision, author: string): TableRow => {
   return new TableRow({
     children: [
-      RevisionCell(formatDateRev(new Date(revision.created_date))),
+      RevisionCell(formatDateNumeric(new Date(revision.created_date))),
       RevisionCell(revision.version),
       RevisionCell(author),
       RevisionCell(revision.sections.join(', ')),
@@ -155,7 +148,7 @@ export class PldDocx {
         DescCell('Email', this.pld.manager.email),
         DescCell('Mots-clés', this.pld.tags.join(', ')),
         DescCell('Promotion', this.pld.promotion.toString()),
-        DescCell('Date de la mise a jour', formatDate(new Date(this.pld.updated_date ?? new Date()))),
+        DescCell('Date de la mise a jour', formatDateNumeric(new Date(this.pld.updated_date ?? new Date()))),
         DescCell('Version du modéle', this.pld.version.toString()),
       ]
     });

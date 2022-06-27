@@ -8,7 +8,6 @@ import {OrganizationApiController} from "../../controller/OrganizationApiControl
 import {Organization} from "../../../../../../libs/data-access/organization/Organization";
 import {DodDocx} from "../../docx/DodDocx";
 import {Document, Packer} from "docx";
-import DocViewer from "react-doc-viewer";
 
 export enum ViewMode {
   New = 'new',
@@ -62,8 +61,8 @@ export class NewTemplateComponent extends React.Component<NewTemplateProps, NewT
       title: 'Hello World',
       owner: 'abc',
       descriptionOfDone: [''],
+      history: [],
       pldOwner: 'me',
-      revisions: [],
       skinOf: 'Développeur',
       updated_date: new Date(),
       version: '2.1.3',

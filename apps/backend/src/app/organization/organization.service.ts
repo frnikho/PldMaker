@@ -1,25 +1,37 @@
 import {BadRequestException, Injectable} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
-import {Organization, OrganizationDocument} from "./organization.schema";
-import {Model, ObjectId} from "mongoose";
+import {NewOrgHistory, Organization, OrganizationDocument, OrgHistory} from "./organization.schema";
+import {Model, ObjectId, Query} from "mongoose";
 import {CreateOrganizationBody} from "../../../../../libs/data-access/organization/CreateOrganizationBody";
 import {UserDocument} from "../user/user.schema";
 import {UpdateOrganizationBody} from "../../../../../libs/data-access/organization/UpdateOrganizationBody";
 import {DeleteOrganizationBody} from "../../../../../libs/data-access/organization/DeleteOrganizationBody";
 import {UserService} from "../user/user.service";
 import {InviteUserOrgBody} from "../../../../../libs/data-access/organization/ManageMembersOrganizationBody";
+import {EventEmitter2} from "@nestjs/event-emitter";
+import {OrgAddMemberEvent, OrgEvents} from "./organization.event";
 
-export type MemberUpdateObjects = UserDocument[] | string[] | ObjectId[];
+export type MemberUpdateObjects = string[];
 
 @Injectable()
 export class OrganizationService {
 
-  constructor(@InjectModel(Organization.name) private organizationModel: Model<Organization>, private userService: UserService) {}
+  constructor(@InjectModel(Organization.name) private organizationModel: Model<Organization>, private userService: UserService, private eventEmitter: EventEmitter2) {}
+
+  private populateAndExecute(query: Query<any, any>) {
+    return query.populate(['owner', 'members'])
+      .populate({
+        path: 'history',
+        populate: [{
+          path: 'owner'
+        }, {
+          path: 'member'
+        }]
+      }).exec();
+  }
 
   public find(orgObjectId: string): Promise<OrganizationDocument | null> {
-    return this.organizationModel.findOne({_id: orgObjectId})
-      .populate(['owner', 'members'])
-      .exec();
+    return this.populateAndExecute(this.organizationModel.findOne({_id: orgObjectId}));
   }
 
   public createByBody(org: CreateOrganizationBody, ownerId: string): Promise<OrganizationDocument | null> {
@@ -78,21 +90,28 @@ export class OrganizationService {
   }
 
   public async addMembers(orgId: string, ownerId: string, userId: MemberUpdateObjects): Promise<OrganizationDocument | null> {
-    return this.organizationModel.findOneAndUpdate({_id: orgId, owner: ownerId}, {$addToSet: {members: userId}}, {new: true, populate: ['members', 'owner']})
-      .exec();
+    const org = await this.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: orgId, owner: ownerId}, {$addToSet: {members: userId}}, {new: true}));
+    this.eventEmitter.emit(OrgEvents.onMemberAdded, new OrgAddMemberEvent(orgId, userId[0], ownerId));
+    return org;
   }
 
   public async addMembersByEmail(ownerId: string, body: InviteUserOrgBody): Promise<OrganizationDocument | null> {
     const user: UserDocument | null = await this.userService.findByEmail(body.memberEmail);
     if (user === null)
       throw new BadRequestException(`can't found user email !`);
-    return this.organizationModel.findOneAndUpdate({_id: body.orgId, owner: ownerId}, {$addToSet: {members: user._id}}, {new: true, populate: ['members', 'owner']})
-      .exec();
+    const org = await this.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: body.orgId, owner: ownerId}, {$addToSet: {members: user._id}}, {new: true}));
+    this.eventEmitter.emit(OrgEvents.onMemberAdded, new OrgAddMemberEvent(body.orgId, user._id, ownerId));
+    return org;
   }
 
   public async removeMembers(orgId: string, ownerId: string, userId: MemberUpdateObjects): Promise<OrganizationDocument | null> {
-    return this.organizationModel.findOneAndUpdate({_id: orgId, owner: ownerId}, {$pull: {members: {$in: userId}}}, {new: true, populate: ['members', 'owner']})
-      .exec();
+    const org = await this.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: orgId, owner: ownerId}, {$pull: {members: {$in: userId}}}, {new: true}));
+    this.eventEmitter.emit(OrgEvents.onMemberAdded, new OrgAddMemberEvent(orgId, userId[0], ownerId));
+    return org;
+  }
+
+  public addHistory(orgId: string, history: NewOrgHistory) {
+    return this.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: orgId}, {$push: {history}}, {new: true}));
   }
 
 }

@@ -3,8 +3,8 @@ import {Observable} from "rxjs";
 import {WsPayload} from "../../../../../../libs/data-access/auth/WsPayload";
 import {WsException} from "@nestjs/websockets";
 import {JwtService} from "@nestjs/jwt";
-import {PayloadLogin} from "../../../../../../libs/data-access/auth/PayloadLogin";
 import {UserService} from "../../user/user.service";
+import {PayloadLogin} from "../../../../../../libs/data-access/auth/LoginToken";
 
 @Injectable()
 export class AuthWsGuard implements CanActivate {

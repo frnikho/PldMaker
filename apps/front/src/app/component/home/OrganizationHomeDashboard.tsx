@@ -17,16 +17,22 @@ import {NavigationState, redirectNavigation} from "../../util/Navigation";
 import {Organization} from "../../../../../../libs/data-access/organization/Organization";
 
 import {View, Add} from '@carbon/icons-react'
+import {formatShortDate} from "../../../../../../libs/utility/DateUtility";
+import {ChartsDashboard} from "./ChartsDashboard";
+import {Pld} from "../../../../../../libs/data-access/pld/Pld";
+import {PldApiController} from "../../controller/PldApiController";
+import {Dod} from "../../../../../../libs/data-access/dod/Dod";
+import {DodApiController} from "../../controller/DodApiController";
 
-const formatDate = (date: Date): string => {
-  return date.toLocaleDateString("fr");
-}
+
 
 type OrganizationHomeDashboardProps = unknown & RequiredUserContextProps
 
 type OrganizationHomeDashboardState = {
   loading: boolean;
   organization: Organization[];
+  pld: Pld[];
+  dods: Dod[];
 } & NavigationState
 
 export class OrganizationHomeDashboard extends React.Component<OrganizationHomeDashboardProps, OrganizationHomeDashboardState> {
@@ -36,11 +42,36 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
     this.state = {
       loading: true,
       organization: [],
+      dods: [],
+      pld: [],
     }
     this.onClickCreateOrganization = this.onClickCreateOrganization.bind(this);
   }
 
+  private loadAllPld() {
+    PldApiController.getAllOrgPld(this.props.userContext.accessToken, this.state.organization.map((org) => org._id), (pld, error) => {
+      if (error) {
+        console.log(error);
+      } else {
+        this.setState({
+          pld,
+        });
+        this.loadAllDod();
+      }
+    });
+  }
 
+  private loadAllDod() {
+    DodApiController.findDods(this.props.userContext.accessToken, this.state.pld.map((pld) => pld._id), (dods, error) => {
+      if (error) {
+        console.log(error);
+      } else {
+        this.setState({
+          dods,
+        })
+      }
+    });
+  }
 
   override componentDidMount() {
     if (this.props.userContext.accessToken === undefined)
@@ -51,6 +82,7 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
           organization: orgs,
           loading: false,
         });
+        this.loadAllPld();
       } else {
         //TODO check error
       }
@@ -80,7 +112,7 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
       return;
     }
     return (
-      <Table style={{marginTop: '20px'}}>
+      <Table>
         <TableHead>
           <TableRow>
             <TableHeader id={"name"} key={"name"}>Nom de l'organisation</TableHeader>
@@ -95,7 +127,7 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
             <TableRow key={index}>
               <TableCell>{org.name}</TableCell>
               <TableCell>{org.description}</TableCell>
-              <TableCell>{formatDate(new Date(org.created_date ?? new Date()))}</TableCell>
+              <TableCell>{formatShortDate(new Date(org.created_date ?? new Date()))}</TableCell>
               <TableCell>{org.owner.email}</TableCell>
               <TableCell>
                 <ButtonSet>
@@ -110,6 +142,14 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
           ))}
         </TableBody>
       </Table>
+    )
+  }
+
+  private showCharts() {
+    if (this.state.organization.length === 0 || this.state.pld.length === 0)
+      return;
+    return (
+      <ChartsDashboard org={this.state.organization} dod={this.state.dods} pld={this.state.pld} userContext={this.props.userContext}/>
     )
   }
 
@@ -131,6 +171,9 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
     return (
       <>
         {redirectNavigation(this.state.navigateUrl)}
+
+        <h1>Status</h1>
+        {this.showCharts()}
         <h1>Mes organizations <Button kind={"ghost"} onClick={this.onClickCreateOrganization} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h1>
         {this.showLoading()}
         {this.showNoOrganizations()}
