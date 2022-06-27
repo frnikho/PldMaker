@@ -154,7 +154,7 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
       return (
         <SideNavLink key={index} onClick={() => {
           onClickSideNavExpand();
-          this.props.onRedirectUrl(`/organization/${pld.owner}/pld/${pld._id}`)
+          this.props.onRedirectUrl(`/organization/${pld.owner._id}/pld/${pld._id}`)
         }}>
           {pld.title}
         </SideNavLink>
