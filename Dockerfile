@@ -1,4 +1,4 @@
-FROM node:17-alpine3.14 as base
+FROM node:18.4.0-bullseye as base
 
 COPY apps /app/apps
 COPY initdb.d /app/initdb.d
