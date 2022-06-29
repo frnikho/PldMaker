@@ -82,7 +82,11 @@ export class RegisterModal extends ReactFormValidation<RegisterModalProps, Regis
     return (<Modal
       open={this.props.open}
       onRequestClose={this.props.onDismiss}
-      onRequestSubmit={() => this.onClickRegister(this.props.userContext)}
+      onRequestSubmit={(e) => {
+        if (e.type === 'keydown')
+          return;
+        this.onClickRegister(this.props.userContext);
+      }}
       modalHeading="Créer un compte"
       modalLabel="Register"
       shouldSubmitOnEnter={true}
@@ -92,29 +96,31 @@ export class RegisterModal extends ReactFormValidation<RegisterModalProps, Regis
       primaryButtonDisabled={this.state.loading}
       secondaryButtonText="Annuler"
       size={"md"}>
-      <Form>
         <Stack gap={7}>
-          <TextInput id="email" type={"email"} labelText="Adresse email"
-                     invalid={this.state.email.error !== undefined}
-                     invalidText={this.state.email.error}
-                     onChange={(event) => this.setState({email: {value: event.target.value}})}/>
-          <TextInput.PasswordInput id="mdp"
-                                   invalid={this.state.password.error !== undefined}
-                                   invalidText={this.state.password.error}
-                                   type={"password"} labelText="Mot de passe"
-                                   onChange={(event) => this.setState({password: {value: event.target.value}})}/>
-          <TextInput id={"lastname"} labelText={"Nom"}
-                     invalid={this.state.lastname.error !== undefined}
-                     invalidText={this.state.lastname.error}
-                     onChange={(event) => this.setState({lastname: {value: event.target.value}})}/>
-          <TextInput id={"firstname"} labelText={"Prénom"}
-                     invalid={this.state.firstname.error !== undefined}
-                     invalidText={this.state.firstname.error}
-                     onChange={(event) => this.setState({firstname: {value: event.target.value}})}/>
-
-
+          <form>
+            <TextInput id="email" type={"email"} labelText="Adresse email"
+                       invalid={this.state.email.error !== undefined}
+                       invalidText={this.state.email.error}
+                       onKeyPress={(e) => {
+                         const form = e.target;
+                         console.log(form);
+                       }}
+                       onChange={(event) => this.setState({email: {value: event.target.value}})}/>
+            <TextInput.PasswordInput id="mdp"
+                                     invalid={this.state.password.error !== undefined}
+                                     invalidText={this.state.password.error}
+                                     type={"password"} labelText="Mot de passe"
+                                     onChange={(event) => this.setState({password: {value: event.target.value}})}/>
+            <TextInput id={"lastname"} labelText={"Nom"}
+                       invalid={this.state.lastname.error !== undefined}
+                       invalidText={this.state.lastname.error}
+                       onChange={(event) => this.setState({lastname: {value: event.target.value}})}/>
+            <TextInput id={"firstname"} labelText={"Prénom"}
+                       invalid={this.state.firstname.error !== undefined}
+                       invalidText={this.state.firstname.error}
+                       onChange={(event) => this.setState({firstname: {value: event.target.value}})}/>
+          </form>
         </Stack>
-      </Form>
       <br/>
       <br/>
       Vous avez deja un compte ? <Link onClick={() => this.props.switchToRegister()}>connectez vous ici !</Link>
