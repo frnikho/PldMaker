@@ -38,7 +38,7 @@ import {
 
 import {Stack, Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react';
 
-import {Classification, DocumentAdd, DocumentTasks, RecentlyViewed, Information, CheckmarkOutline, Incomplete} from '@carbon/icons-react';
+import {Classification, DocumentAdd, DocumentTasks, RecentlyViewed, Information, CheckmarkOutline, Incomplete, Renew} from '@carbon/icons-react';
 
 import Lottie from "lottie-react";
 import {User} from "../../../../../../libs/data-access/user/User";
@@ -170,7 +170,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
         toast(error.error, {type: 'error'});
       }
       if (pld !== null) {
-        toast('Pld mis à jour 👍', {type: 'success'});
+        toast('Pld mis à jour ', {type: 'success', icon: '👍'});
       }
     });
   }
@@ -287,7 +287,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           })}
         </Select>
 
-        <Button onClick={this.onClickUpdatePld}>Mettre à jour</Button>
+        <Button onClick={this.onClickUpdatePld} renderIcon={Renew} iconDescription={"Update"}>Mettre à jour</Button>
 
         <Accordion>
           {this.showRevisions()}
@@ -360,7 +360,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.org === undefined || this.state.pld === undefined) {
       return (<ButtonSkeleton/>)
     } else {
-      return (<Button renderIcon={Classification} onClick={() => this.setState({openChangePldType: true})}>Changer l'état d'avancement</Button>)
+      return (<Button style={{marginTop: 10}} renderIcon={Classification} onClick={() => this.setState({openChangePldType: true})}>Changer l'état d'avancement</Button>)
     }
   }
 
@@ -519,6 +519,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
             label="Signé"
           />
         </ProgressIndicator>
+        {this.showChangeStepButton()}
       </Tile>
     )
   }
@@ -578,7 +579,6 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
                 </TileBelowTheFoldContent>
               </ExpandableTile>
               <ButtonSet style={{marginBottom: '20px'}}>
-                {this.showChangeStepButton()}
                 {this.showGenerateButton()}
                 {this.showHistoryButton()}
               </ButtonSet>

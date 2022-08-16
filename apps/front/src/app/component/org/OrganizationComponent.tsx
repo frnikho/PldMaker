@@ -10,13 +10,13 @@ import {
   ButtonSet,
   ClickableTile,
   Column, Form,
-  Grid,
-  SkeletonPlaceholder, SkeletonText, TextInput, Tile,
+  Grid, NumberInput,
+  SkeletonPlaceholder, SkeletonText, TextArea, Tile,
 } from "carbon-components-react";
 
 import {Stack} from '@carbon/react';
 
-import {Add, Settings, Star} from '@carbon/icons-react'
+import {Add, Settings, Renew, RecentlyViewed} from '@carbon/icons-react'
 import {NavProps, redirectNavigation, withNav} from "../../util/Navigation";
 import {PageState} from "../../util/Page";
 import {PldApiController} from "../../controller/PldApiController";
@@ -28,7 +28,6 @@ import {FavourType} from "../../../../../../libs/data-access/user/Favour";
 import {formatLongDate, formatShortDate} from "../../../../../../libs/utility/DateUtility";
 import {OrgHistoryModal} from "../../modal/org/OrgHistoryModal";
 
-import { ResponsiveCalendar } from "@nivo/calendar";
 import {RequiredLabel} from "../../util/Label";
 
 export type OrganizationComponentProps = {
@@ -120,9 +119,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
       return undefined;
     }
     return (
-      <>
         <OrgHistoryModal org={this.state.org} open={this.state.openHistoryDialog} onDismiss={() => {this.setState({openHistoryDialog: false})}} onSuccess={() => {}}/>
-      </>
     )
   }
 
@@ -133,8 +130,9 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
       <Form>
         <Stack gap={6}>
           <h4>Informations</h4>
-          <TextInput id={"description"} labelText={<RequiredLabel message={"Description"}/>}/>
-          <Button>Mettre à jour</Button>
+          <TextArea rows={4} id={"description"} labelText={"Description"} value={this.state.org.description}/>
+          <NumberInput id={"versionShifting"} value={this.state.org.versionShifting} label={<RequiredLabel message={"Versioning"}/>}/>
+          <Button renderIcon={Renew} iconDescription={"Update"}>Mettre à jour</Button>
         </Stack>
       </Form>
     )
@@ -145,9 +143,28 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
       return;
     return (
       <Tile>
-        <Stack gap={3}>
+        <Stack gap={4}>
+          <Stack gap={3}>
             <h4>Date de création :</h4>
             {this.state.pld === undefined ? <SkeletonText/> : <p>{formatLongDate(new Date(this.state.org?.created_date ?? ""))}</p>}
+          </Stack>
+          <Stack gap={3}>
+            <h4>Date de mise à jour :</h4>
+            {this.state.pld === undefined ? <SkeletonText/> : <p>{formatLongDate(new Date(this.state.org?.updated_date ?? ""))}</p>}
+          </Stack>
+        </Stack>
+      </Tile>
+    )
+  }
+
+  private showMembers() {
+    if (this.state.org === undefined)
+      return;
+    return (
+      <Tile style={{marginTop: 20}}>
+        <Stack>
+          <h4>Membres</h4>
+          {[...this.state.org.members, this.state.org.owner].map((user) => <p>{user.email}</p>)}
         </Stack>
       </Tile>
     )
@@ -235,16 +252,19 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
               </Tile>
             </Column>
             <Column lg={4}>
-              {this.showInfo()}
+              <Stack>
+                {this.showInfo()}
+                {this.showMembers()}
+              </Stack>
             </Column>
           </Grid>
-          <h2>Pld <Button kind={"ghost"} onClick={this.onClickCreatePld} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
+          <h2 style={{marginTop: 10}}>Pld <Button kind={"ghost"} onClick={this.onClickCreatePld} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
           {this.showPld()}
-          <h2>Templates <Button kind={"ghost"} onClick={this.onClickCreateTemplate} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
+         {/* <h2>Templates <Button kind={"ghost"} onClick={this.onClickCreateTemplate} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
           <h2>Documents <Button kind={"ghost"} onClick={this.onClickCreateDocument} hasIconOnly renderIcon={Add} iconDescription={"Créer/Ajouter un document"}/></h2>
-          <ButtonSet style={{marginBottom: '20px'}}>
-            <Button onClick={() => this.props.navigate('manage')}><Settings size={24}/> Gérer</Button>
-            <Button onClick={() => this.setState({openHistoryDialog: true})}>Historique</Button>
+*/}       <ButtonSet style={{marginTop: 10, marginBottom: '20px'}}>
+            <Button onClick={() => this.props.navigate('manage')} renderIcon={Settings} iconDescription={"Settings"}>Gérer</Button>
+            <Button onClick={() => this.setState({openHistoryDialog: true})} renderIcon={RecentlyViewed} iconDescription={"History"}>Historique</Button>
           </ButtonSet>
         </Stack>
       </>

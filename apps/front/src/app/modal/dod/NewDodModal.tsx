@@ -10,7 +10,6 @@ import {
   SelectItem,
   TextArea,
   TextInput,
-  Tile
 } from "carbon-components-react";
 import {FieldData} from "../../util/FieldData";
 

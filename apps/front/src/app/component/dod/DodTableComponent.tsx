@@ -28,7 +28,7 @@ import {Organization} from "../../../../../../libs/data-access/organization/Orga
 import {DodApiController} from "../../controller/DodApiController";
 import {PldGenerator} from "../../docx/PldGenerator";
 
-import {TrashCan, Download, Edit, ImportExport, View} from '@carbon/icons-react'
+import {TrashCan, Download, Edit, ImportExport, View, Add} from '@carbon/icons-react'
 import {User} from "../../../../../../libs/data-access/user/User";
 import {toast} from "react-toastify";
 import {formatShortDate} from "../../../../../../libs/utility/DateUtility";
@@ -286,11 +286,11 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                 <Button
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                   onClick={this.onClickCreateDod}
+                  renderIcon={Add}
+                  iconDescription={"Add"}
                   size="sm"
                   kind="primary"
-                >
-                  Créer une DoD
-                </Button>
+                >Créer une DoD</Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table>
