@@ -75,8 +75,7 @@ export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalS
         open={this.props.open}
         onRequestClose={this.props.onDismiss}
         onRequestSubmit={() => this.onClickCreate(this.props.userContext)}
-        modalHeading="Se connecter"
-        modalLabel="Login"
+        modalHeading={<h3>Se connecter</h3>}
         shouldSubmitOnEnter={true}
         primaryButtonText={this.state.loading ? <InlineLoading
           description={"Chargement ..."}
@@ -84,8 +83,7 @@ export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalS
         primaryButtonDisabled={this.state.loading}
         secondaryButtonText="Annuler"
         size={"md"}>
-        <Form>
-          <Stack gap={7}>
+          <Stack gap={4}>
             <TextInput id="email" type={"email"} invalidText={this.state.email.error} invalid={this.state.email.error !== undefined} labelText="Adresse email" onChange={(event) => this.setState({email: {
               value: event.target.value
               }})}/>
@@ -93,7 +91,6 @@ export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalS
               value: event.target.value}
             })}/>
           </Stack>
-        </Form>
         <br />
         <br />
         Pas encore de compte ? <Link onClick={() => this.props.switchToRegister()}>Inscrivez vous ici !</Link>

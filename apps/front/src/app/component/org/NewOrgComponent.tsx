@@ -10,13 +10,19 @@ import {
   NumberInput, StructuredListBody, StructuredListCell, StructuredListHead, StructuredListRow,
   StructuredListWrapper,
   TextArea,
-  TextInput
+  TextInput, Tile
 } from "carbon-components-react";
+
+import {Stack} from '@carbon/react';
 
 import {Add, Subtract} from '@carbon/icons-react';
 import {Organization} from "../../../../../../libs/data-access/organization/Organization";
 import {CircularProgress} from "../utils/CircularProgress";
 import {UserApiController} from "../../controller/UserApiController";
+import {HelpLabel, RequiredLabel} from "../../util/Label";
+import {FieldData} from "../../util/FieldData";
+import {CreateOrganizationBody} from "../../../../../../libs/data-access/organization/CreateOrganizationBody";
+import {validate} from "class-validator";
 
 export type NewOrgComponentProps = {
   onOrgCreated: (org: Organization) => void;
@@ -27,9 +33,9 @@ export type NewOrgComponentState = {
   searchUserInputText: string,
   loadingAddingUser: boolean,
   loadingCreation: boolean,
-  name: string,
-  description: string,
-  versionShifting: number,
+  name: FieldData<string>,
+  description: FieldData<string>,
+  versionShifting: FieldData<number>,
   error: FieldError,
 };
 
@@ -54,9 +60,15 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
       searchUserInputText: '',
       loadingAddingUser: false,
       loadingCreation: false,
-      name: '',
-      description: '',
-      versionShifting: 1.0,
+      name: {
+        value: ''
+      },
+      description: {
+        value: ''
+      },
+      versionShifting: {
+        value: 1.0
+      },
       error: {
 
       }
@@ -111,15 +123,25 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
   }
 
   private onClickCreateOrg() {
-    if (!this.props.userContext?.accessToken)
-      return;
     this.setState({
       loadingCreation: true,
     });
+
+    const body: CreateOrganizationBody = new CreateOrganizationBody(
+      this.state.name.value,
+      this.state.description.value,
+      this.state.versionShifting.value,
+      this.state.invitedUser.map((user) => user._id),
+    );
+
+    validate(body).then((errors) => {
+      console.log(errors);
+    });
+
     OrganizationApiController.createUserOrganizations(this.props.userContext.accessToken, {
-      name: this.state.name,
-      description: this.state.description,
-      versionShifting: this.state.versionShifting,
+      name: this.state.name.value,
+      description: this.state.description.value,
+      versionShifting: this.state.versionShifting.value,
       invitedMembers: this.state.invitedUser.map((user) => user._id),
     }, (org, error) => {
       this.setState({
@@ -166,23 +188,28 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
 
   override render() {
     return (
-      <>
-        <>
-          <h1>Créer votre organisation</h1>
-          <Grid>
-            <Column sm={4} md={8} lg={10} xlg={10}>
-              <TextInput id={"new-org-name"} labelText={"nom de votre org"} required onChange={(event) => this.setState({name: event.currentTarget.value})}/>
-              <TextArea rows={2} id={"new-org-desc"} labelText={"description de votre org"} onChange={(event) => this.setState({description: event.currentTarget.value})}/>
-              <NumberInput iconDescription={"step de 0.1"} id={"new-org-versionShifting"} value={1.0} max={2.0} min={0.1} step={0.1} label={"versioning de votre org"} onChange={(e) => {this.setState({versionShifting: parseFloat(e.imaginaryTarget.value)});}}/>
-            </Column>
-            <Column sm={0} md={0} lg={1} xlg={1}>
-            </Column>
-            <Column sm={4} md={8} lg={5} xlg={5}>
+      <Stack>
+        <h1>Créer votre organisation</h1>
+        <p style={{fontSize: 14, marginTop: 10}}>Une organization vous permets de créer, de gérer et de générer les documents de vos PLDs en équipe</p>
+        <p style={{fontSize: 14}}>Après la création de votre organisation, vous pourrez gérer les paramètres liés a la confidentialité</p>
+        <Grid style={{marginTop: 20}}>
+          <Column sm={4} md={8} lg={10} xlg={10}>
+            <Stack gap={3}>
+              <RequiredLabel message={"Nom"}/>
+              <TextInput id={"new-org-name"} labelText={false} invalid={this.state.name.error !== undefined} invalidText={this.state.name.error} required onChange={(event) => this.setState({name: {value: event.currentTarget.value}})}/>
+              <TextArea rows={4} id={"new-org-desc"} invalid={this.state.description.error !== undefined} invalidText={this.state.description.error} labelText={"Description"} onChange={(event) => this.setState({description: {value: event.currentTarget.value}})}/>
+              <RequiredLabel message={"Versioning"}/>
+              <NumberInput iconDescription={"step de 0.1"} id={"new-org-versionShifting"} invalid={this.state.versionShifting.error !== undefined} invalidText={this.state.versionShifting.error} value={1.0} max={2.0} min={0.1} step={0.1} onChange={(e) => {this.setState({versionShifting: {value: parseFloat(e.imaginaryTarget.value)}});}}/>
+              <HelpLabel message={'Le versioning correspond aux gap de la monté de version lors de chaque mise à jour de votre pld'}/>
+            </Stack>
+          </Column>
+          <Column sm={4} md={8} lg={5} xlg={6}>
+            <Tile style={{padding: 10}}>
               <h4>Ajouter des utilisateurs dans votre organization</h4>
-              <p>vous pouvez dés maintenant inviter des utilisateurs a intégrer votre organisation dés la création de celle-ci</p>
+              <p style={{fontStyle: 'italic'}}>vous pouvez dés maintenant inviter des utilisateurs a intégrer votre organisation dés la création de celle-ci</p>
               <FluidForm style={{marginTop: '20px'}}>
                 <Grid narrow>
-                  <Column sm={3} md={7} lg={4}>
+                  <Column sm={3} md={7} lg={4} style={{paddingRight: 20, paddingLeft: 20}}>
                     <TextInput
                       invalid={this.state.error.searchUserInputText !== undefined}
                       invalidText={this.state.error.searchUserInputText}
@@ -201,13 +228,13 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
                 </Grid>
                 {this.showInvitedUser()}
               </FluidForm>
-            </Column>
-          </Grid>
-          <Button style={{marginTop: '20px'}} onClick={this.onClickCreateOrg} disabled={this.state.loadingCreation || this.state.loadingAddingUser}>
-            {this.state.loadingCreation ? <InlineLoading description={"Chargement..."}/> : "Créer l'organisation"}
-          </Button>
-        </>
-      </>
+            </Tile>
+          </Column>
+        </Grid>
+        <Button style={{marginTop: '20px'}} onClick={this.onClickCreateOrg} disabled={this.state.loadingCreation || this.state.loadingAddingUser}>
+          {this.state.loadingCreation ? <InlineLoading description={"Chargement..."}/> : "Créer l'organisation"}
+        </Button>
+      </Stack>
     );
   }
 

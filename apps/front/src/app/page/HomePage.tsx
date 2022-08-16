@@ -1,14 +1,18 @@
 import React from "react";
 import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
-import {OrganizationHomeDashboard} from "../component/home/OrganizationHomeDashboard";
-import {Button, Content, SkeletonPlaceholder} from "carbon-components-react";
-import {PldHomeDashboard} from "../component/home/PldHomeDashboard";
+import {ClickableTile, Column, Grid, SkeletonPlaceholder, Tile} from "carbon-components-react";
 import {SocketContext} from "../context/SocketContext";
+import Lottie from 'lottie-react'
 
 import {Stack} from '@carbon/react';
+import {AuthModalComponent} from "../component/AuthModalComponent";
+import {OrganizationHomeDashboard} from "../component/home/OrganizationHomeDashboard";
 
 export type HomePageProps = unknown;
-export type HomePageState = unknown;
+export type HomePageState = {
+  login: boolean;
+  register: boolean;
+};
 
 export class HomePage extends React.Component<HomePageProps, HomePageState> {
 
@@ -17,24 +21,116 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
 
   constructor(props: HomePageProps) {
     super(props);
+    this.state = {
+      login: false,
+      register: false,
+    }
+    this.switchModal = this.switchModal.bind(this);
+    this.onUserRegistered = this.onUserLogged.bind(this);
+    this.onUserLogged = this.onUserLogged.bind(this);
+    this.onDismissModal = this.onDismissModal.bind(this);
+  }
+
+  public openLoginModal() {
+    this.setState({
+      login: true,
+      register: false
+    })
+  }
+
+  public openRegisterModal() {
+    this.setState({
+      login: false,
+      register: true
+    })
+  }
+
+  public onUserRegistered() {
+    this.setState({
+      register: false,
+      login: false,
+    });
+  }
+
+  public onUserLogged() {
+    this.setState({
+      register: false,
+      login: false,
+    });
+  }
+
+  public switchModal() {
+    if (this.state.login) {
+      this.setState({
+        login: false,
+        register: true
+      });
+    } else {
+      this.setState({
+        login: true,
+        register: false
+      });
+    }
+  }
+
+  public onDismissModal() {
+    this.setState({
+      login: false,
+      register: false,
+    })
   }
 
   private showState(authContext: UserContextProps) {
     if (authContext.isLogged === LoginState.not_logged) {
-      return (<h1>Not logged</h1>)
+      return this.showWelcome();
     } else if (authContext.isLogged === LoginState.logged) {
-      return (
-        <Stack gap={4}>
-          <OrganizationHomeDashboard userContext={authContext}/>
-          <PldHomeDashboard userContext={authContext}/>
-        </Stack>
-      )
+      return this.showDashboard(authContext);
     }
     return (
       <>
         <SkeletonPlaceholder style={{height: '20px', width: '20%'}}/>
         <SkeletonPlaceholder style={{marginTop: '50px', height: '20px', width: '20%'}}/>
       </>
+    )
+  }
+
+  private showWelcome() {
+    return (
+      <Stack gap={6}>
+        <AuthModalComponent onDismiss={this.onDismissModal} openLoginModal={this.state.login} openRegisterModal={this.state.register} switchModal={this.switchModal} onUserRegistered={this.onUserRegistered} onUserLogged={this.onUserLogged}/>
+        <Tile>
+          <h1>Bienvenue sur votre PLD <span style={{fontWeight: 'bold'}}>[Maker]</span></h1>
+          <p>PLD Maker est un outils web vous permettants de suivre votre avancement dans votre EIP</p>
+        </Tile>
+        <Grid>
+          <Column sm={4} md={3} xlg={5}>
+            <ClickableTile onClick={() => this.setState({login: true})}>
+              <h3>Se connecter</h3>
+              <p style={{marginTop: 5, marginBottom: 20}}>Retrouvez l'avancement de vos PLD ainsi que de leurs contenus en vous connectant</p>
+              <Lottie animationData={require('../../assets/animations/login.json')} loop={true} style={{height: '300px'}}/>
+            </ClickableTile>
+          </Column>
+          <Column sm={4} md={3} xlg={5}>
+            <ClickableTile onClick={() => this.setState({register: true})}>
+              <h3>Créer mon compte</h3>
+              <p style={{marginTop: 5, marginBottom: 20}}>En vous inscrivant, vous pourrez créer et suivre l'avancement de vos PLDs avec votre équipe</p>
+              <Lottie animationData={require('../../assets/animations/register.json')} loop={true} style={{height: '300px'}}/>
+            </ClickableTile>
+          </Column>
+        </Grid>
+      </Stack>
+    )
+  }
+
+  private showDashboard(userContext: UserContextProps) {
+    return (
+      <Stack>
+        <h1>Bienvenue sur votre tableau de bord</h1>
+        <p>Ici vous pouvez suivre l'avancement des PLDs et de leurs DoDs de vos différentes Organisation</p>
+        <div style={{marginTop: 20}}>
+          <OrganizationHomeDashboard userContext={userContext}/>
+        </div>
+      </Stack>
     )
   }
 

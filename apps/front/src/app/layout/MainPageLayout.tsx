@@ -257,7 +257,7 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
                       onClickSideNavExpand();
                    }}>
                 <Grid condensed={false}>
-                  <Column sm={4} md={8} lg={16}>
+                  <Column sm={4} md={8} lg={16} style={{marginLeft: isSideNavExpanded ? 80 : 0, transition: '0.15s'}}>
                     <Outlet/>
                   </Column>
                 </Grid>

@@ -87,8 +87,7 @@ export class RegisterModal extends ReactFormValidation<RegisterModalProps, Regis
           return;
         this.onClickRegister(this.props.userContext);
       }}
-      modalHeading="Créer un compte"
-      modalLabel="Register"
+      modalHeading={<h3>Créer un compte</h3>}
       shouldSubmitOnEnter={true}
       primaryButtonText={this.state.loading ? <InlineLoading
         description={"Chargement ..."}
@@ -96,30 +95,28 @@ export class RegisterModal extends ReactFormValidation<RegisterModalProps, Regis
       primaryButtonDisabled={this.state.loading}
       secondaryButtonText="Annuler"
       size={"md"}>
-        <Stack gap={7}>
-          <form>
-            <TextInput id="email" type={"email"} labelText="Adresse email"
-                       invalid={this.state.email.error !== undefined}
-                       invalidText={this.state.email.error}
-                       onKeyPress={(e) => {
-                         const form = e.target;
-                         console.log(form);
-                       }}
-                       onChange={(event) => this.setState({email: {value: event.target.value}})}/>
-            <TextInput.PasswordInput id="mdp"
-                                     invalid={this.state.password.error !== undefined}
-                                     invalidText={this.state.password.error}
-                                     type={"password"} labelText="Mot de passe"
-                                     onChange={(event) => this.setState({password: {value: event.target.value}})}/>
-            <TextInput id={"lastname"} labelText={"Nom"}
-                       invalid={this.state.lastname.error !== undefined}
-                       invalidText={this.state.lastname.error}
-                       onChange={(event) => this.setState({lastname: {value: event.target.value}})}/>
-            <TextInput id={"firstname"} labelText={"Prénom"}
-                       invalid={this.state.firstname.error !== undefined}
-                       invalidText={this.state.firstname.error}
-                       onChange={(event) => this.setState({firstname: {value: event.target.value}})}/>
-          </form>
+        <Stack gap={4}>
+          <TextInput id="email" type={"email"} labelText="Adresse email"
+                     invalid={this.state.email.error !== undefined}
+                     invalidText={this.state.email.error}
+                     onKeyPress={(e) => {
+                       const form = e.target;
+                       console.log(form);
+                     }}
+                     onChange={(event) => this.setState({email: {value: event.target.value}})}/>
+          <TextInput.PasswordInput id="mdp"
+                                   invalid={this.state.password.error !== undefined}
+                                   invalidText={this.state.password.error}
+                                   type={"password"} labelText="Mot de passe"
+                                   onChange={(event) => this.setState({password: {value: event.target.value}})}/>
+          <TextInput id={"lastname"} labelText={"Nom"}
+                     invalid={this.state.lastname.error !== undefined}
+                     invalidText={this.state.lastname.error}
+                     onChange={(event) => this.setState({lastname: {value: event.target.value}})}/>
+          <TextInput id={"firstname"} labelText={"Prénom"}
+                     invalid={this.state.firstname.error !== undefined}
+                     invalidText={this.state.firstname.error}
+                     onChange={(event) => this.setState({firstname: {value: event.target.value}})}/>
         </Stack>
       <br/>
       <br/>

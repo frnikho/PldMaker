@@ -23,6 +23,7 @@ import {PldApiController} from "../../controller/PldApiController";
 import {PldOrgCreateBody} from "../../../../../../libs/data-access/pld/PldBody";
 import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 import {HelperText} from "../../util/HelperText";
+import {RequiredLabel} from "../../util/Label";
 
 export type NewPldComponentProps = {
   orgId?: string;
@@ -179,17 +180,20 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
       return;
     const owner = this.state.org.owner as User;
     return (
-      <Select
-        id="new-pld-manager"
-        onChange={(e) => {this.updateField('manager', e.currentTarget.value)}}
-        labelText="Manager"
-        invalidText={this.state.form.manager?.error}
-        invalid={this.state.form.manager?.error !== undefined}>
-        <SelectItem text={owner.email} value={owner._id} />
-        {(this.state.org.members as User[]).map((user, index) => {
-          return (<SelectItem key={index} value={user._id} text={user.email}/>)
-        })}
-      </Select>
+      <>
+        <RequiredLabel message={"Manager"}/>
+        <Select
+          id="new-pld-manager"
+          onChange={(e) => {this.updateField('manager', e.currentTarget.value)}}
+          labelText={false}
+          invalidText={this.state.form.manager?.error}
+          invalid={this.state.form.manager?.error !== undefined}>
+          <SelectItem text={owner.email} value={owner._id} />
+          {(this.state.org.members as User[]).map((user, index) => {
+            return (<SelectItem key={index} value={user._id} text={user.email}/>)
+          })}
+        </Select>
+      </>
     )
   }
 
@@ -197,9 +201,9 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
     return <>
       {this.state.form.steps.value.map((step, index) => {
         return (
-          <Grid key={index}>
+          <Grid key={index} style={{paddingRight: 10, paddingLeft: 10}}>
             <Column lg={11}>
-              <TextInput id={"step"} labelText={`${index+1}:`} value={step} onChange={(e) => {
+              <TextInput id={"step"} labelText={false} value={step} onChange={(e) => {
                 this.state.form.steps.value[index] = e.currentTarget.value;
                 this.setState({});
               }}/>
@@ -212,7 +216,7 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
           </Grid>
         )
       })}
-      <Button hasIconOnly renderIcon={Add} iconDescription={"Ajouter un status"} onClick={this.addStatus}/>
+      <Button style={{marginRight: 10, marginLeft: 10}} hasIconOnly renderIcon={Add} iconDescription={"Ajouter un status"} onClick={this.addStatus}/>
     </>
   }
 
@@ -245,41 +249,41 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
       <Stack gap={4}>
         <h1>Création d'un nouveau PLD</h1>
         <h4>Informations de base</h4>
-        <TextInput id={"pld-name"} labelText={"Nom du pld"}
+        <RequiredLabel message={"Nom"}/>
+        <TextInput id={"pld-name"} labelText={false}
                    required
                    onChange={(e) => this.updateField('name', e.currentTarget.value)}
                    invalid={this.state.form.name?.error !== undefined}
                    invalidText={this.state.form.name?.error}
         />
-        <TextArea rows={4} id={"pld-description"} labelText={"Description du pld"}
+        <RequiredLabel message={"Description"}/>
+        <TextArea rows={4} id={"pld-description"} labelText={false}
                   required
                   invalid={this.state.form.description?.error !== undefined}
                   invalidText={this.state.form.description?.error}
                   onChange={(e) => this.updateField('description', e.currentTarget.value)}/>
         {this.showManagerSelect()}
         {this.showTag()}
+        <RequiredLabel message={"Promotion"}/>
         <NumberInput id={"pld-promotion"}
                      required
                      iconDescription={"Promotion"}
-                     label={"Promotion"}
                      onChange={(e) => {
                        if (e.imaginaryTarget.value === '')
                          return;
                        this.updateField('promotion', parseInt(e.imaginaryTarget.value));}}
                      value={this.state.form.promotion?.value ?? 0}/>
+        <RequiredLabel message={"Version de début"}/>
         <NumberInput id={"pld-version"}
                      required
                      iconDescription={"Version"}
-                     label={"Version du pld"}
                      value={this.state.form.version?.value ?? 0}
                      min={0}
                      onChange={(e) => {
                        if (e.imaginaryTarget.value === '')
                          return;
                        this.updateField('version', parseFloat(e.imaginaryTarget.value));}}/>
-
         <h4>Info du Sprint</h4>
-
         <DatePicker locale={"fr"} datePickerType="range" onChange={(dates) => {
           if (dates.length < 2)
             return;
@@ -302,7 +306,7 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
                       <p>Veuillez noté que l'ordre des status est important !</p>
                       </>} logoSize={14}/>
         {this.showSteps()}
-        <Button onClick={this.onClickCreate}>Créer</Button>
+        <Button onClick={this.onClickCreate} renderIcon={Add} iconDescription={"Create"}>Créer</Button>
       </Stack>
     );
   }

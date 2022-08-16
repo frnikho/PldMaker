@@ -7,7 +7,7 @@ import {Help, Information} from '@carbon/icons-react';
 export type HelperProps = {
   type: ('help' | 'info');
   title: React.ReactNode;
-  helpMessage: React.ReactNode;
+  helpMessage?: React.ReactNode;
   logoSize?: number;
 }
 

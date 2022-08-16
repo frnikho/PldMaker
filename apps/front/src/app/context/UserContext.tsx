@@ -9,8 +9,8 @@ import {RegisterBody} from "../../../../../libs/data-access/auth/RegisterBody";
 import {RegisterResponse} from "../../../../../libs/data-access/auth/RegisterResponse";
 import {UserApiController} from "../controller/UserApiController";
 import {emitBody, SocketContext} from "./SocketContext";
-import {toast} from "react-toastify";
 import {Favour} from "../../../../../libs/data-access/user/Favour";
+import {toast} from "react-toastify";
 
 export const ACCESS_TOKEN_COOKIE_NS = 'access_token';
 
@@ -185,6 +185,7 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
         callback(null, err?.response?.data);
       } else {
         console.log("Error Axios", err);
+        toast.error('Une erreur réseaux est survenue !', {icon: '🌐'});
       }
     });
   }

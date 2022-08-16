@@ -16,10 +16,11 @@ export class CreateOrganizationBody {
   @IsOptional()
   public invitedMembers: string[];
 
-  constructor(name: string, versionShifting: number, invitedMembers: string[]) {
+  constructor(name: string, description: string | undefined, versionShifting: number, invitedMembers: string[]) {
     this.name = name;
     this.versionShifting = versionShifting;
     this.invitedMembers = invitedMembers;
+    this.description = description;
   }
 
 

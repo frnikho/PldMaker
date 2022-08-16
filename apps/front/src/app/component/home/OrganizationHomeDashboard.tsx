@@ -12,7 +12,7 @@ import {
   TableRow
 } from "carbon-components-react";
 import Lottie from "lottie-react";
-import {FlexGrid} from '@carbon/react'
+import {Stack} from '@carbon/react'
 import {NavigationState, redirectNavigation} from "../../util/Navigation";
 import {Organization} from "../../../../../../libs/data-access/organization/Organization";
 
@@ -152,26 +152,22 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
   }
 
   private showNoOrganizations() {
-    if (this.state.organization.length !== 0 || this.state.loading) {
+    if (this.state.organization.length !== 0 || this.state.loading)
       return;
-    }
     return (
-      <FlexGrid>
-        <Row>
-          <h4>Vous n'avez pas rejoin ou créer d'organisation</h4>
-          <Lottie animationData={require('../../../assets/animations/organization.json')} loop={true} style={{width: '300px'}}/>
-          <h4><Button onClick={this.onClickCreateOrganization}>Cliquez ici pour en créer une !</Button></h4>
-        </Row>
-      </FlexGrid>)
+      <Stack>
+        <Lottie animationData={require('../../../assets/animations/organization.json')} loop={true} style={{width: '300px'}}/>
+        <h4>Vous n'avez pas rejoin ou créer d'organisation</h4>
+        <h4><Button kind={"ghost"} onClick={this.onClickCreateOrganization}>Cliquez ici pour en créer une !</Button></h4>
+      </Stack>)
   }
 
   override render() {
     return (
       <>
         {redirectNavigation(this.state.navigateUrl)}
-
-        <h1>Status</h1>
-        {this.showCharts()}
+        {/*<h1>Status</h1>
+        {this.showCharts()}*/}
         <h1>Mes organizations <Button kind={"ghost"} onClick={this.onClickCreateOrganization} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h1>
         {this.showLoading()}
         {this.showNoOrganizations()}

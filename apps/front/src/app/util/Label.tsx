@@ -15,3 +15,27 @@ export class RequiredLabel extends React.Component<RequiredLabelProps, unknown> 
   }
 
 }
+
+export type HelpLabelProps = {
+  message: string;
+  italic?: boolean;
+}
+
+export class HelpLabel extends React.Component<HelpLabelProps, any> {
+  static defaultProps = {
+    italic: true,
+  }
+
+  constructor(props) {
+    super(props);
+  }
+
+  override render() {
+    return (
+      <FormLabel style={{fontStyle: this.props.italic ? 'italic' : 'normal', color: 'black'}}>
+        {this.props.message}
+      </FormLabel>
+    );
+  }
+
+}
