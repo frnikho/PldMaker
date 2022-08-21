@@ -6,6 +6,7 @@
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
+        "no-useless-constructor": "off",
         "@nrwl/nx/enforce-module-boundaries": [
           "error",
           {

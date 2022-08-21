@@ -2,8 +2,8 @@ import {DodColor} from "./Organization";
 
 export type UpdateOrganizationBody = {
   orgId: string;
-  name?: String;
-  description?: String;
+  name?: string;
+  description?: string;
   versionShifting?: number;
   dodColors?: DodColor[];
 }

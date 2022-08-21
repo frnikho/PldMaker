@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { OrganizationService } from './organization.service';
+import {MemberUpdateObjects, OrganizationService} from './organization.service';
 import {Organization, OrganizationDocument, OrganizationSchema} from "./organization.schema";
 import {OrganizationMock} from "../factory/organization.mock";
 import {rootMongooseTestModule} from "../utility/mongoose_memory.testmodule";
@@ -129,12 +129,12 @@ describe('OrganizationService', () => {
         const newMember2 = await userService.create(UserMock.createUser({email: 'abcd'}));
         const newMember3 = await userService.create(UserMock.createUser({email: 'abcd'}));
         const newMember4 = await userService.create(UserMock.createUser({email: 'abcd'}));
-        const membersToUpdate = [newMember, newMember1, newMember2, newMember3, newMember4];
+        const membersToUpdate: MemberUpdateObjects = ([newMember, newMember1, newMember2, newMember3, newMember4].map((u) => u._id.valueOf()));
         let updatedOrg = await service.addMembers(org._id, ownerUser._id, membersToUpdate);
         expect(updatedOrg.members.length).toBe(5);
-        updatedOrg = await service.removeMembers(org._id, ownerUser._id, [newMember, newMember2]);
+        updatedOrg = await service.removeMembers(org._id, ownerUser._id, [newMember._id.valueOf(), newMember2._id.valueOf()]);
         expect(updatedOrg.members.length).toBe(3);
-        updatedOrg = await service.removeMembers(org._id, ownerUser._id, [newMember1, newMember3]);
+        updatedOrg = await service.removeMembers(org._id, ownerUser._id, [newMember1._id.valueOf(), newMember3._id.valueOf()]);
         expect(updatedOrg.members.length).toBe(1);
       })
 
