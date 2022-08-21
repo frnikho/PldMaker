@@ -1,18 +1,16 @@
 import React from "react";
 import {
-  Form,
   InlineLoading, Link,
   Modal,
   TextInput
 } from "carbon-components-react";
 import {Stack} from '@carbon/react';
 import {RequiredUserContextProps, UserContextProps} from "../context/UserContext";
-import {User} from "../../../../../libs/data-access/user/User";
 import {FieldData} from "../util/FieldData";
 import {toast} from "react-toastify";
 import {validate} from "class-validator";
 import {ReactFormValidation} from "../util/Page";
-import {RegisterBody} from "../../../../../libs/data-access/auth/RegisterBody";
+import {RegisterBody, User} from "@pld/shared";
 
 type RegisterModalProps = {
   open: boolean;

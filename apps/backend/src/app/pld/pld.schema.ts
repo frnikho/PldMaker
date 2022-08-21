@@ -3,11 +3,7 @@ import mongoose, {Document, ObjectId} from "mongoose";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
 import {User} from "../user/user.schema";
 import {Organization} from "../organization/organization.schema";
-import {PldOwnerType} from "../../../../../libs/data-access/pld/PldOwnerType";
-import {PldStatus} from "../../../../../libs/data-access/pld/PldStatus";
-import {PldStep} from "../../../../../libs/data-access/pld/PldStep";
-import {PldHistoryAction} from "../../../../../libs/data-access/pld/PldHistory";
-import {EditedField} from "../../../../../libs/data-access/dod/Dod";
+import {PldOwnerType, PldStatus, PldStep, PldHistoryAction, EditedField} from "@pld/shared";
 
 export type PldDocument = Pld & Document;
 

@@ -8,14 +8,13 @@ import {
 } from "carbon-components-react";
 
 import {Stack} from '@carbon/react';
-import {User} from "../../../../../../libs/data-access/user/User";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {User, Organization} from "@pld/shared";
 import {emitBody, SocketContext} from "../../context/SocketContext";
 import {PageState} from "../../util/Page";
 import {RequiredUserContextProps} from "../../context/UserContext";
 
 import {UserOnline, Asleep} from '@carbon/icons-react'
-import {formatLongDate} from "../../../../../../libs/utility/DateUtility";
+import {formatLongDate} from "@pld/utils";
 
 
 

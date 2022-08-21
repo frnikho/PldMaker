@@ -2,8 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {Model, Query} from "mongoose";
 import {InjectModel} from "@nestjs/mongoose";
 import {User, UserDocument} from './user.schema';
-import {UpdateUserBody} from "../../../../../libs/data-access/user/UpdateUserBody";
-import {AddFavourBody, FavourType} from "../../../../../libs/data-access/user/Favour";
+import {AddFavourBody, FavourType, UpdateUserBody} from "@pld/shared";
 import {Favour} from "./favour.schema";
 
 @Injectable()
@@ -18,9 +17,7 @@ export class UserService {
     }
 
     public async find(userObjectId: string): Promise<UserDocument | null> {
-      const user = await this.userModel.findOne({_id: userObjectId}).exec();
-
-      return user;
+      return await this.userModel.findOne({_id: userObjectId}).exec();
     }
 
     public finds(userObjectId: string[]): Promise<UserDocument[] | null> {

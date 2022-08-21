@@ -1,9 +1,9 @@
 import {Body, Controller, Delete, Get, Param, Post, Request} from '@nestjs/common';
-import {DodCreateBody, DodFindPldBody} from "../../../../../libs/data-access/dod/DodBody";
+import {DodCreateBody, DodFindPldBody} from "@pld/shared";
 import {DodService} from "./dod.service";
 import {ObjectIDPipe} from "../ObjectID.pipe";
-import {UpdateDodStatusBody} from "../../../../../libs/data-access/dod/UpdateDodStatusBody";
-import {DodStatus} from "../../../../../libs/data-access/dod/Dod";
+import {UpdateDodStatusBody} from "@pld/shared";
+import {DodStatus} from "@pld/shared";
 import {EventEmitter2} from "@nestjs/event-emitter";
 import {PldDocument} from "../pld/pld.schema";
 

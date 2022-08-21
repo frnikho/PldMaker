@@ -3,8 +3,8 @@ import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import mongoose, {Document} from "mongoose";
 import {User} from "../user/user.schema";
 import {Pld} from "../pld/pld.schema";
-import {DodStatus} from "../../../../../libs/data-access/dod/Dod";
-import {DodHistoryAction} from "../../../../../libs/data-access/dod/DodHistory";
+import {DodStatus} from "@pld/shared";
+import {DodHistoryAction} from "@pld/shared";
 
 export type DodDocument = Dod & Document;
 

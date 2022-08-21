@@ -1,8 +1,7 @@
 import {Body, Controller, Get, Param, Patch, Post, Request} from '@nestjs/common';
-import {UpdateUserBody} from "../../../../../libs/data-access/user/UpdateUserBody";
+import {UpdateUserBody, AddFavourBody, RemoveFavourBody} from "@pld/shared";
 import {UserService} from "./user.service";
 import {UserDocument} from "./user.schema";
-import {AddFavourBody, RemoveFavourBody} from "../../../../../libs/data-access/user/Favour";
 
 @Controller('user')
 export class UserController {

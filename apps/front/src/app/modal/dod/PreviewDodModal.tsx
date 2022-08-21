@@ -1,6 +1,6 @@
 import React from "react";
 import {ModalProps} from "../../util/Modal";
-import {Dod} from "../../../../../../libs/data-access/dod/Dod";
+import {Dod, User} from "@pld/shared";
 import {
   Column,
   Grid,
@@ -13,19 +13,16 @@ import {
 } from "carbon-components-react";
 
 import {TabPanel, TabPanels, TabList} from '@carbon/react';
-import {User} from "../../../../../../libs/data-access/user/User";
 
 import {Stack} from '@carbon/react'
-import {formatDateHistory, formatLongDate, formatShortDate} from "../../../../../../libs/utility/DateUtility";
+import {formatDateHistory, formatLongDate, formatShortDate} from "@pld/utils";
 import {HistoryHelper} from "../../util/HistoryHelper";
 
 export type PreviewDodProps = {
   dod: Dod;
 } & ModalProps;
 
-export type PreviewDodState = {
-
-}
+export type PreviewDodState = unknown
 
 export class PreviewDodModal extends React.Component<PreviewDodProps, PreviewDodState> {
 

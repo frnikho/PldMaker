@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import {Template} from "./template.schema";
 import {Model} from "mongoose";
-import {TemplateBody} from "../../../../../libs/data-access/template/TemplateBody";
+import {TemplateBody} from "@pld/shared";
 
 @Injectable()
 export class TemplateService {

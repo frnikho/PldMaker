@@ -16,14 +16,10 @@ import {FieldData} from "../../util/FieldData";
 import {Stack} from '@carbon/react';
 
 import {Add, Close} from '@carbon/icons-react';
-import {Dod} from "../../../../../../libs/data-access/dod/Dod";
-import {Pld} from "../../../../../../libs/data-access/pld/Pld";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
-import {User} from "../../../../../../libs/data-access/user/User";
+import {Dod, Pld, Organization, User, DodCreateBody} from "@pld/shared";
 import {DodApiController} from "../../controller/DodApiController";
 import {UserContextProps} from "../../context/UserContext";
 import {RequiredLabel} from "../../util/Label";
-import {DodCreateBody} from "../../../../../../libs/data-access/dod/DodBody";
 import {validate} from "class-validator";
 import {ReactFormValidation} from "../../util/Page";
 
@@ -188,7 +184,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
     })
   }
 
-  override componentDidUpdate(prevProps: Readonly<NewDodModalProps>, prevState: Readonly<NewDodModalState>, snapshot?: any) {
+  override componentDidUpdate(prevProps: Readonly<NewDodModalProps>, prevState: Readonly<NewDodModalState>, snapshot?: unknown) {
     if (this.props.open && !prevProps.open) {
       this.onModalOpen();
     }

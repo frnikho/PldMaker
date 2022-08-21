@@ -12,16 +12,13 @@ import {
   Tile
 } from "carbon-components-react";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {Organization, User, PldOrgCreateBody, Pld} from "@pld/shared";
 import {FieldData, onEnter} from "../../util/FieldData";
-import {User} from "../../../../../../libs/data-access/user/User";
 
 import {Stack, Tag} from '@carbon/react';
 
 import {Close, ArrowUp, ArrowDown, TrashCan, Add} from '@carbon/icons-react';
 import {PldApiController} from "../../controller/PldApiController";
-import {PldOrgCreateBody} from "../../../../../../libs/data-access/pld/PldBody";
-import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 import {HelperText} from "../../util/HelperText";
 import {RequiredLabel} from "../../util/Label";
 

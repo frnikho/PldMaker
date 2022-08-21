@@ -1,8 +1,6 @@
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
-import {User} from "../../../../../libs/data-access/user/User";
+import {User, UpdateUserBody, AddFavourBody, Favour, RemoveFavourBody} from "@pld/shared";
 import {AxiosError, AxiosResponse} from "axios";
-import {UpdateUserBody} from "../../../../../libs/data-access/user/UpdateUserBody";
-import {AddFavourBody, Favour, RemoveFavourBody} from "../../../../../libs/data-access/user/Favour";
 
 export type CallbackUser = (user: User | null, error?: ApiError) => void;
 export type CallbackFavour = (favour: Favour | null, error?: ApiError) => void;

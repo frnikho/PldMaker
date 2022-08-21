@@ -5,7 +5,7 @@ import {Stack} from '@carbon/react';
 import {Button, ButtonSet, Checkbox, Column, Grid, TextInput, Tile} from "carbon-components-react";
 import {FieldData} from "../../util/FieldData";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {Organization} from "@pld/shared";
 import {DodDocx} from "../../docx/DodDocx";
 import {Document, Packer} from "docx";
 
@@ -102,17 +102,17 @@ export class NewTemplateComponent extends React.Component<NewTemplateProps, NewT
     if (this.state.org === undefined || this.state.previewUrl === undefined)
       return;
 
-    const docs = [
+/*    const docs = [
       { uri: this.state.previewUrl },
-    ];
+    ];*/
 
-    return <></>;
+    return null;
   }
 
   private content() {
     if (this.state.org === undefined)
       return;
-    return (<></>)
+    return null;
   }
 
   override render() {

@@ -3,10 +3,10 @@ import {UserService} from "../user/user.service";
 import * as bcrypt from 'bcrypt';
 import {JwtService} from "@nestjs/jwt";
 import {UserDocument} from "../user/user.schema";
-import {RegisterBody} from "../../../../../libs/data-access/auth/RegisterBody";
+import {RegisterBody} from "@pld/shared";
 import {ConfigService} from "@nestjs/config";
 import {LANGUAGE_CONFIG_LABEL, LanguageConfig} from "../config/language";
-import {RegisterResponse} from "../../../../../libs/data-access/auth/RegisterResponse";
+import {RegisterResponse} from "@pld/shared";
 @Injectable()
 export class AuthService {
 

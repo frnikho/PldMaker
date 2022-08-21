@@ -1,7 +1,6 @@
-import {Dod, UserWorkTime} from "../../../../../libs/data-access/dod/Dod";
+import {Dod, UserWorkTime, Organization} from "@pld/shared";
 import {Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
-import {Organization} from "../../../../../libs/data-access/organization/Organization";
 import {getDodStatusColor} from "../util/Preferences";
 
 const colors = {

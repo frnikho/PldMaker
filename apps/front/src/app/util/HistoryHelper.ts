@@ -1,8 +1,4 @@
-import {PldHistoryAction} from "../../../../../libs/data-access/pld/PldHistory";
-import {OrgHistoryAction} from "../../../../../libs/data-access/organization/OrgHistory";
-import {DodHistoryAction} from "../../../../../libs/data-access/dod/DodHistory";
-import {User} from "../../../../../libs/data-access/user/User";
-import {Dod} from "../../../../../libs/data-access/dod/Dod";
+import {User, Dod, DodHistoryAction, OrgHistoryAction, PldHistoryAction} from "@pld/shared";
 
 export class HistoryHelper {
 
@@ -27,9 +23,9 @@ export class HistoryHelper {
     return 'Aucun donnée valable pour cet historique'
   }
 
-  private static getOrgHelperMessage = (action: OrgHistoryAction) => {
+/*  private static getOrgHelperMessage = (action: OrgHistoryAction) => {
     return 'ORG'
-  }
+  }*/
 
   private static getPldHelperMessage = (action: PldHistoryAction): string => {
     const actions = {

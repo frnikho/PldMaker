@@ -1,10 +1,9 @@
 import {CanActivate, ExecutionContext, Injectable, UnauthorizedException} from "@nestjs/common";
-import {Observable} from "rxjs";
-import {WsPayload} from "../../../../../../libs/data-access/auth/WsPayload";
+import {WsPayload} from "@pld/shared";
 import {WsException} from "@nestjs/websockets";
 import {JwtService} from "@nestjs/jwt";
 import {UserService} from "../../user/user.service";
-import {PayloadLogin} from "../../../../../../libs/data-access/auth/LoginToken";
+import {PayloadLogin} from "@pld/shared";
 
 @Injectable()
 export class AuthWsGuard implements CanActivate {

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import {OrganizationService} from "../organization/organization.service";
-import {UserService} from "../user/user.service";
 import {UserDocument} from "../user/user.schema";
 import {OrganizationDocument} from "../organization/organization.schema";
 import {WsException} from "@nestjs/websockets";

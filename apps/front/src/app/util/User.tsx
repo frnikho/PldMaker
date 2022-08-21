@@ -1,12 +1,10 @@
-import {Pld} from "../../../../../libs/data-access/pld/Pld";
+import {Pld, Organization, FavourType} from "@pld/shared";
 import React from "react";
 import {UserContext} from "../context/UserContext";
 import {Button} from "carbon-components-react";
 
 import {Star, StarFilled} from '@carbon/icons-react';
-import {Organization} from "../../../../../libs/data-access/organization/Organization";
 import {UserApiController} from "../controller/UserApiController";
-import {FavourType} from "../../../../../libs/data-access/user/Favour";
 
 export type ShowFavourIconProps = {
   type: FavourType;
@@ -14,7 +12,7 @@ export type ShowFavourIconProps = {
   clickable?: boolean;
 };
 
-export class ShowFavourIcon extends React.Component<ShowFavourIconProps, any> {
+export class ShowFavourIcon extends React.Component<ShowFavourIconProps, unknown> {
 
   static override contextType = UserContext;
   override context!: React.ContextType<typeof UserContext>;

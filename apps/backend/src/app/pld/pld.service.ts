@@ -2,15 +2,11 @@ import { Injectable } from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import {NewPldHistory, Pld, PldDocument} from "./pld.schema";
 import {Model, Query} from "mongoose";
-import {PldOwnerType} from "../../../../../libs/data-access/pld/PldOwnerType";
-import {PldOrgCreateBody} from "../../../../../libs/data-access/pld/PldBody";
-import {PldStatus} from "../../../../../libs/data-access/pld/PldStatus";
-import {CreatePldRevisionBody} from "../../../../../libs/data-access/pld/Pld";
+import {PldOwnerType, PldOrgCreateBody, PldStatus, CreatePldRevisionBody, PldUpdateBody} from "@pld/shared";
 import {User} from "../user/user.schema";
-import {PldUpdateBody} from "../../../../../libs/data-access/pld/PldUpdateBody";
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {PldEvents, PldRevisionAddedEvent, PldUpdatedEvent} from "./pld.event";
-import {Dod, EditedField} from "../dod/dod.schema";
+import {Dod} from "../dod/dod.schema";
 import {PldHelper} from "./pld.helper";
 
 @Injectable()
@@ -78,10 +74,6 @@ export class PldService {
     const pldUpdated = await this.populateAndExecute(this.pldModel.findOneAndUpdate({_id: body.pldId}, {updated_date: new Date(), title: body.title, description: body.description, manager: body.manager, promotion: body.promotion, currentStep: body.currentStep}, {new: true}));
     this.eventEmitter.emit(PldEvents.onPldUpdate, new PldUpdatedEvent(ownerId, body.pldId, this.helper.getEditedFields(beforePld, pldUpdated)));
     return pldUpdated;
-  }
-
-  public async getPld(userId: string) {
-
   }
 
   public async update(pldId: string, ownerId: string, pld: PldDocument): Promise<PldDocument | null> {

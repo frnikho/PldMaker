@@ -1,16 +1,14 @@
 import React from "react";
 import {
-  Form,
   InlineLoading, Link,
   Modal,
   TextInput,
 } from "carbon-components-react";
 import {Stack} from '@carbon/react';
 import {RequiredUserContextProps, UserContextProps} from "../context/UserContext";
-import {User} from "../../../../../libs/data-access/user/User";
+import {User, LoginBody} from "@pld/shared";
 import ErrorManager from "../manager/ErrorManager";
 import {toast} from "react-toastify";
-import {LoginBody} from "../../../../../libs/data-access/auth/LoginBody";
 import {validate} from "class-validator";
 import {FieldData} from "../util/FieldData";
 import {ReactFormValidation} from "../util/Page";

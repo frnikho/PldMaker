@@ -1,5 +1,4 @@
 import React from "react";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {ApiError} from "../../util/Api";
@@ -20,15 +19,15 @@ import {Add, Settings, Renew, RecentlyViewed} from '@carbon/icons-react'
 import {NavProps, redirectNavigation, withNav} from "../../util/Navigation";
 import {PageState} from "../../util/Page";
 import {PldApiController} from "../../controller/PldApiController";
-import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 import {FieldData} from "../../util/FieldData";
 import {SocketContext} from "../../context/SocketContext";
 import {ShowFavourIcon} from "../../util/User";
-import {FavourType} from "../../../../../../libs/data-access/user/Favour";
-import {formatLongDate, formatShortDate} from "../../../../../../libs/utility/DateUtility";
 import {OrgHistoryModal} from "../../modal/org/OrgHistoryModal";
 
 import {RequiredLabel} from "../../util/Label";
+
+import {Organization, Pld, FavourType} from "@pld/shared";
+import {formatLongDate, formatShortDate} from "@pld/utils";
 
 export type OrganizationComponentProps = {
   orgId?: string;
@@ -119,7 +118,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
       return undefined;
     }
     return (
-        <OrgHistoryModal org={this.state.org} open={this.state.openHistoryDialog} onDismiss={() => {this.setState({openHistoryDialog: false})}} onSuccess={() => {}}/>
+        <OrgHistoryModal org={this.state.org} open={this.state.openHistoryDialog} onDismiss={() => {this.setState({openHistoryDialog: false})}} onSuccess={() => null}/>
     )
   }
 

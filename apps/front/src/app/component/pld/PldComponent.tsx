@@ -2,8 +2,7 @@ import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {PldApiController} from "../../controller/PldApiController";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
-import {Pld} from "../../../../../../libs/data-access/pld/Pld";
+import {Organization, Pld, User, Dod, PldStatus, FavourType} from "@pld/shared";
 import {
   Accordion,
   AccordionItem,
@@ -41,24 +40,20 @@ import {Stack, Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react
 import {Classification, DocumentAdd, DocumentTasks, RecentlyViewed, Information, CheckmarkOutline, Incomplete, Renew} from '@carbon/icons-react';
 
 import Lottie from "lottie-react";
-import {User} from "../../../../../../libs/data-access/user/User";
 import {DodTableComponent} from "../dod/DodTableComponent";
 import {GenerateComponent} from "./GenerateComponent";
 import {DodApiController} from "../../controller/DodApiController";
-import {Dod} from "../../../../../../libs/data-access/dod/Dod";
 import {SignPldModal} from "../../modal/pld/SignPldModal";
 import {AddRevisionPldModal} from "../../modal/pld/AddRevisionPldModal";
 import {toast} from "react-toastify";
-import {PldStatus} from "../../../../../../libs/data-access/pld/PldStatus";
 import {SocketContext} from "../../context/SocketContext";
 import {ChangePldTypeModal} from "../../modal/pld/ChangePldTypeModal";
 import {OnlineOrgMembersComponent} from "./OnlineOrgMembersComponent";
 import {NavProps, withNav} from "../../util/Navigation";
 import {ShowFavourIcon} from "../../util/User";
-import {FavourType} from "../../../../../../libs/data-access/user/Favour";
 import {IncompleteStatusIcon} from "../../icon/IncompleteStatusIcon";
 import {RequiredLabel} from "../../util/Label";
-import {formatLongDate} from "../../../../../../libs/utility/DateUtility";
+import {formatLongDate} from "@pld/utils";
 import {PldHistoryModal} from "../../modal/pld/PldHistoryModal";
 
 export type PldComponentProps = {
@@ -424,7 +419,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           pld={this.state.pld}
           org={this.state.org}
           dod={this.state.dod}
-          open={this.state.openHistoryModal} onDismiss={() => this.setState({openHistoryModal: false})} onSuccess={() => {}}
+          open={this.state.openHistoryModal} onDismiss={() => this.setState({openHistoryModal: false})} onSuccess={() => null}
         />
         <SignPldModal
           open={this.state.openSignModal}

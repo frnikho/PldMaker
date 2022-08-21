@@ -7,7 +7,7 @@ import {MongooseModule} from "@nestjs/mongoose";
 import {UserMock} from "../factory/user.mock";
 import {User, UserDocument, UserSchema} from "../user/user.schema";
 import {UserService} from "../user/user.service";
-import {CreateOrganizationBody} from "../../../../../libs/data-access/organization/CreateOrganizationBody";
+import {CreateOrganizationBody} from "@pld/shared";
 
 describe('OrganizationService', () => {
   let service: OrganizationService;

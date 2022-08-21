@@ -3,7 +3,7 @@ import React from "react";
 import {Loading} from "carbon-components-react";
 import {LoginState, UserContext, UserContextProps} from "../../context/UserContext";
 import {NavigationState, redirectNavigation} from "../../util/Navigation";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {Organization} from "@pld/shared";
 
 export type NewOrganizationPageProps = unknown;
 export type NewOrganizationPageState = NavigationState;

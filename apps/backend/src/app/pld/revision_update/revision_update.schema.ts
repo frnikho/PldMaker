@@ -2,7 +2,7 @@ import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import mongoose, {Document} from "mongoose";
 import {User} from "../../user/user.schema";
 import {Organization} from "../../organization/organization.schema";
-import {PldOwnerType} from "../../../../../../libs/data-access/pld/PldOwnerType";
+import {PldOwnerType} from "@pld/shared";
 
 export type RevisionUpdateDocument = RevisionUpdate & Document;
 

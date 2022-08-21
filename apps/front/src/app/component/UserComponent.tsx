@@ -3,7 +3,6 @@ import {RequiredUserContextProps} from "../context/UserContext";
 import {Button, MultiSelect, TextInput, Tile} from "carbon-components-react";
 import {FieldData} from "../util/FieldData";
 import {UserApiController} from "../controller/UserApiController";
-import {UserDomain} from "../../../../../libs/data-access/user/User";
 import {toast} from "react-toastify";
 
 export type UserComponentProps = RequiredUserContextProps;

@@ -1,6 +1,6 @@
 import {Body, Controller, Get, Param, Post} from '@nestjs/common';
 import {TemplateService} from "./template.service";
-import {TemplateBody} from "../../../../../libs/data-access/template/TemplateBody";
+import {TemplateBody} from "@pld/shared";
 import {Template} from "./template.schema";
 
 @Controller('template')

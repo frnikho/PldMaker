@@ -1,11 +1,9 @@
 import React from "react";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
-import {Pld} from "../../../../../../libs/data-access/pld/Pld";
+import {Organization, Pld, Dod} from "@pld/shared";
 import {Button} from "carbon-components-react";
 
 import * as docx from 'docx';
 import {PldGenerator} from "../../docx/PldGenerator";
-import {Dod} from "../../../../../../libs/data-access/dod/Dod";
 
 import {DocumentView} from '@carbon/icons-react'
 

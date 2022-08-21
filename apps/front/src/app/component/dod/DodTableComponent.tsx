@@ -22,17 +22,14 @@ import {
 import {DataTable} from '@carbon/react';
 
 import {NewDodModal} from "../../modal/dod/NewDodModal";
-import {Dod} from "../../../../../../libs/data-access/dod/Dod";
-import {Pld} from "../../../../../../libs/data-access/pld/Pld";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {Dod, Pld, Organization, User} from "@pld/shared";
 import {DodApiController} from "../../controller/DodApiController";
 import {PldGenerator} from "../../docx/PldGenerator";
 
 import {TrashCan, Download, Edit, ImportExport, View, Add} from '@carbon/icons-react'
-import {User} from "../../../../../../libs/data-access/user/User";
 import {toast} from "react-toastify";
-import {formatShortDate} from "../../../../../../libs/utility/DateUtility";
 import {PreviewDodModal} from "../../modal/dod/PreviewDodModal";
+import {formatShortDate} from '@pld/utils';
 
 export type DodTableComponentProps = {
   onUpdateDod: () => void;
@@ -130,6 +127,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
   }
 
   private onCreateDod(newDod: Dod) {
+    console.log(newDod.title);
     this.setState({
       openCreateModal: false,
       editionDod: undefined,
@@ -137,10 +135,10 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
     this.props.onCreatedDod();
   }
 
-  private showSelectStatus(dodId: string): JSX.Element {
+  private showSelectStatus(dodId: string): JSX.Element | null {
     const currentDod = this.props.dod.find((dod) => dod._id === dodId);
     if (currentDod === undefined)
-      return <></>;
+      return null;
     const dodColor = this.props.org.dodColors.find((d) => d.name === currentDod.status);
     return (
       <Select

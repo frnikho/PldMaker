@@ -2,7 +2,7 @@ import {Injectable, Logger} from "@nestjs/common";
 import {DodService} from "./dod.service";
 import {OnEvent} from "@nestjs/event-emitter";
 import {DodEvents, DodUpdateEvent} from "./dod.event";
-import {DodHistoryAction} from "../../../../../libs/data-access/dod/DodHistory";
+import {DodHistoryAction} from "@pld/shared";
 
 @Injectable()
 export class DodListener {

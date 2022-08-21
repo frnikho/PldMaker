@@ -6,7 +6,6 @@ import {
   Column,
   FluidForm,
   Grid, InlineLoading,
-  Loading,
   NumberInput, StructuredListBody, StructuredListCell, StructuredListHead, StructuredListRow,
   StructuredListWrapper,
   TextArea,
@@ -16,12 +15,11 @@ import {
 import {Stack} from '@carbon/react';
 
 import {Add, Subtract} from '@carbon/icons-react';
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {Organization, CreateOrganizationBody} from "@pld/shared";
 import {CircularProgress} from "../utils/CircularProgress";
 import {UserApiController} from "../../controller/UserApiController";
 import {HelpLabel, RequiredLabel} from "../../util/Label";
 import {FieldData} from "../../util/FieldData";
-import {CreateOrganizationBody} from "../../../../../../libs/data-access/organization/CreateOrganizationBody";
 import {validate} from "class-validator";
 
 export type NewOrgComponentProps = {
@@ -78,7 +76,7 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
     this.onClickRemoveUser = this.onClickRemoveUser.bind(this);
   }
 
-  private onClickRemoveUser(user: InvitedUser, index: number) {
+  private onClickRemoveUser(user: InvitedUser) {
     this.state.invitedUser.splice(this.state.invitedUser.findIndex((invUser) => invUser._id === user._id), 1);
     this.setState({invitedUser: this.state.invitedUser});
   }
@@ -174,7 +172,7 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
                 <Button
                   size={"sm"}
                   kind={"tertiary"}
-                  onClick={() => this.onClickRemoveUser(user, index)}
+                  onClick={() => this.onClickRemoveUser(user)}
                   renderIcon={Subtract}
                   iconDescription="Retirer l'utilisateur"
                   hasIconOnly/>

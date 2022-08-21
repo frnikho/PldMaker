@@ -1,9 +1,6 @@
-import {Organization} from "../../../../../libs/data-access/organization/Organization";
-import {Pld} from "../../../../../libs/data-access/pld/Pld";
+import {Organization, Pld, User, Dod} from "@pld/shared";
 import {AlignmentType, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
-import {User} from "../../../../../libs/data-access/user/User";
-import {Dod} from "../../../../../libs/data-access/dod/Dod";
 
 const UserAdv = (): TableRow => {
   return new TableRow({

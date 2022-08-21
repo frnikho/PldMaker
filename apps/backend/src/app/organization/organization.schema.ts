@@ -2,8 +2,8 @@ import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import mongoose, {Document, ObjectId} from "mongoose";
 import {User} from "../user/user.schema";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
-import {DodColor} from "../../../../../libs/data-access/organization/Organization";
-import {OrgHistoryAction} from "../../../../../libs/data-access/organization/OrgHistory";
+import {DodColor} from "@pld/shared";
+import {OrgHistoryAction} from "@pld/shared";
 
 export type OrganizationDocument = Organization & Document;
 

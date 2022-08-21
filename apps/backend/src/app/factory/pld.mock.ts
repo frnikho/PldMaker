@@ -1,8 +1,8 @@
 import {Pld, RevisionUpdate} from "../pld/pld.schema";
 import {User} from "../user/user.schema";
 import {Organization} from "../organization/organization.schema";
-import {PldOwnerType} from "../../../../../libs/data-access/pld/PldOwnerType";
-import {PldStatus} from "../../../../../libs/data-access/pld/PldStatus";
+import {PldOwnerType} from "@pld/shared";
+import {PldStatus} from "@pld/shared";
 
 export type PldMockUserOwner = {
   owner: User;

@@ -1,7 +1,7 @@
 import {DatedObjectSchema} from "../utility/datted_object.utility";
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import mongoose, {Document} from "mongoose";
-import {TemplateData} from "../../../../../libs/data-access/Template";
+import {TemplateData} from "@pld/shared";
 import {User} from "../user/user.schema";
 import {Organization} from "../organization/organization.schema";
 

@@ -1,7 +1,7 @@
 import React from "react";
 import io from 'socket.io-client';
 import * as socketio from 'socket.io-client';
-import {WsPayload} from "../../../../../libs/data-access/auth/WsPayload";
+import {WsPayload} from "@pld/shared";
 import {toast} from "react-toastify";
 
 const ENDPOINT = process.env['NX_SERVER_HOST'];

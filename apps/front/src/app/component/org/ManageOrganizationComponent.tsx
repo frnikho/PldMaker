@@ -1,7 +1,7 @@
 import React from "react";
 import {UserContextProps} from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {Organization, User} from "@pld/shared";
 import {toast} from "react-toastify";
 import {
   Breadcrumb,
@@ -21,9 +21,8 @@ import Block from "@uiw/react-color-block";
 
 import {TrashCan, Add} from '@carbon/icons-react'
 
-import {Stack, Layer} from '@carbon/react';
+import {Stack} from '@carbon/react';
 import {FieldData} from "../../util/FieldData";
-import {User} from "../../../../../../libs/data-access/user/User";
 import {NavProps, withNav} from "../../util/Navigation";
 import {NewOrgDodColorModal} from "../../modal/org/NewOrgDodColorModal";
 import {SocketContext} from "../../context/SocketContext";

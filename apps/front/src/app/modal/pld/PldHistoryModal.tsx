@@ -10,21 +10,14 @@ import {CodeSnippet,
 import {ModalProps} from "../../util/Modal";
 
 import {TabList, TabPanels, TabPanel} from '@carbon/react';
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
-import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 import { ResponsiveCalendar } from "@nivo/calendar";
-import {Dod, EditedField} from "../../../../../../libs/data-access/dod/Dod";
+import {Dod, EditedField, Pld, Organization} from "@pld/shared";
 import {
   formatDateCharts,
   formatDateHistory,
-  formatLongDate,
   isSameDate
-} from "../../../../../../libs/utility/DateUtility";
+} from "@pld/utils";
 import {HistoryHelper} from "../../util/HistoryHelper";
-import {PldHistoryAction} from "../../../../../../libs/data-access/pld/PldHistory";
-import {OrgHistoryAction} from "../../../../../../libs/data-access/organization/OrgHistory";
-import {DodHistoryAction} from "../../../../../../libs/data-access/dod/DodHistory";
-import {User} from "../../../../../../libs/data-access/user/User";
 
 export type HistoryDetails = {
   date: Date;

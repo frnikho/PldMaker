@@ -1,5 +1,5 @@
 import {User} from "../user/user.schema";
-import {UserDomain} from "../../../../../libs/data-access/user/User";
+import {UserDomain} from "@pld/shared";
 
 export class UserMock {
 

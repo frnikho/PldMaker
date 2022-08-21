@@ -1,12 +1,9 @@
 import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
-import {Pld} from "../../../../../../libs/data-access/pld/Pld";
-import {PldStatus} from "../../../../../../libs/data-access/pld/PldStatus";
+import {Organization, Pld, PldStatus, Dod} from "@pld/shared";
 import {MeterChart} from "@carbon/charts-react";
 
 import {Stack} from '@carbon/react';
-import {Dod} from "../../../../../../libs/data-access/dod/Dod";
 
 export type ChartsDashboardProps = {
   org: Organization[];
@@ -14,8 +11,7 @@ export type ChartsDashboardProps = {
   dod: Dod[];
 } & RequiredUserContextProps;
 
-export type ChartsDashboardState = {
-}
+export type ChartsDashboardState = unknown
 
 export class ChartsDashboard extends React.Component<ChartsDashboardProps, ChartsDashboardState> {
 
@@ -24,7 +20,7 @@ export class ChartsDashboard extends React.Component<ChartsDashboardProps, Chart
   }
 
   override componentDidMount() {
-
+    //
   }
 
   private getActivePld(): Pld[] {

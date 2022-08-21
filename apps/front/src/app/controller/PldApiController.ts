@@ -1,8 +1,6 @@
-import {PldOrgCreateBody, PldOrgFindsBody} from "../../../../../libs/data-access/pld/PldBody";
+import {PldOrgCreateBody, PldOrgFindsBody, CreatePldRevisionBody, Pld, PldUpdateBody} from "@pld/shared";
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
 import {AxiosError} from "axios";
-import {CreatePldRevisionBody, Pld} from "../../../../../libs/data-access/pld/Pld";
-import {PldUpdateBody} from "../../../../../libs/data-access/pld/PldUpdateBody";
 
 export type PldCallback = (pld: Pld | null, error?: ApiError) => void
 export type PldsCallback = (pld: Pld[], error?: ApiError) => void

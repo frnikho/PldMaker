@@ -4,7 +4,9 @@
   "projects": {
     "backend": "apps/backend",
     "front": "apps/front",
-    "front-e2e": "apps/front-e2e"
+    "front-e2e": "apps/front-e2e",
+    "shared": "libs/shared",
+    "utils": "libs/utils"
   },
   "webpackConfig": "@nrwl/react/plugins/babel"
 }

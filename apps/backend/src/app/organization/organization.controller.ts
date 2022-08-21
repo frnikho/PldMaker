@@ -1,12 +1,12 @@
 import {Body, Controller, Get, Param, Post, Request} from '@nestjs/common';
 import {OrganizationService} from "./organization.service";
-import {CreateOrganizationBody} from "../../../../../libs/data-access/organization/CreateOrganizationBody";
+import {CreateOrganizationBody} from "@pld/shared";
 import {
   InviteUserOrgBody,
   ManageMembersOrganizationBody
-} from "../../../../../libs/data-access/organization/ManageMembersOrganizationBody";
-import {UpdateOrganizationBody} from "../../../../../libs/data-access/organization/UpdateOrganizationBody";
-import {DeleteOrganizationBody} from "../../../../../libs/data-access/organization/DeleteOrganizationBody";
+} from "@pld/shared";
+import {UpdateOrganizationBody} from "@pld/shared";
+import {DeleteOrganizationBody} from "@pld/shared";
 import {ObjectIDPipe} from "../ObjectID.pipe";
 import {EventEmitter2} from "@nestjs/event-emitter";
 

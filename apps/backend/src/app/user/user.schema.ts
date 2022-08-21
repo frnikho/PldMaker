@@ -1,7 +1,7 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
 import {Document} from "mongoose";
-import {UserDomain} from "../../../../../libs/data-access/user/User";
+import {UserDomain} from "@pld/shared";
 
 export type UserDocument = User & Document;
 

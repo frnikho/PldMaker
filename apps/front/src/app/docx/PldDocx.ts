@@ -1,8 +1,7 @@
-import {Pld, PldRevision} from "../../../../../libs/data-access/pld/Pld";
+import {Pld, PldRevision, Organization} from "@pld/shared";
 import {Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
-import {Organization} from "../../../../../libs/data-access/organization/Organization";
-import {formatDateNumeric} from "../../../../../libs/utility/DateUtility";
+import {formatDateNumeric} from "@pld/utils";
 
 const HeaderRevisionCell = (title: string, size: string) => {
   return new TableCell({

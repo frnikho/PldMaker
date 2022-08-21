@@ -1,9 +1,6 @@
-import {Pld} from "../../../../../libs/data-access/pld/Pld";
-import {Dod} from "../../../../../libs/data-access/dod/Dod";
+import {Pld, Dod, Organization, User} from "@pld/shared";
 import {AlignmentType, Document, Footer, Header, Packer, PageNumber, Paragraph, TextRun, WidthType} from "docx";
 import {DodDocx} from "./DodDocx";
-import {Organization} from "../../../../../libs/data-access/organization/Organization";
-import {User} from "../../../../../libs/data-access/user/User";
 import {PldDocx} from "./PldDocx";
 import {PldResumeDocx} from "./PldResumeDocx";
 

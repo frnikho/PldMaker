@@ -1,9 +1,6 @@
-import {DodCreateBody, DodFindPldBody} from "../../../../../libs/data-access/dod/DodBody";
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
-import {Dod} from "../../../../../libs/data-access/dod/Dod";
 import {AxiosError} from "axios";
-import {UpdateDodStatusBody} from "../../../../../libs/data-access/dod/UpdateDodStatusBody";
-import {PldOrgFindsBody} from "../../../../../libs/data-access/pld/PldBody";
+import {UpdateDodStatusBody, Dod, DodCreateBody, DodFindPldBody} from "@pld/shared";
 
 export type CallbackDod = (dod: Dod | null, error?: ApiError) => void;
 export type CallbackDods = (dod: Dod[], error?: ApiError) => void;

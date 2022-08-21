@@ -1,12 +1,6 @@
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
-import {CreateOrganizationBody} from "../../../../../libs/data-access/organization/CreateOrganizationBody";
+import {CreateOrganizationBody, Organization, InviteUserOrgBody, ManageMembersOrganizationBody, UpdateOrganizationBody} from "@pld/shared";
 import {AxiosError} from "axios";
-import {Organization} from "../../../../../libs/data-access/organization/Organization";
-import {
-  InviteUserOrgBody,
-  ManageMembersOrganizationBody
-} from "../../../../../libs/data-access/organization/ManageMembersOrganizationBody";
-import {UpdateOrganizationBody} from "../../../../../libs/data-access/organization/UpdateOrganizationBody";
 
 export type CallbackOrganizations = (orgs: Organization[], error?: ApiError) => void;
 export type CallbackOrganization = (org: Organization | null, error?: ApiError) => void;
@@ -37,9 +31,6 @@ export class OrganizationApiController {
     });
   }
 
-  public static getUserOrganizations(accessToken: string, userId: string, callback: CallbackOrganizations) {
-    return null;
-  }
 
   public static findOrganizationById(accessToken: string, orgId: string, callback: CallbackOrganization) {
     api.get<Organization | null>(`organization/find/id/${orgId}`, authorize(accessToken)).then((response) => {
@@ -52,7 +43,7 @@ export class OrganizationApiController {
   public static createUserOrganizations(accessToken: string, body: CreateOrganizationBody, callback: CallbackOrganization) {
     api.post<Organization>('organization/create', body, authorize(accessToken)).then((response) => {
       return callback(response.data);
-    }).catch((err) => {
+    }).catch(() => {
       return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
     });
   }
@@ -60,7 +51,7 @@ export class OrganizationApiController {
   public static updateOrg(accessToken: string, body: UpdateOrganizationBody, callback: CallbackOrganization) {
     api.post<Organization>(`organization/update`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
-    }).catch((err: AxiosError<ApiError>) => {
+    }).catch(() => {
       return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
     });
   }

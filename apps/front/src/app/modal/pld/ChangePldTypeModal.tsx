@@ -1,7 +1,7 @@
 import React from "react";
 import {Modal, Select, SelectItem} from "carbon-components-react";
 import {ModalProps} from "../../util/Modal";
-import {Pld} from "../../../../../../libs/data-access/pld/Pld";
+import {Pld} from "@pld/shared";
 import {FieldData} from "../../util/FieldData";
 
 export type ChangePldTypeProps = {
@@ -29,7 +29,7 @@ export class ChangePldTypeModal extends React.Component<ChangePldTypeProps, Chan
         size={"md"}
         open={this.props.open}
         primaryButtonText={"Valider"}
-        onSubmit={(e) => {
+        onSubmit={() => {
           this.props.onSuccess(this.state.typeInput.value);
         }}
         onRequestSubmit={() => this.props.onSuccess(this.state.typeInput.value)}

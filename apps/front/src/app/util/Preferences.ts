@@ -1,4 +1,4 @@
-import {DodColor} from "../../../../../libs/data-access/organization/Organization";
+import {DodColor} from "@pld/shared";
 
 export const getDodStatusColor = (dodColors: DodColor[], status: string) => {
   const color: DodColor | undefined = dodColors.find((dodColor) => {

@@ -1,9 +1,7 @@
 import {Body, Controller, Get, Param, Post, Request} from '@nestjs/common';
 import {PldService} from "./pld.service";
 import {ObjectIDPipe} from "../ObjectID.pipe";
-import {PldOrgCreateBody, PldOrgFindsBody} from "../../../../../libs/data-access/pld/PldBody";
-import {CreatePldRevisionBody} from "../../../../../libs/data-access/pld/Pld";
-import {PldUpdateBody} from "../../../../../libs/data-access/pld/PldUpdateBody";
+import {PldOrgCreateBody, PldOrgFindsBody, CreatePldRevisionBody, PldUpdateBody} from "@pld/shared";
 import {EventEmitter2} from "@nestjs/event-emitter";
 
 @Controller('pld')
@@ -18,7 +16,7 @@ export class PldController {
 
   @Get('me')
   public async getOwnPld() {
-
+    //
   }
 
   @Get('find/:pldId')

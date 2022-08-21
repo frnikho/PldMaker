@@ -2,7 +2,7 @@ import {Injectable} from "@nestjs/common";
 import {OnEvent} from "@nestjs/event-emitter";
 import {OrgAddMemberEvent, OrgEvents, OrgRemoveMemberEvent} from "./organization.event";
 import {OrganizationService} from "./organization.service";
-import {OrgHistoryAction} from "../../../../../libs/data-access/organization/OrgHistory";
+import {OrgHistoryAction} from "@pld/shared";
 
 @Injectable()
 export class OrganizationListener {

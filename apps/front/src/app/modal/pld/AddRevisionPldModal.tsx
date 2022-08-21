@@ -4,13 +4,12 @@ import {Modal, MultiSelect, NumberInput, TextArea, TextInput} from "carbon-compo
 import {FieldData} from "../../util/FieldData";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {PldApiController} from "../../controller/PldApiController";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {Organization, Pld} from "@pld/shared";
 import {toast} from "react-toastify";
-import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 
 import {Stack} from '@carbon/react'
 import {RequiredLabel} from "../../util/Label";
-import {formatLongDate} from "../../../../../../libs/utility/DateUtility";
+import {formatLongDate} from "@pld/utils";
 
 export type AddRevisionPldModalProps = {
   version: number;

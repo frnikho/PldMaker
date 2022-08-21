@@ -1,15 +1,10 @@
 import React from "react";
 import {Cookies, ReactCookieProps, withCookies} from "react-cookie";
 import api, {ApiError} from "../util/Api";
-import {User} from "../../../../../libs/data-access/user/User";
-import {LoginToken} from "../../../../../libs/data-access/auth/LoginToken";
+import {User, LoginToken, LoginBody, RegisterBody, RegisterResponse, Favour} from "@pld/shared";
 import {AxiosError} from "axios";
-import {LoginBody} from "../../../../../libs/data-access/auth/LoginBody";
-import {RegisterBody} from "../../../../../libs/data-access/auth/RegisterBody";
-import {RegisterResponse} from "../../../../../libs/data-access/auth/RegisterResponse";
 import {UserApiController} from "../controller/UserApiController";
 import {emitBody, SocketContext} from "./SocketContext";
-import {Favour} from "../../../../../libs/data-access/user/Favour";
 import {toast} from "react-toastify";
 
 export const ACCESS_TOKEN_COOKIE_NS = 'access_token';

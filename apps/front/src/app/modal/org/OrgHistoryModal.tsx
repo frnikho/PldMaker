@@ -1,6 +1,6 @@
 import React from "react";
 import {ModalProps} from "../../util/Modal";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {Organization} from "@pld/shared";
 import {
   Modal,
   ModalBody, StructuredListBody,
@@ -9,7 +9,7 @@ import {
   StructuredListRow,
   StructuredListWrapper
 } from "carbon-components-react";
-import {formatLongDate} from "../../../../../../libs/utility/DateUtility";
+import {formatLongDate} from "@pld/utils";
 
 export type OrgHistoryModelProps = {
   org: Organization;

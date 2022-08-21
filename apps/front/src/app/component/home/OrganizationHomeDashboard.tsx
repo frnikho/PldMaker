@@ -3,7 +3,6 @@ import {RequiredUserContextProps} from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {
   Button, ButtonSet, DataTableSkeleton,
-  Row,
   SkeletonPlaceholder,
   Table,
   TableBody, TableCell,
@@ -14,14 +13,12 @@ import {
 import Lottie from "lottie-react";
 import {Stack} from '@carbon/react'
 import {NavigationState, redirectNavigation} from "../../util/Navigation";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {Organization, Pld, Dod} from "@pld/shared";
 
 import {View, Add} from '@carbon/icons-react'
-import {formatShortDate} from "../../../../../../libs/utility/DateUtility";
+import {formatShortDate} from "@pld/utils";
 import {ChartsDashboard} from "./ChartsDashboard";
-import {Pld} from "../../../../../../libs/data-access/pld/Pld";
 import {PldApiController} from "../../controller/PldApiController";
-import {Dod} from "../../../../../../libs/data-access/dod/Dod";
 import {DodApiController} from "../../controller/DodApiController";
 
 type OrganizationHomeDashboardProps = unknown & RequiredUserContextProps
@@ -143,13 +140,13 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
     )
   }
 
-  private showCharts() {
+/*  private showCharts() {
     if (this.state.organization.length === 0 || this.state.pld.length === 0)
       return;
     return (
       <ChartsDashboard org={this.state.organization} dod={this.state.dods} pld={this.state.pld} userContext={this.props.userContext}/>
     )
-  }
+  }*/
 
   private showNoOrganizations() {
     if (this.state.organization.length !== 0 || this.state.loading)

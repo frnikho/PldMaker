@@ -2,7 +2,6 @@ import {Injectable, Logger} from "@nestjs/common";
 import {PldService} from "./pld.service";
 import {OnEvent} from "@nestjs/event-emitter";
 import {
-  PldDataImportedEvent,
   PldDodCreatedEvent,
   PldDodDeletedEvent,
   PldEvents,
@@ -10,7 +9,7 @@ import {
   PldSignedEvent, PldStatusUpdatedEvent,
   PldUpdatedEvent
 } from "./pld.event";
-import {PldHistoryAction} from "../../../../../libs/data-access/pld/PldHistory";
+import {PldHistoryAction} from "@pld/shared";
 
 @Injectable()
 export class PldListener {
@@ -88,8 +87,8 @@ export class PldListener {
   }
 
   @OnEvent(PldEvents.onPldDataImported)
-  public onPldDataImported(event: PldDataImportedEvent) {
-
+  public onPldDataImported() {
+    //
   }
 
 }

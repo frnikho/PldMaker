@@ -12,16 +12,12 @@ import {
 } from "carbon-components-react";
 
 import {Account} from '@carbon/icons-react';
-import {formatLongDate, formatShortDate} from "../../../../../../libs/utility/DateUtility";
-import {Organization} from "../../../../../../libs/data-access/organization/Organization";
+import {formatLongDate, formatShortDate} from "@pld/utils";
+import {Organization} from "@pld/shared";
 
-type PldHomeDashboardProps = {
+type PldHomeDashboardProps = RequiredUserContextProps
 
-} & RequiredUserContextProps
-
-type PldHomeDashboardState = {
-
-}
+type PldHomeDashboardState = unknown
 
 export class PldHomeDashboard extends React.Component<PldHomeDashboardProps, PldHomeDashboardState> {
 

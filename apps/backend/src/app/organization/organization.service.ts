@@ -1,13 +1,10 @@
 import {BadRequestException, Injectable} from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
-import {NewOrgHistory, Organization, OrganizationDocument, OrgHistory} from "./organization.schema";
-import {Model, ObjectId, Query} from "mongoose";
-import {CreateOrganizationBody} from "../../../../../libs/data-access/organization/CreateOrganizationBody";
+import {NewOrgHistory, Organization, OrganizationDocument} from "./organization.schema";
+import {Model, Query} from "mongoose";
+import {CreateOrganizationBody, UpdateOrganizationBody, DeleteOrganizationBody, InviteUserOrgBody} from "@pld/shared";
 import {UserDocument} from "../user/user.schema";
-import {UpdateOrganizationBody} from "../../../../../libs/data-access/organization/UpdateOrganizationBody";
-import {DeleteOrganizationBody} from "../../../../../libs/data-access/organization/DeleteOrganizationBody";
 import {UserService} from "../user/user.service";
-import {InviteUserOrgBody} from "../../../../../libs/data-access/organization/ManageMembersOrganizationBody";
 import {EventEmitter2} from "@nestjs/event-emitter";
 import {OrgAddMemberEvent, OrgEvents} from "./organization.event";
 
