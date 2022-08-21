@@ -63,3 +63,89 @@ Lib UI: https://carbondesignsystem.com/
 
 #### Backend
 Techno: Nest JS
+
+
+# Installation
+
+## Configuration
+
+Avant de commencer, que ça soit pour docker ou bien le build en manuel, il faut créer un fichier .env à la racine du repo. Des fichiers d'exemple commencent par '.env' sont présent pour vous guider.
+
+```shell
+# ce fichier est pré rempli pour avoir un environnement prés a l'emploi avec Docker
+.env.docker.example
+# celui-ci est conseillé quand vous devez déployer/construire votre application en mode développement
+.env.example
+```
+
+## Installation / Deployment via Docker
+
+Le repo contient un fichier [Docker Compose](https://docs.docker.com/compose/) qui comprend 3 services :
+
+ - Une database MongoDB ()
+ - Un app front sous react 
+ - Une api nestjs
+
+Vous pouvez par la suite rajoutez d'autres services comme mongo-express pour visualiser votre db.
+
+```shell 
+# pour lancer tout les services
+$ docker compose up -d
+# si vous souaitez seulement lancer la db pour pouvoir dev en local, vous pouvez lancer le service mongo a pars
+$ docker compose up -d mongo
+```
+
+## Installation Manuel
+
+Pour commencer a build/dev vous devez cloner le repo:
+
+```shell
+$ git clone git@github.com:OutsideEIP/PLD.git
+# ou
+$ git clone https://github.com/OutsideEIP/PLD.git
+```
+
+
+Le repo a été configurer en mode Monorepo grace a [NX](https://nx.dev/), il vous faut donc installer nx en local pour pouvoir build ou dev l'app:
+
+```shell
+$ npm i -g nx
+# ou avec sudo
+$ sudo npm i -g nx
+```
+
+et par la suite, vous pouvez installer les dépendences nécéssaire aux apps:
+
+```shell
+# le -f va forcer l'installation de dépendances qui ne sont pas compatibles entre elles (pas de panique 🙂)
+$ npm -f i
+```
+
+Une fois cette étape fini, vous pourrez lancer les applications solo:
+
+```shell
+# Pour le front 
+$ nx serve front
+# et pour le back
+$ nx serve backend
+```
+
+#### Tips 💡 
+L'idéal quand vous devez développer sur le front ou le back est de lancer la db via le docker compose et de lancer les apps manuellement comme ci-dessus.
+
+### Build
+
+A la racine:
+```shell
+$ nx build backend
+$ nx build front
+```
+
+Un dossier dist a été créer avec votre app front en static et votre api.
+vous pouvez par la suite lancer vos apps en mode prod:
+
+```shell
+
+$ serve dist/apps/front
+$ node dist/apps/backend
+```

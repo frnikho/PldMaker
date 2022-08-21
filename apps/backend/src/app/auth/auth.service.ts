@@ -47,6 +47,7 @@ export class AuthService {
       roles: ['user'],
       updated_date: new Date(),
       created_date: new Date(),
+      devices: [],
     });
     return {
       accessToken: this.login(createdUser).access_token,

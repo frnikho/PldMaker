@@ -1,5 +1,5 @@
 import {Body, Controller, Get, Param, Patch, Post, Request} from '@nestjs/common';
-import {UpdateUserBody, AddFavourBody, RemoveFavourBody} from "@pld/shared";
+import {UpdateUserBody, AddFavourBody, RemoveFavourBody, AddDeviceBody} from "@pld/shared";
 import {UserService} from "./user.service";
 import {UserDocument} from "./user.schema";
 
@@ -16,6 +16,12 @@ export class UserController {
   public async update(@Request() req, @Body() updateBody: UpdateUserBody) {
     return this.userService.updateByBody(req.user._id, updateBody);
   }
+
+  @Post('devices/add')
+  public async addDevices(@Request() req, @Body() body: AddDeviceBody) {
+    console.log('IP', req.clientIp);
+  }
+
 
   @Get('favours')
   public async getFavour(@Request() req) {

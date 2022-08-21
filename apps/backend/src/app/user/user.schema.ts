@@ -1,7 +1,7 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
 import {Document} from "mongoose";
-import {UserDomain} from "@pld/shared";
+import {Device, Gender, Mobile, UserDomain} from "@pld/shared";
 
 export type UserDocument = User & Document;
 
@@ -26,6 +26,33 @@ export class User extends DatedObjectSchema {
 
   @Prop({required: false, default: UserDomain.MOBILE})
   domain?: string[];
+
+  @Prop({required: false, default: []})
+  devices: Device[];
+
+  @Prop({required: false, default: 'default-1'})
+  profile_picture?: string;
+
+  @Prop({required: false})
+  job_title?: string;
+
+  @Prop({required: false})
+  department?: string;
+
+  @Prop({required: false})
+  organization?: string;
+
+  @Prop({required: false})
+  location?: string;
+
+  @Prop({required: false})
+  mobile?: Mobile;
+
+  @Prop({required: false})
+  language?: string;
+
+  @Prop({required: true, enum: Gender})
+  gender?: string;
 
 }
 

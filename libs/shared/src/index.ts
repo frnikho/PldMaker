@@ -20,6 +20,9 @@ export * from './lib/pld/PldUpdateBody';
 export * from './lib/user/User';
 export * from './lib/user/Favour';
 export * from './lib/user/UpdateUserBody';
+export * from './lib/user/Gender';
+export * from './lib/user/Device';
+export * from './lib/user/Privacy';
 
 export * from './lib/organization/Organization';
 export * from './lib/organization/CreateOrganizationBody';
@@ -33,3 +36,4 @@ export * from './lib/template/TemplateType';
 
 export * from './lib/DatedObject';
 export * from './lib/Template';
+export * from './lib/Mobile'

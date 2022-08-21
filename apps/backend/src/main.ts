@@ -4,7 +4,7 @@ import {NestFactory} from '@nestjs/core';
 import {AppModule} from './app/app.module';
 import {NestExpressApplication} from "@nestjs/platform-express";
 import {Logger} from "./app/logger/logger";
-import {TransformInterceptor} from "./app/transform.interceptor";
+import * as requestIp from 'request-ip';
 import * as io from 'socket.io-client';
 
 class Server {
@@ -34,6 +34,7 @@ class Server {
       origin: process.env.NX_CLIENT_HOST,
     });
     this.app.useGlobalPipes(new ValidationPipe());
+    this.app.use(requestIp.mw());
   }
 
   private onServerOpened() {

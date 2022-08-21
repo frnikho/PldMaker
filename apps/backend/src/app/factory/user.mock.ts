@@ -11,6 +11,7 @@ export class UserMock {
         password,
         roles,
         domain,
+        devices: [],
       };
     }
 

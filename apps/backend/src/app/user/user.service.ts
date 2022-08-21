@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {Model, Query} from "mongoose";
 import {InjectModel} from "@nestjs/mongoose";
 import {User, UserDocument} from './user.schema';
-import {AddFavourBody, FavourType, UpdateUserBody} from "@pld/shared";
+import {AddDeviceBody, AddFavourBody, FavourType, UpdateUserBody} from "@pld/shared";
 import {Favour} from "./favour.schema";
 
 @Injectable()
@@ -42,6 +42,10 @@ export class UserService {
 
     public updateByBody(userObjectId: string, userBody: UpdateUserBody): Promise<UserDocument | null> {
       return this.userModel.findOneAndUpdate({_id: userObjectId}, userBody, {new: true}).exec();
+    }
+
+    public addDevices(userId: string, ip: string, body: AddDeviceBody) {
+
     }
 
     public findFavour(ownerId: string) {
