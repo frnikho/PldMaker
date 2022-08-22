@@ -12,6 +12,8 @@ import {PageNotFound} from "./page/PageNotFound";
 import NewTemplatePage from "./page/organization/template/NewTemplatePage";
 import {ViewMode} from "./component/template/NewTemplateComponent";
 import ManageOrganizationPage from "./page/organization/ManageOrganizationPage";
+import {DevicePage} from "./page/DevicePage";
+import {FAQPage} from "./page/FAQPage";
 
 export function App() {
 
@@ -29,6 +31,12 @@ export function App() {
           </Route>
           <Route path={"/profile"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
             <Route index element={<UserPage/>}/>
+          </Route>
+          <Route path={"/devices"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
+            <Route index element={<DevicePage/>}/>
+          </Route>
+          <Route path={"/faq"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
+            <Route index element={<FAQPage/>}/>
           </Route>
           <Route path={"/organization"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
             <Route path={"new"} element={<NewOrganizationPage/>}/>

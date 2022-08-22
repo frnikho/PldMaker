@@ -15,8 +15,15 @@ export class LoginBody {
   })
   password: string;
 
-  constructor(email: string, password: string) {
+  agent: string;
+  os: string;
+  language?: string;
+
+  constructor(email: string, password: string, agent: string, os: string, language: string) {
     this.email = email;
     this.password = password;
+    this.agent = agent;
+    this.os = os;
+    this.language = language;
   }
 }

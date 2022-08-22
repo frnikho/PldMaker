@@ -1,6 +1,5 @@
 export type DeviceInfo = {
   ip?: string;
-  location?: string;
   firstConnection?: Date;
   lastConnection?: Date;
   os?: string;
@@ -28,7 +27,7 @@ export class Device {
 
 }
 
-export class AddDeviceBody {
+export class DeviceBody {
   agent: string;
   os: string;
   language?: string;

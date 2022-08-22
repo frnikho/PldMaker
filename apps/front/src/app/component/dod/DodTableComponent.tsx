@@ -226,13 +226,14 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
                   renderIcon={Download}
                   onClick={() => {
-                    const dod: Dod[] = this.props.dod.map((dod) => {
+                    /*const dod: Dod[] = this.props.dod.map((dod) => {
                       return {
                         ...dod,
                         estimatedWorkTime: dod.estimatedWorkTime.map((workTime) => {
                           return {
                             ...workTime,
                             users: workTime.users.map((wtUser) => {
+                              console.log(wtUser);
                               const u1 = (this.props.org.members as User[]).find((user) => user._id === wtUser._id);
                               if (u1 !== undefined) {
                                 return u1.email;
@@ -252,7 +253,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
 
                     PldGenerator.getBlobFromDoc(pld.generate(), (blob) => {
                       window.open(URL.createObjectURL(blob));
-                    });
+                    });*/
 
                   }}
                 >

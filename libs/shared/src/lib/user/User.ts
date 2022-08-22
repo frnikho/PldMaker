@@ -1,4 +1,5 @@
 import {DatedObject} from "../DatedObject";
+import {Device} from "./Device";
 
 export type User = {
   _id: string;
@@ -7,6 +8,7 @@ export type User = {
   firstname?: string;
   lastname?: string;
   domain?: string[];
+  devices: Device[];
 } & DatedObject
 
 export enum UserDomain {

@@ -96,6 +96,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
     this.onClickBackPreview = this.onClickBackPreview.bind(this);
     this.onClickCreate = this.onClickCreate.bind(this);
     this.clearField = this.clearField.bind(this);
+    this.onClickEnterDoD = this.onClickEnterDoD.bind(this);
   }
 
   private onModalOpen() {
@@ -294,12 +295,18 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
     })
   }
 
+  private onClickEnterDoD(event, index) {
+    if (event.key === 'Enter')
+      this.onClickAddDefinitionOfDone();
+  }
+
   private showDefinitionsOfDoneText() {
     return this.state.descriptionOfDone.value.map((dod, index) => {
       return (
         <Grid key={index} style={{marginTop: '12px'}}>
           <Column lg={11} md={7}>
             <TextInput
+              onKeyPress={(event) => {this.onClickEnterDoD(event, index)}}
               invalid={this.state.descriptionOfDone.error !== undefined}
               invalidText={this.state.descriptionOfDone.error}
               required id={"dod-"} labelText={""} hideLabel={true} value={dod} onChange={(e) => {
@@ -389,84 +396,97 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
     )
   }
 
+  private onClickEnter(event, next) {
+    if (event.key === 'Enter') {
+      console.log(event.currentTarget.form.elements[next].focus());
+    }
+  }
+
   private showEdit() {
     if (this.state.preview)
       return;
     return (
-      <Stack gap={4}>
-        <Grid>
-          <Column lg={3} md={3}>
-            <TextInput
-              invalid={this.state.version.error !== undefined}
-              invalidText={this.state.version.error}
-              id={"dod-version"} labelText={<RequiredLabel message={"Version"}/>} min={0} value={this.state.version.value} onChange={(e) => {
-              this.setState({
-                version: {
-                  value: e.currentTarget.value,
-                }
-              })
-            }}/>
-          </Column>
-          <Column lg={8} md={5}>
-            <TextInput
-              invalid={this.state.title.error !== undefined}
-              invalidText={this.state.title.error}
-              id={"dod-title"} labelText={<RequiredLabel message={"Nom du DoD"}/>} value={this.state.title.value} onChange={(e) => {
-              this.setState({
-                title: {
-                  value: e.currentTarget.value
-                }
-              })
-            }}/>
-          </Column>
-        </Grid>
-        <Grid>
-          <Column lg={3} md={3}>
-            <TextInput
-              invalid={this.state.skinOf.error !== undefined}
-              invalidText={this.state.skinOf.error}
-              id={"dod-skinOf"} labelText={<RequiredLabel message={"En tant que ..."}/>} value={this.state.skinOf.value} onChange={(e) => {
-              this.setState({
-                skinOf: {
-                  value: e.currentTarget.value,
-                }
-              })
-            }}/>
-          </Column>
-          <Column lg={8} md={5}>
-            <TextInput
-              invalid={this.state.want.error !== undefined}
-              invalidText={this.state.want.error}
-              id={"dod-want"} labelText={<RequiredLabel message={"Je veux ..."}/>} value={this.state.want.value} onChange={(e) => {
-              this.setState({
-                want: {
-                  value: e.currentTarget.value
-                }
-              })
-            }}/>
-          </Column>
-        </Grid>
-        <TextArea
-          invalid={this.state.description.error !== undefined}
-          invalidText={this.state.description.error}
-          id={"dod-description"} labelText={<RequiredLabel message={"Description"}/>} value={this.state.description.value} onChange={(e) => {
-          this.setState({
-            description: {
-              value: e.currentTarget.value
-            }
-          });
-        }}/>
-        <div>
-          <RequiredLabel message={"Définition of Done"}/>
-          {this.showDefinitionsOfDoneText()}
-          <Button style={{marginTop: '20px'}} size={"sm"} iconDescription={"Ajouter une définition"} kind={"secondary"}  onClick={this.onClickAddDefinitionOfDone} hasIconOnly renderIcon={Add}/>
-        </div>
-        <div>
-          <RequiredLabel message={"Temps estimé"}/>
-          {this.showEstimatedWorkTime()}
-          <Button style={{marginTop: '20px'}} size={"sm"} iconDescription={"Ajouter une définition"} kind={"secondary"}  onClick={this.onClickAddEstimatedWorkTime} hasIconOnly renderIcon={Add}/>
-        </div>
-      </Stack>
+      <form>
+        <Stack gap={4}>
+          <Grid>
+            <Column lg={3} md={3}>
+              <TextInput
+                onKeyPress={(event) => this.onClickEnter(event, 1)}
+                invalid={this.state.version.error !== undefined}
+                invalidText={this.state.version.error}
+                id={"dod-version"} labelText={<RequiredLabel message={"Version"}/>} min={0} value={this.state.version.value} onChange={(e) => {
+                this.setState({
+                  version: {
+                    value: e.currentTarget.value,
+                  }
+                })
+              }}/>
+            </Column>
+            <Column lg={8} md={5}>
+              <TextInput
+                onKeyPress={(event) => this.onClickEnter(event, 2)}
+                invalid={this.state.title.error !== undefined}
+                invalidText={this.state.title.error}
+                id={"dod-title"} labelText={<RequiredLabel message={"Nom du DoD"}/>} value={this.state.title.value} onChange={(e) => {
+                this.setState({
+                  title: {
+                    value: e.currentTarget.value
+                  }
+                })
+              }}/>
+            </Column>
+          </Grid>
+          <Grid>
+            <Column lg={3} md={3}>
+              <TextInput
+                onKeyPress={(event) => this.onClickEnter(event, 3)}
+                invalid={this.state.skinOf.error !== undefined}
+                invalidText={this.state.skinOf.error}
+                id={"dod-skinOf"} labelText={<RequiredLabel message={"En tant que ..."}/>} value={this.state.skinOf.value} onChange={(e) => {
+                this.setState({
+                  skinOf: {
+                    value: e.currentTarget.value,
+                  }
+                })
+              }}/>
+            </Column>
+            <Column lg={8} md={5}>
+              <TextInput
+                onKeyPress={(event) => this.onClickEnter(event, 4)}
+                invalid={this.state.want.error !== undefined}
+                invalidText={this.state.want.error}
+                id={"dod-want"} labelText={<RequiredLabel message={"Je veux ..."}/>} value={this.state.want.value} onChange={(e) => {
+                this.setState({
+                  want: {
+                    value: e.currentTarget.value
+                  }
+                })
+              }}/>
+            </Column>
+          </Grid>
+          <TextArea
+            onKeyPress={(event) => this.onClickEnter(event, 5)}
+            invalid={this.state.description.error !== undefined}
+            invalidText={this.state.description.error}
+            id={"dod-description"} labelText={<RequiredLabel message={"Description"}/>} value={this.state.description.value} onChange={(e) => {
+            this.setState({
+              description: {
+                value: e.currentTarget.value
+              }
+            });
+          }}/>
+          <>
+            <RequiredLabel message={"Définition of Done"}/>
+            {this.showDefinitionsOfDoneText()}
+            <Button style={{marginTop: '20px'}} size={"sm"} iconDescription={"Ajouter une définition"} kind={"secondary"}  onClick={this.onClickAddDefinitionOfDone} hasIconOnly renderIcon={Add}/>
+          </>
+          <div>
+            <RequiredLabel message={"Temps estimé"}/>
+            {this.showEstimatedWorkTime()}
+            <Button style={{marginTop: '20px'}} size={"sm"} iconDescription={"Ajouter une définition"} kind={"secondary"}  onClick={this.onClickAddEstimatedWorkTime} hasIconOnly renderIcon={Add}/>
+          </div>
+        </Stack>
+      </form>
     )
   }
 
@@ -480,10 +500,8 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
         secondaryButtonText={"Fermer"}
         onRequestClose={this.props.onDismiss}
         modalHeading={this.props.editionDod !== undefined ? 'Modification du dod' : "Créer un nouveau DoD"}>
-
         {this.showPreview()}
         {this.showEdit()}
-
       </Modal>
     );
   }

@@ -66,4 +66,12 @@ export class UserApiController {
     });
   }
 
+  public static deleteAllDevice(accessToken: string, callback: CallbackUser) {
+    api.post(`user/devices/clean`, {}, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data);
+    });
+  }
+
 }

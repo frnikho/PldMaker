@@ -21,7 +21,7 @@ export type Dod = {
 } & DatedObject;
 
 export type UserWorkTime = {
-  users: string[] | User[];
+  users: User[];
   value: number;
   format: string,
 }

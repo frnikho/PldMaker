@@ -149,3 +149,5 @@ vous pouvez par la suite lancer vos apps en mode prod:
 $ serve dist/apps/front
 $ node dist/apps/backend
 ```
+
+
