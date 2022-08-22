@@ -43,7 +43,7 @@ export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalS
   }
 
   public onClickCreate(authContext: UserContextProps) {
-    const loginBody = new LoginBody(this.state.email.value, this.state.password.value);
+    const loginBody = new LoginBody(this.state.email.value, this.state.password.value, navigator.userAgent, navigator.platform, navigator.language);
     this.setState({loading: true});
     validate(loginBody).then((errors) => {
       if (errors.length <= 0)

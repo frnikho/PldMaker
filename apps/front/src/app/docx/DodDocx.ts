@@ -66,6 +66,7 @@ const DodComp = (...dod: string[]) => {
 }
 
 const EstimatedCharge = (charges: UserWorkTime[]) => {
+
   return new Paragraph({
     children: charges.map((charges) => {
         return [
@@ -81,7 +82,7 @@ const EstimatedCharge = (charges: UserWorkTime[]) => {
             text: charges.format + ' '
           }),
           new TextRun({
-            text: charges.users.join(', '),
+            text: charges.users.map((user) => `${user.firstname}`).join(', '),
             size: '13pt',
             font: 'Roboto'
           })

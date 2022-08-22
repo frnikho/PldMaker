@@ -20,7 +20,7 @@ import {
 
 import {Layer} from '@carbon/react';
 
-import {Bee, Dashboard, Events, Login, Notification, UserAvatar, Account} from '@carbon/icons-react'
+import {Bee, Dashboard, Login, Notification, UserAvatar, Account, Legend} from '@carbon/icons-react'
 
 import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
 import {NavigationState} from "../util/Navigation";
@@ -131,8 +131,11 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
       <OverflowMenu ariaLabel="overflow-menu" style={{marginTop: 'auto', marginBottom: 'auto'}} menuOffset={{left: -60}} renderIcon={UserAvatar}>
         <OverflowMenuItem itemText={title} requireTitle disabled/>
         <OverflowMenuItem itemText="Mon profile" onClick={() => {
-          this.props.onRedirectUrl('/profile')
+          this.props.onRedirectUrl('/profile');
         }} />
+        <OverflowMenuItem itemText={"Mes appareils"} onClick={() => {
+          this.props.onRedirectUrl('/devices');
+        }}/>
         <OverflowMenuItem hasDivider itemText="Se déconnecter" onClick={() => {
           auth.logout();
           this.props.onRedirectUrl('/');
@@ -216,6 +219,11 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
                       large
                       renderIcon={Account}>
                       Organisations
+                    </SideNavLink>
+                    <SideNavLink
+                      large
+                      renderIcon={Legend}>
+                      FAQ
                     </SideNavLink>
                     <SideNavDivider/>
 

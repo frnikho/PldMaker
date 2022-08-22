@@ -1,7 +1,7 @@
 import React from "react";
 import {Cookies, ReactCookieProps, withCookies} from "react-cookie";
 import api, {ApiError} from "../util/Api";
-import {User, LoginToken, LoginBody, RegisterBody, RegisterResponse, Favour} from "@pld/shared";
+import {User, LoginToken, LoginBody, RegisterBody, RegisterResponse, Favour, DeviceBody} from "@pld/shared";
 import {AxiosError} from "axios";
 import {UserApiController} from "../controller/UserApiController";
 import {emitBody, SocketContext} from "./SocketContext";
@@ -156,6 +156,7 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
       callback(null);
       return;
     }
+
     api.post<LoginToken>(`auth/login`, loginBody).then((response) => {
       if (response.data !== undefined) {
         UserApiController.getMe(response.data.access_token, (user, error) => {

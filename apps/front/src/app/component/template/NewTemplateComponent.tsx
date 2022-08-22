@@ -55,7 +55,7 @@ export class NewTemplateComponent extends React.Component<NewTemplateProps, NewT
     const dodDocx = new DodDocx({
       _id: 'abc',
       created_date: new Date(),
-      estimatedWorkTime: [{value: 2, users: ['nicolas.sansd@gmail.com'], format: ''}],
+      estimatedWorkTime: [{value: 2, users: [{_id: '', devices: [], email: 'nicolas.sansd@gmail.com'}], format: ''}],
       description: '',
       status: 'A faire',
       title: 'Hello World',

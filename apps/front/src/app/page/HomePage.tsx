@@ -7,6 +7,7 @@ import Lottie from 'lottie-react'
 import {Stack} from '@carbon/react';
 import {AuthModalComponent} from "../component/AuthModalComponent";
 import {OrganizationHomeDashboard} from "../component/home/OrganizationHomeDashboard";
+import {FAQComponent} from "../component/home/FAQComponent";
 
 export type HomePageProps = unknown;
 export type HomePageState = {
@@ -100,7 +101,7 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
         <AuthModalComponent onDismiss={this.onDismissModal} openLoginModal={this.state.login} openRegisterModal={this.state.register} switchModal={this.switchModal} onUserRegistered={this.onUserRegistered} onUserLogged={this.onUserLogged}/>
         <Tile>
           <h1>Bienvenue sur votre PLD <span style={{fontWeight: 'bold'}}>[Maker]</span></h1>
-          <p>PLD Maker est un outils web vous permettants de suivre votre avancement dans votre EIP</p>
+          <p style={{marginTop: 10}}>PLD Maker est une web app vous permettant de suivre votre avancement dans votre EIP</p>
         </Tile>
         <Grid>
           <Column sm={4} md={3} xlg={5}>
@@ -117,6 +118,11 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
               <Lottie animationData={require('../../assets/animations/register.json')} loop={true} style={{height: '300px'}}/>
             </ClickableTile>
           </Column>
+          <Column sm={4} md={3} xlg={6}>
+            <Tile>
+              <FAQComponent home={true}/>
+            </Tile>
+          </Column>
         </Grid>
       </Stack>
     )
@@ -125,9 +131,11 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
   private showDashboard(userContext: UserContextProps) {
     return (
       <Stack>
-        <h1>Bienvenue sur votre tableau de bord</h1>
-        <p>Ici vous pouvez suivre l'avancement des PLDs et de leurs DoDs de vos différentes Organisation</p>
-        <div style={{marginTop: 20}}>
+        <div>
+          <h1>Bienvenue sur votre tableau de bord</h1>
+          <p>Ici vous pouvez suivre l'avancement des PLDs et de leurs DoDs de vos différentes Organisation</p>
+        </div>
+        <div style={{marginTop: 40}}>
           <OrganizationHomeDashboard userContext={userContext}/>
         </div>
       </Stack>

@@ -37,29 +37,7 @@ export class PldGenerator {
     this.org = org;
     this.pld = pld;
     this.rawDod = dod;
-    this.dod = dod.map((dod) => {
-      return {
-        ...dod,
-        estimatedWorkTime: dod.estimatedWorkTime.map((workTime) => {
-          return {
-            ...workTime,
-            users: workTime.users.map((userId) => {
-              const u1 = [...(org.members as User[]), org.owner as User].find((user) => user._id === userId);
-              if (u1 !== undefined) {
-                if (u1.lastname !== undefined && u1.firstname !== undefined) {
-                  return u1.firstname;
-                } else {
-                  return u1.email;
-                }
-              } else if (userId === (org.owner as User)._id) {
-                return (org.owner as User).email;
-              }
-              return undefined;
-            }).filter((a) => a !== undefined) as string[],
-          }
-        })
-      }
-    })
+    this.dod = dod;
   }
 
   /*footers: {

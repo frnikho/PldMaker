@@ -1,4 +1,4 @@
-FROM node:18.4.0-bullseye as base
+FROM node:16.17.0-bullseye as base
 
 COPY apps /app/apps
 COPY initdb.d /app/initdb.d
@@ -12,15 +12,15 @@ COPY .env /app/
 
 WORKDIR "/app/"
 
-RUN npm i -g nx
-RUN npm i --force
+RUN npm i -g nx serve
+RUN npm i --legacy-peer-deps
 
 FROM base as backend
 WORKDIR "/app/"
 RUN nx build backend
-CMD ["nx", "serve", "backend", "--host=0.0.0.0"]
+CMD ["node", "dist/apps/backend/main.js"]
 
 FROM base as frontend
 WORKDIR "/app/"
 RUN nx build front
-CMD ["nx", "serve", "front", "--host=0.0.0.0"]
+CMD ["serve", "dist/apps/front", "-p", "4200"]

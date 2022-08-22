@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {Model, Query} from "mongoose";
 import {InjectModel} from "@nestjs/mongoose";
 import {User, UserDocument} from './user.schema';
-import {AddDeviceBody, AddFavourBody, FavourType, UpdateUserBody} from "@pld/shared";
+import {DeviceBody, AddFavourBody, FavourType, UpdateUserBody, Device} from "@pld/shared";
 import {Favour} from "./favour.schema";
 
 @Injectable()
@@ -44,8 +44,23 @@ export class UserService {
       return this.userModel.findOneAndUpdate({_id: userObjectId}, userBody, {new: true}).exec();
     }
 
-    public addDevices(userId: string, ip: string, body: AddDeviceBody) {
+    public async addDevices(userId: string, ip: string, body: DeviceBody) {
+      const user = await this.userModel.findOne({_id: userId});
+      if (user.devices.some((d) => d.agent === body.agent)) {
+        user.devices = user.devices.map((d) => {
+          if (d.agent !== body.agent)
+            return d;
+          d.lastConnection = new Date();
+          return d;
+        });
+      } else {
+        user.devices.push(new Device({ip: ip, agent: body.agent, language: body.language, os: body.os}))
+      }
+      return this.userModel.findOneAndUpdate({_id: userId}, {devices: user.devices}, {new: true}).exec();
+    }
 
+    public cleanDevices(userId: string) {
+      return this.userModel.findOneAndUpdate({_id: userId}, {devices: []}, {new: true}).exec();
     }
 
     public findFavour(ownerId: string) {

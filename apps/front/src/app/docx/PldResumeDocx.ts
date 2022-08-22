@@ -101,7 +101,7 @@ export class PldResumeDocx {
        title = member.email;
     }
 
-    const userDod = this.dod.filter((dod) => dod.estimatedWorkTime.some((wt) => wt.users.some((user) => user === member._id)));
+    const userDod = this.dod.filter((dod) => dod.estimatedWorkTime.some((wt) => wt.users.some((user) => user._id === member._id)));
     const dodDones = userDod.filter((dod) => {
       return dod.status === 'En cours';
     });
