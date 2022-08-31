@@ -222,24 +222,21 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
                     </SideNavLink>
                     <SideNavLink
                       large
+                      onClick={() => this.props.onRedirectUrl(`/faq`)}
                       renderIcon={Legend}>
                       FAQ
                     </SideNavLink>
                     <SideNavDivider/>
-
                     <SideNavMenu title="Organisation" large>
                       <UserContext.Consumer>
                         {(auth) => this.showFavoursOrg(auth, onClickSideNavExpand)}
                       </UserContext.Consumer>
                     </SideNavMenu>
-
                     <SideNavMenu title="PLD" large>
                       <UserContext.Consumer>
                         {(auth) => this.showFavoursPld(auth, onClickSideNavExpand)}
                       </UserContext.Consumer>
                     </SideNavMenu>
-
-
 {/*                    <SideNavLink
                       large
                       renderIcon={Events}>

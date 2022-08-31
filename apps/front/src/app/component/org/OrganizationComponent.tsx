@@ -26,8 +26,14 @@ import {OrgHistoryModal} from "../../modal/org/OrgHistoryModal";
 
 import {RequiredLabel} from "../../util/Label";
 
-import {Organization, Pld, FavourType} from "@pld/shared";
+import {Organization, Pld, FavourType, Calendar} from "@pld/shared";
 import {formatLongDate, formatShortDate} from "@pld/utils";
+import {CalendarApiController} from "../../controller/CalendarApiController";
+import {toast} from "react-toastify";
+import {CircularProgress} from "../utils/CircularProgress";
+
+import FullCalendar from '@fullcalendar/react' // must go before plugins
+import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
 
 export type OrganizationComponentProps = {
   orgId?: string;
@@ -37,6 +43,7 @@ export type OrganizationComponentProps = {
 export type OrganizationComponentState = {
   org?: Organization;
   pld: FieldData<Pld[]>;
+  calendars: FieldData<Calendar[]>;
   openHistoryDialog: boolean;
 } & PageState;
 
@@ -52,6 +59,10 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
       org: undefined,
       loading: false,
       navigateUrl: undefined,
+      calendars: {
+        value: [],
+        loading: true,
+      },
       pld: {
         value: [],
         loading: true,
@@ -60,10 +71,31 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     this.onClickCreateDocument = this.onClickCreateDocument.bind(this);
     this.onClickCreatePld = this.onClickCreatePld.bind(this);
     this.onClickCreateTemplate = this.onClickCreateTemplate.bind(this);
+    this.onClickCreateCalendar = this.onClickCreateCalendar.bind(this);
   }
 
   override componentDidMount() {
     this.loadOrg();
+    this.loadCalendars();
+  }
+
+  private loadCalendars() {
+    if (this.props.orgId === undefined)
+      return;
+    CalendarApiController.getCalendars(this.props.userContext.accessToken, this.props.orgId, (calendar, error) => {
+      if (!error) {
+        this.setState({
+          calendars: {
+            value: calendar,
+            loading: false,
+          }
+        })
+      } else {
+        toast('Une erreur est survenue lors du chargement des calendriers !', {type: 'error', icon: '❌'});
+        console.log(error);
+        this.setState({calendars: {loading: false, value: []}})
+      }
+    });
   }
 
   private loadOrg() {
@@ -113,6 +145,12 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     })
   }
 
+  private onClickCreateCalendar() {
+    this.setState({
+      navigateUrl: 'calendar/new'
+    });
+  }
+
   private showModals() {
     if (this.state.org === undefined) {
       return undefined;
@@ -130,7 +168,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
         <Stack gap={6}>
           <h4>Informations</h4>
           <TextArea rows={4} id={"description"} labelText={"Description"} value={this.state.org.description}/>
-          <NumberInput id={"versionShifting"} value={this.state.org.versionShifting} label={<RequiredLabel message={"Versioning"}/>}/>
+          <NumberInput iconDescription={""} id={"versionShifting"} value={this.state.org.versionShifting} label={<RequiredLabel message={"Versioning"}/>}/>
           <Button renderIcon={Renew} iconDescription={"Update"}>Mettre à jour</Button>
         </Stack>
       </Form>
@@ -162,8 +200,8 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     return (
       <Tile style={{marginTop: 20}}>
         <Stack>
-          <h4>Membres</h4>
-          {[...this.state.org.members, this.state.org.owner].map((user) => <p>{user.email}</p>)}
+          <h4>Membres :</h4>
+          {[...this.state.org.members, this.state.org.owner].map((user, index) => <p key={index}>{user.email}</p>)}
         </Stack>
       </Tile>
     )
@@ -199,6 +237,26 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
         })}
       </Grid>
     )
+  }
+
+  private showCalendars() {
+    if (this.state.calendars.loading) {
+      return <CircularProgress/>
+    }
+    return this.state.calendars.value.map((calendar) => {
+      return (
+        <ClickableTile>
+          <p>{calendar.name}</p>
+          <FullCalendar
+            aspectRatio={4}
+
+            locale={'fr'}
+            plugins={[ dayGridPlugin ]}
+            initialView="dayGridMonth"
+          />
+        </ClickableTile>
+      )
+    })
   }
 
   private showCharts() {
@@ -257,13 +315,15 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
               </Stack>
             </Column>
           </Grid>
-          <h2 style={{marginTop: 10}}>Pld <Button kind={"ghost"} onClick={this.onClickCreatePld} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
+          <h2 style={{marginTop: 10}}>Pld <Button kind={"ghost"} onClick={this.onClickCreatePld} hasIconOnly renderIcon={Add} iconDescription={"create org"}/></h2>
           {this.showPld()}
+          <h2 style={{marginTop: 10}}>Calendriers <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create calendar"}/></h2>
+          {this.showCalendars()}
          {/* <h2>Templates <Button kind={"ghost"} onClick={this.onClickCreateTemplate} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
-          <h2>Documents <Button kind={"ghost"} onClick={this.onClickCreateDocument} hasIconOnly renderIcon={Add} iconDescription={"Créer/Ajouter un document"}/></h2>
-*/}       <ButtonSet style={{marginTop: 10, marginBottom: '20px'}}>
+          <h2>Documents <Button kind={"ghost"} onClick={this.onClickCreateDocument} hasIconOnly renderIcon={Add} iconDescription={"Créer/Ajouter un document"}/></h2>*/}
+          <ButtonSet style={{marginTop: 10, marginBottom: '20px'}}>
             <Button onClick={() => this.props.navigate('manage')} renderIcon={Settings} iconDescription={"Settings"}>Gérer</Button>
-            <Button onClick={() => this.setState({openHistoryDialog: true})} renderIcon={RecentlyViewed} iconDescription={"History"}>Historique</Button>
+            <Button disabled onClick={() => this.setState({openHistoryDialog: true})} renderIcon={RecentlyViewed} iconDescription={"History"}>Historique</Button>
           </ButtonSet>
         </Stack>
       </>

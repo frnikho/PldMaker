@@ -5,9 +5,10 @@ import {MongooseModule} from "@nestjs/mongoose";
 import {Organization, OrganizationSchema} from "./organization.schema";
 import {UserModule} from "../user/user.module";
 import {OrganizationListener} from "./organization.listener";
+import { CalendarModule } from './calendar/calendar.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{name: Organization.name, schema: OrganizationSchema}]), UserModule],
+  imports: [MongooseModule.forFeature([{name: Organization.name, schema: OrganizationSchema}]), UserModule, CalendarModule],
   controllers: [OrganizationController],
   providers: [OrganizationService, OrganizationListener],
   exports: [OrganizationService]

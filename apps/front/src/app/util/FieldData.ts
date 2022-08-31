@@ -4,6 +4,12 @@ export type FieldData<T> = {
   loading?: boolean;
 }
 
+export type FieldError = {
+  error?: string;
+  id?: string;
+  loading?: boolean;
+}
+
 export const onEnter = (event: any, func: any) => {
   if (event.key === 'Enter') {
     func();

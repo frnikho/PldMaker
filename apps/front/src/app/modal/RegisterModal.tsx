@@ -85,7 +85,7 @@ export class RegisterModal extends ReactFormValidation<RegisterModalProps, Regis
           return;
         this.onClickRegister(this.props.userContext);
       }}
-      modalHeading={<h3>Créer un compte</h3>}
+      modalHeading={'Créer un compte'}
       shouldSubmitOnEnter={true}
       primaryButtonText={this.state.loading ? <InlineLoading
         description={"Chargement ..."}

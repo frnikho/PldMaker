@@ -23,7 +23,7 @@ services:
     depends_on:
       - mongo
   mongo:
-    image: mongo
+    image: mongo:4.4.16
     restart: always
     container_name: mongodb
     ports:

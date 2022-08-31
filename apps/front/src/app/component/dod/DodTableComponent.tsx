@@ -273,11 +273,16 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                 >
                   <TableToolbarAction onClick={() => {
                     //TODO import data
+
                   }}>
                     Importer
                   </TableToolbarAction>
                   <TableToolbarAction onClick={() => {
-                    //TODO export data
+                    const a = document.createElement("a");
+                    const file = new Blob([JSON.stringify(this.props.dod)], {type: "text/plain"});
+                    a.href = URL.createObjectURL(file);
+                    a.download = 'data.bak';
+                    a.click();
                   }}>
                     Exporter
                   </TableToolbarAction>

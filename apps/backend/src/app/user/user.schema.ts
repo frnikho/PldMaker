@@ -51,7 +51,7 @@ export class User extends DatedObjectSchema {
   @Prop({required: false})
   language?: string;
 
-  @Prop({required: true, enum: Gender})
+  @Prop({required: false, enum: Gender})
   gender?: string;
 
 }

@@ -229,7 +229,7 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
             </Tile>
           </Column>
         </Grid>
-        <Button style={{marginTop: '20px'}} onClick={this.onClickCreateOrg} disabled={this.state.loadingCreation || this.state.loadingAddingUser}>
+        <Button renderIcon={Add} iconDescription={"Create"} style={{marginTop: '20px'}} onClick={this.onClickCreateOrg} disabled={this.state.loadingCreation || this.state.loadingAddingUser}>
           {this.state.loadingCreation ? <InlineLoading description={"Chargement..."}/> : "Créer l'organisation"}
         </Button>
       </Stack>

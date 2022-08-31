@@ -29,11 +29,9 @@ class OrganizationPage extends React.Component<OrganizationPageProps, Organizati
 
   private showState(authContext: UserContextProps) {
     if (authContext.isLogged === LoginState.not_logged) {
-      return (<h1>Not logged</h1>)
+      return <h1>Not logged</h1>
     } else if (authContext.isLogged === LoginState.logged) {
-      return (
-        <OrganizationComponent onError={this.onError} orgId={this.props.params['id']}  userContext={authContext}/>
-      )
+      return <OrganizationComponent onError={this.onError} orgId={this.props.params['id']}  userContext={authContext}/>
     }
     return (
       <SkeletonPlaceholder style={{height: '20px', width: '20%'}}/>

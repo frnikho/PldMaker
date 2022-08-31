@@ -14,6 +14,7 @@ import {ViewMode} from "./component/template/NewTemplateComponent";
 import ManageOrganizationPage from "./page/organization/ManageOrganizationPage";
 import {DevicePage} from "./page/DevicePage";
 import {FAQPage} from "./page/FAQPage";
+import NewCalendarPage from "./page/organization/calendar/NewCalendarPage";
 
 export function App() {
 
@@ -44,6 +45,10 @@ export function App() {
             <Route path={":id/manage"} element={<ManageOrganizationPage/>}/>
             <Route path={":id/pld/new"} element={<NewPldPage/>}/>
             <Route path={":id/pld/:pldId"} element={<PldPage/>}/>
+            <Route path={":id/calendar"}>
+              <Route index element={<Navigate to={"new"}/>}/>
+              <Route path={"new"} element={<NewCalendarPage/>}/>
+            </Route>
             <Route path={":id/template"}>
               <Route index element={<Navigate to={"new"}/>}/>
               <Route path={"new"} element={<NewTemplatePage mode={ViewMode.New}/>}/>

@@ -73,7 +73,7 @@ export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalS
         open={this.props.open}
         onRequestClose={this.props.onDismiss}
         onRequestSubmit={() => this.onClickCreate(this.props.userContext)}
-        modalHeading={<h3>Se connecter</h3>}
+        modalHeading={'Se connecter'}
         shouldSubmitOnEnter={true}
         primaryButtonText={this.state.loading ? <InlineLoading
           description={"Chargement ..."}

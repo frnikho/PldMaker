@@ -31,6 +31,10 @@ export * from './lib/organization/ManageMembersOrganizationBody';
 export * from './lib/organization/OrgHistory';
 export * from './lib/organization/UpdateOrganizationBody';
 
+export * from './lib/organization/calendar/Calendar'
+export * from './lib/organization/calendar/CalendarMember'
+export * from './lib/organization/calendar/CalendarEvent'
+
 export * from './lib/template/TemplateBody';
 export * from './lib/template/TemplateType';
 
