@@ -79,6 +79,7 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
         toast(error.message, {type: 'error'});
       }
       if (org !== null) {
+        console.log(org);
         this.setState({
           org,
         })
@@ -152,6 +153,9 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
   }
 
   private isOwner(): boolean {
+    console.log(this.state.org?.owner);
+    console.log(this.props.auth.user?._id);
+    console.log(this.props.auth.user?._id === this.state.org?.owner);
     return this.state.org?.owner ._id === this.props.auth.user?._id;
   }
 

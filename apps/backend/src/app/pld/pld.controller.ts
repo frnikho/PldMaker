@@ -1,8 +1,10 @@
 import {Body, Controller, Get, Param, Post, Request} from '@nestjs/common';
 import {PldService} from "./pld.service";
-import {ObjectIDPipe} from "../ObjectID.pipe";
-import {PldOrgCreateBody, PldOrgFindsBody, CreatePldRevisionBody, PldUpdateBody} from "@pld/shared";
+import {ObjectIDPipe} from "../utility/ObjectID.pipe";
+import { PldOrgCreateBody, PldOrgFindsBody, CreatePldRevisionBody, PldUpdateBody, Organization, Pld } from "@pld/shared";
 import {EventEmitter2} from "@nestjs/event-emitter";
+import { OrganizationPipe } from "../organization/organization.pipe";
+import { PldPipe } from "./pld.pipe";
 
 @Controller('pld')
 export class PldController {
@@ -10,8 +12,8 @@ export class PldController {
   constructor(private pldService: PldService, private eventEmitter: EventEmitter2) {}
 
   @Get('organization/find/:orgId')
-  public async getPldOrganization(@Request() req, @Param('orgId', new ObjectIDPipe()) orgId: string) {
-    return this.pldService.findByOrganizationOwner([orgId]);
+  public async getPldOrganization(@Request() req, @Param('orgId', OrganizationPipe) org: Organization) {
+    return this.pldService.findByOrganizationOwner([org._id]);
   }
 
   @Get('me')
@@ -20,8 +22,8 @@ export class PldController {
   }
 
   @Get('find/:pldId')
-  public async getPldById(@Request() req, @Param('pldId', new ObjectIDPipe()) pldId: string) {
-    return this.pldService.find(pldId);
+  public async getPldById(@Request() req, @Param('pldId', PldPipe) pld: Pld) {
+    return pld;
   }
 
   @Post('finds')

@@ -8,6 +8,7 @@ export type User = {
   firstname?: string;
   lastname?: string;
   domain?: string[];
+  roles?: string[];
   devices: Device[];
 } & DatedObject
 

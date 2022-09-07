@@ -11,7 +11,7 @@ export class OrganizationListener {
 
   @OnEvent(OrgEvents.onMemberAdded)
   public onMemberAdded(event: OrgAddMemberEvent) {
-    this.orgService.addHistory(event.orgId, {
+    return this.orgService.addHistory(event.orgId, {
       owner: event.addedBy,
       action: OrgHistoryAction.ADD_MEMBER,
       member: event.newMemberId,
@@ -21,7 +21,7 @@ export class OrganizationListener {
 
   @OnEvent(OrgEvents.onMemberRemoved)
   public onMemberRemoved(event: OrgRemoveMemberEvent) {
-    this.orgService.addHistory(event.orgId, {
+    return this.orgService.addHistory(event.orgId, {
       owner: event.removedBy,
       action: OrgHistoryAction.REMOVE_MEMBER,
       member: event.removedMemberId,

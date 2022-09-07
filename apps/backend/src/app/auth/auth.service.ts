@@ -2,8 +2,7 @@ import {BadRequestException, Injectable, UnauthorizedException} from '@nestjs/co
 import {UserService} from "../user/user.service";
 import * as bcrypt from 'bcrypt';
 import {JwtService} from "@nestjs/jwt";
-import {UserDocument} from "../user/user.schema";
-import {RegisterBody, RegisterResponse} from "@pld/shared";
+import { RegisterBody, RegisterResponse, User } from "@pld/shared";
 import {ConfigService} from "@nestjs/config";
 import {LANGUAGE_CONFIG_LABEL, LanguageConfig} from "../config/language";
 
@@ -26,7 +25,7 @@ export class AuthService {
     throw new UnauthorizedException('Invalid password');
   }
 
-  public login(user: UserDocument) {
+  public login(user: User) {
     const payload = {email: user.email, sub: user._id.valueOf()};
     return {
       access_token: this.jwtService.sign(JSON.stringify(payload))
@@ -39,7 +38,8 @@ export class AuthService {
       throw new BadRequestException(this.config.get<LanguageConfig>(LANGUAGE_CONFIG_LABEL).auth.userAlreadyRegistered);
     }
     const hashedPassword = await bcrypt.hash(body.password, 10);
-    const createdUser: UserDocument = await this.usersService.create({
+    const createdUser = await this.usersService.create({
+      _id: '',
       email: body.email,
       firstname: body.firstname,
       lastname: body.lastname,
@@ -52,6 +52,7 @@ export class AuthService {
     return {
       accessToken: this.login(createdUser).access_token,
       user: {
+        roles: [],
         email: createdUser.email,
         created_date: createdUser.created_date,
         updated_date: createdUser.updated_date,

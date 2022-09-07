@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import {MongooseModule, MongooseModuleFactoryOptions} from "@nestjs/mongoose";
 import language from "./config/language";
@@ -18,6 +16,7 @@ import { PldModule } from './pld/pld.module';
 import { TemplateModule } from './template/template.module';
 import { GatewayModule } from './socket/gateway.module';
 import {EventEmitterModule} from "@nestjs/event-emitter";
+import { DocumentModule } from './document/document.module';
 
 @Module({
   imports: [
@@ -44,9 +43,10 @@ import {EventEmitterModule} from "@nestjs/event-emitter";
     PldModule,
     TemplateModule,
     GatewayModule,
+    DocumentModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, {
+  controllers: [],
+  providers: [{
     provide: 'APP_GUARD',
     useClass: JwtAuthGuard,
   }],

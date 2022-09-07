@@ -4,6 +4,7 @@ import {Pld} from "../../pld/Pld";
 import {Length} from "class-validator";
 
 export class Calendar {
+  _id: string;
   name: string;
   description: string;
   deadline?: Deadline;
@@ -12,7 +13,8 @@ export class Calendar {
   events: CalendarEvent;
   linkedPld: Pld[];
 
-  constructor(name: string, description: string, deadline: Deadline, createdDate: Date, updatedDate: Date, events: CalendarEvent, linkedPld: Pld[]) {
+  constructor(_id: string, name: string, description: string, deadline: Deadline, createdDate: Date, updatedDate: Date, events: CalendarEvent, linkedPld: Pld[]) {
+    this._id = _id;
     this.name = name;
     this.linkedPld = linkedPld;
     this.description = description;

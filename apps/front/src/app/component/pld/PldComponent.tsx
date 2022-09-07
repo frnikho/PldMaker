@@ -445,7 +445,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
             this.setState({
               openAddRevisionModal: false,
             })
-            toast('Révision ajoutée avec succés 👍 !', {type: 'success'})
+            toast('Révision ajoutée ', {type: 'success', icon: '👍'})
             this.loadPld();
           }}/>
         <ChangePldTypeModal

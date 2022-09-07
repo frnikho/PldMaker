@@ -31,9 +31,8 @@ export class OrganizationApiController {
     });
   }
 
-
   public static findOrganizationById(accessToken: string, orgId: string, callback: CallbackOrganization) {
-    api.get<Organization | null>(`organization/find/id/${orgId}`, authorize(accessToken)).then((response) => {
+    api.get<Organization | null>(`organization/${orgId}`, authorize(accessToken)).then((response) => {
       callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       callback(null, err.response?.data ?? {message: ['Test abc'], type: ErrorType.NO_USER_FOUND_EMAIL});
@@ -49,7 +48,7 @@ export class OrganizationApiController {
   }
 
   public static updateOrg(accessToken: string, body: UpdateOrganizationBody, callback: CallbackOrganization) {
-    api.post<Organization>(`organization/update`, body, authorize(accessToken)).then((response) => {
+    api.patch<Organization>(`organization/${body.orgId}/update`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch(() => {
       return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});

@@ -28,3 +28,11 @@ export class InviteUserOrgBody {
   }
 
 }
+
+export class RemoveUserOrgBody {
+  public memberId: string;
+
+  constructor(memberId: string) {
+    this.memberId = memberId;
+  }
+}

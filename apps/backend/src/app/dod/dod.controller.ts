@@ -1,11 +1,17 @@
 import {Body, Controller, Delete, Get, Param, Post, Request} from '@nestjs/common';
-import {DodCreateBody, DodFindPldBody} from "@pld/shared";
+import { Dod, DodCreateBody, DodFindPldBody, Pld } from "@pld/shared";
 import {DodService} from "./dod.service";
-import {ObjectIDPipe} from "../ObjectID.pipe";
 import {UpdateDodStatusBody} from "@pld/shared";
 import {DodStatus} from "@pld/shared";
 import {EventEmitter2} from "@nestjs/event-emitter";
 import {PldDocument} from "../pld/pld.schema";
+import { PldPipe } from "../pld/pld.pipe";
+import { DodPipe } from "./dod.pipe";
+
+/**
+ * @author Nicolas SANS
+ * @date 06/09/2022
+ */
 
 @Controller('dod')
 export class DodController {
@@ -20,19 +26,19 @@ export class DodController {
   }
 
   @Get('find/pld/:pldId')
-  public async findByPld(@Request() req, @Param('pldId', new ObjectIDPipe()) pldId: string) {
-    return this.dodService.findByPldId([pldId]);
+  public async findByPld(@Request() req, @Param('pldId', PldPipe) pld: Pld) {
+    return this.dodService.findByPldId([pld._id]);
   }
 
   @Get('find/id/:id')
-  public async find(@Request() req, @Param('pldId', new ObjectIDPipe()) id: string) {
-    return this.dodService.find(id);
+  public async find(@Request() req, @Param('pldId', DodPipe) dod: Dod) {
+    return dod;
   }
 
   @Delete('delete/id/:id')
-  public async delete(@Request() req, @Param('id') id: string) {
-    const dod = await this.dodService.delete(id);
-    this.eventEmitter.emit('Dod:Update', (dod.pldOwner as PldDocument)._id);
+  public async delete(@Request() req, @Param('pldId', DodPipe) dod: Dod) {
+    dod = await this.dodService.delete(dod._id);
+    this.eventEmitter.emit('Dod:Update', (dod.pldOwner as any)._id);
     return dod;
   }
 
@@ -44,9 +50,9 @@ export class DodController {
   }
 
   @Post(':id/update')
-  public async updateDod(@Request() req, @Param('id') dodId: string, @Body() body: DodCreateBody) {
-    const dod = await this.dodService.update(req.user._id, dodId, body);
-    this.eventEmitter.emit('Dod:Update', (dod.pldOwner as PldDocument)._id);
+  public async updateDod(@Request() req, @Param('id', DodPipe) dod: Dod, @Body() body: DodCreateBody) {
+    dod = await this.dodService.update(req.user._id, dod._id, body);
+    this.eventEmitter.emit('Dod:Update', (dod.pldOwner as any)._id);
     return dod;
   }
 
@@ -54,5 +60,7 @@ export class DodController {
   public async getDod(@Request() req, @Body() body: DodFindPldBody) {
     return this.dodService.findByPldId(body.plds);
   }
+
+
 
 }

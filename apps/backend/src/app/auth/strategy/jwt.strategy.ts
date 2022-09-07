@@ -20,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.userService.find(payload.sub)
     if (user === null || user === undefined)
       throw new UnauthorizedException('Invalid user inside token !');
+    user._id = user._id.toString();
     return user;
   }
 }

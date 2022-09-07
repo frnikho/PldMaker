@@ -15,6 +15,8 @@ import ManageOrganizationPage from "./page/organization/ManageOrganizationPage";
 import {DevicePage} from "./page/DevicePage";
 import {FAQPage} from "./page/FAQPage";
 import NewCalendarPage from "./page/organization/calendar/NewCalendarPage";
+import CalendarPage from "./page/organization/calendar/CalendarPage";
+import EventPage from "./page/organization/calendar/event/EventPage";
 
 export function App() {
 
@@ -48,6 +50,10 @@ export function App() {
             <Route path={":id/calendar"}>
               <Route index element={<Navigate to={"new"}/>}/>
               <Route path={"new"} element={<NewCalendarPage/>}/>
+              <Route path={":calendarId"} element={<CalendarPage/>}/>
+              <Route path={":calendarId/event"}>
+                <Route path={":eventId"} element={<EventPage/>}/>
+              </Route>
             </Route>
             <Route path={":id/template"}>
               <Route index element={<Navigate to={"new"}/>}/>

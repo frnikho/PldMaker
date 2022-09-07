@@ -1,5 +1,5 @@
-import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
-import mongoose, {Document, ObjectId} from "mongoose";
+import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import mongoose, { Document, ObjectId } from "mongoose";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
 import {User} from "../user/user.schema";
 import {Organization} from "../organization/organization.schema";
@@ -46,7 +46,7 @@ export class PldHistory {
   @Prop({required: true, enum: PldHistoryAction})
   action: string;
 
-  @Prop({required: false, ref: User.name, type: mongoose.Schema.Types.ObjectId})
+  @Prop({required: false, ref: 'Dod', type: mongoose.Schema.Types.ObjectId})
   dod?: any;
 
   @Prop({required: false, default: undefined})
@@ -137,3 +137,8 @@ export class Pld extends DatedObjectSchema {
 }
 
 export const PldSchema = SchemaFactory.createForClass(Pld);
+
+export const PldDefinition: ModelDefinition = {
+  name: Pld.name,
+  schema: PldSchema,
+}

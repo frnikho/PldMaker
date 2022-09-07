@@ -1,10 +1,9 @@
-import { Organization } from "../organization/organization.schema";
 import { User } from "../user/user.schema";
 import { UserMock } from "./user.mock";
 
 export class OrganizationMock {
 
-    public static createOrg({name = 'EIP #1', description = 'Main eip org for epitech student', owner = UserMock.createUser({}), members = []}): Organization {
+    public static createOrg({name = 'EIP #1', description = 'Main eip org for epitech student', owner = UserMock.createUser({}), members = []}) {
       return {
         created_date: new Date(),
         updated_date: new Date(),

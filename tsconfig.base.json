@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@pld/editor": ["libs/editor/src/index.ts"],
       "@pld/shared": ["libs/shared/src/index.ts"],
       "@pld/utils": ["libs/utils/src/index.ts"]
     }

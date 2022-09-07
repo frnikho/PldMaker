@@ -1,62 +1,49 @@
-import {Body, Controller, Get, Param, Post, Request} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Request } from "@nestjs/common";
 import {OrganizationService} from "./organization.service";
-import {CreateOrganizationBody} from "@pld/shared";
+import { CreateOrganizationBody, Organization, RemoveUserOrgBody, UpdateOrganizationBody } from "@pld/shared";
 import {
   InviteUserOrgBody,
-  ManageMembersOrganizationBody
 } from "@pld/shared";
-import {UpdateOrganizationBody} from "@pld/shared";
-import {DeleteOrganizationBody} from "@pld/shared";
-import {ObjectIDPipe} from "../ObjectID.pipe";
-import {EventEmitter2} from "@nestjs/event-emitter";
+import { OrganizationPipe } from "./organization.pipe";
 
 @Controller('organization')
 export class OrganizationController {
 
-  constructor(private orgService: OrganizationService, private eventEmitter: EventEmitter2) {
+  constructor(private orgService: OrganizationService) {}
+
+  @Get()
+  public async get(@Request() req) {
+    return this.orgService.getUserOrg(req.user);
   }
 
   @Post('create')
-  public async create(@Request() req, @Body() orgBody: CreateOrganizationBody) {
-    return this.orgService.createByBody(orgBody, req.user._id);
+  public async create(@Request() req, @Body() body: CreateOrganizationBody) {
+    return this.orgService.createByBody(req.user, body);
   }
 
-  @Post('update')
-  public async update(@Request() req, @Body() body: UpdateOrganizationBody) {
-    this.eventEmitter.emit('Org:Update', body.orgId);
-    return this.orgService.updateByBody(req.user._id, body);
+  @Get(':orgId')
+  public async getOrg(@Request() req, @Param('orgId', OrganizationPipe) org: Organization) {
+    return this.orgService.getOrg(req.user, org);
   }
 
-  @Post('delete')
-  public async delete(@Request() req, @Body() body: DeleteOrganizationBody) {
-    return this.orgService.deleteByBody(req.user, body);
+  @Patch(':orgId/update')
+  public async update(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Body() body: UpdateOrganizationBody) {
+    return this.orgService.updateByBody(req.user, org, body);
   }
 
-  @Get(['', 'get'])
-  public async get(@Request() req) {
-    return this.orgService.findOrgsByAuthorAndMembers(req.user._id);
+  @Delete(':orgId/delete')
+  public async delete(@Request() req, @Param('orgId', OrganizationPipe) org: Organization) {
+    return this.orgService.deleteWithBody(req.user, org);
   }
 
-  @Get('find/id/:orgId')
-  public async getOrg(@Request() req, @Param('orgId', new ObjectIDPipe()) orgId: string) {
-    return this.orgService.find(orgId);
+  @Post(':orgId/invite')
+  public async addMember(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Body() orgBody: InviteUserOrgBody) {
+    return this.orgService.addMemberByEmail(req.user, org, orgBody);
   }
 
-  @Get('find/name/:orgName')
-  public async findOrgName(@Param('orgName') orgName: string) {
-    //TODO finish function controller
-  }
-
-  @Post('invite')
-  public async addMember(@Request() req, @Body() orgBody: InviteUserOrgBody) {
-    this.eventEmitter.emit('Org:Update', orgBody.orgId);
-    return this.orgService.addMembersByEmail(req.user._id, orgBody);
-  }
-
-  @Post('revoke')
-  public async removeMember(@Request() req, @Body() orgBody: ManageMembersOrganizationBody) {
-    this.eventEmitter.emit('Org:Update', orgBody.orgId);
-    return this.orgService.removeMembers(orgBody.orgId, req.user._id, orgBody.membersId);
+  @Post(':orgId/revoke')
+  public async removeMember(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Body() body: RemoveUserOrgBody) {
+    return this.orgService.removeMember(req.user, org, body);
   }
 
 }

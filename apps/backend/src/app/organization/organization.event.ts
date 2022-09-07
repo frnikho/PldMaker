@@ -23,4 +23,10 @@ export class OrgRemoveMemberEvent {
   orgId: string;
   removedMemberId: string;
   removedBy: string;
+
+  constructor(orgId: string, removedMemberId: string, removedBy: string) {
+    this.orgId = orgId;
+    this.removedMemberId = removedMemberId;
+    this.removedBy = removedBy;
+  }
 }

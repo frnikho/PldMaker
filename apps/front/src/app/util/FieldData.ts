@@ -4,6 +4,12 @@ export type FieldData<T> = {
   loading?: boolean;
 }
 
+export type Data<T> = {
+  value?: T;
+  error?: string;
+  loading?: boolean;
+}
+
 export type FieldError = {
   error?: string;
   id?: string;

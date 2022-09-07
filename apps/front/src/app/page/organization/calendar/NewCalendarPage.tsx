@@ -1,26 +1,18 @@
 import React from "react";
 import {LoginState, UserContext, UserContextProps} from "../../../context/UserContext";
-import {NewCalendarComponent} from "../../../component/org/calendar/NewCalendarComponent";
+import { NewCalendarComponent } from "../../../component/org/calendar/NewCalendarComponent";
 import {CircularProgress} from "../../../component/utils/CircularProgress";
 import {withParams} from "../../../util/Navigation";
 import {RouteMatch} from "react-router/lib/router";
 
-export type NewCalendarProps = {
 
-} & RouteMatch;
-
-export type NewCalendarState = {
-
-}
+export type NewCalendarProps = RouteMatch;
+export type NewCalendarState = unknown;
 
 export class NewCalendarPage extends React.Component<NewCalendarProps, NewCalendarState> {
 
   constructor(props: NewCalendarProps) {
     super(props);
-  }
-
-  override componentDidMount() {
-    console.log(this.props);
   }
 
   private showState(authContext: UserContextProps) {

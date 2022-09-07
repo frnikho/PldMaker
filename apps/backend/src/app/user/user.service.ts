@@ -1,142 +1,66 @@
 import {Injectable} from '@nestjs/common';
-import {Model, Query} from "mongoose";
-import {InjectModel} from "@nestjs/mongoose";
-import {User, UserDocument} from './user.schema';
-import {DeviceBody, AddFavourBody, FavourType, UpdateUserBody, Device} from "@pld/shared";
-import {Favour} from "./favour.schema";
+import { DeviceBody, AddFavourBody, UpdateUserBody, User } from "@pld/shared";
+import { UserHelper } from "./user.helper";
 
 @Injectable()
 export class UserService {
 
-    constructor(@InjectModel(User.name) private userModel: Model<User>, @InjectModel(Favour.name) private favourModel: Model<Favour>) {}
+    constructor(private userHelper: UserHelper) {}
 
-    public async create(user: User): Promise<UserDocument> {
-      const createdUser = await this.userModel.create(user);
-      await this.favourModel.create({owner: createdUser._id});
-      return createdUser;
+    public create(user: User) {
+      return this.userHelper.create(user);
     }
 
-    public async find(userObjectId: string): Promise<UserDocument | null> {
-      return await this.userModel.findOne({_id: userObjectId}).exec();
+    public find(userId: string) {
+      return this.userHelper.find(userId);
     }
 
-    public finds(userObjectId: string[]): Promise<UserDocument[] | null> {
-      return this.userModel.find({_id: {$in: userObjectId}}).exec();
+    public findUser(loggedUser: User, userFound: User) {
+      //TODO check loggedUser permission !
     }
 
-    public findByEmail(email: string): Promise<UserDocument | null> {
-      return this.userModel.findOne({email}).exec();
+    public finds(usersId: string[]) {
+      return this.userHelper.findMany(usersId);
     }
 
-    public findWithPassword({email = undefined}): Promise<UserDocument | null> {
-      return this.userModel.findOne({email}).select('+password').exec();
+    public findByEmail(email: string) {
+      return this.userHelper.findByEmail(email);
     }
 
-    public delete(userObjectId: string): Promise<UserDocument | null> {
-        return this.userModel.findOneAndDelete({_id: userObjectId}).exec();
+    public findWithPassword({email = undefined}) {
+      return this.userHelper.findByEmailWithPassword(email);
     }
 
-    public update(userObjectId: string, user: User): Promise<UserDocument | null> {
-        return this.userModel.findOneAndUpdate({_id: userObjectId}, user, {new: true}).exec();
+    public delete(user: User) {
+        return this.userHelper.delete(user)
     }
 
-    public updateByBody(userObjectId: string, userBody: UpdateUserBody): Promise<UserDocument | null> {
-      return this.userModel.findOneAndUpdate({_id: userObjectId}, userBody, {new: true}).exec();
+    public update(user: User) {
+      return this.userHelper.update(user);
     }
 
-    public async addDevices(userId: string, ip: string, body: DeviceBody) {
-      const user = await this.userModel.findOne({_id: userId});
-      if (user.devices.some((d) => d.agent === body.agent)) {
-        user.devices = user.devices.map((d) => {
-          if (d.agent !== body.agent)
-            return d;
-          d.lastConnection = new Date();
-          return d;
-        });
-      } else {
-        user.devices.push(new Device({ip: ip, agent: body.agent, language: body.language, os: body.os}))
-      }
-      return this.userModel.findOneAndUpdate({_id: userId}, {devices: user.devices}, {new: true}).exec();
+    public updateByBody(user: User, body: UpdateUserBody) {
+      return this.userHelper.updateWithBody(user, body);
     }
 
-    public cleanDevices(userId: string) {
-      return this.userModel.findOneAndUpdate({_id: userId}, {devices: []}, {new: true}).exec();
+    public async addDevices(user: User, ip: string, body: DeviceBody) {
+      return this.userHelper.addDevice(user, ip, body);
     }
 
-    public findFavour(ownerId: string) {
-      return this.favourModel.findOne({owner: ownerId})
-        .populate({
-          path: 'pld',
-          populate: [
-            {
-              path: 'owner',
-            },
-            {
-              path: 'manager'
-            }]
-        })
-        .populate({
-          path: 'org',
-          populate: [
-            {
-              path: 'owner'
-            },
-          ]
-        })
-        .exec();
+    public cleanDevices(user: User) {
+      return this.userHelper.cleanAllDevices(user);
     }
 
-    public addFavour(userId: string, body: AddFavourBody) {
-      let query: Query<Favour, any>;
-      if (body.type === FavourType.Organization) {
-        query = this.favourModel.findOneAndUpdate({owner: userId}, {$addToSet: {org : body.data_id}}, {new: true});
-      } else {
-        query = this.favourModel.findOneAndUpdate({owner: userId}, {$addToSet: {pld: body.data_id}}, {new: true});
-      }
-      return query
-        .populate({
-          path: 'pld',
-          populate: [
-            {
-              path: 'owner',
-            },
-            {
-              path: 'manager'
-            }]
-        })
-        .populate({
-          path: 'org',
-          populate: [
-            {
-              path: 'owner'
-            },
-          ]
-        })
-        .exec();
+    public findFavour(user: User) {
+     return this.userHelper.findFavour(user);
     }
 
-    public removeFavour(userId: string, favourId: string) {
-      console.log(favourId);
-      return this.favourModel.findOneAndUpdate({owner: userId}, {$pull: {org: favourId, pld: favourId}}, {new: true})
-        .populate({
-          path: 'pld',
-          populate: [
-            {
-              path: 'owner',
-            },
-            {
-              path: 'manager'
-            }]
-        })
-        .populate({
-          path: 'org',
-          populate: [
-            {
-              path: 'owner'
-            },
-          ]
-        })
-        .exec();
+    public addFavour(user: User, body: AddFavourBody) {
+      return this.userHelper.addFavourWithBody(user, body);
+    }
+
+    public removeFavour(user: User, favourId: string) {
+     return this.userHelper.removeFavour(user, favourId);
     }
 
 }

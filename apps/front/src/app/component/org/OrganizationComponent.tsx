@@ -2,6 +2,7 @@ import React from "react";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {ApiError} from "../../util/Api";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -33,7 +34,8 @@ import {toast} from "react-toastify";
 import {CircularProgress} from "../utils/CircularProgress";
 
 import FullCalendar from '@fullcalendar/react' // must go before plugins
-import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
+import dayGridPlugin from '@fullcalendar/daygrid'
+import { Editor } from "../../util/editor";
 
 export type OrganizationComponentProps = {
   orgId?: string;
@@ -245,11 +247,12 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     }
     return this.state.calendars.value.map((calendar) => {
       return (
-        <ClickableTile>
-          <p>{calendar.name}</p>
+        <ClickableTile onClick={() => this.setState({navigateUrl: `calendar/${calendar._id}`})}>
+          <h4>{calendar.name}</h4>
+          <p>{calendar.description}</p>
           <FullCalendar
             aspectRatio={4}
-
+            headerToolbar={{start: '', right: '', end: '', center: '', left: ''}}
             locale={'fr'}
             plugins={[ dayGridPlugin ]}
             initialView="dayGridMonth"
@@ -257,6 +260,13 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
         </ClickableTile>
       )
     })
+  }
+
+  private showDocuments() {
+    return (
+      <>
+      </>
+    )
   }
 
   private showCharts() {
@@ -317,6 +327,8 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
           </Grid>
           <h2 style={{marginTop: 10}}>Pld <Button kind={"ghost"} onClick={this.onClickCreatePld} hasIconOnly renderIcon={Add} iconDescription={"create org"}/></h2>
           {this.showPld()}
+          <h2 style={{marginTop: 10}}>Documents <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create document"}/></h2>
+          {this.showDocuments()}
           <h2 style={{marginTop: 10}}>Calendriers <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create calendar"}/></h2>
           {this.showCalendars()}
          {/* <h2>Templates <Button kind={"ghost"} onClick={this.onClickCreateTemplate} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
@@ -325,6 +337,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
             <Button onClick={() => this.props.navigate('manage')} renderIcon={Settings} iconDescription={"Settings"}>Gérer</Button>
             <Button disabled onClick={() => this.setState({openHistoryDialog: true})} renderIcon={RecentlyViewed} iconDescription={"History"}>Historique</Button>
           </ButtonSet>
+          <Editor onSave={(content) => console.log('saved !', content)}/>
         </Stack>
       </>
     );

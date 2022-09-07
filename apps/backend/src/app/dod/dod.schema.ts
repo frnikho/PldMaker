@@ -1,5 +1,5 @@
 import {DatedObjectSchema} from "../utility/datted_object.utility";
-import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
+import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, {Document} from "mongoose";
 import {User} from "../user/user.schema";
 import {Pld} from "../pld/pld.schema";
@@ -89,3 +89,8 @@ export class Dod extends DatedObjectSchema {
 }
 
 export const DodSchema = SchemaFactory.createForClass(Dod);
+
+export const DodDefinition: ModelDefinition = {
+  name: Dod.name,
+  schema: DodSchema,
+}

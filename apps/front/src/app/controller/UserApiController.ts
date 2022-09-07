@@ -26,7 +26,7 @@ export class UserApiController {
   }
 
   public static findUserById(userId: string, callback: CallbackUser) {
-    api.get<User>(`user/find/id/${userId}`).then((response: AxiosResponse<User>) => {
+    api.get<User>(`user/${userId}`).then((response: AxiosResponse<User>) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       return callback(null, err.response?.data)

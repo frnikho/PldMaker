@@ -1,56 +1,93 @@
 import {Body, Controller, Get, Param, Patch, Post, Request} from '@nestjs/common';
-import {UpdateUserBody, AddFavourBody, RemoveFavourBody, DeviceBody} from "@pld/shared";
-import {UserService} from "./user.service";
-import {UserDocument} from "./user.schema";
+import { UpdateUserBody, AddFavourBody, User } from "@pld/shared";
+import { UserService } from "./user.service";
+import { UserPipe } from "./user.pipe";
+import { ObjectIDPipe } from "../utility/ObjectID.pipe";
 
+/**
+ * @author Nicolas SANS
+ * @date 06/09/2022
+ */
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Get(['', 'get'])
-  public async find(@Request() req): Promise<UserDocument> {
-    return this.userService.find(req.user._id);
+  /**
+   * Get logged User information
+   * @param req NestJS Request
+   */
+  @Get([''])
+  public async get(@Request() req) {
+    return req.user;
   }
 
+  /**
+   * Update user information
+   * @param req NestJS Request
+   * @param updateBody UpdateUserBody
+   */
   @Patch('update')
   public async update(@Request() req, @Body() updateBody: UpdateUserBody) {
-    return this.userService.updateByBody(req.user._id, updateBody);
+    return this.userService.updateByBody(req.user, updateBody);
   }
 
+  /**
+   * Remove all recent device of logged user
+   * @param req NestJS Request
+   */
   @Post('devices/clean')
   public async removeAllDevice(@Request() req) {
-    return this.userService.cleanDevices(req.user._id);
+    return this.userService.cleanDevices(req.user);
   }
 
-
+  /**
+   * Get logged User favours
+   * @param req NestJS Request
+   */
   @Get('favours')
   public async getFavour(@Request() req) {
-    return this.userService.findFavour(req.user._id);
+    return this.userService.findFavour(req.user);
   }
 
+  /**
+   * Add favour for logged user
+   * @param req NestJS Request
+   * @param body AddFavourBody
+   */
   @Post('favours/add')
   public async addFavour(@Request() req, @Body() body: AddFavourBody) {
-    return this.userService.addFavour(req.user._id, body);
+    return this.userService.addFavour(req.user, body);
   }
 
-  @Post('favours/remove')
-  public async removeFavour(@Request() req, @Body() body: RemoveFavourBody) {
-    return this.userService.removeFavour(req.user._id, body.favourId);
+  /**
+   * Remove favour for logged user
+   * @param req NestJS Request
+   * @param favourId favourId
+   */
+  @Post('favours/:favourId/remove')
+  public async removeFavour(@Request() req, @Param('favourId', ObjectIDPipe) favourId: string) {
+    return this.userService.removeFavour(req.user, favourId);
   }
 
-  @Get('find/id/:userId')
-  public async findUser(@Param('userId') userId: string) {
-    return this.userService.find(userId);
+  /**
+   * Find a user by Id
+   * //TODO Check user permission to get user info
+   * @param req NestJS Request
+   * @param user User
+   */
+  @Get(':userId')
+  public async findUser(@Request() req, @Param('userId', UserPipe) user: User) {
+    return this.userService.findUser(req.user, user);
   }
 
+  /**
+   * Find a user by email
+   * //TODO Check user permission to get user info
+   * @param email Email string
+   */
   @Get('find/email/:email')
   public async findUserByEmail(@Param('email') email: string) {
     return this.userService.findByEmail(email);
-  }
-
-  @Get('gets')
-  public async findUsers() {
-    return null; //Todo check if get can have a body
   }
 
 }

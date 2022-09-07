@@ -1,4 +1,4 @@
-import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
+import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 import {Pld} from "../pld/pld.schema";
 import {Organization} from "../organization/organization.schema";
@@ -17,4 +17,9 @@ export class Favour {
   owner: User;
 }
 
-export const FavourSchema = SchemaFactory.createForClass(Favour)
+export const FavourSchema = SchemaFactory.createForClass(Favour);
+
+export const FavourDefinition: ModelDefinition = {
+  name: Favour.name,
+  schema: FavourSchema,
+}

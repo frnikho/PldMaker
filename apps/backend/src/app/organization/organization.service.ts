@@ -1,114 +1,74 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
-import {InjectModel} from "@nestjs/mongoose";
-import {NewOrgHistory, Organization, OrganizationDocument} from "./organization.schema";
-import {Model, Query} from "mongoose";
-import {CreateOrganizationBody, UpdateOrganizationBody, DeleteOrganizationBody, InviteUserOrgBody} from "@pld/shared";
-import {UserDocument} from "../user/user.schema";
-import {UserService} from "../user/user.service";
-import {EventEmitter2} from "@nestjs/event-emitter";
-import {OrgAddMemberEvent, OrgEvents} from "./organization.event";
+import {Injectable} from '@nestjs/common';
+import { NewOrgHistory, OrganizationDocument } from "./organization.schema";
+import { CreateOrganizationBody, InviteUserOrgBody, User, RemoveUserOrgBody, UpdateOrganizationBody } from "@pld/shared";
+import { OrganizationHelper } from "./organization.helper";
+import { Organization } from "@pld/shared";
+import { CheckOrgPerm } from "./organization.util";
 
 export type MemberUpdateObjects = string[];
 
 @Injectable()
 export class OrganizationService {
 
-  constructor(@InjectModel(Organization.name) private organizationModel: Model<Organization>, private userService: UserService, private eventEmitter: EventEmitter2) {}
+  constructor(private orgHelper: OrganizationHelper) {}
 
-  private populateAndExecute(query: Query<any, any>) {
-    return query.populate(['owner', 'members'])
-      .populate({
-        path: 'history',
-        populate: [{
-          path: 'owner'
-        }, {
-          path: 'member'
-        }]
-      }).exec();
+  public find(orgId: string) {
+    return this.orgHelper.find(orgId);
   }
 
-  public find(orgObjectId: string): Promise<OrganizationDocument | null> {
-    return this.populateAndExecute(this.organizationModel.findOne({_id: orgObjectId}));
+  public createByBody(user: User, org: CreateOrganizationBody) {
+    return this.orgHelper.createOrgWithBody(user, org);
   }
 
-  public createByBody(org: CreateOrganizationBody, ownerId: string): Promise<OrganizationDocument | null> {
-    return this.organizationModel.create({
-      name: org.name,
-      description: org.description,
-      members: [],
-      owner: ownerId,
-      versionShifting: org.versionShifting,
-    });
+  public create(user: User, org: Organization) {
+    return this.orgHelper.createOrg(user, org);
   }
 
-  public create(org: Organization): Promise<OrganizationDocument> {
-    return this.organizationModel.create(org);
+/*  public async delete(ownerId: string, orgObjectId: string) {
+    /!*return this.organizationModel.findOneAndDelete({_id: orgObjectId, owner: ownerId})
+      .exec();*!/
+  }*/
+
+  @CheckOrgPerm({role: 'owner'})
+  public async deleteWithBody(user: User, org: Organization) {
+    return this.orgHelper.deleteOrgWithBody(user, org);
   }
 
-  public async delete(ownerId: string, orgObjectId: string): Promise<OrganizationDocument | null> {
-    return this.organizationModel.findOneAndDelete({_id: orgObjectId, owner: ownerId})
-      .exec();
+  public update(user: User, org: Organization) {
+    //return this.orgHelper.update(user, org);
   }
 
-  public async deleteByBody(owner: string | UserDocument, body: DeleteOrganizationBody): Promise<OrganizationDocument | null> {
-    return this.organizationModel.findOneAndDelete({_id: body.orgId, owner}).exec();
+  @CheckOrgPerm({role: 'owner'})
+  public updateByBody(user: User, org: Organization, body: UpdateOrganizationBody) {
+    return this.orgHelper.updateWithBody(user, org, body);
   }
 
-  public update(orgObjectId: string, ownerId: string, org: Organization): Promise<OrganizationDocument | null> {
-    return this.organizationModel.findOneAndUpdate({_id: orgObjectId, owner: ownerId}, org, {new: true})
-      .populate(['owner', 'members'])
-      .exec();
+  public getUserOrg(user: User) {
+   return this.orgHelper.getUserOrg(user);
   }
 
-  public updateByBody(ownerId: string, body: UpdateOrganizationBody) {
-    const orgId = body.orgId;
-    delete body.orgId;
-    return this.organizationModel.findOneAndUpdate({_id: orgId}, {...body, updated_date: new Date()}, {new: true})
-      .populate(['owner', 'members'])
-      .exec();
-  }
-
-  public findOrgsByAuthor(userObjectId: string): Promise<OrganizationDocument[] | null> {
-    return this.organizationModel.find({owner: userObjectId})
-      .populate(['owner', 'members'])
-      .exec();
-  }
-
-  public findOrgsByAuthorAndMembers(userObjectId: string): Promise<OrganizationDocument[] | null> {
-    return this.organizationModel.find({$or: [{owner: userObjectId}, {members: {$in: userObjectId}}]})
-      .populate(['owner', 'members'])
-      .exec();
-  }
-
-  public findOrgsContainingMember(userObjectId: string): Promise<OrganizationDocument[] | null> {
-    return this.organizationModel.find({members: userObjectId})
-      .populate(['owner', 'members'])
-      .exec();
-  }
-
-  public async addMembers(orgId: string, ownerId: string, userId: MemberUpdateObjects): Promise<OrganizationDocument | null> {
-    const org = await this.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: orgId, owner: ownerId}, {$addToSet: {members: userId}}, {new: true}));
-    this.eventEmitter.emit(OrgEvents.onMemberAdded, new OrgAddMemberEvent(orgId, userId[0], ownerId));
+  @CheckOrgPerm()
+  public getOrg(user: User, org: Organization) {
     return org;
   }
 
-  public async addMembersByEmail(ownerId: string, body: InviteUserOrgBody): Promise<OrganizationDocument | null> {
-    const user: UserDocument | null = await this.userService.findByEmail(body.memberEmail);
-    if (user === null)
-      throw new BadRequestException(`can't found user email !`);
-    const org = await this.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: body.orgId, owner: ownerId}, {$addToSet: {members: user._id}}, {new: true}));
-    this.eventEmitter.emit(OrgEvents.onMemberAdded, new OrgAddMemberEvent(body.orgId, user._id, ownerId));
-    return org;
+  @CheckOrgPerm({role: 'owner'})
+  public async addMember(user: User, org: Organization, userToAdd: string) {
+    return this.orgHelper.addMember(user, org, userToAdd);
   }
 
-  public async removeMembers(orgId: string, ownerId: string, userId: MemberUpdateObjects): Promise<OrganizationDocument | null> {
-    const org = await this.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: orgId, owner: ownerId}, {$pull: {members: {$in: userId}}}, {new: true}));
-    this.eventEmitter.emit(OrgEvents.onMemberAdded, new OrgAddMemberEvent(orgId, userId[0], ownerId));
-    return org;
+  @CheckOrgPerm({role: 'owner'})
+  public addMemberByEmail(user: User, org: Organization, body: InviteUserOrgBody) {
+    return this.orgHelper.addMemberWithEmail(user, org, body);
+  }
+
+  @CheckOrgPerm({role: 'owner'})
+  public async removeMember(user: User, org: Organization, body: RemoveUserOrgBody): Promise<OrganizationDocument | null> {
+    return this.orgHelper.removeMember(user, org, body)
   }
 
   public addHistory(orgId: string, history: NewOrgHistory) {
-    return this.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: orgId}, {$push: {history}}, {new: true}));
+    return this.orgHelper.addHistory(orgId, history);
   }
 
 }

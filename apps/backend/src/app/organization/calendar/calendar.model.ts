@@ -1,6 +1,5 @@
 import mongoose, {Document} from "mongoose";
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
-import {CalendarEvent} from "@pld/shared";
 import {Deadline} from "@pld/utils";
 import {Pld} from "../../pld/pld.schema";
 import {User} from "../../user/user.schema";
@@ -17,9 +16,6 @@ export class Calendar extends Document {
 
   @Prop({required: false})
   deadline?: Deadline;
-
-  @Prop({required: false, default: []})
-  events: CalendarEvent[];
 
   @Prop({required: false, default: []})
   linkedPld: Pld[];
