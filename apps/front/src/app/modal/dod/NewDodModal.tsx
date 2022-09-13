@@ -198,7 +198,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
       this.props.pld._id,
       this.props.authContext.user?._id ?? '',
       this.state.descriptionOfDone.value,
-      this.state.estimatedWorkOfTime.value
+      (this.state.estimatedWorkOfTime.value as any)
     );
     validate(body).then((errors) => {
       if (errors.length <= 0)
@@ -218,7 +218,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
       if (!valid)
         return;
       if (this.props.editionDod !== undefined) {
-        DodApiController.updateDod(this.props.authContext.accessToken, this.props.editionDod._id, body, (dod, error) => {
+        DodApiController.updateDod(this.props.authContext.accessToken, this.props.org._id, this.props.pld._id, this.props.editionDod._id, body, (dod, error) => {
           if (!error && dod !== null) {
             this.props.onCreatedDod(dod);
           }
@@ -227,7 +227,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
           }
         });
       } else {
-        DodApiController.createDod(this.props.authContext.accessToken, body, (dod, error) => {
+        DodApiController.createDod(this.props.authContext.accessToken, this.props.org._id, this.props.pld._id, body, (dod, error) => {
           if (!error && dod !== null) {
             this.props.onCreatedDod(dod);
           }

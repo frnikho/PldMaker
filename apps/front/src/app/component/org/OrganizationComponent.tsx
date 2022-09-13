@@ -245,9 +245,9 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     if (this.state.calendars.loading) {
       return <CircularProgress/>
     }
-    return this.state.calendars.value.map((calendar) => {
+    return this.state.calendars.value.map((calendar, index) => {
       return (
-        <ClickableTile onClick={() => this.setState({navigateUrl: `calendar/${calendar._id}`})}>
+        <ClickableTile key={index} onClick={() => this.setState({navigateUrl: `calendar/${calendar._id}`})}>
           <h4>{calendar.name}</h4>
           <p>{calendar.description}</p>
           <FullCalendar
@@ -317,6 +317,19 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
               <Tile>
                 {this.showEditableInfo()}
               </Tile>
+              <h2 style={{marginTop: 10}}>Pld <Button kind={"ghost"} onClick={this.onClickCreatePld} hasIconOnly renderIcon={Add} iconDescription={"create org"}/></h2>
+              {this.showPld()}
+              <h2 style={{marginTop: 10}}>Documents <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create document"}/></h2>
+              {this.showDocuments()}
+              <h2 style={{marginTop: 10}}>Calendriers <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create calendar"}/></h2>
+              {this.showCalendars()}
+              {/* <h2>Templates <Button kind={"ghost"} onClick={this.onClickCreateTemplate} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
+              <h2>Documents <Button kind={"ghost"} onClick={this.onClickCreateDocument} hasIconOnly renderIcon={Add} iconDescription={"Créer/Ajouter un document"}/></h2>*/}
+              <ButtonSet style={{marginTop: 10, marginBottom: '20px'}}>
+                <Button onClick={() => this.props.navigate('manage')} renderIcon={Settings} iconDescription={"Settings"}>Gérer</Button>
+                <Button disabled onClick={() => this.setState({openHistoryDialog: true})} renderIcon={RecentlyViewed} iconDescription={"History"}>Historique</Button>
+              </ButtonSet>
+              {/*<Editor onSave={(content) => console.log('saved !', content)}/>*/}
             </Column>
             <Column lg={4}>
               <Stack>
@@ -325,19 +338,6 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
               </Stack>
             </Column>
           </Grid>
-          <h2 style={{marginTop: 10}}>Pld <Button kind={"ghost"} onClick={this.onClickCreatePld} hasIconOnly renderIcon={Add} iconDescription={"create org"}/></h2>
-          {this.showPld()}
-          <h2 style={{marginTop: 10}}>Documents <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create document"}/></h2>
-          {this.showDocuments()}
-          <h2 style={{marginTop: 10}}>Calendriers <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create calendar"}/></h2>
-          {this.showCalendars()}
-         {/* <h2>Templates <Button kind={"ghost"} onClick={this.onClickCreateTemplate} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
-          <h2>Documents <Button kind={"ghost"} onClick={this.onClickCreateDocument} hasIconOnly renderIcon={Add} iconDescription={"Créer/Ajouter un document"}/></h2>*/}
-          <ButtonSet style={{marginTop: 10, marginBottom: '20px'}}>
-            <Button onClick={() => this.props.navigate('manage')} renderIcon={Settings} iconDescription={"Settings"}>Gérer</Button>
-            <Button disabled onClick={() => this.setState({openHistoryDialog: true})} renderIcon={RecentlyViewed} iconDescription={"History"}>Historique</Button>
-          </ButtonSet>
-          <Editor onSave={(content) => console.log('saved !', content)}/>
         </Stack>
       </>
     );

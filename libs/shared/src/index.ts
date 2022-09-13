@@ -41,3 +41,5 @@ export * from './lib/template/TemplateType';
 export * from './lib/DatedObject';
 export * from './lib/Template';
 export * from './lib/Mobile'
+
+export * from './lib/auth/Mfa';

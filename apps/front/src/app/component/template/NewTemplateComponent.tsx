@@ -1,13 +1,14 @@
 import React from "react";
-import {RequiredUserContextProps} from "../../context/UserContext";
+import { RequiredUserContextProps } from "../../context/UserContext";
 
-import {Stack} from '@carbon/react';
-import {Button, ButtonSet, Checkbox, Column, Grid, TextInput, Tile} from "carbon-components-react";
-import {FieldData} from "../../util/FieldData";
-import {OrganizationApiController} from "../../controller/OrganizationApiController";
-import {Organization} from "@pld/shared";
-import {DodDocx} from "../../docx/DodDocx";
-import {Document, Packer} from "docx";
+import { Stack } from "@carbon/react";
+import { Button, ButtonSet, Checkbox, Column, Grid, TextInput, Tile } from "carbon-components-react";
+import { FieldData } from "../../util/FieldData";
+import { OrganizationApiController } from "../../controller/OrganizationApiController";
+import { Organization } from "@pld/shared";
+import { DodDocx } from "../../docx/DodDocx";
+import { Document, Packer } from "docx";
+import { Timezone } from "@pld/utils";
 
 export enum ViewMode {
   New = 'new',
@@ -55,7 +56,7 @@ export class NewTemplateComponent extends React.Component<NewTemplateProps, NewT
     const dodDocx = new DodDocx({
       _id: 'abc',
       created_date: new Date(),
-      estimatedWorkTime: [{value: 2, users: [{_id: '', devices: [], email: 'nicolas.sansd@gmail.com'}], format: ''}],
+      estimatedWorkTime: [{value: 2, users: [{_id: '', devices: [], email: 'nicolas.sansd@gmail.com', firstname: 'Nico', lastname: 'S', timezone: Timezone["Europe/Paris"]}], format: ''}],
       description: '',
       status: 'A faire',
       title: 'Hello World',

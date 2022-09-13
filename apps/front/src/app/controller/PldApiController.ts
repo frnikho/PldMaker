@@ -7,8 +7,8 @@ export type PldsCallback = (pld: Pld[], error?: ApiError) => void
 
 export class PldApiController {
 
-  public static createOrgPld(accessToken: string, body: PldOrgCreateBody, callback: PldCallback) {
-    api.post<Pld>(`pld/organization/create`, body, authorize(accessToken)).then((response) => {
+  public static createOrgPld(accessToken: string, orgId: string, body: PldOrgCreateBody, callback: PldCallback) {
+    api.post<Pld>(`organization/${orgId}/pld/create`, body, authorize(accessToken)).then((response) => {
       callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)
@@ -18,7 +18,7 @@ export class PldApiController {
   }
 
   public static findOrgPld(accessToken: string, orgId: string, callback: PldsCallback) {
-    api.get<Pld[]>(`pld/organization/find/${orgId}`, authorize(accessToken)).then((response) => {
+    api.get<Pld[]>(`organization/${orgId}/pld/`, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)
@@ -28,7 +28,7 @@ export class PldApiController {
   }
 
   public static getAllOrgPld(accessToken: string, orgId: string[], callback: PldsCallback) {
-    api.post<Pld[]>(`pld/finds/`, new PldOrgFindsBody(orgId), authorize(accessToken)).then((response) => {
+    api.post<Pld[]>(`organization/${orgId}/finds/`, new PldOrgFindsBody(orgId), authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)
@@ -37,8 +37,8 @@ export class PldApiController {
     });
   }
 
-  public static findPld(accessToken: string, pldId: string, callback: PldCallback) {
-    api.get<Pld>(`pld/find/${pldId}`, authorize(accessToken)).then((response) => {
+  public static findPld(accessToken: string, orgId: string, pldId: string, callback: PldCallback) {
+    api.get<Pld>(`organization/${orgId}/pld/${pldId}`, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)
@@ -47,8 +47,8 @@ export class PldApiController {
     });
   }
 
-  public static addRevision(accessToken: string, pldId: string, body: CreatePldRevisionBody, callback: PldCallback) {
-    api.post(`pld/${pldId}/revision`, body, authorize(accessToken)).then((response) => {
+  public static addRevision(accessToken: string, orgId: string, pldId: string, body: CreatePldRevisionBody, callback: PldCallback) {
+    api.post(`organization/${orgId}/pld/${pldId}/revision`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)
@@ -57,8 +57,8 @@ export class PldApiController {
     })
   }
 
-  public static updatePld(accessToken: string, body: PldUpdateBody, callback: PldCallback) {
-    api.post<Pld>(`pld/update`, body, authorize(accessToken)).then((response) => {
+  public static updatePld(accessToken: string, orgId: string, body: PldUpdateBody, callback: PldCallback) {
+    api.patch<Pld>(`organization/${orgId}/pld/${body.pldId}/update`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)

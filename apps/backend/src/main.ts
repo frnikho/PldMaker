@@ -49,4 +49,5 @@ class Server {
 }
 
 new Server().start().then(() => {
-  console.log('');});
+  console.log('');
+});

@@ -1,5 +1,5 @@
-import { User } from "../user/user.schema";
 import { UserMock } from "./user.mock";
+import { User } from "@pld/business";
 
 export class OrganizationMock {
 

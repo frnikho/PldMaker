@@ -40,7 +40,7 @@ export class DodCreateBody {
   estimatedWorkTime: UserWorkTime[];
 
 
-  constructor(version, title, skinOf, want, description, pldOwner, owner, descriptionOfDone, estimatedWorkTime) {
+  constructor(version: string, title: string, skinOf: string, want: string, description: string, pldOwner: string, owner: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[]) {
     this.version = version;
     this.title = title;
     this.skinOf = skinOf;
@@ -62,4 +62,30 @@ type UserWorkTime = {
 export enum WorkTimeFormat {
   JOUR_HOMME = 'J/H',
   HOURS = 'Heures',
+}
+
+export class DodUpdateBody {
+  version?: string;
+  title?: string;
+  skinOf?: string;
+  want?: string;
+  description?: string;
+  pldOwner?: string;
+  owner?: string;
+  descriptionOfDone?: string[];
+  estimatedWorkTime?: UserWorkTime[];
+  status?: string;
+
+  constructor(version: string, title: string, skinOf: string, want: string, description: string, pldOwner: string, owner: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[], status: string) {
+    this.version = version;
+    this.title = title;
+    this.skinOf = skinOf;
+    this.want = want;
+    this.description = description;
+    this.pldOwner = pldOwner;
+    this.owner = owner;
+    this.descriptionOfDone = descriptionOfDone;
+    this.estimatedWorkTime = estimatedWorkTime;
+    this.status = status;
+  }
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import {UserContextProps} from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
-import {Organization, User} from "@pld/shared";
+import { Organization, OrganizationSection, User } from "@pld/shared";
 import {toast} from "react-toastify";
 import {
   Breadcrumb,
@@ -9,15 +9,17 @@ import {
   Button,
   Column,
   Grid,
-  Table,
+  Table, TableBatchAction, TableBatchActions,
   TableBody,
-  TableCell,
+  TableCell, TableContainer,
   TableHead,
   TableHeader,
-  TableRow, TextInput,
+  TableRow, TableSelectAll, TableSelectRow, TableToolbar, TableToolbarContent, TableToolbarMenu, TableToolbarSearch, TextInput,
   Tile
 } from "carbon-components-react";
 import Block from "@uiw/react-color-block";
+
+import {DataTable} from '@carbon/react';
 
 import {TrashCan, Add} from '@carbon/icons-react'
 
@@ -26,6 +28,18 @@ import {FieldData} from "../../util/FieldData";
 import {NavProps, withNav} from "../../util/Navigation";
 import {NewOrgDodColorModal} from "../../modal/org/NewOrgDodColorModal";
 import {SocketContext} from "../../context/SocketContext";
+import { CreateOrgSectionModal } from "../../modal/org/CreateOrgSectionModal";
+
+export const headerData = [
+  {
+    key: 'section',
+    header: 'Section',
+  },
+  {
+    key: 'name',
+    header: 'Nom',
+  },
+];
 
 export type ManageOrgProps = {
   auth: UserContextProps,
@@ -34,8 +48,10 @@ export type ManageOrgProps = {
 
 export type ManageOrgState = {
   org?: Organization,
+  orgSection: OrganizationSection[];
   newUserInput: FieldData<string>;
   openDodColor: boolean;
+  openSection: boolean;
 }
 
 class ManageOrganizationComponent extends React.Component<ManageOrgProps, ManageOrgState> {
@@ -46,7 +62,9 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
   constructor(props) {
     super(props);
     this.state = {
+      orgSection: [],
       openDodColor: false,
+      openSection: false,
       org: undefined,
       newUserInput: {
         value: '',
@@ -74,6 +92,13 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
   }
 
   private loadOrg() {
+    OrganizationApiController.getOrgSections(this.props.auth.accessToken, this.props.orgId, (section, error) => {
+      if (error) {
+        toast(error.message, {type: 'error'});
+      } else {
+        this.setState({orgSection: section})
+      }
+    });
     OrganizationApiController.findOrganizationById(this.props.auth.accessToken, this.props.orgId, (org, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
@@ -103,12 +128,13 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
   private onClickRevokeUser(userId: string) {
     if (this.state.org === undefined)
       return;
-    OrganizationApiController.revokeUser(this.props.auth.accessToken, {
-      orgId: this.state.org?._id ?? '',
-      membersId: [userId]
+    OrganizationApiController.revokeUser(this.props.auth.accessToken, this.props.orgId, {
+      memberId: userId,
     }, (org, error) => {
       if (error) {
         console.log(error);
+      } else {
+        console.log(org);
       }
     });
   }
@@ -131,8 +157,7 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
         }
       })
     }
-    OrganizationApiController.inviteUser(this.props.auth.accessToken, {
-      orgId: this.state.org?._id ?? '',
+    OrganizationApiController.inviteUser(this.props.auth.accessToken, this.props.orgId, {
       memberEmail: this.state.newUserInput.value
     }, (org, error) => {
       if (error) {
@@ -163,68 +188,153 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
     if (this.state.org === undefined)
       return;
     return (
-        <Tile style={{padding: '18px'}}>
-          <h4>Créateur / Manager</h4>
-          <Table style={{marginTop: '20px', marginBottom: '20px'}} >
-            <TableHead>
-              <TableRow>
-                <TableHeader id={"hd-email"} key={"hda-email"}>Email</TableHeader>
-                <TableHeader id={"hd-names"} key={"hda-names"}>Nom, Prénom</TableHeader>
-                <TableHeader id={"hd-secteurs"} key={"hda-secteurs"}>Secteurs</TableHeader>
+      <Tile style={{padding: '18px'}}>
+        <h4>Créateur / Manager</h4>
+        <Table style={{marginTop: '20px', marginBottom: '20px'}} >
+          <TableHead>
+            <TableRow>
+              <TableHeader id={"hd-email"} key={"hda-email"}>Email</TableHeader>
+              <TableHeader id={"hd-names"} key={"hda-names"}>Nom, Prénom</TableHeader>
+              <TableHeader id={"hd-secteurs"} key={"hda-secteurs"}>Secteurs</TableHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow key={"owner"}>
+              <TableCell key={"owner-email"}>{this.state.org.owner.email}</TableCell>
+              <TableCell key={"owner-names"}>{this.state.org.owner.lastname?.toUpperCase() ?? '' + this.state.org.owner.firstname}</TableCell>
+              <TableCell key={"owner-secteur"}>{this.state.org.owner.domain?.join(', ')}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+        <h4>Membres</h4>
+        <Table style={{marginTop: '20px', marginBottom: '20px'}} >
+          <TableHead>
+            <TableRow>
+              <TableHeader id={"members-email"} key={"memail"}>
+                Email
+              </TableHeader>
+              <TableHeader id={"members-names"} key={"mnames"}>
+                Nom, Prénom
+              </TableHeader>
+              <TableHeader id={"members-domain"} key={"mdomain"}>
+                Secteur(s)
+              </TableHeader>
+              <TableHeader></TableHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {this.state.org.members.map((user, key) => (
+              <TableRow key={key}>
+                <TableCell key={key + ":email"}>{user.email}</TableCell>
+                <TableCell key={key + ":names"}>{user.firstname} {user.lastname?.toUpperCase()}</TableCell>
+                <TableCell key={key + ":origin"}>{user.domain?.join(', ')}</TableCell>
+                <TableCell key={key + ":actions"}>
+                  {this.isOwner() ? <Button hasIconOnly renderIcon={TrashCan} iconDescription={"Supprimer l'utilisateur"} kind={'ghost'} onClick={() => this.onClickRevokeUser(user._id)}/> : null}
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow key={"owner"}>
-                <TableCell key={"owner-email"}>{this.state.org.owner.email}</TableCell>
-                <TableCell key={"owner-names"}>{this.state.org.owner.lastname?.toUpperCase() ?? '' + this.state.org.owner.firstname}</TableCell>
-                <TableCell key={"owner-secteur"}>{this.state.org.owner.domain?.join(', ')}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-          <h4>Membres</h4>
-          <Table style={{marginTop: '20px', marginBottom: '20px'}} >
-            <TableHead>
-              <TableRow>
-                <TableHeader id={"members-email"} key={"memail"}>
-                  Email
-                </TableHeader>
-                <TableHeader id={"members-names"} key={"mnames"}>
-                  Nom, Prénom
-                </TableHeader>
-                <TableHeader id={"members-domain"} key={"mdomain"}>
-                  Secteur(s)
-                </TableHeader>
-                <TableHeader></TableHeader>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.state.org.members.map((user, key) => (
-                <TableRow key={key}>
-                  <TableCell key={key + ":email"}>{user.email}</TableCell>
-                  <TableCell key={key + ":names"}>{user.firstname} {user.lastname?.toUpperCase()}</TableCell>
-                  <TableCell key={key + ":origin"}>{user.domain?.join(', ')}</TableCell>
-                  <TableCell key={key + ":actions"}>
-                    {this.isOwner() ? <Button hasIconOnly renderIcon={TrashCan} iconDescription={"Supprimer l'utilisateur"} kind={'ghost'} onClick={() => this.onClickRevokeUser(user._id)}/> : null}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <TextInput
-            disabled={!this.isOwner()}
-            helperText={!this.isOwner() ? "Seulement le créateur peut ajouter des utilisateurs dans l'organisation !" : null}
-            id={"org-invite-user"} labelText={"Ajouter un utilisateur à l'organisation"} onChange={(e) => {
-            this.setState({
-              newUserInput: {
-                value: e.currentTarget.value,
-              }
-            })
-          }}
-                     invalid={this.state.newUserInput.error !== undefined}
-                     invalidText={this.state.newUserInput.error}
-          />
-          <Button style={{marginTop: '20px'}} hasIconOnly renderIcon={Add} iconDescription={"Ajouter"} onClick={this.onClickInviteUser}/>
-        </Tile>
+            ))}
+          </TableBody>
+        </Table>
+        <TextInput
+          disabled={!this.isOwner()}
+          helperText={!this.isOwner() ? "Seulement le créateur peut ajouter des utilisateurs dans l'organisation !" : null}
+          id={"org-invite-user"} labelText={"Ajouter un utilisateur à l'organisation"} onChange={(e) => {
+          this.setState({
+            newUserInput: {
+              value: e.currentTarget.value,
+            }
+          })
+        }}
+                   invalid={this.state.newUserInput.error !== undefined}
+                   invalidText={this.state.newUserInput.error}
+        />
+        <Button style={{marginTop: '20px'}} hasIconOnly renderIcon={Add} iconDescription={"Ajouter"} onClick={this.onClickInviteUser}/>
+      </Tile>
+    )
+  }
+
+  private showSections() {
+    return (
+      <Tile>
+        <DataTable rows={this.state.orgSection} headers={headerData} isSortable locale={"fr"}>
+          {({
+              rows,
+              headers,
+              getHeaderProps,
+              getRowProps,
+              getSelectionProps,
+              getBatchActionProps,
+              onInputChange,
+              selectedRows,
+            }) => (
+            <TableContainer>
+              <TableToolbar size={"lg"}>
+                <TableBatchActions {...getBatchActionProps()}>
+                  <TableBatchAction
+                    tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
+                    renderIcon={TrashCan}
+                    onClick={() => {
+                      console.log('abc');
+                    }}
+                  >
+                    Supprimer
+                  </TableBatchAction>
+                  <TableBatchAction
+                    tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
+                    onClick={() => {
+                      console.log('abcde');
+                    }}
+                  >
+                    Générer un docx
+                  </TableBatchAction>
+                </TableBatchActions>
+                <TableToolbarContent>
+                  <TableToolbarSearch
+                    placeholder={"1.1, 2.1..."}
+                    tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+                    onChange={onInputChange}
+                  />
+                  <TableToolbarMenu
+                    iconDescription={"Filter"}
+                    tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+                  >
+                  </TableToolbarMenu>
+                  <Button
+                    tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+                    onClick={() => {this.setState({openSection: true})}}
+                    renderIcon={Add}
+                    iconDescription={"Add"}
+                    size="sm"
+                    kind="primary"
+                  >Créer une section</Button>
+                </TableToolbarContent>
+              </TableToolbar>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableSelectAll {...getSelectionProps()} />
+                    {headers.map((header) => (
+                      <TableHeader style={{whiteSpace: 'nowrap'}} {...getHeaderProps({ header })}>
+                        {header.header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow {...getRowProps({ row })}>
+                      <TableSelectRow {...getSelectionProps({ row })} />
+                      {row.cells.map((cell) => {
+                        return (<TableCell key={cell.id}>{cell.value}</TableCell>)
+                      })}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
+      </Tile>
     )
   }
 
@@ -269,24 +379,32 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
   }
 
   private showModal() {
+    if (this.state.org === undefined)
+      return;
     return (
-      <NewOrgDodColorModal
-        open={this.state.openDodColor}
-        onSuccess={(...args: unknown[]) => {
-          this.state.org?.dodColors.push({
-            name: args[0] as string,
-            color: args[1] as string,
-          })
-          this.setState({
-            openDodColor: false,
-          });
-          this.onUpdateDodColor();
-        }}
-        onDismiss={() => {
-          this.setState({
-            openDodColor: false,
-          })
+      <>
+        <NewOrgDodColorModal
+          open={this.state.openDodColor}
+          onSuccess={(...args: unknown[]) => {
+            this.state.org?.dodColors.push({
+              name: args[0] as string,
+              color: args[1] as string,
+            })
+            this.setState({
+              openDodColor: false,
+            });
+            this.onUpdateDodColor();
+          }}
+          onDismiss={() => {
+            this.setState({
+              openDodColor: false,
+            })
+          }}/>
+        <CreateOrgSectionModal userContext={this.props.auth} org={this.state.org} open={this.state.openSection} onDismiss={() => this.setState({openSection: false})} onSuccess={() => {
+          this.setState({openSection: false});
+          this.loadOrg();
         }}/>
+      </>
     )
   }
 
@@ -313,6 +431,8 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
           </Stack>
           {this.showPreferences()}
         </Tile>
+        <h2>Sections des DoDs</h2>
+        {this.showSections()}
         <h2>Paramètres</h2>
         {this.showParameters()}
       </Stack>

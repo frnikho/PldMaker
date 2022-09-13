@@ -162,7 +162,7 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
       steps: this.state.form.steps.value,
     }
 
-    PldApiController.createOrgPld(this.props.userContext.accessToken, body, (pld, error) => {
+    PldApiController.createOrgPld(this.props.userContext.accessToken, this.props.orgId, body, (pld, error) => {
       if (error) {
         console.log(error);
       } else if (pld !== null){

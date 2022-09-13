@@ -2,7 +2,7 @@ import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {PldApiController} from "../../controller/PldApiController";
-import {Organization, Pld, User, Dod, PldStatus, FavourType} from "@pld/shared";
+import { Organization, Pld, User, Dod, PldStatus, FavourType, OrganizationSection } from "@pld/shared";
 import {
   Accordion,
   AccordionItem,
@@ -37,7 +37,7 @@ import {
 
 import {Stack, Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react';
 
-import {Classification, DocumentAdd, DocumentTasks, RecentlyViewed, Information, CheckmarkOutline, Incomplete, Renew} from '@carbon/icons-react';
+import {Classification, DocumentAdd, DocumentTasks, RecentlyViewed, Information, CheckmarkOutline, Incomplete, Renew, Hourglass} from '@carbon/icons-react';
 
 import Lottie from "lottie-react";
 import {DodTableComponent} from "../dod/DodTableComponent";
@@ -55,6 +55,7 @@ import {IncompleteStatusIcon} from "../../icon/IncompleteStatusIcon";
 import {RequiredLabel} from "../../util/Label";
 import {formatLongDate} from "@pld/utils";
 import {PldHistoryModal} from "../../modal/pld/PldHistoryModal";
+import { ResumePldModal } from "../../modal/pld/ResumePldModal";
 
 export type PldComponentProps = {
   pldId: string;
@@ -65,10 +66,12 @@ export type PldComponentState = {
   org?: Organization;
   pld?: Pld;
   dod: Dod[];
+  sections: OrganizationSection[];
   openSignModal: boolean;
   openHistoryModal: boolean;
   openAddRevisionModal: boolean;
   openChangePldType: boolean;
+  openResumeModal: boolean;
 }
 
 class PldComponent extends React.Component<PldComponentProps, PldComponentState> {
@@ -79,6 +82,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
   constructor(props) {
     super(props);
     this.state = {
+      sections: [],
       dod: [],
       org: undefined,
       pld: undefined,
@@ -86,6 +90,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
       openSignModal: false,
       openChangePldType: false,
       openHistoryModal: false,
+      openResumeModal: false,
     }
     this.onClickUpdatePld = this.onClickUpdatePld.bind(this);
     this.onDodUpdated = this.onDodUpdated.bind(this);
@@ -116,6 +121,16 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
   }
 
   private loadOrg() {
+    OrganizationApiController.getOrgSections(this.props.userContext.accessToken, this.props.orgId, (sections, error) => {
+      if (error) {
+        console.log(error);
+      }
+      if (sections !== null) {
+        this.setState({
+          sections: sections,
+        });
+      }
+    })
     OrganizationApiController.findOrganizationById(this.props.userContext.accessToken, this.props.orgId, (org, error) => {
       if (error) {
         console.log(error);
@@ -129,7 +144,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
   }
 
   private loadPld() {
-    PldApiController.findPld(this.props.userContext.accessToken, this.props.pldId, (pld, error) => {
+    PldApiController.findPld(this.props.userContext.accessToken, this.props.orgId, this.props.pldId, (pld, error) => {
       if (error) {
         toast(error.error, {type: 'error'});
       }
@@ -142,7 +157,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
   }
 
   private loadDod() {
-    DodApiController.findDodWithPld(this.props.userContext.accessToken, this.props.pldId, (dod, error) => {
+    DodApiController.findDodWithPld(this.props.userContext.accessToken, this.props.orgId, this.props.pldId, (dod, error) => {
       if (error) {
         toast(error.error, {type: 'error'})
       } else {
@@ -154,7 +169,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
   }
 
   private onClickUpdatePld() {
-    PldApiController.updatePld(this.props.userContext.accessToken, {
+    PldApiController.updatePld(this.props.userContext.accessToken, this.props.orgId,{
       title: this.state.pld?.title,
       pldId: this.props.pldId,
       promotion: this.state.pld?.promotion,
@@ -375,8 +390,16 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     }
   }
 
+  private showResumeButton() {
+    if (this.state.org === undefined || this.state.pld === undefined) {
+      return (<ButtonSkeleton/>)
+    } else {
+      return (<Button onClick={() => this.setState({openResumeModal: true})} renderIcon={Hourglass} iconDescription="">Voir le résume des J/H</Button>)
+    }
+  }
+
   private onPldTypeUpdated(step) {
-    PldApiController.updatePld(this.props.userContext.accessToken, {
+    PldApiController.updatePld(this.props.userContext.accessToken, this.props.orgId, {
       pldId: this.props.pldId,
       currentStep: step
     }, (pld, error) => {
@@ -421,6 +444,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           dod={this.state.dod}
           open={this.state.openHistoryModal} onDismiss={() => this.setState({openHistoryModal: false})} onSuccess={() => null}
         />
+        <ResumePldModal reload={() => this.loadOrg()} userContext={this.props.userContext} sections={this.state.sections} pld={this.state.pld} org={this.state.org} dod={this.state.dod} open={this.state.openResumeModal} hide={(show) => this.setState({openResumeModal: show})}/>
         <SignPldModal
           open={this.state.openSignModal}
           onDismiss={() => {
@@ -576,6 +600,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
               <ButtonSet style={{marginBottom: '20px'}}>
                 {this.showGenerateButton()}
                 {this.showHistoryButton()}
+                {this.showResumeButton()}
               </ButtonSet>
             </Stack>
           </Column>

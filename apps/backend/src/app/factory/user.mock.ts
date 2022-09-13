@@ -1,5 +1,6 @@
-import {User} from "../user/user.schema";
 import {UserDomain} from "@pld/shared";
+import { Timezone } from "@pld/utils";
+import { User } from "@pld/business";
 
 export class UserMock {
 
@@ -12,6 +13,8 @@ export class UserMock {
         roles,
         domain,
         devices: [],
+        mfa: [],
+        timezone: Timezone.CET,
       };
     }
 

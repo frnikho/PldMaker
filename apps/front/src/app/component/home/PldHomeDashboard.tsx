@@ -52,7 +52,7 @@ export class PldHomeDashboard extends React.Component<PldHomeDashboardProps, Pld
               <TableCell>{formatShortDate(new Date(pld.created_date ?? new Date()))}</TableCell>
               <TableCell>{formatLongDate(new Date(pld.updated_date ?? new Date()))}</TableCell>
               <TableCell>{pld.manager.lastname?.toUpperCase()} {pld.manager.firstname}</TableCell>
-              <TableCell>{(pld.owner as Organization).name}</TableCell>
+              <TableCell>{pld.org.name}</TableCell>
               <TableCell>
                 <ButtonSet>
                   <Button

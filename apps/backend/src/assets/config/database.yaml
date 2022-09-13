@@ -1,6 +1,0 @@
-maxPoolSize: 100
-minPoolSize: 0
-maxIdleTimeMS: 30000
-connectTimeoutMS: 30000
-socketTimeoutMS: 20000
-retryDelay: 50000

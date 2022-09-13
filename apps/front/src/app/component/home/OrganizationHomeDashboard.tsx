@@ -44,7 +44,7 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
   }
 
   private loadAllPld() {
-    PldApiController.getAllOrgPld(this.props.userContext.accessToken, this.state.organization.map((org) => org._id), (pld, error) => {
+    /*PldApiController.getAllOrgPld(this.props.userContext.accessToken, this.state.organization.map((org) => org._id), (pld, error) => {
       if (error) {
         console.log(error);
       } else {
@@ -53,7 +53,7 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
         });
         this.loadAllDod();
       }
-    });
+    });*/
   }
 
   private loadAllDod() {

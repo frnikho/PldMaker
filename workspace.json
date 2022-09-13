@@ -3,6 +3,7 @@
   "version": 2,
   "projects": {
     "backend": "apps/backend",
+    "business": "libs/business",
     "front": "apps/front",
     "front-e2e": "apps/front-e2e",
     "shared": "libs/shared",

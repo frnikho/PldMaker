@@ -1,5 +1,4 @@
 import {DatedObject} from "../DatedObject";
-import {PldOwnerType} from "./PldOwnerType";
 import {User} from "../user/User";
 import {Organization} from "../organization/Organization";
 import {PldHistory} from "./PldHistory";
@@ -7,8 +6,8 @@ import {PldHistory} from "./PldHistory";
 export type Pld = {
   description: string;
   manager: User;
-  owner: User | Organization;
-  ownerType: PldOwnerType;
+  owner: User;
+  org: Organization;
   promotion: number;
   revisions: PldRevision[];
   status: string;

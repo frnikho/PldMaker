@@ -1,6 +1,6 @@
 import React from "react";
-import {LoginModal} from "../modal/LoginModal";
-import {RegisterModal} from "../modal/RegisterModal";
+import {LoginModal} from "../modal/auth/LoginModal";
+import {RegisterModal} from "../modal/auth/RegisterModal";
 import {UserContext} from "../context/UserContext";
 import {User} from "@pld/shared";
 

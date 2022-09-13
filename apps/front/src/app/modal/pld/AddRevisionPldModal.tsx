@@ -38,7 +38,7 @@ export class AddRevisionPldModal extends React.Component<AddRevisionPldModalProp
   }
 
   private onClickAddRevision() {
-    PldApiController.addRevision(this.props.userContext.accessToken, this.props.pld._id, {
+    PldApiController.addRevision(this.props.userContext.accessToken, this.props.org._id, this.props.pld._id, {
       owner: this.props.userContext.user?._id ?? 'null',
       comments: this.state.comments.value,
       version: parseFloat((this.props.versionShifting + this.props.version).toFixed(2)),

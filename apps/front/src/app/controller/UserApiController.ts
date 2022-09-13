@@ -1,9 +1,12 @@
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
-import {User, UpdateUserBody, AddFavourBody, Favour, RemoveFavourBody} from "@pld/shared";
+import { User, UpdateUserBody, AddFavourBody, Favour, RemoveFavourBody, Mfa, MfaOtpBody } from "@pld/shared";
 import {AxiosError, AxiosResponse} from "axios";
 
 export type CallbackUser = (user: User | null, error?: ApiError) => void;
 export type CallbackFavour = (favour: Favour | null, error?: ApiError) => void;
+
+export type CallbackMfa = (mfa: Mfa | null, error?: ApiError) => void;
+export type CallbackMfas = (mfa: Mfa[], error?: ApiError) => void;
 
 export class UserApiController {
 
@@ -68,6 +71,38 @@ export class UserApiController {
 
   public static deleteAllDevice(accessToken: string, callback: CallbackUser) {
     api.post(`user/devices/clean`, {}, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data);
+    });
+  }
+
+  public static getMfa(accessToken: string, callback: CallbackMfas) {
+    api.get(`auth/mfa`, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback([], err.response?.data);
+    });
+  }
+
+  public static enableOtp(accessToken: string, callback: CallbackMfa) {
+    api.post(`auth/mfa/otp/enable`, {}, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data);
+    });
+  }
+
+  public static verifyOtp(accessToken: string, body: MfaOtpBody, callback: CallbackMfa) {
+    api.post(`auth/mfa/otp/validate`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data);
+    });
+  }
+
+  public static deleteOtp(accessToken: string, otpId: string, callback: CallbackMfa) {
+    api.delete(`auth/mfa/otp/${otpId}`, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       return callback(null, err.response?.data);

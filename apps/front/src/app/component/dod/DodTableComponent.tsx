@@ -89,7 +89,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
   }
 
   private onClickDeleteDod(dodId: string) {
-    DodApiController.deleteDod(this.props.userContext.accessToken, dodId, (dod, error) => {
+    DodApiController.deleteDod(this.props.userContext.accessToken, this.props.org._id, this.props.pld._id, dodId, (dod, error) => {
       if (error) {
         this.props.onDeleteDod();
       }
@@ -152,9 +152,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
           display: 'inline-block',
         }}/>}
         onChange={(e) => {
-
-          DodApiController.updateDodStatus(this.props.userContext.accessToken, {
-            dodId: dodId,
+          DodApiController.updateDod(this.props.userContext.accessToken, this.props.org._id, this.props.pld._id, dodId, {
             status: e.currentTarget.value
           }, (dod, error) => {
             if (error) {

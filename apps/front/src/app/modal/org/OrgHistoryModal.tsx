@@ -49,9 +49,9 @@ export class OrgHistoryModal extends React.Component<OrgHistoryModelProps, OrgHi
             <StructuredListBody>
               <StructuredListRow>
 
-                {this.props.org.history.map((history) => {
+                {this.props.org.history.map((history, index) => {
                   return (
-                    <StructuredListRow>
+                    <StructuredListRow key={index}>
                       <StructuredListCell noWrap>{formatLongDate(new Date(history.date))}</StructuredListCell>
                       <StructuredListCell noWrap>{formatLongDate(new Date(history.date))}</StructuredListCell>
                     </StructuredListRow>)

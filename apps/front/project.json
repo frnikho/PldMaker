@@ -18,7 +18,7 @@
         "assets": ["apps/front/src/favicon.ico", "apps/front/src/assets"],
         "styles": [],
         "scripts": [],
-        "webpackConfig": "@nrwl/react/plugins/webpack"
+        "webpackConfig": "webpack.config.js"
       },
       "configurations": {
         "development": {
@@ -48,7 +48,8 @@
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "front:build",
-        "hmr": true
+        "hmr": true,
+        "webpackConfig": "webpack.dev.config.js"
       },
       "configurations": {
         "development": {

@@ -3,27 +3,19 @@ import {IsNotEmpty} from "class-validator";
 export class ManageMembersOrganizationBody {
 
   @IsNotEmpty()
-  public orgId: string;
+  public userId: string;
 
-  @IsNotEmpty()
-  public membersId: string[];
-
-  constructor(orgId: string, membersId: string[]) {
-    this.orgId = orgId;
-    this.membersId = membersId;
+  constructor(userId: string) {
+    this.userId = userId;
   }
 }
 
 export class InviteUserOrgBody {
 
   @IsNotEmpty()
-  public orgId: string;
-
-  @IsNotEmpty()
   public memberEmail: string;
 
-  constructor(orgId: string, memberEmail: string) {
-    this.orgId = orgId;
+  constructor(memberEmail: string) {
     this.memberEmail = memberEmail;
   }
 

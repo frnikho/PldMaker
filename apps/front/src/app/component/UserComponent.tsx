@@ -1,14 +1,16 @@
 import React from "react";
-import {RequiredUserContextProps} from "../context/UserContext";
-import { Button, MultiSelect, TextInput, Tile } from "carbon-components-react";
-import {FieldData} from "../util/FieldData";
-import {UserApiController} from "../controller/UserApiController";
-import {toast} from "react-toastify";
-import { formatLongDate } from "@pld/utils";
+import { RequiredUserContextProps } from "../context/UserContext";
+import { Button, MultiSelect, Select, SelectItem, TextInput, Tile } from "carbon-components-react";
+import { FieldData } from "../util/FieldData";
+import { UserApiController } from "../controller/UserApiController";
+import { toast } from "react-toastify";
+import { formatLongDate, Timezone } from "@pld/utils";
 
-import {Renew} from '@carbon/icons-react';
+import { Renew } from "@carbon/icons-react";
 
-import {Stack} from '@carbon/react';
+import { Stack } from "@carbon/react";
+import { MfaModal } from "../modal/auth/MfaModal";
+import { Mfa, MfaType } from "@pld/shared";
 
 export type UserComponentProps = RequiredUserContextProps;
 
@@ -16,6 +18,9 @@ export type UserComponentState = {
   firstname: FieldData<string>;
   lastname: FieldData<string>;
   domain: FieldData<string[]>;
+  timezone: FieldData<string>;
+  open: boolean;
+  mfa: Mfa[]
 }
 
 export class UserComponent extends React.Component<UserComponentProps, UserComponentState> {
@@ -23,6 +28,7 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
   constructor(props) {
     super(props);
     this.state = {
+      mfa: [],
       firstname: {
         value: ''
       },
@@ -31,14 +37,18 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
       },
       domain: {
         value: [],
-      }
+      },
+      timezone: {
+        value: '',
+      },
+      open: false
     }
     this.onClickUpdate = this.onClickUpdate.bind(this);
+    this.onMfaEnable = this.onMfaEnable.bind(this);
   }
 
   override componentDidMount() {
     this.loadInfo();
-    console.log(this.props.userContext.user);
   }
 
   private loadInfo() {
@@ -53,8 +63,18 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
       },
       domain: {
         value: this.props.userContext.user.domain,
+      },
+      timezone: {
+        value: this.props.userContext.user.timezone,
       }
-    })
+    });
+    UserApiController.getMfa(this.props.userContext.accessToken, (mfa, error) => {
+      if (error) {
+        toast(error.message, {type: 'error'});
+      } else {
+        this.setState({mfa: mfa});
+      }
+    });
   }
 
   private onClickUpdate() {
@@ -62,6 +82,7 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
       firstname: this.state.firstname.value,
       lastname: this.state.lastname.value,
       domain: this.state.domain.value,
+      timezone: Timezone[this.state.timezone.value]
     }, (user, error) => {
       if (error) {
         toast('Une erreur est survenue !', {type: 'error'});
@@ -74,13 +95,35 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
     });
   }
 
+  private showMfaOtp() {
+    const mfa = this.state.mfa.find((mfa) => mfa.type === MfaType.OTP && mfa.user._id === this.props.userContext.user?._id);
+    if (this.state.mfa.length === 0 || mfa === undefined) {
+      return (
+        <>
+          <Tile>Vous n'avez pas activer l'OTP</Tile>
+          <Button onClick={() => this.setState({open: true})}>Ajouter 2FA</Button>
+        </>
+      );
+    } else {
+      return (<>
+        <Tile>OTP actif depuis: {formatLongDate(new Date(mfa.activationDate))}</Tile>
+        <Button kind={"ghost"} onClick={() => this.setState({open: true})}>Désactiver MFA</Button>
+      </>);
+    }
+  }
+
   private showSecurity() {
     return (
       <Tile>
-       {/* <h3 style={{marginBottom: 14}}>Sécurité</h3>
-        <h4>Mot de passe</h4>
-        <p>Vous pouvez changer votre mot passe actuel en cliquant <Link>ici</Link></p>
-        <h4>2FA</h4>*/}
+        <Stack gap={4}>
+          <h3 style={{marginBottom: 14}}>Sécurité</h3>
+          <h4>2FA</h4>
+          <p>
+            La double authentification permet de renforcer la sécurité de vos comptes en exigeant un troisième élément d'identification, en plus de votre email et de votre mot de passe, pour valider chaque connexion.
+            Pour le moment, seulement l'OTP est disponible pour la double authentification (One Time Password)
+          </p>
+          {this.showMfaOtp()}
+        </Stack>
       </Tile>
     )
   }
@@ -105,6 +148,22 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
           }
         })
       }}/>
+        <Select id={"timezone-input"} labelText={"Timezone"} onChange={(e) => this.setState({timezone: {value: e.currentTarget.value}})} value={this.state.timezone.value}>
+          {Object.keys(Timezone).sort((a, b) => {
+            if (a > b) {
+              return 1;
+            } else {
+              return -1;
+            }
+          }).map((t) => {
+            return (
+              <SelectItem
+                value={t}
+                text={t}
+              />
+            )
+          })}
+        </Select>
       <MultiSelect
         label={this.state.domain.value.join(', ')}
         titleText={"Domaines d'application"}
@@ -126,9 +185,16 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
     )
   }
 
+  private onMfaEnable() {
+    this.setState({open: false});
+    console.log('abc');
+    toast('2FA Activé', {type: 'success'});
+  }
+
   override render() {
     return (
       <Stack gap={4}>
+        <MfaModal open={this.state.open} onDismiss={() => this.setState({open: false})} onSuccess={this.onMfaEnable} userContext={this.props.userContext}/>
         {this.showInfo()}
         {this.showSecurity()}
       </Stack>
