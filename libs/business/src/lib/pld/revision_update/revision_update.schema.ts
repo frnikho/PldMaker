@@ -1,8 +1,6 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import mongoose, {Document} from "mongoose";
 import {User} from "../../user/user.schema";
-import {Organization} from "../../organization/organization.schema";
-import {PldOwnerType} from "@pld/shared";
 
 export type RevisionUpdateDocument = RevisionUpdate & Document;
 
@@ -15,11 +13,8 @@ export class RevisionUpdate {
   @Prop({required: true})
   version: number;
 
-  @Prop({type: mongoose.Schema.Types.ObjectId, refPath: 'ownerType'})
-  owner: User | Organization;
-
-  @Prop({type: String, required: true, enum: PldOwnerType})
-  ownerType: PldOwnerType;
+  @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User'})
+  owner: User;
 
   @Prop({default: []})
   sections: string[];

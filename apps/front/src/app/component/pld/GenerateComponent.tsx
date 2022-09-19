@@ -62,7 +62,7 @@ export class GenerateComponent extends React.Component<GenerateComponentProps, G
 
   override render() {
     return (
-     <Button renderIcon={DocumentView} onClick={this.onClickCreatePreview}>Générer une preview du PLD </Button>
+     <Button style={{borderRadius: 6}} renderIcon={DocumentView} onClick={this.onClickCreatePreview}>Générer une preview du PLD </Button>
     );
   }
 

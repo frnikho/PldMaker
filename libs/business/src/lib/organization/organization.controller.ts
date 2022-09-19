@@ -1,6 +1,15 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Request } from "@nestjs/common";
 import {OrganizationService} from "./organization.service";
-import { CreateOrganizationBody, Organization, OrganizationSection, OrganizationSectionBody, OrganizationSectionUpdateBody, RemoveUserOrgBody, UpdateOrganizationBody } from "@pld/shared";
+import {
+  CreateOrganizationBody,
+  MigrateOrganizationBody,
+  Organization,
+  OrganizationSection,
+  OrganizationSectionBody,
+  OrganizationSectionUpdateBody,
+  RemoveUserOrgBody,
+  UpdateOrganizationBody
+} from "@pld/shared";
 import {
   InviteUserOrgBody,
 } from "@pld/shared";
@@ -28,12 +37,12 @@ export class OrganizationController {
     return this.orgService.getOrg(req.user, org);
   }
 
-  @Patch(':orgId/update')
+  @Patch(':orgId')
   public async update(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Body() body: UpdateOrganizationBody) {
     return this.orgService.updateByBody(req.user, org, body);
   }
 
-  @Delete(':orgId/delete')
+  @Delete(':orgId')
   public async delete(@Request() req, @Param('orgId', OrganizationPipe) org: Organization) {
     return this.orgService.deleteWithBody(req.user, org);
   }
@@ -66,6 +75,11 @@ export class OrganizationController {
   @Delete(':orgId/section/:sectionId')
   public async removeSection(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param(':sectionId', OrganizationSectionPipe) section: OrganizationSection) {
     return this.orgSectionService.deleteSection(req.user, org, section);
+  }
+
+  @Post(':orgId/migrate')
+  public async migrate(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Body() body: MigrateOrganizationBody) {
+    return this.orgService.migrate(req.user, org, body);
   }
 
 }

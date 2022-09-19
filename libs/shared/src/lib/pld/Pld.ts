@@ -1,9 +1,8 @@
-import {DatedObject} from "../DatedObject";
 import {User} from "../user/User";
 import {Organization} from "../organization/Organization";
 import {PldHistory} from "./PldHistory";
 
-export type Pld = {
+export class Pld {
   description: string;
   manager: User;
   owner: User;
@@ -24,7 +23,31 @@ export type Pld = {
 
   history: PldHistory[];
 
-} & DatedObject
+  created_date: Date;
+  updated_date: Date;
+
+
+  constructor(description: string, manager: User, owner: User, org: Organization, promotion: number, revisions: PldRevision[], status: string, tags: string[], title: string, version: number, id: string, steps: string[], startingDate: Date, endingDate: Date, currentStep: string, history: PldHistory[], created_date: Date, updated_date: Date) {
+    this.description = description;
+    this.manager = manager;
+    this.owner = owner;
+    this.org = org;
+    this.promotion = promotion;
+    this.revisions = revisions;
+    this.status = status;
+    this.tags = tags;
+    this.title = title;
+    this.version = version;
+    this._id = id;
+    this.steps = steps;
+    this.startingDate = startingDate;
+    this.endingDate = endingDate;
+    this.currentStep = currentStep;
+    this.history = history;
+    this.created_date = created_date;
+    this.updated_date = updated_date;
+  }
+}
 
 export type PldRevision = {
   created_date: Date;

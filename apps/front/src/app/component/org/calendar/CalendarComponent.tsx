@@ -2,9 +2,11 @@ import React from "react";
 import {Calendar, CalendarEvent, Organization} from "@pld/shared";
 import {Data} from "../../../util/FieldData";
 import FullCalendar, {DateSelectArg, EventClickArg} from "@fullcalendar/react";
+import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from "@fullcalendar/daygrid";
+import listGridPlugin from '@fullcalendar/list';
 import interactionPlugin, {DateClickArg} from "@fullcalendar/interaction";
-import {Button, Column, Grid, Tile} from "carbon-components-react";
+import { Breadcrumb, BreadcrumbItem, Button, Column, Grid, Tile } from "carbon-components-react";
 import {NewEventModal, NewEventType} from "../../../modal/org/calendar/NewEventModal";
 
 import {Stack} from '@carbon/react';
@@ -57,7 +59,6 @@ export class CalendarComponent extends React.Component<CalendarProps, CalendarSt
   }
 
   private onClickNewDate(date: DateClickArg) {
-    console.log(date);
     this.setState({
       modal: true,
       select: undefined,
@@ -109,6 +110,7 @@ export class CalendarComponent extends React.Component<CalendarProps, CalendarSt
                            calendar={this.props.calendar.value}
                            userContext={this.props.userContext}
                            open={this.state.modal}
+                           onSuccess={(event) => this.setState({redirectUrl: `event/${event._id}`, modal: false})}
                            onDismiss={() => this.setState({modal: false})}
                            type={this.state.select ? NewEventType.LONG_EVENT : NewEventType.SIMPLE_EVENT}
                            dates={this.state.select ? [this.state.select.start, this.state.select.end] : [this.state.selectedDate ?? new Date()]}/>);
@@ -127,42 +129,35 @@ export class CalendarComponent extends React.Component<CalendarProps, CalendarSt
       <>
         {this.state.redirectUrl !== undefined ? <Navigate to={this.state.redirectUrl}/> : null}
         {this.showModal()}
-        <p>{this.props.org.value?.name}</p>
-        <p>{this.props.calendar.value?.name}</p>
-        <Grid>
-          <Column xlg={13} lg={13} md={8}>
-            <FullCalendar
-              eventClick={this.onClickEvent}
-              aspectRatio={1.5}
-              headerToolbar={{start: '', left: '', right: '', center: 'title', end: ''}}
-              footerToolbar={{right: 'prev,next'}}
-              selectable={true}
-              events={(arg, successCallback) => {successCallback(parseEvents(this.state.events))}}
-              editable={true}
-              dateClick={(arg) => {this.onClickNewDate(arg)}}
-              select={(arg) => {
-                const diffDays = Math.ceil(Math.abs(arg.end.getTime() - arg.start.getTime()) / (1000 * 60 * 60 * 24));
-                if (diffDays <= 1)
-                  return;
-                this.setState({
-                  select: arg,
-                  modal: true,
-                })
-              }}
-              locale={'fr'}
-              plugins={[ dayGridPlugin, interactionPlugin ]}
-              initialView="dayGridMonth"
-            />
-          </Column>
-          <Column xlg={3} lg={3}>
-            <div style={{marginTop: 60}}>
-              <Stack gap={3}>
-                {this.showSelectedDate()}
-                {this.showAction()}
-              </Stack>
-            </div>
-          </Column>
-        </Grid>
+        <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
+          <BreadcrumbItem onClick={() => this.setState({redirectUrl: `/`})}>Dashboard</BreadcrumbItem>
+          <BreadcrumbItem onClick={() => this.setState({redirectUrl: `/organization/${this.props.orgId}`})}>{this.props.org.value?.name ?? "Organisation"}</BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>Calendrier</BreadcrumbItem>
+        </Breadcrumb>
+        <h4 style={{fontWeight: 'bold', fontSize: 26}}>{this.props.org.value?.name}</h4>
+        <p style={{marginBottom: 18}}>{this.props.calendar.value?.name}</p>
+        <FullCalendar
+          eventClick={this.onClickEvent}
+          aspectRatio={1.5}
+          headerToolbar={{start: 'dayGridMonth,dayGridWeek,listWeek',  center: 'title', end: 'prev,next'}}
+          footerToolbar={{right: 'prev,next'}}
+          selectable={true}
+          events={(arg, successCallback) => {successCallback(parseEvents(this.state.events))}}
+          editable={true}
+          dateClick={(arg) => {this.onClickNewDate(arg)}}
+          select={(arg) => {
+            const diffDays = Math.ceil(Math.abs(arg.end.getTime() - arg.start.getTime()) / (1000 * 60 * 60 * 24));
+            if (diffDays <= 1)
+              return;
+            this.setState({
+              select: arg,
+              modal: true,
+            })
+          }}
+          locale={'fr'}
+          plugins={[ dayGridPlugin, interactionPlugin, timeGridPlugin, listGridPlugin ]}
+          initialView="dayGridMonth"
+        />
       </>
     )
   }

@@ -1,4 +1,4 @@
-import React from "react";
+import React  from "react";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {ApiError} from "../../util/Api";
@@ -7,7 +7,6 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   Button,
-  ButtonSet,
   ClickableTile,
   Column, Form,
   Grid, NumberInput,
@@ -16,26 +15,24 @@ import {
 
 import {Stack} from '@carbon/react';
 
-import {Add, Settings, Renew, RecentlyViewed} from '@carbon/icons-react'
+import {Add, Settings, Renew} from '@carbon/icons-react'
 import {NavProps, redirectNavigation, withNav} from "../../util/Navigation";
 import {PageState} from "../../util/Page";
 import {PldApiController} from "../../controller/PldApiController";
 import {FieldData} from "../../util/FieldData";
 import {SocketContext} from "../../context/SocketContext";
-import {ShowFavourIcon} from "../../util/User";
 import {OrgHistoryModal} from "../../modal/org/OrgHistoryModal";
 
 import {RequiredLabel} from "../../util/Label";
 
-import {Organization, Pld, FavourType, Calendar} from "@pld/shared";
-import {formatLongDate, formatShortDate} from "@pld/utils";
+import {Organization, Pld, Calendar} from "@pld/shared";
+import {formatLongDate} from "@pld/utils";
 import {CalendarApiController} from "../../controller/CalendarApiController";
 import {toast} from "react-toastify";
 import {CircularProgress} from "../utils/CircularProgress";
 
-import FullCalendar from '@fullcalendar/react' // must go before plugins
+import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import { Editor } from "../../util/editor";
 
 export type OrganizationComponentProps = {
   orgId?: string;
@@ -48,6 +45,21 @@ export type OrganizationComponentState = {
   calendars: FieldData<Calendar[]>;
   openHistoryDialog: boolean;
 } & PageState;
+
+const pldIllustration = [
+  require('../../../assets/illustrations/pld/undraw_content_structure_re_ebkv.png'),
+  require('../../../assets/illustrations/pld/undraw_google_docs_re_evm3.png'),
+  require('../../../assets/illustrations/pld/undraw_live_collaboration_re_60ha.png'),
+  require('../../../assets/illustrations/pld/undraw_blog_post_re_fy5x.png'),
+  require('../../../assets/illustrations/pld/undraw_secure_files_re_6vdh.png'),
+  require('../../../assets/illustrations/pld/undraw_reviewed_docs_re_9lmr.png'),
+  require('../../../assets/illustrations/pld/undraw_personal_documents_re_vcf2.png'),
+  require('../../../assets/illustrations/pld/undraw_online_everywhere_re_n3lr.png'),
+  require('../../../assets/illustrations/pld/undraw_my_personal_files_re_3q0p.png'),
+  require('../../../assets/illustrations/pld/undraw_hiring_re_yk5n.png'),
+  require('../../../assets/illustrations/pld/undraw_folder_files_re_2cbm.png'),
+  require('../../../assets/illustrations/pld/undraw_customer_survey_re_v9cj.png'),
+]
 
 class OrganizationComponent extends React.Component<OrganizationComponentProps, OrganizationComponentState> {
 
@@ -162,16 +174,23 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     )
   }
 
+  private updateOrgData(key: string, data: any) {
+    if (this.state.org === undefined)
+      return;
+  }
+
   private showEditableInfo() {
     if (this.state.org === undefined)
       return;
     return (
       <Form>
         <Stack gap={6}>
-          <h4>Informations</h4>
-          <TextArea rows={4} id={"description"} labelText={"Description"} value={this.state.org.description}/>
-          <NumberInput iconDescription={""} id={"versionShifting"} value={this.state.org.versionShifting} label={<RequiredLabel message={"Versioning"}/>}/>
-          <Button renderIcon={Renew} iconDescription={"Update"}>Mettre à jour</Button>
+          <TextArea rows={4} id={"description"} labelText={"Description"} defaultValue={this.state.org.description}/>
+          <NumberInput iconDescription={""} id={"versionShifting"} defaultValue={this.state.org.versionShifting} label={<RequiredLabel message={"Versioning"}/>} value={this.state.org.versionShifting}/>
+          <div style={{display: 'flex', flexDirection: 'row', gap: 10}}>
+            <Button renderIcon={Renew} iconDescription={"Update"} style={{borderRadius: 8}}>Mettre à jour</Button>
+            <Button onClick={() => this.props.navigate('manage')} style={{borderRadius: 8}} renderIcon={Settings} iconDescription={"Settings"}>Paramètre</Button>
+          </div>
         </Stack>
       </Form>
     )
@@ -181,14 +200,14 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     if (this.state.org === undefined)
       return;
     return (
-      <Tile>
-        <Stack gap={4}>
-          <Stack gap={3}>
-            <h4>Date de création :</h4>
+      <Tile style={{borderRadius: 10}}>
+        <Stack gap={6}>
+          <Stack gap={1}>
+            <h4 style={{fontWeight: 600}}>Date de création :</h4>
             {this.state.pld === undefined ? <SkeletonText/> : <p>{formatLongDate(new Date(this.state.org?.created_date ?? ""))}</p>}
           </Stack>
-          <Stack gap={3}>
-            <h4>Date de mise à jour :</h4>
+          <Stack gap={1}>
+            <h4 style={{fontWeight: 600}}>Date de mise à jour :</h4>
             {this.state.pld === undefined ? <SkeletonText/> : <p>{formatLongDate(new Date(this.state.org?.updated_date ?? ""))}</p>}
           </Stack>
         </Stack>
@@ -200,10 +219,15 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     if (this.state.org === undefined)
       return;
     return (
-      <Tile style={{marginTop: 20}}>
+      <Tile style={{marginTop: 20, borderRadius: 10}}>
         <Stack>
-          <h4>Membres :</h4>
-          {[...this.state.org.members, this.state.org.owner].map((user, index) => <p key={index}>{user.email}</p>)}
+          <h4 style={{fontWeight: 600}}>Membres :</h4>
+          {[...this.state.org.members, this.state.org.owner].map((user, index) => (
+            <div key={index}>
+              <p>{user.lastname.toUpperCase()} {user.firstname}</p>
+              <p style={{fontWeight: 100, fontStyle: 'italic'}}>{user.email}</p>
+            </div>
+          ))}
         </Stack>
       </Tile>
     )
@@ -219,20 +243,16 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
       <Grid>
         {this.state.pld.value.map((pld, index) => {
           return (
-            <Column key={index} sm={4} md={8} lg={4}>
-              <ClickableTile onClick={() => {this.setState({navigateUrl: `pld/${pld._id}`})}}>
-                <h4>{pld.title}</h4>
-                <p>{pld.description}</p>
-                <p>{pld.version}</p>
-                <p>{pld.currentStep}</p>
+            <Column key={index} sm={4} md={8} lg={5}>
+              <ClickableTile onClick={() => {this.setState({navigateUrl: `pld/${pld._id}`})}} style={{borderRadius: 10}}>
+                <p style={{fontWeight: 600, fontSize: 26}}>{pld.title} (v{pld.version})</p>
+                <p>{pld.description.substring(0, 160)}</p>
                 <br/>
-                <p style={{fontStyle: 'italic'}}>Création</p>
-                <p>{formatShortDate(new Date(pld.created_date ?? new Date()))}</p>
-                <p style={{fontStyle: 'italic'}}>Dernière mise a jour</p>
-                <p>{formatShortDate(new Date(pld.created_date ?? new Date()))}</p>
-                <div style={{marginLeft: 'auto', marginRight: '0px', textAlign: 'end'}}>
-                  <ShowFavourIcon type={FavourType.PLD} data={pld} clickable={false}/>
+                <div style={{width: '100%', textAlign: 'center', marginTop: 20, marginBottom: 20}}>
+                  <img style={{maxWidth: '100%', height: 160}} src={pldIllustration[Math.floor(Math.random() * pldIllustration.length)]}/>
                 </div>
+                <p>Dernière mise a jour le</p>
+                <p style={{fontWeight: 'bold'}}>{formatLongDate(new Date(pld.updated_date))}</p>
               </ClickableTile>
             </Column>
           )
@@ -247,11 +267,11 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     }
     return this.state.calendars.value.map((calendar, index) => {
       return (
-        <ClickableTile key={index} onClick={() => this.setState({navigateUrl: `calendar/${calendar._id}`})}>
-          <h4>{calendar.name}</h4>
+        <ClickableTile style={{borderRadius: 10}} key={index} onClick={() => this.setState({navigateUrl: `calendar/${calendar._id}`})}>
+          <h4 style={{fontWeight: 600, fontSize: 26}}>{calendar.name}</h4>
           <p>{calendar.description}</p>
           <FullCalendar
-            aspectRatio={4}
+            aspectRatio={3}
             headerToolbar={{start: '', right: '', end: '', center: '', left: ''}}
             locale={'fr'}
             plugins={[ dayGridPlugin ]}
@@ -311,31 +331,25 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
         {this.showCharts()}
         <Stack gap={4}>
           {redirectNavigation(this.state.navigateUrl)}
-          <h1>{this.state.org?.name}</h1>
+          <h1 style={{fontWeight: 600}}>{this.state.org?.name}</h1>
           <Grid>
             <Column lg={12}>
-              <Tile>
+              <Tile style={{borderRadius: 10}}>
                 {this.showEditableInfo()}
               </Tile>
-              <h2 style={{marginTop: 10}}>Pld <Button kind={"ghost"} onClick={this.onClickCreatePld} hasIconOnly renderIcon={Add} iconDescription={"create org"}/></h2>
+              <h2 style={{marginTop: 20, marginBottom: 10}}>Pld <Button kind={"ghost"} onClick={this.onClickCreatePld} hasIconOnly renderIcon={Add} iconDescription={"create org"}/></h2>
               {this.showPld()}
-              <h2 style={{marginTop: 10}}>Documents <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create document"}/></h2>
-              {this.showDocuments()}
-              <h2 style={{marginTop: 10}}>Calendriers <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create calendar"}/></h2>
+{/*              <h2 style={{marginTop: 20, marginBottom: 10}}>Documents <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create document"}/></h2>
+              {this.showDocuments()}*/}
+              <h2 style={{marginTop: 20, marginBottom: 10}}>Calendriers <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create calendar"}/></h2>
               {this.showCalendars()}
               {/* <h2>Templates <Button kind={"ghost"} onClick={this.onClickCreateTemplate} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
               <h2>Documents <Button kind={"ghost"} onClick={this.onClickCreateDocument} hasIconOnly renderIcon={Add} iconDescription={"Créer/Ajouter un document"}/></h2>*/}
-              <ButtonSet style={{marginTop: 10, marginBottom: '20px'}}>
-                <Button onClick={() => this.props.navigate('manage')} renderIcon={Settings} iconDescription={"Settings"}>Gérer</Button>
-                <Button disabled onClick={() => this.setState({openHistoryDialog: true})} renderIcon={RecentlyViewed} iconDescription={"History"}>Historique</Button>
-              </ButtonSet>
               {/*<Editor onSave={(content) => console.log('saved !', content)}/>*/}
             </Column>
             <Column lg={4}>
-              <Stack>
-                {this.showInfo()}
-                {this.showMembers()}
-              </Stack>
+              {this.showInfo()}
+              {this.showMembers()}
             </Column>
           </Grid>
         </Stack>

@@ -16,8 +16,6 @@ import {RequiredUserContextProps} from "../../context/UserContext";
 import {UserOnline, Asleep} from '@carbon/icons-react'
 import {formatLongDate} from "@pld/utils";
 
-
-
 export const defaultRefreshTime = 10 * 1000;
 
 export type OnlineOrgMembersComponentProps = {
@@ -111,7 +109,7 @@ export class OnlineOrgMembersComponent extends React.Component<OnlineOrgMembersC
 
   override render() {
     return (
-      <Tile>
+      <Tile style={{borderRadius: 10}}>
         <Stack>
           <h4>Membres</h4>
           <p>En ligne</p>

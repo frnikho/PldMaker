@@ -12,6 +12,7 @@ export type AuthModalComponentProps = {
   onUserRegistered: (user: User) => void;
   switchModal: () => void;
   onDismiss: () => void;
+  onRedirect: (path: string) => void;
 }
 
 export class AuthModalComponent extends React.Component<AuthModalComponentProps, unknown> {
@@ -22,7 +23,7 @@ export class AuthModalComponent extends React.Component<AuthModalComponentProps,
         {(auth) => {
           return (
             <>
-              <LoginModal open={this.props.openLoginModal} onDismiss={this.props.onDismiss} onUserLogged={this.props.onUserLogged} switchToRegister={this.props.switchModal} userContext={auth}/>
+              <LoginModal onRedirect={this.props.onRedirect} open={this.props.openLoginModal} onDismiss={this.props.onDismiss} onUserLogged={this.props.onUserLogged} switchToRegister={this.props.switchModal} userContext={auth}/>
               <RegisterModal open={this.props.openRegisterModal} onDismiss={this.props.onDismiss} onRegister={this.props.onUserRegistered} switchToRegister={this.props.switchModal} userContext={auth}/>
             </>
           )

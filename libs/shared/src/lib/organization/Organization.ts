@@ -2,6 +2,14 @@ import {User} from "../user/User";
 import {OrgHistory} from "./OrgHistory";
 import { Length } from "class-validator";
 
+export class MigrateOrganizationBody {
+  newOwnerId: string;
+
+  constructor(newOwnerId: string) {
+    this.newOwnerId = newOwnerId;
+  }
+}
+
 export class OrganizationSectionUpdateBody {
   @Length(3)
   name: string;

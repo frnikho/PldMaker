@@ -191,16 +191,16 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.pld.revisions.length > 0) {
       return this.state.pld.revisions[this.state.pld.revisions.length-1].owner.email;
     } else {
-      return ((this.state.org.owner as User).email);
+      return (this.state.org.owner.email);
     }
   }
 
   private showPldState() {
     return (
-      <Tile>
+      <Tile style={style.tile}>
         <Stack gap={6}>
           <h4>Status : {this.state.pld?.status.toUpperCase() ?? ""}</h4>
-          {this.showSignButton()}
+          {/*{this.showSignButton()}*/}
         </Stack>
       </Tile>
     )
@@ -208,7 +208,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
 
   private showQuickInformationPanel() {
     return (
-      <Tile>
+      <Tile style={style.tile}>
         <Stack gap={6}>
           <div>
             <h4>Date de création :</h4>
@@ -297,7 +297,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           })}
         </Select>
 
-        <Button onClick={this.onClickUpdatePld} renderIcon={Renew} iconDescription={"Update"}>Mettre à jour</Button>
+        <Button style={style.button} onClick={this.onClickUpdatePld} renderIcon={Renew} iconDescription={"Update"}>Mettre à jour</Button>
 
         <Accordion>
           {this.showRevisions()}
@@ -313,7 +313,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.pld.revisions.length <= 0) {
       return (
         <AccordionItem title={"Dernieres révisions du documents"}>
-          <h4 style={{margin: '10px'}}>Aucune révisions disponible, vous pouvez en créer dans les "Actions" en bas de page.</h4>
+          <h4 style={{margin: '10px'}}>Aucune révisions disponible.</h4>
         </AccordionItem>
       )
     }
@@ -354,7 +354,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.org === undefined || this.state.pld === undefined) {
       return (<ButtonSkeleton/>)
     } else {
-      return (<Button renderIcon={DocumentAdd} onClick={() => this.setState({openAddRevisionModal: true})}>Ajouter une révision</Button>)
+      return (<Button style={style.button} renderIcon={DocumentAdd} onClick={() => this.setState({openAddRevisionModal: true})}>Ajouter une révision</Button>)
     }
   }
 
@@ -370,7 +370,11 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.org === undefined || this.state.pld === undefined) {
       return (<ButtonSkeleton/>)
     } else {
-      return (<Button style={{marginTop: 10}} renderIcon={Classification} onClick={() => this.setState({openChangePldType: true})}>Changer l'état d'avancement</Button>)
+      return (
+        <div style={{marginTop: 18}}>
+          <Button style={style.button} renderIcon={Classification} onClick={() => this.setState({openChangePldType: true})}>Changer l'état d'avancement</Button>
+        </div>
+      )
     }
   }
 
@@ -386,7 +390,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.org === undefined || this.state.pld === undefined) {
       return (<ButtonSkeleton/>)
     } else {
-      return (<Button onClick={() => this.setState({openHistoryModal: true})} renderIcon={RecentlyViewed} iconDescription="">Voir tout les changements</Button>)
+      return (<Button style={style.button} onClick={() => this.setState({openHistoryModal: true})} renderIcon={RecentlyViewed} iconDescription="">Voir tout les changements</Button>)
     }
   }
 
@@ -394,7 +398,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.org === undefined || this.state.pld === undefined) {
       return (<ButtonSkeleton/>)
     } else {
-      return (<Button onClick={() => this.setState({openResumeModal: true})} renderIcon={Hourglass} iconDescription="">Voir le résume des J/H</Button>)
+      return (<Button style={style.button} onClick={() => this.setState({openResumeModal: true})} renderIcon={Hourglass} iconDescription="">Voir le résume des J/H</Button>)
     }
   }
 
@@ -491,7 +495,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.pld === undefined)
       return;
     return (
-      <Tile>
+      <Tile style={style.tile}>
         <div style={{display: 'flex'}}>
           <h4>État d'avancement</h4>
           <div style={{marginLeft: 'auto', marginTop:'auto', marginBottom: 'auto', display: 'flex', justifyContent: 'center'}}>
@@ -573,7 +577,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           {this.showModals()}
           <Column lg={12} md={8} sm={4}>
             <Stack gap={6}>
-              <Tile>
+              <Tile style={style.tile}>
                   <div style={{display: 'flex'}}>
                     <h1 style={{marginBottom: '20px'}}>Informations</h1>
                     <div style={{marginLeft: 'auto', marginRight: '0px', textAlign: 'end', marginTop:'auto', marginBottom: 'auto'}}>
@@ -582,22 +586,18 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
                   </div>
                 {this.showInfoPanel()}
               </Tile>
-              <Tile>
+              <Tile style={style.tile}>
                 <h1>DoDs</h1>
                 {this.showDataTable()}
               </Tile>
-              <ExpandableTile>
-                <TileAboveTheFoldContent>
+              <Tile style={style.tile}>
                   <h1>Documents</h1>
                   <p>Pour le moments, les documents ne sont pas encore disponible.</p>
-                </TileAboveTheFoldContent>
-                <TileBelowTheFoldContent>
                   <Lottie>
-                    <Lottie animationData={require('../../../assets/animations/wip.json')} loop={true} style={{width: '300px'}}/>
+                    <Lottie animationData={require('../../../assets/animations/wip.json')} loop={true} style={{width: '200px'}}/>
                   </Lottie>
-                </TileBelowTheFoldContent>
-              </ExpandableTile>
-              <ButtonSet style={{marginBottom: '20px'}}>
+              </Tile>
+              <ButtonSet style={{marginBottom: '20px', gap: 10}}>
                 {this.showGenerateButton()}
                 {this.showHistoryButton()}
                 {this.showResumeButton()}
@@ -619,3 +619,12 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
 }
 
 export default withNav(PldComponent);
+
+const style = {
+  tile: {
+    borderRadius: 10,
+  },
+  button: {
+    borderRadius: 6,
+  }
+}

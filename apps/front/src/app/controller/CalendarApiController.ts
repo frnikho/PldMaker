@@ -18,8 +18,8 @@ export class CalendarApiController {
     })
   }
 
-  public static createEvent(accessToken: string, orgId: string, calendarId: string, body: NewCalendarEvent, callback: CallbackCalendar) {
-    api.post<Calendar>(`organization/${orgId}/calendar/${calendarId}/event`, body, authorize(accessToken)).then((response) => {
+  public static createEvent(accessToken: string, orgId: string, calendarId: string, body: NewCalendarEvent, callback: CallbackEvent) {
+    api.post<CalendarEvent>(`organization/${orgId}/calendar/${calendarId}/event`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((error: ApiError) => {
       return callback(null, error);

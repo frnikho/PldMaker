@@ -29,7 +29,6 @@ export class NewCalendarComponent extends React.Component<NewCalendarProps, NewC
 
   constructor(props: NewCalendarProps) {
     super(props);
-    console.log(this.props);
     this.state = {
       errors: [],
       pld: {

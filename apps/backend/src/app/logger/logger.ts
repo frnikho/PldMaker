@@ -11,19 +11,27 @@ export class Logger implements LoggerService {
   }
 
   error(message: unknown, ...optionalParams: never[]): void {
-    log4js.getLogger(optionalParams[0] || "app").error(message);
+    if (process.env.LOG_LEVEL === 'ALL' || process.env.LOG_LEVEL === 'WARN' || process.env.LOG_LEVEL === 'ERROR') {
+      log4js.getLogger(optionalParams[0] || "app").error(message);
+    }
   }
 
   log(message: unknown, ...optionalParams: never[]): void {
-    log4js.getLogger(optionalParams[0] || "app").info(message);
+    if (process.env.LOG_LEVEL === 'ALL' || process.env.LOG_LEVEL === 'DEBUG') {
+      log4js.getLogger(optionalParams[0] || "app").info(message);
+    }
   }
 
   warn(message: unknown, ...optionalParams: never[]): void {
-    log4js.getLogger(optionalParams[0] || "app").warn(message);
+    if (process.env.LOG_LEVEL === 'ALL' || process.env.LOG_LEVEL === 'WARN') {
+      log4js.getLogger(optionalParams[0] || "app").warn(message);
+    }
   }
 
   debug(message: unknown, ...optionalParams: never[]): void {
-    log4js.getLogger(optionalParams[0] || "app").debug(message);
+    if (process.env.LOG_LEVEL === 'ALL' || process.env.LOG_LEVEL === 'DEBUG') {
+      log4js.getLogger(optionalParams[0] || "app").debug(message);
+    }
   }
 
 }

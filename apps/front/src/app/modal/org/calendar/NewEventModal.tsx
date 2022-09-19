@@ -1,7 +1,7 @@
 import React from "react";
-import {Checkbox, DatePicker, DatePickerInput, Modal, MultiSelect, RadioButton, RadioButtonGroup, TextArea, TextInput, TimePicker} from "carbon-components-react";
+import { Checkbox, Column, DatePicker, DatePickerInput, Grid, Modal, MultiSelect, RadioButton, RadioButtonGroup, TextArea, TextInput, TimePicker } from "carbon-components-react";
 import {RequiredLabel} from "../../../util/Label";
-import {Calendar, NewCalendarEvent, Organization, User} from "@pld/shared";
+import { Calendar, CalendarEvent, NewCalendarEvent, Organization } from "@pld/shared";
 import {FieldData} from "../../../util/FieldData";
 import Circle from "@uiw/react-color-circle";
 
@@ -11,6 +11,8 @@ import {RequiredUserContextProps} from "../../../context/UserContext";
 import {validate} from "class-validator";
 import {CalendarApiController} from "../../../controller/CalendarApiController";
 import { formatDateNumeric } from "../../../util/Date";
+import { toast } from "react-toastify";
+import ReactMarkdown from "react-markdown";
 
 type InvitedUser = {
   email: string;
@@ -35,6 +37,7 @@ export enum DayType {
 export type NewEventModalProps = {
   open: boolean;
   onDismiss: () => void;
+  onSuccess: (event: CalendarEvent) => void;
   type: NewEventType;
   dates: Date[];
   org: Organization;
@@ -48,6 +51,7 @@ export type NewEventModalState = {
   invitedUser: FieldData<InvitedUser[]>;
   eventColor: FieldData<string>;
   dates: FieldData<string[]>;
+  description: string;
 }
 
 export class NewEventModal extends React.Component<NewEventModalProps, NewEventModalState> {
@@ -58,6 +62,7 @@ export class NewEventModal extends React.Component<NewEventModalProps, NewEventM
       inviteType: InviteMembersType.allMembers,
       dayType: this.props.dates.length >= 2 ? DayType.MULTI_DAY : DayType.SINGLE_DAY,
       allDay: false,
+      description: '',
       eventColor: {
         value: 'F44E3B',
       },
@@ -71,7 +76,7 @@ export class NewEventModal extends React.Component<NewEventModalProps, NewEventM
     }
   }
 
-  override componentDidUpdate(prevProps: Readonly<NewEventModalProps>, prevState: Readonly<NewEventModalState>, snapshot?: any) {
+  override componentDidUpdate(prevProps: Readonly<NewEventModalProps>, prevState: Readonly<NewEventModalState>) {
     if (this.props.open && !prevProps.open) {
       this.init();
     }
@@ -86,6 +91,16 @@ export class NewEventModal extends React.Component<NewEventModalProps, NewEventM
     })
   }
 
+  private getEventMembers(): string[] {
+    let members: string[];
+    if (this.state.inviteType === InviteMembersType.allMembers) {
+      members = [...this.props.org.members, this.props.org.owner].map((u) => u._id);
+    } else {
+      members = this.state.invitedUser.value.map((u) => u.id);
+    }
+    return members.filter((u) => u !== this.props.userContext.user?._id);
+  }
+
   private createEvent(event) {
     const forms = event.currentTarget.form.elements;
     const title = forms[1].value;
@@ -93,7 +108,6 @@ export class NewEventModal extends React.Component<NewEventModalProps, NewEventM
     const dayStart = forms[7].value;
     let deadline: Deadline | undefined;
     let date: Date | undefined;
-    console.log(forms);
     if (this.state.dayType === DayType.SINGLE_DAY) {
       if (this.state.allDay) {
         date = new Date(Date.parse(`${dayStart}`))
@@ -107,9 +121,16 @@ export class NewEventModal extends React.Component<NewEventModalProps, NewEventM
         deadline = {startDate: new Date(Date.parse(`${dayStart}, ${forms[9].value}`)), endDate: new Date(Date.parse(`${forms[8].value}, ${forms[10].value}`))}
       }
     }
-    const newEvent: NewCalendarEvent = new NewCalendarEvent(title, description, this.state.invitedUser.value.map((a) => a.id), this.state.eventColor.value, this.state.allDay, this.state.dayType === DayType.MULTI_DAY, date, deadline);
-    validate(newEvent).then((errors) => {
+    const newEvent: NewCalendarEvent = new NewCalendarEvent(title, description, this.getEventMembers(), this.state.eventColor.value, this.state.allDay, this.state.dayType === DayType.MULTI_DAY, date, deadline);
+    validate(newEvent).then(() => {
       CalendarApiController.createEvent(this.props.userContext.accessToken, this.props.org._id, this.props.calendar._id, newEvent, (calendar, error) => {
+        if (error || calendar === null) {
+          toast('Une erreur est survenue !', {type: 'error'});
+        } else {
+          toast('Événement créer avec succès !', {type: 'success'});
+          this.props.onSuccess(calendar);
+        }
+
         //console.log(calendar, error);
       });
     })
@@ -168,7 +189,16 @@ export class NewEventModal extends React.Component<NewEventModalProps, NewEventM
           open={this.props.open} onRequestClose={this.props.onDismiss} size={'md'} modalLabel={"Nouveau event"} onRequestSubmit={(event) => this.createEvent(event)}>
           <Stack gap={3}>
             <TextInput id={"event-name"} labelText={<RequiredLabel message={"Nom"}/>} placeholder={"Réunion avant Follow-up..."}/>
-            <TextArea rows={4} id={"event-description"} labelText={<RequiredLabel message={"Description"}/>} placeholder={"Lien pour rejoindre la réunion: https://...."}/>
+            <Grid>
+              <Column xlg={8}>
+                <TextArea rows={10} id={"event-description"} value={this.state.description} onChange={(e) => this.setState({description: e.currentTarget.value})} labelText={<RequiredLabel message={"Description"}/>} placeholder={"Lien pour rejoindre la réunion: https://...."}/>
+              </Column>
+              <Column xlg={8} style={{marginTop: 20}}>
+                <ReactMarkdown>
+                  {this.state.description}
+                </ReactMarkdown>
+              </Column>
+            </Grid>
             <RadioButtonGroup
               legendText={<RequiredLabel message={"Durée"}/>}
               name="radio-day-type"
@@ -185,7 +215,7 @@ export class NewEventModal extends React.Component<NewEventModalProps, NewEventM
                 id="radio-20"
               />
             </RadioButtonGroup>
-            <Checkbox id={"all-day-checkbox"} labelText={this.state.dayType === DayType.SINGLE_DAY ? 'Toute la journée' : 'Tout les jours'} checked={this.state.allDay} onChange={(event, {checked}) => this.setState({allDay: checked})}/>
+            <Checkbox id={"all-day-checkbox"} labelText={this.state.dayType === DayType.SINGLE_DAY ? 'Toute la journée' : 'Toute la journée'} checked={this.state.allDay} onChange={(event, {checked}) => this.setState({allDay: checked})}/>
             {this.showDates()}
             <RadioButtonGroup
               legendText={<RequiredLabel message={"Membres"}/>}
@@ -211,7 +241,7 @@ export class NewEventModal extends React.Component<NewEventModalProps, NewEventM
               invalidText={this.state.invitedUser.error}
               invalid={this.state.invitedUser.error !== undefined}
               titleText={"Membres à inviter"}
-              items={(this.props.org.members as User[]).concat([this.props.org.owner as User]).map((user) => ({label: user.email, value: user._id}))}
+              items={[...this.props.org.members, this.props.org.owner].filter((a) => a._id !== this.props.userContext.user?._id).map((user) => ({label: user.email, value: user._id}))}
               label={this.state.invitedUser.value.map((a) => a.email).join(', ')}
               id="carbon-multiselect-example"
               selectionFeedback="top-after-reopen"/>

@@ -17,6 +17,7 @@ import {FAQPage} from "./page/FAQPage";
 import NewCalendarPage from "./page/organization/calendar/NewCalendarPage";
 import CalendarPage from "./page/organization/calendar/CalendarPage";
 import EventPage from "./page/organization/calendar/event/EventPage";
+import { AuthOtpPage } from "./page/AuthOtpPage";
 
 export function App() {
 
@@ -40,6 +41,9 @@ export function App() {
           </Route>
           <Route path={"/faq"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
             <Route index element={<FAQPage/>}/>
+          </Route>
+          <Route path={"/auth/otp"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
+            <Route index element={<AuthOtpPage/>}/>
           </Route>
           <Route path={"/organization"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
             <Route path={"new"} element={<NewOrganizationPage/>}/>

@@ -38,5 +38,7 @@ export type Error = {
 
 export enum ErrorType {
   API_ERROR = '',
+  MFA_OTP_REQUIRED = 'MFA_OTP_REQUIRED',
   NO_USER_FOUND_EMAIL = 'NO_USER_FOUND_EMAIL',
+  UNAUTHORIZED = 'UNAUTHORIZED'
 }

@@ -7,7 +7,7 @@ export class Mfa {
   @Prop({enum: MfaType})
   type: string;
 
-  @Prop({required: false, })
+  @Prop({required: false})
   validate: boolean;
 
   @Prop({required: true, ref: 'User', type: mongoose.Schema.Types.ObjectId})

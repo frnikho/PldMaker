@@ -16,6 +16,22 @@ export const formatLongDate = (date: Date): string => {
 }
 
 /**
+ * Format long date format like '22 septembre 2022'
+ * @param date
+ */
+export const formatAllDayEventDate = (date: Date): string => {
+  return date.toLocaleDateString("fr", {day: '2-digit', month: 'long', year: 'numeric'});
+}
+
+/**
+ * Format long date format like '22 septembre 2022'
+ * @param date
+ */
+export const formatLongDayEventDate = (date: Date): string => {
+  return date.toLocaleDateString("fr", {day: '2-digit', month: 'long', year: 'numeric'}) + ' à ' + date.toLocaleTimeString("fr");
+}
+
+/**
  * Format numeric date like '22/10/2000'
  * @param date
  */

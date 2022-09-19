@@ -20,7 +20,7 @@ export class PldHelper {
         path: 'revisions',
         populate: {
           path: 'owner',
-          model: 'User'
+          model: 'User',
         },
       })
       .populate({
@@ -75,7 +75,6 @@ export class PldHelper {
   }
 
   public async addRevision(user: User, org: Organization, pld: Pld, body: CreatePldRevisionBody) {
-    console.log(user, org, pld, body);
     const updatedPld = await PldHelper.populateAndExecute(this.pldModel.findOneAndUpdate({_id: pld._id}, {$addToSet: {revisions: body}, version: body.version, updated_date: new Date()}, {new: true}));
     this.eventEmitter.emit(PldEvents.onPldRevisionAdded, new PldRevisionAddedEvent(body.owner, pld._id, updatedPld.revisions[0]));
     this.eventEmitter.emit('Pld:Update', pld._id); //TODO Check useless of this

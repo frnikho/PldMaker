@@ -6,7 +6,7 @@ import {toast} from "react-toastify";
 
 const ENDPOINT = process.env['NX_SERVER_HOST'];
 
-const socket = io(ENDPOINT?.valueOf() ?? 'abc', {path: '/ws', transports: ['websocket']});
+const socket = io(ENDPOINT?.valueOf() ?? 'abc', {path: '/ws', transports: ['websocket'], timeout: 30000});
 
 export const SocketContext = React.createContext<socketio.Socket>(socket);
 

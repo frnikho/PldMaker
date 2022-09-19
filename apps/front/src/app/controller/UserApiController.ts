@@ -1,5 +1,5 @@
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
-import { User, UpdateUserBody, AddFavourBody, Favour, RemoveFavourBody, Mfa, MfaOtpBody } from "@pld/shared";
+import { User, UpdateUserBody, AddFavourBody, Favour, Mfa, MfaOtpBody, PayloadLogin } from "@pld/shared";
 import {AxiosError, AxiosResponse} from "axios";
 
 export type CallbackUser = (user: User | null, error?: ApiError) => void;
@@ -7,6 +7,8 @@ export type CallbackFavour = (favour: Favour | null, error?: ApiError) => void;
 
 export type CallbackMfa = (mfa: Mfa | null, error?: ApiError) => void;
 export type CallbackMfas = (mfa: Mfa[], error?: ApiError) => void;
+
+export type CallbackLogin = (mfa: string | null, error?: ApiError) => void;
 
 export class UserApiController {
 
@@ -53,7 +55,7 @@ export class UserApiController {
   }
 
   public static addFavour(accessToken: string, body: AddFavourBody, callback: CallbackUser) {
-    api.post(`user/favours/add`, body, authorize(accessToken)).then((response) => {
+    api.post(`user/favours`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       return callback(null, err.response?.data);
@@ -61,8 +63,8 @@ export class UserApiController {
   }
 
 
-  public static removeFavour(accessToken: string, body: RemoveFavourBody, callback: CallbackUser) {
-    api.post(`user/favours/remove`, body, authorize(accessToken)).then((response) => {
+  public static removeFavour(accessToken: string, favourId: string, callback: CallbackUser) {
+    api.delete(`user/favours/${favourId}`, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       return callback(null, err.response?.data);
@@ -95,6 +97,14 @@ export class UserApiController {
 
   public static verifyOtp(accessToken: string, body: MfaOtpBody, callback: CallbackMfa) {
     api.post(`auth/mfa/otp/validate`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data);
+    });
+  }
+
+  public static loginOtp(accessToken: string, body: MfaOtpBody, callback: CallbackLogin) {
+    api.post(`auth/mfa/otp/login`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       return callback(null, err.response?.data);

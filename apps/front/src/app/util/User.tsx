@@ -36,9 +36,7 @@ export class ShowFavourIcon extends React.Component<ShowFavourIconProps, unknown
   }
 
   private removeFavour() {
-    UserApiController.removeFavour(this.context.accessToken, {
-      favourId: this.props.data._id
-    }, (user, error) => {
+    UserApiController.removeFavour(this.context.accessToken, this.props.data._id, (user, error) => {
       if (error) {
         console.log(error);
       }

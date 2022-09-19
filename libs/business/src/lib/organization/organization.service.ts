@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import { NewOrgHistory, OrganizationDocument } from "./organization.schema";
-import { CreateOrganizationBody, InviteUserOrgBody, User, RemoveUserOrgBody, UpdateOrganizationBody } from "@pld/shared";
+import { CreateOrganizationBody, InviteUserOrgBody, User, RemoveUserOrgBody, UpdateOrganizationBody, MigrateOrganizationBody } from "@pld/shared";
 import { OrganizationHelper } from "./organization.helper";
 import { Organization } from "@pld/shared";
 import { CheckOrgPerm } from "./organization.util";
@@ -24,18 +24,9 @@ export class OrganizationService {
     return this.orgHelper.createOrg(user, org);
   }
 
-/*  public async delete(ownerId: string, orgObjectId: string) {
-    /!*return this.organizationModel.findOneAndDelete({_id: orgObjectId, owner: ownerId})
-      .exec();*!/
-  }*/
-
   @CheckOrgPerm({role: 'owner'})
-  public async deleteWithBody(user: User, org: Organization) {
+  public deleteWithBody(user: User, org: Organization) {
     return this.orgHelper.deleteOrgWithBody(user, org);
-  }
-
-  public update(user: User, org: Organization) {
-    //return this.orgHelper.update(user, org);
   }
 
   @CheckOrgPerm({role: 'owner'})
@@ -53,7 +44,7 @@ export class OrganizationService {
   }
 
   @CheckOrgPerm({role: 'owner'})
-  public async addMember(user: User, org: Organization, userToAdd: string) {
+  public addMember(user: User, org: Organization, userToAdd: string) {
     return this.orgHelper.addMember(user, org, userToAdd);
   }
 
@@ -63,8 +54,13 @@ export class OrganizationService {
   }
 
   @CheckOrgPerm({role: 'owner'})
-  public async removeMember(user: User, org: Organization, body: RemoveUserOrgBody): Promise<OrganizationDocument | null> {
+  public removeMember(user: User, org: Organization, body: RemoveUserOrgBody): Promise<OrganizationDocument | null> {
     return this.orgHelper.removeMember(user, org, body)
+  }
+
+  @CheckOrgPerm({role: 'owner'})
+  public migrate(user: User, org: Organization, body: MigrateOrganizationBody) {
+    return this.orgHelper.migrate(user, org, body);
   }
 
   public addHistory(orgId: string, history: NewOrgHistory) {

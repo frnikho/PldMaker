@@ -1,7 +1,7 @@
 import {Color, Deadline} from "@pld/utils";
-import {CalendarMember} from "./CalendarMember";
 import {User} from "../../user/User";
 import {Length} from "class-validator";
+import { CalendarMember } from "./CalendarMember";
 
 export class CalendarEvent {
   _id: string;

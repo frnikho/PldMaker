@@ -17,6 +17,8 @@ export * from './lib/pld/PldStatus';
 export * from './lib/pld/PldOwnerType';
 export * from './lib/pld/PldUpdateBody';
 
+export * from './lib/alert/Alert';
+
 export * from './lib/user/User';
 export * from './lib/user/Favour';
 export * from './lib/user/UpdateUserBody';

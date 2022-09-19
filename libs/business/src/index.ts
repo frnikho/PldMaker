@@ -11,6 +11,10 @@ export * from './lib/document/document.module';
 export * from './lib/template/template.module';
 
 export * from './lib/auth/socket/authws.guard';
+export * from './lib/auth/mfa/mfa.guard';
+export * from './lib/auth/mfa/mfa.service';
+export * from './lib/auth/mfa/mfa.helper';
+export * from './lib/auth/mfa/mfa.schema';
 export * from './lib/socket/gateway.socket';
 
 export * from './lib/user/user.schema';
@@ -18,3 +22,5 @@ export * from './lib/dod/dod.schema';
 export * from './lib/organization/organization.schema';
 export * from './lib/pld/pld.schema';
 export * from './lib/organization/calendar/calendar.model';
+
+export * from './lib/alert/alert.module';

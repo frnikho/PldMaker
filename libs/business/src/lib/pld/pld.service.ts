@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import {NewPldHistory} from "./pld.schema";
 import { PldOrgCreateBody, CreatePldRevisionBody, PldUpdateBody, Pld, Organization, User } from "@pld/shared";
 import {PldHelper} from "./pld.helper";
+import { CheckOrgPerm } from "../organization/organization.util";
+import { CheckPld } from "./pld.util";
 
 @Injectable()
 export class PldService {
@@ -22,14 +24,19 @@ export class PldService {
     return this.helper.find(pldId);
   }
 
+  @CheckOrgPerm()
+  @CheckPld()
   public async findPld(user: User, org: Organization, pld: Pld) {
     return pld;
   }
 
+  @CheckOrgPerm()
   public async findByOrganizationOwner(user: User, org: Organization) {
     return this.helper.getOrgPld(user, org);
   }
 
+  @CheckOrgPerm()
+  @CheckPld()
   public async updateWithBody(user: User, org: Organization, pld: Pld, body: PldUpdateBody) {
     return this.helper.updateWithBody(user, org, pld, body);
   }
@@ -40,10 +47,14 @@ export class PldService {
     return updatedPld;
   }*/
 
+  @CheckOrgPerm()
+  @CheckPld()
   public async delete(user: User, org: Organization, pld: Pld) {
     return this.helper.delete(user, org, pld)
   }
 
+  @CheckOrgPerm()
+  @CheckPld()
   public async addRevision(user: User, org: Organization, pld: Pld, body: CreatePldRevisionBody) {
     return this.helper.addRevision(user, org, pld, body);
   }

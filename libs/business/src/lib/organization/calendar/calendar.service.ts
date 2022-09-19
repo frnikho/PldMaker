@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import {CalendarHelper} from "./calendar.helper";
-import {NewCalendarBody, NewCalendarEvent, Organization} from "@pld/shared";
+import { NewCalendarBody, NewCalendarEvent, Organization, User } from "@pld/shared";
 import {InjectModel} from "@nestjs/mongoose";
 import {Model} from "mongoose";
 import {Calendar} from "./calendar.model";
+import { CheckOrgPerm } from "../organization.util";
 
 @Injectable()
 export class CalendarService {
@@ -12,28 +13,34 @@ export class CalendarService {
     @InjectModel('Calendar') private calendarModel: Model<Calendar>,
     private calendarHelper: CalendarHelper) {}
 
-  public createCalendar(userId: string, org: Organization, body: NewCalendarBody) {
-    return this.calendarHelper.createCalendar(userId, org, body);
+  @CheckOrgPerm()
+  public createCalendar(user: User, org: Organization, body: NewCalendarBody) {
+    return this.calendarHelper.createCalendar(user, org, body);
   }
 
-  public getAllCalendarsFromOrg(userId: string, org: Organization) {
-    return this.calendarHelper.getAllCalendars(userId, org);
+  @CheckOrgPerm()
+  public getAllCalendarsFromOrg(user: User, org: Organization) {
+    return this.calendarHelper.getAllCalendars(user, org);
   }
 
-  public getCalendar(userId: string, org: Organization, calendarId: string) {
-    return this.calendarHelper.getCalendar(userId, org, calendarId);
+  @CheckOrgPerm()
+  public getCalendar(user: User, org: Organization, calendarId: string) {
+    return this.calendarHelper.getCalendar(user, org, calendarId);
   }
 
-  public createEvent(userId: string, org: Organization, calendar: Calendar, body: NewCalendarEvent) {
-    return this.calendarHelper.createEvent(userId, org, calendar, body);
+  @CheckOrgPerm()
+  public createEvent(user: User, org: Organization, calendar: Calendar, body: NewCalendarEvent) {
+    return this.calendarHelper.createEvent(user, org, calendar, body);
   }
 
-  public getEvents(userId: string, org: Organization, calendar: Calendar) {
-    return this.calendarHelper.getEvents(userId, org, calendar);
+  @CheckOrgPerm()
+  public getEvents(user: User, org: Organization, calendar: Calendar) {
+    return this.calendarHelper.getEvents(user, org, calendar);
   }
 
-  public getEvent(userId: string, org: Organization, calendar: Calendar, event: string) {
-    return this.calendarHelper.getEvent(userId, org, calendar, event);
+  @CheckOrgPerm()
+  public getEvent(user: User, org: Organization, calendar: Calendar, event: string) {
+    return this.calendarHelper.getEvent(user, org, calendar, event);
   }
 
 }

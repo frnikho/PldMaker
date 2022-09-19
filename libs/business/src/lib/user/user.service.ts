@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common';
-import { DeviceBody, AddFavourBody, UpdateUserBody, User, Mfa } from "@pld/shared";
+import { DeviceBody, AddFavourBody, UpdateUserBody, User, Mfa, Favour } from "@pld/shared";
 import { UserHelper } from "./user.helper";
 
 @Injectable()
@@ -59,8 +59,7 @@ export class UserService {
       return this.userHelper.addFavourWithBody(user, body);
     }
 
-    public removeFavour(user: User, favourId: string) {
-     return this.userHelper.removeFavour(user, favourId);
+    public removeFavour(user: User, favour: Favour) {
+     return this.userHelper.removeFavour(user, favour);
     }
-
 }

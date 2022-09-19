@@ -1,9 +1,10 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "carbon-components-react";
 import { Dod, Organization, OrganizationSection, Pld, User } from "@pld/shared";
 import { CreateOrgSectionModal } from "../org/CreateOrgSectionModal";
 import { RequiredUserContextProps } from "../../context/UserContext";
 import { UpdateOrgSectionModal } from "../org/UpdateOrgSectionModal";
+import { PreviewDodModal } from "../dod/PreviewDodModal";
 
 type UserResume = {
   user: User;
@@ -24,8 +25,10 @@ export type ResumePldModalState = {
   resume: UserResume[];
   openCreateSection: boolean;
   openUpdateSection: boolean;
+  openDodPreview: boolean;
   preselectedSection: string;
   selectedSection?: OrganizationSection;
+  selectedDod?: Dod;
 }
 
 export class ResumePldModal extends React.Component<ResumePldModalProps, ResumePldModalState> {
@@ -36,6 +39,7 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
       preselectedSection: '',
       openCreateSection: false,
       openUpdateSection: false,
+      openDodPreview: false,
       resume: []
     }
     this.showSection = this.showSection.bind(this);
@@ -97,7 +101,7 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
     if (nextDod !== undefined) {
       const dodAV = dod.version.split('.');
       const dodBV = nextDod.version.split('.');
-      if (dodAV[1] !== dodBV[1]) {
+      if (dodAV[0] !== dodBV[0] || dodAV[1] !== dodBV[1]) {
         return true;
       }
     }
@@ -140,7 +144,7 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
     return (
       <TableRow style={{backgroundColor: 'red', color: 'red'}} id={'sectiondod_' + nextDod._id + 'section_' + nextDod._id} key={'section' + index + nextDod._id}>
         {this.showTableCellSection(title, orgSection)}
-        {this.getUsers(this.props.org).map((u) => <TableCell/>)}
+        {this.getUsers(this.props.org).map((u, index) => <TableCell key={'user_blank_cell_' + index}/>)}
       </TableRow>
     )
   }
@@ -150,9 +154,9 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
       const color = this.props.org.dodColors.find((a) => dod.status === a.name);
       const nextDod: Dod = this.props.dod[index+1];
       return (
-        <>
+        <Fragment key={index}>
           <TableRow id={'dod_' + dod._id} key={index + dod._id}>
-            <TableCell key={dod._id + '_name'}><div className="square" style={{
+            <TableCell style={{cursor: 'pointer'}} onClick={() => {this.props.hide(false); this.setState({openDodPreview: true, selectedDod: dod});}} key={dod._id + '_name'}><div className="square" style={{
               height: '12px',
               width: '12px',
               marginRight: 10,
@@ -174,7 +178,7 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
             })}
           </TableRow>
           {this.hasSection(dod, nextDod) ? this.showSection(index, nextDod) : null}
-        </>
+        </Fragment>
       )
     })
   }
@@ -182,6 +186,13 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
   private showModals() {
     return (
       <>
+        {this.state.selectedDod ? <PreviewDodModal dod={this.state.selectedDod} open={this.state.openDodPreview} onDismiss={() => {
+          this.setState({openDodPreview: false});
+          this.props.hide(true);
+        }} onSuccess={() => {
+          this.props.hide(true);
+          this.setState({openCreateSection: false})
+        }}/> : null}
         <CreateOrgSectionModal preselectedSection={this.state.preselectedSection} open={this.state.openCreateSection} onDismiss={() => {
           this.setState({openCreateSection: false});
           this.props.hide(true);

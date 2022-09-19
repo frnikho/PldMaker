@@ -33,9 +33,9 @@ export class FAQComponent extends React.Component<FAQProps, FAQState> {
         {this.state.redirect ? <Navigate to={this.state.redirect}/> : null}
         <h1>FAQ :</h1>
         <Accordion style={{marginTop: 20}}>
-          {this.getFAQ().map((f) => {
+          {this.getFAQ().map((f, index) => {
             return (
-              <AccordionItem title={<p style={{fontSize: this.props.home ? 18 : 24}}>{f.title}</p>}>
+              <AccordionItem key={index} title={<p style={{fontSize: this.props.home ? 18 : 24}}>{f.title}</p>}>
                 <p style={{fontSize: this.props.home ? 14 : 16}}>{f.answers}</p>
               </AccordionItem>
             )

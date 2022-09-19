@@ -105,7 +105,6 @@ export class PldHistoryModal extends React.Component<PldHistoryProps, PldHistory
     const details: HistoryDetails[] = [];
     this.props.dod.forEach((dod) => {
       dod.history.forEach((history) => {
-        console.log(history.action);
         details.push({
           action: history.action,
           editedFields: history.editedFields,

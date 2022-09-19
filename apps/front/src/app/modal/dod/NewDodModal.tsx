@@ -146,14 +146,10 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
   }
 
   private prefillField() {
-
     if (this.props.editionDod === undefined) {
       this.clearField();
       return;
     }
-
-    console.log(this.props.editionDod.estimatedWorkTime);
-
     this.setState({
       title: {
         value: this.props.editionDod.title,
@@ -303,8 +299,8 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
   private showDefinitionsOfDoneText() {
     return this.state.descriptionOfDone.value.map((dod, index) => {
       return (
-        <Grid key={index} style={{marginTop: '12px'}}>
-          <Column lg={11} md={7}>
+        <Grid key={index} style={{marginTop: '0px'}}>
+          <Column lg={10} md={7}>
             <TextInput
               onKeyPress={(event) => {this.onClickEnterDoD(event, index)}}
               invalid={this.state.descriptionOfDone.error !== undefined}
@@ -319,8 +315,10 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
               })
             }}/>
           </Column>
-          <Column lg={1} style={{}}>
-            <Button iconDescription={"Supprimer la line"} kind={"tertiary"} hasIconOnly renderIcon={Close} onClick={() => this.onClickDeleteDefinitionOfDone(index)} size={"sm"}/>
+          <Column lg={2} style={{marginTop: 'auto', marginBottom: 'auto'}}>
+            <Stack gap={2} orientation={"horizontal"}>
+              <Button iconDescription={'X'} kind={"tertiary"} hasIconOnly renderIcon={Close} onClick={() => this.onClickDeleteDefinitionOfDone(index)} size={"sm"}/>
+            </Stack>
           </Column>
         </Grid>
       )
@@ -330,7 +328,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
   private showEstimatedWorkTime() {
     return this.state.estimatedWorkOfTime.value.map((dod, index) => {
       return (
-        <Grid key={index} style={{marginTop: '12px', alignItems: 'center'}}>
+        <Grid key={index} style={{marginTop: '0px', alignItems: 'center'}}>
           <Column lg={5} md={3}>
             <FilterableMultiSelect
               invalid={this.state.estimatedWorkOfTime.error !== undefined}
@@ -363,7 +361,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
           </Column>
           <Column lg={3} md={2}>
             <Select
-              style={{marginBottom: '10px'}}
+              style={{marginTop: 'auto', marginBottom: 'auto'}}
               id="dod-estimated-work-time-format"
               onChange={(e) => {
                 const value = this.state.estimatedWorkOfTime.value;
@@ -380,7 +378,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
             </Select>
           </Column>
           <Column lg={1} md={1} style={{}}>
-            <Button iconDescription={"Supprimer la line"} kind={"tertiary"} hasIconOnly renderIcon={Close} onClick={() => this.onClickDeleteEstimatedWorkTime(index)} size={"sm"}/>
+            <Button iconDescription={"X"} kind={"tertiary"} hasIconOnly renderIcon={Close} onClick={() => this.onClickDeleteEstimatedWorkTime(index)} size={"sm"}/>
           </Column>
         </Grid>
       )
@@ -398,7 +396,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
 
   private onClickEnter(event, next) {
     if (event.key === 'Enter') {
-      console.log(event.currentTarget.form.elements[next].focus());
+      event.currentTarget.form.elements[next].focus();
     }
   }
 
@@ -407,7 +405,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
       return;
     return (
       <form>
-        <Stack gap={4}>
+        <Stack gap={3}>
           <Grid>
             <Column lg={3} md={3}>
               <TextInput
@@ -478,12 +476,12 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
           <>
             <RequiredLabel message={"Définition of Done"}/>
             {this.showDefinitionsOfDoneText()}
-            <Button style={{marginTop: '20px'}} size={"sm"} iconDescription={"Ajouter une définition"} kind={"secondary"}  onClick={this.onClickAddDefinitionOfDone} hasIconOnly renderIcon={Add}/>
+            <Button size={"sm"} iconDescription={"Ajouter une définition"} kind={"secondary"}  onClick={this.onClickAddDefinitionOfDone} hasIconOnly renderIcon={Add}/>
           </>
           <div>
             <RequiredLabel message={"Temps estimé"}/>
             {this.showEstimatedWorkTime()}
-            <Button style={{marginTop: '20px'}} size={"sm"} iconDescription={"Ajouter une définition"} kind={"secondary"}  onClick={this.onClickAddEstimatedWorkTime} hasIconOnly renderIcon={Add}/>
+            <Button size={"sm"} iconDescription={"Ajouter une définition"} kind={"secondary"}  onClick={this.onClickAddEstimatedWorkTime} hasIconOnly renderIcon={Add}/>
           </div>
         </Stack>
       </form>

@@ -1,16 +1,18 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { NewOrgHistory } from "./organization.schema";
 import { Model, Query } from "mongoose";
 import { UserService } from "../user/user.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
-import { InviteUserOrgBody, Organization, RemoveUserOrgBody, UpdateOrganizationBody } from "@pld/shared";
+import { InviteUserOrgBody, MigrateOrganizationBody, Organization, RemoveUserOrgBody, UpdateOrganizationBody } from "@pld/shared";
 import { CreateOrganizationBody, User } from "@pld/shared";
 import { OrgAddMemberEvent, OrgEvents, OrgRemoveMemberEvent } from "./organization.event";
 import { UserDocument } from "../user/user.schema";
 
 @Injectable()
 export class OrganizationHelper {
+
+  private readonly logger = new Logger('OrganizationHelper');
 
   constructor(
     @InjectModel('Organization') private organizationModel: Model<Organization>,
@@ -35,10 +37,14 @@ export class OrganizationHelper {
   }
 
   public createOrg(user: User, org: Organization) {
+    this.logger.debug(`Creation of Organization (${user.email} - ${user._id}): `)
+    this.logger.debug(org);
     return this.organizationModel.create({ ...org });
   }
 
   public createOrgWithBody(user: User, body: CreateOrganizationBody) {
+    this.logger.debug(`Creation of Organization (${user.email} - ${user._id}): `)
+    this.logger.debug(body);
     return this.organizationModel.create({
       name: body.name,
       description: body.description,
@@ -49,10 +55,14 @@ export class OrganizationHelper {
   }
 
   public deleteOrgWithBody(user: User, org: Organization) {
+    this.logger.debug(`Deleting organization (${user.email} - ${user._id}): `)
+    this.logger.debug(org);
     return OrganizationHelper.populateAndExecute(this.organizationModel.findOneAndDelete({_id: org._id, owner: user._id}));
   }
 
   public async updateWithBody(user: User, org: Organization, body: UpdateOrganizationBody) {
+    this.logger.debug(`Updating organization (${user.email} - ${user._id}): `)
+    this.logger.debug(body);
     const updatedOrg: Organization = await OrganizationHelper.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: org._id}, {...body, updated_date: new Date()}, {new: true}));
     this.eventEmitter.emit('Org:Update', updatedOrg._id);
     return updatedOrg;
@@ -63,6 +73,8 @@ export class OrganizationHelper {
   }
 
   public async addMember(user: User, org: Organization, userToAdd: string) {
+    this.logger.debug(`Adding new organization's member (${user.email} - ${user._id}): +${userToAdd})`);
+    this.logger.debug(org);
     const updatedOrg = await OrganizationHelper.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: org._id, owner: user}, {$addToSet: {members: userToAdd}}, {new: true}));
     this.eventEmitter.emit('Org:Update', updatedOrg._id);
     this.eventEmitter.emit(OrgEvents.onMemberAdded, new OrgAddMemberEvent(updatedOrg.membersId, userToAdd, user._id));
@@ -70,6 +82,8 @@ export class OrganizationHelper {
   }
 
   public async addMemberWithEmail(user: User, org: Organization, body: InviteUserOrgBody) {
+    this.logger.debug(`Adding new organization's member (${user.email} - ${user._id}): `)
+    this.logger.debug(body);
     if (org.owner.email === body.memberEmail || org.members.some((member) => member.email === body.memberEmail))
       throw new BadRequestException('User already in organization !');
     const invitedUser: UserDocument = await this.userService.findByEmail(body.memberEmail);
@@ -82,10 +96,23 @@ export class OrganizationHelper {
   }
 
   public async removeMember(user: User, org: Organization, body: RemoveUserOrgBody) {
+    this.logger.debug(`Removing organization's member (${user.email} - ${user._id}): -${body.memberId}`);
+    this.logger.debug(org);
     const updatedOrg = await OrganizationHelper.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: org._id, owner: user._id}, {$pull: {members: {$in: body.memberId}}}, {new: true}));
     this.eventEmitter.emit(OrgEvents.onMemberRemoved, new OrgRemoveMemberEvent(org._id, body.memberId, user._id));
     this.eventEmitter.emit('Org:Update', updatedOrg._id);
     return updatedOrg;
+  }
+
+  public async migrate(user: User, org: Organization, body: MigrateOrganizationBody) {
+    this.logger.debug(`Migrate organization's owner (${user.email} - ${user._id}): `);
+    this.logger.debug(body);
+    await OrganizationHelper.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: org._id}, {owner: body.newOwnerId,
+      $pull: {
+        members: body.newOwnerId,
+      },
+    }, {new: true}));
+    return OrganizationHelper.populateAndExecute(this.organizationModel.findOneAndUpdate({_id: org._id, $push: {members: [user._id.toString()]}}));
   }
 
   public addHistory(orgId: string, history: NewOrgHistory) {

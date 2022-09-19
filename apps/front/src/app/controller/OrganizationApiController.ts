@@ -7,7 +7,7 @@ import {
   RemoveUserOrgBody,
   OrganizationSectionBody,
   OrganizationSection,
-  OrganizationSectionUpdateBody
+  OrganizationSectionUpdateBody, MigrateOrganizationBody
 } from "@pld/shared";
 import {AxiosError} from "axios";
 
@@ -60,7 +60,7 @@ export class OrganizationApiController {
   }
 
   public static updateOrg(accessToken: string, body: UpdateOrganizationBody, callback: CallbackOrganization) {
-    api.patch<Organization>(`organization/${body.orgId}/update`, body, authorize(accessToken)).then((response) => {
+    api.patch<Organization>(`organization/${body.orgId}`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch(() => {
       return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
@@ -96,6 +96,22 @@ export class OrganizationApiController {
       return callback(response.data);
     }).catch(() => {
       return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
+    });
+  }
+
+  public static deleteOrg(accessToken: string, orgId: string, callback: CallbackOrganization) {
+    api.delete<Organization>(`organization/${orgId}`, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch(() => {
+      return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
+    });
+  }
+
+  public static migrateOrg(accessToken: string, orgId: string, body: MigrateOrganizationBody, callback: CallbackOrganization) {
+    api.post<Organization>(`organization/${orgId}/migrate`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch(() => {
+      return callback(null, {type: ErrorType.UNAUTHORIZED, message: ['Vous n\'avez les privilèges requit !']});
     });
   }
 

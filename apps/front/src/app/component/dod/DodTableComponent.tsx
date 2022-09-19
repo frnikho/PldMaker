@@ -127,7 +127,6 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
   }
 
   private onCreateDod(newDod: Dod) {
-    console.log(newDod.title);
     this.setState({
       openCreateModal: false,
       editionDod: undefined,
@@ -220,43 +219,6 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                 >
                   Supprimer
                 </TableBatchAction>
-                <TableBatchAction
-                  tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
-                  renderIcon={Download}
-                  onClick={() => {
-                    /*const dod: Dod[] = this.props.dod.map((dod) => {
-                      return {
-                        ...dod,
-                        estimatedWorkTime: dod.estimatedWorkTime.map((workTime) => {
-                          return {
-                            ...workTime,
-                            users: workTime.users.map((wtUser) => {
-                              console.log(wtUser);
-                              const u1 = (this.props.org.members as User[]).find((user) => user._id === wtUser._id);
-                              if (u1 !== undefined) {
-                                return u1.email;
-                              }
-                              if (wtUser._id === (this.props.org.owner as User)._id)
-                                return (this.props.org.owner as User).email;
-                              return undefined;
-                            }).filter((a) => a !== undefined) as string[],
-                          }
-                        })
-                      }
-                    })
-                    const pld: PldGenerator = new PldGenerator(this.props.pld, selectedRows.map((row) => {
-                      return dod.find((a) => row.id === a._id);
-                    }), this.props.org);
-
-
-                    PldGenerator.getBlobFromDoc(pld.generate(), (blob) => {
-                      window.open(URL.createObjectURL(blob));
-                    });*/
-
-                  }}
-                >
-                  Générer un docx
-                </TableBatchAction>
               </TableBatchActions>
               <TableToolbarContent>
                 <TableToolbarSearch
@@ -313,14 +275,13 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                   <TableRow {...getRowProps({ row })}>
                     <TableSelectRow {...getSelectionProps({ row })} />
                     {row.cells.map((cell) => {
-                      return (<TableCell key={cell.id}>{cell.value}</TableCell>)
+                      return (<TableCell key={cell.id} style={{cursor: 'pointer'}} onClick={() => this.onClickPreviewDod(this.props.dod.find((dod) => dod._id === row.id))}>{cell.value}</TableCell>)
                     })}
                     <TableCell>
                       {this.showSelectStatus(row.id)}
                     </TableCell>
                     <TableCell key={"actions"} style={{minWidth: '100px'}}>
                       <Link renderIcon={Edit} onClick={() => this.onClickUpdateDod(this.props.dod.find((dod) => dod._id === row.id))}/>
-                      <Link renderIcon={View} onClick={() => this.onClickPreviewDod(this.props.dod.find((dod) => dod._id === row.id))}/>
                     </TableCell>
                   </TableRow>
                 ))}

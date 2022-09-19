@@ -14,13 +14,15 @@ import { User } from "@pld/shared";
 import { UserDocument } from "../user/user.schema";
 import { AuthWsGuard } from "../auth/socket/authws.guard";
 
-@WebSocketGateway({transports: 'websocket', path: '/ws', pingInterval: 4000})
+@WebSocketGateway({transports: 'websocket', path: '/ws', pingInterval: 15000, pingTimeout: 30000, })
 export class Gateway {
-
-  constructor(private service: GatewayService) {}
 
   @WebSocketServer()
   server: Server;
+
+  constructor(private service: GatewayService) {
+
+  }
 
   private registerListeners(client: Socket, user: UserDocument) {
     client.on('disconnect', () => {

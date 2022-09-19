@@ -23,22 +23,22 @@ export class CalendarController {
    */
   @Post(':calendarId/event')
   public async createEvent(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId', CalendarPipe) calendar: Calendar, @Body() body: NewCalendarEvent) {
-    return this.calendarService.createEvent(req.user._id, org, calendar, body);
+    return this.calendarService.createEvent(req.user, org, calendar, body);
   }
 
   @Get(':calendarId/event')
   public async getEvents(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId', CalendarPipe) calendar: Calendar) {
-    return this.calendarService.getEvents(req.user._id, org, calendar);
+    return this.calendarService.getEvents(req.user, org, calendar);
   }
 
   @Get(':calendarId/event/:eventId')
   public async getEvent(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId', CalendarPipe) calendar: Calendar, @Param('eventId') eventId: string) {
-    return this.calendarService.getEvent(req.user._id, org, calendar, eventId);
+    return this.calendarService.getEvent(req.user, org, calendar, eventId);
   }
 
   @Post('new')
   public async createCalendar(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Body() body: NewCalendarBody) {
-    return this.calendarService.createCalendar(req.user._id, org, body);
+    return this.calendarService.createCalendar(req.user, org, body);
   }
 
   @Patch(':calendarId/update')
@@ -53,12 +53,12 @@ export class CalendarController {
 
   @Get()
   public async getAllCalendar(@Request() req, @Param('orgId', OrganizationPipe) org: Organization) {
-    return this.calendarService.getAllCalendarsFromOrg(req.user._id, org);
+    return this.calendarService.getAllCalendarsFromOrg(req.user, org);
   }
 
   @Get(':calendarId')
   public async getCalendar(@Request() req,  @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId') calendarId: string) {
-    return this.calendarService.getCalendar(req.user._id, org, calendarId);
+    return this.calendarService.getCalendar(req.user, org, calendarId);
   }
 
 

@@ -125,7 +125,7 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
                this.state.form.tags?.value?.splice(index, 1);
                this.updateField('tags', this.state.form.tags?.value);
              }}
-             size="lg">
+             size="md">
           {tag}
         </Tag>
       )
@@ -200,7 +200,7 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
         return (
           <Grid key={index} style={{paddingRight: 10, paddingLeft: 10}}>
             <Column lg={11}>
-              <TextInput id={"step"} labelText={false} value={step} onChange={(e) => {
+              <TextInput id={"step_" + index} labelText={false} value={step} onChange={(e) => {
                 this.state.form.steps.value[index] = e.currentTarget.value;
                 this.setState({});
               }}/>

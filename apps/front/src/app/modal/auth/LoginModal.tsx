@@ -1,22 +1,20 @@
 import React from "react";
-import {
-  InlineLoading, Link,
-  Modal,
-  TextInput,
-} from "carbon-components-react";
-import {Stack} from '@carbon/react';
-import {RequiredUserContextProps, UserContextProps} from "../../context/UserContext";
-import {User, LoginBody} from "@pld/shared";
+import { InlineLoading, Link, Modal, TextInput } from "carbon-components-react";
+import { Stack } from "@carbon/react";
+import { RequiredUserContextProps, UserContextProps } from "../../context/UserContext";
+import { LoginBody, User } from "@pld/shared";
 import ErrorManager from "../../manager/ErrorManager";
-import {toast} from "react-toastify";
-import {validate} from "class-validator";
-import {FieldData} from "../../util/FieldData";
-import {ReactFormValidation} from "../../util/Page";
+import { toast } from "react-toastify";
+import { validate } from "class-validator";
+import { FieldData } from "../../util/FieldData";
+import { ReactFormValidation } from "../../util/Page";
+import { ErrorType } from "../../util/Api";
 
 type LoginModalProps = {
   open: boolean;
   onDismiss: () => void;
   onUserLogged: (user: User) => void;
+  onRedirect: (path: string) => void;
   switchToRegister: () => void;
 } & RequiredUserContextProps;
 
@@ -58,6 +56,10 @@ export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalS
         return;
       authContext.login(loginBody, (user, error) => {
         if (error) {
+          if (error.type === ErrorType.MFA_OTP_REQUIRED) {
+            this.props.onRedirect('auth/otp');
+            this.props.onDismiss();
+          }
           toast(ErrorManager.LoginError(error.statusCode ?? -1).message, {type: 'error'});
         } else if (user !== null) {
           this.props.onUserLogged(user);

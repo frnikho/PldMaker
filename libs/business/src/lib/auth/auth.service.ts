@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/
 import { UserService } from "../user/user.service";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
-import { RegisterBody, RegisterResponse, User } from "@pld/shared";
+import { PayloadLogin, RegisterBody, RegisterResponse, User } from "@pld/shared";
 import { Timezone } from "@pld/utils";
 
 @Injectable()
@@ -24,7 +24,7 @@ export class AuthService {
   }
 
   public login(user: User) {
-    const payload = {email: user.email, sub: user._id.valueOf()};
+    const payload: PayloadLogin = {email: user.email, sub: user._id.valueOf(), mfa: []};
     return {
       access_token: this.jwtService.sign(JSON.stringify(payload))
     }

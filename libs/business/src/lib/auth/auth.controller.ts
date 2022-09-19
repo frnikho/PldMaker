@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Request, UseGuards } from "@nestjs/common";
 import {LocalAuthGuard} from "./guard/local-auth.guard";
 import {AuthService} from "./auth.service";
-import {Public} from "./jwt/public.decorator";
+import { BypassMfa, Public } from "./jwt/public.decorator";
 import { DeviceBody, MfaOtpBody, RegisterBody } from "@pld/shared";
 import {UserService} from "../user/user.service";
 import { MfaService } from "./mfa/mfa.service";
@@ -12,6 +12,7 @@ export class AuthController {
   constructor(private authService: AuthService, private userService: UserService, private mfaService: MfaService) {}
 
   @Public()
+  @BypassMfa()
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
   @Post('login')
@@ -23,6 +24,7 @@ export class AuthController {
 
   @Post('register')
   @Public()
+  @BypassMfa()
   @HttpCode(201)
   public register(@Body() body: RegisterBody) {
     return this.authService.register(body);
@@ -41,6 +43,12 @@ export class AuthController {
   @Post('mfa/otp/validate')
   public validateOtpCode(@Request() req, @Body() body: MfaOtpBody) {
     return this.mfaService.validateOtpCode(req.user, body);
+  }
+
+  @BypassMfa()
+  @Post('mfa/otp/login')
+  public loginOtpCode(@Request() req, @Body() body: MfaOtpBody) {
+    return this.mfaService.loginOtp(req.user, body);
   }
 
   @Delete('mfa/otp/:otpId')

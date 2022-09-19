@@ -53,7 +53,7 @@ export class NewTemplateComponent extends React.Component<NewTemplateProps, NewT
   private onClickPreview() {
     if (this.state.org === undefined)
       return;
-    const dodDocx = new DodDocx({
+    /*const dodDocx = new DodDocx({
       _id: 'abc',
       created_date: new Date(),
       estimatedWorkTime: [{value: 2, users: [{_id: '', devices: [], email: 'nicolas.sansd@gmail.com', firstname: 'Nico', lastname: 'S', timezone: Timezone["Europe/Paris"]}], format: ''}],
@@ -83,7 +83,7 @@ export class NewTemplateComponent extends React.Component<NewTemplateProps, NewT
       })
       console.log(this.state.previewUrl);
     })
-
+*/
   }
 
   private loadOrg() {

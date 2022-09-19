@@ -1,18 +1,19 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { MfaOtpBody, MfaType, User } from "@pld/shared";
+import { MfaOtpBody, MfaType, PayloadLogin, User } from "@pld/shared";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Query } from "mongoose";
 import { Mfa } from "./mfa.schema";
-import { authenticator, totp } from 'otplib';
+import { authenticator } from 'otplib';
 import * as base32 from 'base32';
 import { UserService } from "../../user/user.service";
+import { JwtService } from "@nestjs/jwt";
 
 
 @Injectable()
 export class MfaHelper {
-  constructor(@InjectModel('Mfa') private mfaModel: Model<Mfa>, private userService: UserService) {}
+  constructor(@InjectModel('Mfa') private mfaModel: Model<Mfa>, private userService: UserService, private jwtService: JwtService) {}
 
-  public static populateAndExecute(query: Query<any, any>) {
+  public static populateAndExecute<T, Z>(query: Query<T, Z>) {
     return query.populate('user').exec();
   }
 
@@ -44,15 +45,34 @@ export class MfaHelper {
       throw new BadRequestException('You need to enable MFA before validating token !');
     if (!authenticator.check(body.token, mfa.secret))
       throw new BadRequestException('Invalid OTP token !');
-    return MfaHelper.populateAndExecute(this.mfaModel.findOneAndUpdate({user: user}, {validate: 1, backupCode: base32.encode(user._id + process.env.MFA_SECRET)}, {new: true}).select('+backupCode'));
+    await this.mfaModel.findOneAndUpdate({user: user}, {validate: 1, activationDate: new Date(), backupCode: base32.encode(user._id + process.env.MFA_SECRET)}, {new: true}).select('+backupCode');
+    return this.jwtService.sign({email: user.email, sub: user._id, mfa: [{secret: mfa.secret, date: new Date()}]} as PayloadLogin);
   }
 
   public disableMfa(user: User, mfaId: string) {
     return MfaHelper.populateAndExecute(this.mfaModel.findOneAndDelete({_id: mfaId, user: user}));
   }
 
-  public getMfa(user: User) {
-    return MfaHelper.populateAndExecute(this.mfaModel.find({user: user}));
+  public getMfa(user: User, select = '') {
+    return MfaHelper.populateAndExecute(this.mfaModel.find({user: user}).select(select));
+  }
+
+  public async loginOtp(user: User, body: MfaOtpBody) {
+    const mfa = await this.mfaModel.findOne({user: user._id, type: MfaType.OTP}).select('+secret').exec();
+    if (!mfa)
+      throw new BadRequestException('You need to enable MFA before validating token !');
+    if (!authenticator.check(body.token, mfa.secret))
+      throw new BadRequestException('Invalid OTP token !');
+    return this.jwtService.sign({email: user.email, sub: user._id, mfa: [{secret: mfa.secret, date: new Date()}]} as PayloadLogin);
+  }
+
+  public async checkMfaAuth(user: User, bearerToken: string): Promise<boolean> {
+    const mfa: Mfa[] = await this.getMfa(user, '+secret');
+    const payload: PayloadLogin = this.jwtService.verify(bearerToken);
+    const otp = mfa.find((m) => m.type === MfaType.OTP && m.validate === true);
+    if (otp === undefined)
+      return true;
+    return payload.mfa.some((value) => value.secret === otp.secret);
   }
 
 }

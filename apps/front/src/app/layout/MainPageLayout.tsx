@@ -124,10 +124,10 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
       title = auth.user?.email.split('@')[0] ?? auth.user?.email ?? '';
     }
     return (<>
-      <HeaderGlobalAction
+      {/*<HeaderGlobalAction
         aria-label="Notifications">
         <Notification/>
-      </HeaderGlobalAction>
+      </HeaderGlobalAction>*/}
       <OverflowMenu ariaLabel="overflow-menu" style={{marginTop: 'auto', marginBottom: 'auto'}} menuOffset={{left: -60}} renderIcon={UserAvatar}>
         <OverflowMenuItem itemText={title} requireTitle disabled/>
         <OverflowMenuItem itemText="Mon profile" onClick={() => {
@@ -181,7 +181,7 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
   override render() {
     return (
       <>
-        <AuthModalComponent onDismiss={this.onDismissModal} openLoginModal={this.state.login} openRegisterModal={this.state.register} switchModal={this.switchModal} onUserRegistered={this.onUserRegistered} onUserLogged={this.onUserLogged}/>
+        <AuthModalComponent onRedirect={(path) => this.props.onRedirectUrl(path)} onDismiss={this.onDismissModal} openLoginModal={this.state.login} openRegisterModal={this.state.register} switchModal={this.switchModal} onUserRegistered={this.onUserRegistered} onUserLogged={this.onUserLogged}/>
         <HeaderContainer
           render={({ isSideNavExpanded, onClickSideNavExpand }) => (
             <>
@@ -212,17 +212,24 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
                   <SideNavItems>
                     <SideNavLink
                       large
+                      onClick={() => {
+                        onClickSideNavExpand();
+                        this.props.onRedirectUrl("/");
+                      }}
                       renderIcon={Dashboard}>
                       Dashboard
                     </SideNavLink>
-                    <SideNavLink
+{/*                    <SideNavLink
                       large
                       renderIcon={Account}>
                       Organisations
-                    </SideNavLink>
+                    </SideNavLink>*/}
                     <SideNavLink
                       large
-                      onClick={() => this.props.onRedirectUrl(`/faq`)}
+                      onClick={() => {
+                        onClickSideNavExpand();
+                        this.props.onRedirectUrl(`/faq`);
+                      }}
                       renderIcon={Legend}>
                       FAQ
                     </SideNavLink>
@@ -273,5 +280,4 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
       </>
     )
   }
-
 }

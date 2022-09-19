@@ -8,11 +8,13 @@ import {Stack} from '@carbon/react';
 import {AuthModalComponent} from "../component/AuthModalComponent";
 import {OrganizationHomeDashboard} from "../component/home/OrganizationHomeDashboard";
 import {FAQComponent} from "../component/home/FAQComponent";
+import { Navigate } from "react-router-dom";
 
 export type HomePageProps = unknown;
 export type HomePageState = {
   login: boolean;
   register: boolean;
+  redirect?: string;
 };
 
 export class HomePage extends React.Component<HomePageProps, HomePageState> {
@@ -98,7 +100,7 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
   private showWelcome() {
     return (
       <Stack gap={6}>
-        <AuthModalComponent onDismiss={this.onDismissModal} openLoginModal={this.state.login} openRegisterModal={this.state.register} switchModal={this.switchModal} onUserRegistered={this.onUserRegistered} onUserLogged={this.onUserLogged}/>
+        <AuthModalComponent onRedirect={() => this.setState({redirect: 'auth/otp'})} onDismiss={this.onDismissModal} openLoginModal={this.state.login} openRegisterModal={this.state.register} switchModal={this.switchModal} onUserRegistered={this.onUserRegistered} onUserLogged={this.onUserLogged}/>
         <Tile>
           <h1>Bienvenue sur votre PLD <span style={{fontWeight: 'bold'}}>[Maker]</span></h1>
           <p style={{marginTop: 10}}>PLD Maker est une web app vous permettant de suivre votre avancement dans votre EIP</p>
@@ -131,7 +133,11 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
   private showDashboard(userContext: UserContextProps) {
     return (
       <Stack>
-        <div>
+        <Tile>
+          <p style={{fontSize: 20}}>Hello World</p>
+          <p style={{fontSize: 14}}>Bienvenue sur votre tableau de bord</p>
+        </Tile>
+        <div style={{marginTop: 20}}>
           <h1>Bienvenue sur votre tableau de bord</h1>
           <p>Ici vous pouvez suivre l'avancement des PLDs et de leurs DoDs de vos différentes Organisation</p>
         </div>
@@ -145,6 +151,7 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
   override render() {
     return (
       <>
+        {this.state.redirect ? <Navigate to={this.state.redirect}/> : null}
         <UserContext.Consumer>
           {userContext => this.showState(userContext)}
         </UserContext.Consumer>

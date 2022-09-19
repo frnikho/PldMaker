@@ -62,7 +62,6 @@ export class ChartsDashboard extends React.Component<ChartsDashboardProps, Chart
   }
 
   override render() {
-    console.log(this.props.dod);
     return (
       <Stack>
         <h1>Avancement des PLDs</h1>

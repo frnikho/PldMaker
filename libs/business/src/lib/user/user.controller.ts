@@ -1,8 +1,9 @@
-import {Body, Controller, Get, Param, Patch, Post, Request} from '@nestjs/common';
-import { UpdateUserBody, AddFavourBody, User } from "@pld/shared";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Request } from "@nestjs/common";
+import { UpdateUserBody, AddFavourBody, User, Favour } from "@pld/shared";
 import { UserService } from "./user.service";
 import { ObjectIdPipe } from "../pipe/objectId.pipe";
 import { UserPipe } from "./user.pipe";
+import { FavourPipe } from "./favour.pipe";
 
 /**
  * @author Nicolas SANS
@@ -54,7 +55,7 @@ export class UserController {
    * @param req NestJS Request
    * @param body AddFavourBody
    */
-  @Post('favours/add')
+  @Post('favours')
   public async addFavour(@Request() req, @Body() body: AddFavourBody) {
     return this.userService.addFavour(req.user, body);
   }
@@ -62,11 +63,11 @@ export class UserController {
   /**
    * Remove favour for logged user
    * @param req NestJS Request
-   * @param favourId favourId
+   * @param favour Favour
    */
-  @Post('favours/:favourId/remove')
-  public async removeFavour(@Request() req, @Param('favourId', ObjectIdPipe) favourId: string) {
-    return this.userService.removeFavour(req.user, favourId);
+  @Delete('favours/:favourId')
+  public async removeFavour(@Request() req, @Param('favourId', FavourPipe) favour: Favour) {
+    return this.userService.removeFavour(req.user, favour);
   }
 
   /**

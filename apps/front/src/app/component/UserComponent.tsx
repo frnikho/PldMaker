@@ -10,7 +10,8 @@ import { Renew } from "@carbon/icons-react";
 
 import { Stack } from "@carbon/react";
 import { MfaModal } from "../modal/auth/MfaModal";
-import { Mfa, MfaType } from "@pld/shared";
+import { Mfa, MfaType, Organization } from "@pld/shared";
+import { OrganizationApiController } from "../controller/OrganizationApiController";
 
 export type UserComponentProps = RequiredUserContextProps;
 
@@ -20,14 +21,17 @@ export type UserComponentState = {
   domain: FieldData<string[]>;
   timezone: FieldData<string>;
   open: boolean;
-  mfa: Mfa[]
+  mfa: Mfa[];
+  org: Organization[];
 }
 
 export class UserComponent extends React.Component<UserComponentProps, UserComponentState> {
 
+
   constructor(props) {
     super(props);
     this.state = {
+      org: [],
       mfa: [],
       firstname: {
         value: ''
@@ -68,6 +72,13 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
         value: this.props.userContext.user.timezone,
       }
     });
+    OrganizationApiController.getMeOrganizations(this.props.userContext.accessToken, (orgs, error) => {
+      if (error) {
+        toast(error.message, {type: 'error'})
+      } else {
+        this.setState({org: orgs,})
+      }
+    });
     UserApiController.getMfa(this.props.userContext.accessToken, (mfa, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
@@ -96,7 +107,7 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
   }
 
   private showMfaOtp() {
-    const mfa = this.state.mfa.find((mfa) => mfa.type === MfaType.OTP && mfa.user._id === this.props.userContext.user?._id);
+    const mfa = this.state.mfa.find((mfa) => mfa.type === MfaType.OTP && mfa.user._id === this.props.userContext.user?._id && mfa.validate);
     if (this.state.mfa.length === 0 || mfa === undefined) {
       return (
         <>
@@ -130,18 +141,18 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
 
   private showInfo() {
     return (<Tile>
-      <h3 style={{marginBottom: '20px'}}>Mes informations</h3>
-      <TextInput disabled id={"updated-user"} labelText={"Date de création"} value={formatLongDate(new Date(this.props.userContext.user?.created_date ?? ''))}/>
-      <TextInput disabled id={"updated-user"} labelText={"Dernière mise a jour"} value={formatLongDate(new Date(this.props.userContext.user?.updated_date ?? ''))}/>
+        <h3 style={{marginBottom: '20px'}}>Mes informations</h3>
+      <TextInput disabled id={"created-date-user"} labelText={"Date de création"} value={formatLongDate(new Date(this.props.userContext.user?.created_date ?? ''))}/>
+      <TextInput disabled id={"updated-date-user"} labelText={"Dernière mise a jour"} value={formatLongDate(new Date(this.props.userContext.user?.updated_date ?? ''))}/>
       <TextInput disabled id={"email-user"} labelText={"Email"} value={this.props.userContext.user?.email}/>
-      <TextInput style={{marginBottom: '20px'}} id={"lastname"} labelText={"Nom"} value={this.state.lastname.value} onChange={(e) => {
+      <TextInput style={{marginBottom: '20px'}} id={"lastname-input"} labelText={"Nom"} value={this.state.lastname.value} onChange={(e) => {
         this.setState({
           lastname: {
             value: e.currentTarget.value
           }
         })
       }}/>
-      <TextInput id={"firstname"} labelText={"Prénom"} value={this.state.firstname.value} onChange={(e) => {
+      <TextInput id={"firstname-input-disabled"} labelText={"Prénom"} value={this.state.firstname.value} onChange={(e) => {
         this.setState({
           firstname: {
             value: e.currentTarget.value
@@ -155,9 +166,10 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
             } else {
               return -1;
             }
-          }).map((t) => {
+          }).map((t, index) => {
             return (
               <SelectItem
+                key={index}
                 value={t}
                 text={t}
               />
@@ -185,10 +197,38 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
     )
   }
 
-  private onMfaEnable() {
-    this.setState({open: false});
-    console.log('abc');
-    toast('2FA Activé', {type: 'success'});
+  private showOrgOwners(org: Organization[]) {
+    return (
+     <>
+       <p>
+         Votre compte est actuellement le dirigeant de ce(s) organisation(s) : <span style={{fontWeight: 'bold'}}>{org.map((a) => a.name).join(', ')} </span>
+       </p>
+       <p>
+         Vous devez léger ou supprimer ces organizations afin de pouvoir supprimer votre compte.
+       </p>
+     </>
+    )
+  }
+
+  private showDangerZone() {
+    const orgOwners = this.state.org.filter((org) => org.owner._id === this.props.userContext.user?._id);
+    return (
+      <Tile>
+        <h3 style={{marginBottom: '20px'}}>⚠ Supprimer mon compte </h3>
+        {orgOwners.length > 0 ? this.showOrgOwners(orgOwners) : null}
+      </Tile>
+    )
+  }
+
+  private onMfaEnable(token) {
+    this.props.userContext.saveOtpToken(token, (user, error) => {
+      if (error) {
+        toast('Une erreur est survenue !', {type: 'error'});
+      } else {
+        this.setState({open: false});
+        toast('2FA Activé', {type: 'success'});
+      }
+    })
   }
 
   override render() {
@@ -197,6 +237,7 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
         <MfaModal open={this.state.open} onDismiss={() => this.setState({open: false})} onSuccess={this.onMfaEnable} userContext={this.props.userContext}/>
         {this.showInfo()}
         {this.showSecurity()}
+        {this.showDangerZone()}
       </Stack>
     );
   }
