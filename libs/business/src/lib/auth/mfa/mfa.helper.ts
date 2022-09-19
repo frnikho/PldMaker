@@ -27,7 +27,7 @@ export class MfaHelper {
     if (!mfaModel) {
       console.log('created !');
       return await this.mfaModel.create({
-        validate: false,
+        verified: false,
         user: user._id,
         secret: secret,
         activationDate: new Date(),
@@ -45,7 +45,7 @@ export class MfaHelper {
       throw new BadRequestException('You need to enable MFA before validating token !');
     if (!authenticator.check(body.token, mfa.secret))
       throw new BadRequestException('Invalid OTP token !');
-    await this.mfaModel.findOneAndUpdate({user: user}, {validate: 1, activationDate: new Date(), backupCode: base32.encode(user._id + process.env.MFA_SECRET)}, {new: true}).select('+backupCode');
+    await this.mfaModel.findOneAndUpdate({user: user}, {verified: 1, activationDate: new Date(), backupCode: base32.encode(user._id + process.env.MFA_SECRET)}, {new: true}).select('+backupCode');
     return this.jwtService.sign({email: user.email, sub: user._id, mfa: [{secret: mfa.secret, date: new Date()}]} as PayloadLogin);
   }
 
@@ -69,7 +69,7 @@ export class MfaHelper {
   public async checkMfaAuth(user: User, bearerToken: string): Promise<boolean> {
     const mfa: Mfa[] = await this.getMfa(user, '+secret');
     const payload: PayloadLogin = this.jwtService.verify(bearerToken);
-    const otp = mfa.find((m) => m.type === MfaType.OTP && m.validate === true);
+    const otp = mfa.find((m) => m.type === MfaType.OTP && m.verified === true);
     if (otp === undefined)
       return true;
     return payload.mfa.some((value) => value.secret === otp.secret);

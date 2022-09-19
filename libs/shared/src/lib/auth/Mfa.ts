@@ -12,16 +12,16 @@ export class Mfa {
   secret: string;
   createdDate: Date;
   activationDate: Date;
-  validate: boolean;
+  verified: boolean;
 
-  constructor(type: MfaType, user: User, backupCode: string, secret: string, createdDate: Date, activationDate: Date, validate: boolean) {
+  constructor(type: MfaType, user: User, backupCode: string, secret: string, createdDate: Date, activationDate: Date, verified: boolean) {
     this.type = type;
     this.user = user;
     this.backupCode = backupCode;
     this.secret = secret;
     this.createdDate = createdDate;
     this.activationDate = activationDate;
-    this.validate = validate;
+    this.verified = verified;
   }
 }
 

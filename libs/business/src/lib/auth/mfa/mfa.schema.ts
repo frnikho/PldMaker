@@ -8,7 +8,7 @@ export class Mfa {
   type: string;
 
   @Prop({required: false})
-  validate: boolean;
+  verified: boolean;
 
   @Prop({required: true, ref: 'User', type: mongoose.Schema.Types.ObjectId})
   user: User;

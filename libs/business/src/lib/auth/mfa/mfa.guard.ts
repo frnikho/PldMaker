@@ -2,7 +2,6 @@ import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from "@
 import { BYPASS_MFA_KEY } from "../jwt/public.decorator";
 import { Reflector } from "@nestjs/core";
 import { MfaService } from "./mfa.service";
-import { Mfa, MfaType } from "@pld/shared";
 
 @Injectable()
 export class MfaGuard implements CanActivate {
