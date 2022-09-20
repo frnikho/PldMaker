@@ -107,7 +107,7 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
   }
 
   private showMfaOtp() {
-    const mfa = this.state.mfa.find((mfa) => mfa.type === MfaType.OTP && mfa.user._id === this.props.userContext.user?._id && mfa.validate);
+    const mfa = this.state.mfa.find((mfa) => mfa.type === MfaType.OTP && mfa.user._id === this.props.userContext.user?._id && mfa.verified);
     if (this.state.mfa.length === 0 || mfa === undefined) {
       return (
         <>

@@ -5,7 +5,8 @@
   "scripts": {
     "start": "nx serve",
     "build": "nx build",
-    "test": "nx test"
+    "test": "nx test",
+    "build:api": "env-cmd node dist/apps/backend/main.js"
   },
   "private": true,
   "dependencies": {
@@ -52,6 +53,7 @@
     "d3": "^7.5.0",
     "docx": "^7.4.1",
     "ejs": "^3.1.8",
+    "env-cmd": "^10.1.0",
     "js-yaml": "^4.1.0",
     "log4js": "^6.5.1",
     "lottie-react": "^2.2.1",

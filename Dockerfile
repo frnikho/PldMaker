@@ -18,7 +18,7 @@ RUN npm i --legacy-peer-deps
 FROM base as backend
 WORKDIR "/app/"
 RUN nx build backend
-CMD ["node", "dist/apps/backend/main.js"]
+CMD npm run build:api
 
 FROM base as frontend
 WORKDIR "/app/"

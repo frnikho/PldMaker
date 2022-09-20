@@ -7,6 +7,7 @@ import {Logger} from "./app/logger/logger";
 import * as requestIp from 'request-ip';
 import * as io from 'socket.io-client';
 
+
 class Server {
 
   private app: NestExpressApplication;
@@ -18,6 +19,7 @@ class Server {
   }
 
   public async start(): Promise<void> {
+    console.log(process.env);
     this.app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: new Logger(),
     });
@@ -49,5 +51,6 @@ class Server {
 }
 
 new Server().start().then(() => {
-  console.log('');
+  console.log('Hello World');
 });
+
