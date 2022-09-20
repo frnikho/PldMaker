@@ -4,7 +4,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-      target: backend
+      target: api
     container_name: pld_backend
     networks:
       - pld
@@ -14,7 +14,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-      target: frontend
+      target: web
     container_name: pld_frontend
     networks:
       - pld

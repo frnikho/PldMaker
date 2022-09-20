@@ -7,9 +7,7 @@ export type OtpLoginModalProps = {
   hide: (show) => void;
 } & RequiredUserContextProps;
 
-export type OtpLoginModalState = {
-
-}
+export type OtpLoginModalState = unknown;
 
 export class OtpLoginModal extends React.Component<OtpLoginModalProps, OtpLoginModalState> {
 

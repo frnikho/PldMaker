@@ -124,10 +124,10 @@ $ npm -f i
 Une fois cette étape fini, vous pourrez lancer les applications solo:
 
 ```shell
-# Pour le front 
-$ nx serve front
+# Pour le web 
+$ nx serve web
 # et pour le back
-$ nx serve backend
+$ nx serve api
 ```
 
 #### Tips 💡 
@@ -137,8 +137,8 @@ L'idéal quand vous devez développer sur le front ou le back est de lancer la d
 
 A la racine:
 ```shell
-$ nx build backend
-$ nx build front
+$ nx build api
+$ nx build web
 ```
 
 Un dossier dist a été créer avec votre app front en static et votre api.
@@ -146,8 +146,8 @@ vous pouvez par la suite lancer vos apps en mode prod:
 
 ```shell
 
-$ serve dist/apps/front
-$ node dist/apps/backend
+$ serve dist/apps/web
+$ node dist/apps/api
 ```
 
 

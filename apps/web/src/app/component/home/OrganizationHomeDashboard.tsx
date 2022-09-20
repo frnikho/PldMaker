@@ -17,7 +17,6 @@ import {Organization, Pld, Dod} from "@pld/shared";
 
 import {View, Add} from '@carbon/icons-react'
 import { formatShortDate } from "@pld/utils";
-import {DodApiController} from "../../controller/DodApiController";
 
 type OrganizationHomeDashboardProps = unknown & RequiredUserContextProps
 
@@ -148,7 +147,7 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
       return;
     return (
       <Stack>
-        <Lottie animationData={orgIllustrations[Math.floor(Math.random() * orgIllustrations.length)]} loop={true} style={{width: '300px'}}/>
+        <Lottie animationData={require('../../../assets/animations/organization.json')} loop={true} style={{width: '300px'}}/>
         <h4>Vous n'avez pas rejoin ou créer d'organisation</h4>
         <h4><Button kind={"ghost"} onClick={this.onClickCreateOrganization}>Cliquez ici pour en créer une !</Button></h4>
       </Stack>)

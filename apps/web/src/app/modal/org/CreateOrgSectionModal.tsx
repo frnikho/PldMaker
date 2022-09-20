@@ -3,7 +3,7 @@ import { Button, Modal, TextInput } from "carbon-components-react";
 
 import {Stack} from '@carbon/react';
 import { OrganizationApiController } from "../../controller/OrganizationApiController";
-import { Organization, OrganizationSection, OrganizationSectionUpdateBody } from "@pld/shared";
+import { Organization, OrganizationSectionBody } from "@pld/shared";
 import { RequiredUserContextProps } from "../../context/UserContext";
 import { toast } from "react-toastify";
 
@@ -12,24 +12,22 @@ export type OrgSectionModalProps = {
   onDismiss: () => void;
   onSuccess: () => void;
   org: Organization;
-  section: OrganizationSection;
+  preselectedSection?: string;
 } & RequiredUserContextProps;
 
-export type OrgSectionModalState = {
+export type OrgSectionModalState = unknown;
 
-}
-
-export class UpdateOrgSectionModal extends React.Component<OrgSectionModalProps, OrgSectionModalState> {
+export class CreateOrgSectionModal extends React.Component<OrgSectionModalProps, OrgSectionModalState> {
 
   constructor(props: OrgSectionModalProps) {
     super(props);
-    this.onClickUpdate = this.onClickUpdate.bind(this);
+    this.onClickCreate = this.onClickCreate.bind(this);
   }
 
-  private onClickUpdate(event: any) {
+  private onClickCreate(event: any) {
     const elements = event.currentTarget.form?.elements;
-    const body = new OrganizationSectionUpdateBody(elements[0].value);
-    OrganizationApiController.updateOrgSection(this.props.userContext.accessToken, this.props.org._id, this.props.section._id, body, (section, error) => {
+    const body = new OrganizationSectionBody(elements[0].value, elements[1].value);
+    OrganizationApiController.createOrgSection(this.props.userContext.accessToken, this.props.org._id, body, (section, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
       } else {
@@ -46,12 +44,12 @@ export class UpdateOrgSectionModal extends React.Component<OrgSectionModalProps,
         onRequestClose={this.props.onDismiss}
         onRequestSubmit={this.props.onSuccess}
         passiveModal
-        modalHeading={`Mettra a jour la section ${this.props.section.section}`}>
+        modalHeading="Créer une section">
         <form>
           <Stack gap={3}>
-            <TextInput disabled id={"section-input"} defaultValue={this.props.section.section} placeholder={"1.2"} labelText={"Section"}/>
+            <TextInput id={"section-input"} defaultValue={this.props.preselectedSection} placeholder={"1.2"} labelText={"Section"}/>
             <TextInput id={"name-input"} placeholder={"User"} labelText={"Nom"}/>
-            <Button onClick={this.onClickUpdate}>Créer</Button>
+            <Button onClick={this.onClickCreate}>Créer</Button>
           </Stack>
         </form>
       </Modal>

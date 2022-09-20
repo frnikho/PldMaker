@@ -15,12 +15,12 @@ WORKDIR "/app/"
 RUN npm i -g nx serve
 RUN npm i --legacy-peer-deps
 
-FROM base as backend
+FROM base as api
 WORKDIR "/app/"
-RUN nx build backend
+RUN nx build api
 CMD npm run build:api
 
-FROM base as frontend
+FROM base as web
 WORKDIR "/app/"
-RUN nx build front
-CMD ["serve", "dist/apps/front", "-p", "4200"]
+RUN nx build web
+CMD ["serve", "dist/apps/web", "-p", "4200"]

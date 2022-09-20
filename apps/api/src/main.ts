@@ -19,7 +19,6 @@ class Server {
   }
 
   public async start(): Promise<void> {
-    console.log(process.env);
     this.app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: new Logger(),
     });
@@ -51,6 +50,6 @@ class Server {
 }
 
 new Server().start().then(() => {
-  console.log('Hello World');
+  //
 });
 

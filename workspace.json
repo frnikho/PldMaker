@@ -2,10 +2,10 @@
   "$schema": "./node_modules/nx/schemas/workspace-schema.json",
   "version": 2,
   "projects": {
-    "backend": "apps/backend",
+    "api": "apps/api",
     "backend-testing": "apps/backend-testing",
     "business": "libs/business",
-    "front": "apps/front",
+    "web": "apps/web",
     "front-e2e": "apps/front-e2e",
     "shared": "libs/shared",
     "utils": "libs/utils"

@@ -8,9 +8,7 @@ import { UserApiController } from "../controller/UserApiController";
 import { toast } from "react-toastify";
 import { Navigate } from "react-router-dom";
 
-export type AuthOtpProps = {
-
-} & RequiredUserContextProps;
+export type AuthOtpProps = RequiredUserContextProps;
 
 export type AuthOtpState = {
   redirectUrl?: string;

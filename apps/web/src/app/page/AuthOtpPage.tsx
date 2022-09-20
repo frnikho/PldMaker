@@ -2,19 +2,11 @@ import React from "react";
 import { UserContext } from "../context/UserContext";
 import { AuthOtpComponent } from "../component/AuthOtpComponent";
 
-export type AuthOtpPageProps = {
+export type AuthOtpPageProps = unknown
 
-}
-
-export type AuthOtpPageState = {
-
-}
+export type AuthOtpPageState = unknown
 
 export class AuthOtpPage extends React.Component<AuthOtpPageProps, AuthOtpPageState> {
-
-  constructor(props: AuthOtpPageProps) {
-    super(props);
-  }
 
   override render() {
     return (
