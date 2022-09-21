@@ -8,8 +8,8 @@
     "test": "nx test",
     "dev:api": "env-cmd nx serve api",
     "dev:web": "env-cmd nx serve web",
-    "build:api": "env-cmd node dist/apps/api/main.js",
-    "build:web": "env-cmd serve dist/apps/web/"
+    "build:api": "nx build api ; cp .env dist/apps/api ; env-cmd node dist/apps/api/main.js",
+    "build:web": "nx build web ; cp .env dist/apps/web ; cd dist/apps/web && npx serve -s"
   },
   "private": true,
   "dependencies": {
@@ -87,6 +87,7 @@
     "socket.io-client": "^4.5.1",
     "styled-components": "5.3.5",
     "tslib": "^2.3.0",
+    "typedi": "^0.10.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

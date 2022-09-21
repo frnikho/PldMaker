@@ -5,6 +5,7 @@ import {Pld} from "../pld/pld.schema";
 import {DodStatus} from "@pld/shared";
 import {DodHistoryAction} from "@pld/shared";
 import { DatedObjectSchema } from "../utility/datted_object.utility";
+import { IsUserAlreadyExist } from "./dod.rule";
 
 export type DodDocument = Dod & Document;
 
@@ -53,10 +54,11 @@ export class DodHistory {
 @Schema()
 export class Dod extends DatedObjectSchema {
 
-  @Prop({required: true, validate: (obj) => {new RegExp('[0-9]+\\..*\\.[0-9]+').test(obj)}})
+  @Prop({required: true})
   version: string;
 
-  @Prop({required: true})
+  @Prop({required: true, validate: IsUserAlreadyExist})
+  @IsUserAlreadyExist()
   title: string;
 
   @Prop({required: true})

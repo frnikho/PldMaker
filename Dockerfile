@@ -18,6 +18,7 @@ RUN npm i --legacy-peer-deps
 FROM base as api
 WORKDIR "/app/"
 RUN nx build api
+
 CMD npm run build:api
 
 FROM base as web

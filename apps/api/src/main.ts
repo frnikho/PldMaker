@@ -6,7 +6,8 @@ import {NestExpressApplication} from "@nestjs/platform-express";
 import {Logger} from "./app/logger/logger";
 import * as requestIp from 'request-ip';
 import * as io from 'socket.io-client';
-
+import { Container } from 'typedi';
+import { useContainer, Validator } from 'class-validator';
 
 class Server {
 
@@ -22,6 +23,7 @@ class Server {
     this.app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: new Logger(),
     });
+    useContainer(this.app.select(AppModule), {fallbackOnErrors: true});
     await this.config();
     await this.app.listen(this.port, this.onServerOpened);
   }

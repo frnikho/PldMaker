@@ -1,4 +1,4 @@
-import {ArrayMinSize, ArrayNotContains, IsNotEmpty} from "class-validator";
+import { ArrayMinSize, ArrayNotContains, IsNotEmpty, Length, MaxLength } from "class-validator";
 
 export class DodFindPldBody {
   plds: string[];
@@ -11,18 +11,23 @@ export class DodFindPldBody {
 
 export class DodCreateBody {
   @IsNotEmpty({message: 'La version ne peut pas être vide !'})
+  /*@Matches(new RegExp('[0-9]+\\..*\\.[0-9]+'), {message: 'Format invalide !'})*/
   version: string;
 
   @IsNotEmpty({message: 'Le titre ne peut pas être vide !'})
+  @Length(2,64)
   title: string;
 
   @IsNotEmpty({message: 'Cette section ne peut pas être vide !'})
+  @Length(2,64)
   skinOf: string;
 
   @IsNotEmpty({message: 'Cette section ne peut pas être vide !'})
+  @Length(2,64)
   want: string;
 
   @IsNotEmpty({message: 'La description ne peut pas être vide !'})
+  @MaxLength(512)
   description: string;
 
   @IsNotEmpty({message: "le PLD owner ne peut pas être vide !"})
@@ -36,9 +41,8 @@ export class DodCreateBody {
   descriptionOfDone: string[];
 
   @ArrayMinSize(1)
-  @ArrayNotContains([{value: 0}, {users: ''}])
+  @ArrayNotContains([{value: 0}, {users: ''}, {users: ''}, {value: 0}])
   estimatedWorkTime: UserWorkTime[];
-
 
   constructor(version: string, title: string, skinOf: string, want: string, description: string, pldOwner: string, owner: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[]) {
     this.version = version;
