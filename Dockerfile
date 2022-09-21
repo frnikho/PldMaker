@@ -18,10 +18,9 @@ RUN npm i --legacy-peer-deps
 FROM base as api
 WORKDIR "/app/"
 RUN nx build api
-
 CMD npm run build:api
 
 FROM base as web
 WORKDIR "/app/"
 RUN nx build web
-CMD ["serve", "dist/apps/web", "-p", "4200"]
+CMD ["serve", "dist/apps/web", "-p", "4200", "-s"]

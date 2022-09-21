@@ -9,7 +9,7 @@
     "dev:api": "env-cmd nx serve api",
     "dev:web": "env-cmd nx serve web",
     "build:api": "nx build api ; cp .env dist/apps/api ; env-cmd node dist/apps/api/main.js",
-    "build:web": "nx build web ; cp .env dist/apps/web ; cd dist/apps/web && npx serve -s"
+    "build:web": "nx build web ; cp .env dist/apps/web ; cd dist/apps/web && npx serve -s -p 4200"
   },
   "private": true,
   "dependencies": {
