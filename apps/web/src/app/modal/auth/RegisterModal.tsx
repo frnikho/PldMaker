@@ -49,6 +49,23 @@ export class RegisterModal extends ReactFormValidation<RegisterModalProps, Regis
     this.onClickRegister = this.onClickRegister.bind(this);
   }
 
+  private resetFields() {
+    this.setState({
+      firstname: {
+        value: ''
+      },
+      lastname: {
+        value: ''
+      },
+      email: {
+        value: '',
+      },
+      password: {
+        value: ''
+      }
+    })
+  }
+
   public onClickRegister(authContext: UserContextProps) {
     const registerBody = new RegisterBody(this.state.email.value, this.state.password.value, this.state.firstname.value, this.state.lastname.value);
     this.setState({loading: true});
@@ -73,6 +90,7 @@ export class RegisterModal extends ReactFormValidation<RegisterModalProps, Regis
       });
     }).then(() => {
       this.setState({loading: false})
+      this.resetFields();
     });
   }
 

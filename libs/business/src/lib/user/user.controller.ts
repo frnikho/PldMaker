@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Request } from "@nestjs/common";
 import { UpdateUserBody, AddFavourBody, User, Favour } from "@pld/shared";
 import { UserService } from "./user.service";
-import { ObjectIdPipe } from "../pipe/objectId.pipe";
 import { UserPipe } from "./user.pipe";
 import { FavourPipe } from "./favour.pipe";
+import { CalendarService } from "../organization/calendar/calendar.service";
 
 /**
  * @author Nicolas SANS
@@ -11,13 +11,13 @@ import { FavourPipe } from "./favour.pipe";
  */
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private calendarService: CalendarService) {}
 
   /**
    * Get logged User information
    * @param req NestJS Request
    */
-  @Get([''])
+  @Get()
   public async get(@Request() req) {
     return req.user;
   }
@@ -48,6 +48,15 @@ export class UserController {
   @Get('favours')
   public async getFavour(@Request() req) {
     return this.userService.findFavour(req.user);
+  }
+
+  /**
+   * Get all user events
+   * @param req NestJS Request
+   */
+  @Get('events')
+  public async getEvents(@Request() req) {
+    return this.calendarService.getAllEvents(req.user);
   }
 
   /**

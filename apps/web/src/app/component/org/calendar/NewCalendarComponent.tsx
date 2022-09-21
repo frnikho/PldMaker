@@ -3,7 +3,7 @@ import {RequiredUserContextProps} from "../../../context/UserContext";
 import {FieldData, FieldError} from "../../../util/FieldData";
 import {NewCalendarBody, Pld} from "@pld/shared";
 import {PldApiController} from "../../../controller/PldApiController";
-import {Button, ButtonSet, ClickableTile, DatePicker, DatePickerInput, FormLabel, TextArea, TextInput} from "carbon-components-react";
+import { Breadcrumb, BreadcrumbItem, Button, ButtonSet, ClickableTile, DatePicker, DatePickerInput, FormLabel, TextArea, TextInput } from "carbon-components-react";
 
 import {Add, CheckmarkOutline, CircleDash} from '@carbon/icons-react';
 
@@ -13,6 +13,7 @@ import {Deadline} from "@pld/utils";
 import { validate } from "class-validator";
 import {CalendarApiController} from "../../../controller/CalendarApiController";
 import {toast} from "react-toastify";
+import { Navigate } from "react-router-dom";
 
 
 type NewCalendarProps = {
@@ -23,6 +24,7 @@ type NewCalendarState = {
   pld: FieldData<Pld[]>
   selectedPld: FieldData<string[]>
   errors: FieldError[];
+  redirectUrl?: string;
 }
 
 export class NewCalendarComponent extends React.Component<NewCalendarProps, NewCalendarState> {
@@ -117,6 +119,12 @@ export class NewCalendarComponent extends React.Component<NewCalendarProps, NewC
   override render() {
     return (
       <form>
+        {this.state.redirectUrl ? <Navigate to={this.state.redirectUrl}/> : null}
+        <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
+          <BreadcrumbItem onClick={() => this.setState({redirectUrl: '/'})}>Dashboard</BreadcrumbItem>
+          <BreadcrumbItem onClick={() => this.setState({redirectUrl: `/organization/${this.props.orgId}`})}>Organisation</BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>Calendrier</BreadcrumbItem>
+        </Breadcrumb>
         <Stack gap={4}>
           <h2>Créer un Calendrier</h2>
           <h4>Info</h4>

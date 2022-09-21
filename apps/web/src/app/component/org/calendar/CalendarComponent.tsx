@@ -6,8 +6,10 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from "@fullcalendar/daygrid";
 import listGridPlugin from '@fullcalendar/list';
 import interactionPlugin, {DateClickArg} from "@fullcalendar/interaction";
-import { Breadcrumb, BreadcrumbItem, Button, Column, Grid, Tile } from "carbon-components-react";
+import { Breadcrumb, BreadcrumbItem, Button, ButtonSet, Tile } from "carbon-components-react";
 import {NewEventModal, NewEventType} from "../../../modal/org/calendar/NewEventModal";
+
+import {TrashCan} from '@carbon/icons-react';
 
 import {Stack} from '@carbon/react';
 import {RequiredUserContextProps} from "../../../context/UserContext";
@@ -131,14 +133,14 @@ export class CalendarComponent extends React.Component<CalendarProps, CalendarSt
         {this.showModal()}
         <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
           <BreadcrumbItem onClick={() => this.setState({redirectUrl: `/`})}>Dashboard</BreadcrumbItem>
-          <BreadcrumbItem onClick={() => this.setState({redirectUrl: `/organization/${this.props.orgId}`})}>{this.props.org.value?.name ?? "Organisation"}</BreadcrumbItem>
+          <BreadcrumbItem onClick={() => this.setState({redirectUrl: `/organization/${this.props.orgId}`})}>Organisation</BreadcrumbItem>
           <BreadcrumbItem isCurrentPage>Calendrier</BreadcrumbItem>
         </Breadcrumb>
         <h4 style={{fontWeight: 'bold', fontSize: 26}}>{this.props.org.value?.name}</h4>
         <p style={{marginBottom: 18}}>{this.props.calendar.value?.name}</p>
         <FullCalendar
           eventClick={this.onClickEvent}
-          aspectRatio={1.5}
+          aspectRatio={2}
           headerToolbar={{start: 'dayGridMonth,dayGridWeek,listWeek',  center: 'title', end: 'prev,next'}}
           footerToolbar={{right: 'prev,next'}}
           selectable={true}
@@ -158,6 +160,9 @@ export class CalendarComponent extends React.Component<CalendarProps, CalendarSt
           plugins={[ dayGridPlugin, interactionPlugin, timeGridPlugin, listGridPlugin ]}
           initialView="dayGridMonth"
         />
+        <ButtonSet>
+          <Button kind={'danger'} renderIcon={TrashCan}>Supprimer</Button>
+        </ButtonSet>
       </>
     )
   }

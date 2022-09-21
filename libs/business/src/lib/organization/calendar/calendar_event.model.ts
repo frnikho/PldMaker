@@ -1,9 +1,9 @@
 import mongoose, {Document} from "mongoose";
-import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
+import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import {CalendarMemberStatus} from "@pld/shared";
 import {Deadline} from "@pld/utils";
 import { User } from "../../user/user.schema";
-import {Calendar} from "./calendar.model";
+import { Calendar } from "./calendar.model";
 
 @Schema({versionKey: false})
 export class CalendarMember extends Document {
@@ -51,3 +51,8 @@ export class CalendarEvent extends Document {
 }
 
 export const CalendarEventSchema = SchemaFactory.createForClass(CalendarEvent);
+
+export const CalendarEventDefinition: ModelDefinition = {
+  name: CalendarEvent.name,
+  schema: CalendarEventSchema
+}

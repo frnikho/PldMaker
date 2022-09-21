@@ -6,6 +6,7 @@ import {EventEmitterModule} from "@nestjs/event-emitter";
 import { AuthModule, OrganizationModule, PldModule, UserModule, JwtAuthGuard, TemplateModule, DocumentModule, GatewayModule, MfaGuard, MfaHelper, MfaSchema, AlertModule } from "@pld/business";
 import { MfaService } from "@pld/business";
 import { JwtModule } from "@nestjs/jwt";
+import { DbExceptionFilter } from "./exception/db.filter";
 
 @Module({
   imports: [
@@ -47,7 +48,11 @@ import { JwtModule } from "@nestjs/jwt";
     {
       provide: 'APP_GUARD',
       useClass: MfaGuard,
-    }
+    },
+    {
+      provide: 'APP_FILTER',
+      useClass: DbExceptionFilter,
+    },
   ],
 })
 export class AppModule {}

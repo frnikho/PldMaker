@@ -25,8 +25,8 @@ import {OrgHistoryModal} from "../../modal/org/OrgHistoryModal";
 
 import {RequiredLabel} from "../../util/Label";
 
-import {Organization, Pld, Calendar} from "@pld/shared";
-import {formatLongDate} from "@pld/utils";
+import { Organization, Pld, Calendar, OrganizationSectionUpdateBody, UpdateOrganizationBody } from "@pld/shared";
+import { capitalize, formatLongDate } from "@pld/utils";
 import {CalendarApiController} from "../../controller/CalendarApiController";
 import {toast} from "react-toastify";
 import {CircularProgress} from "../utils/CircularProgress";
@@ -44,6 +44,8 @@ export type OrganizationComponentState = {
   pld: FieldData<Pld[]>;
   calendars: FieldData<Calendar[]>;
   openHistoryDialog: boolean;
+  description: string;
+  versionShifting: number;
 } & PageState;
 
 const pldIllustration = [
@@ -70,6 +72,8 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     super(props);
     this.state = {
       openHistoryDialog: false,
+      description: '',
+      versionShifting: 0.1,
       org: undefined,
       loading: false,
       navigateUrl: undefined,
@@ -86,6 +90,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     this.onClickCreatePld = this.onClickCreatePld.bind(this);
     this.onClickCreateTemplate = this.onClickCreateTemplate.bind(this);
     this.onClickCreateCalendar = this.onClickCreateCalendar.bind(this);
+    this.onClickUpdate = this.onClickUpdate.bind(this);
   }
 
   override componentDidMount() {
@@ -121,7 +126,9 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
       }
       if (org !== null) {
         this.setState({
-          org: org
+          org: org,
+          description: org.description,
+          versionShifting: org.versionShifting
         });
         this.loadPld(org._id);
       }
@@ -174,9 +181,21 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     )
   }
 
-  private updateOrgData(key: string, data: any) {
+  private onClickUpdate() {
     if (this.state.org === undefined)
       return;
+    const body: UpdateOrganizationBody = {
+      orgId: this.state.org._id,
+      description: this.state.description,
+      versionShifting: this.state.versionShifting,
+    }
+    OrganizationApiController.updateOrg(this.props.userContext.accessToken, body, (org, error) => {
+      if (error) {
+        toast('Une erreur est survenue !', {type: 'error'});
+      } else {
+        toast('Organisation mis à jour !', {type: 'success'});
+      }
+    })
   }
 
   private showEditableInfo() {
@@ -185,10 +204,10 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     return (
       <Form>
         <Stack gap={6}>
-          <TextArea rows={4} id={"description"} labelText={"Description"} defaultValue={this.state.org.description}/>
-          <NumberInput iconDescription={""} id={"versionShifting"} defaultValue={this.state.org.versionShifting} label={<RequiredLabel message={"Versioning"}/>} value={this.state.org.versionShifting}/>
+          <TextArea rows={4} id={"description"} labelText={"Description"} value={this.state.description} onChange={(a) => this.setState({description: a.currentTarget.value})}/>
+          <NumberInput iconDescription={""} id={"versionShifting"} value={this.state.versionShifting} onChange={(a, {value}) => this.setState({versionShifting: value})} label={<RequiredLabel message={"Versioning"}/>}/>
           <div style={{display: 'flex', flexDirection: 'row', gap: 10}}>
-            <Button renderIcon={Renew} iconDescription={"Update"} style={{borderRadius: 8}}>Mettre à jour</Button>
+            <Button renderIcon={Renew} iconDescription={"Update"} style={{borderRadius: 8}} onClick={this.onClickUpdate}>Mettre à jour</Button>
             <Button onClick={() => this.props.navigate('manage')} style={{borderRadius: 8}} renderIcon={Settings} iconDescription={"Settings"}>Paramètre</Button>
           </div>
         </Stack>
@@ -224,7 +243,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
           <h4 style={{fontWeight: 600}}>Membres :</h4>
           {[...this.state.org.members, this.state.org.owner].map((user, index) => (
             <div key={index}>
-              <p>{user.lastname.toUpperCase()} {user.firstname}</p>
+              <p>{capitalize(user.firstname)} {user.lastname.toUpperCase()}</p>
               <p style={{fontWeight: 100, fontStyle: 'italic'}}>{user.email}</p>
             </div>
           ))}
@@ -326,7 +345,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
         {this.showModals()}
         <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
           <BreadcrumbItem onClick={() => this.props.navigate(`/`)}>Dashboard</BreadcrumbItem>
-          <BreadcrumbItem isCurrentPage>{this.state.org?.name ?? "Organisation"}</BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>Organisation</BreadcrumbItem>
         </Breadcrumb>
         {this.showCharts()}
         <Stack gap={4}>

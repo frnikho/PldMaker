@@ -51,6 +51,7 @@ export class AuthService {
       accessToken: this.login(createdUser).access_token,
       user: {
         roles: [],
+        domain: [],
         email: createdUser.email,
         lastname: createdUser.lastname,
         firstname: createdUser.firstname,

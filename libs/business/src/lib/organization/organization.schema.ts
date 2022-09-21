@@ -33,12 +33,12 @@ export class OrgHistory {
 
 const defaultDodColors: DodColor[] = [
   {
-    name: 'En cours',
-    color: 'FBBC04'
-  },
-  {
     name: 'À faire',
     color: '2D9BF0'
+  },
+  {
+    name: 'En cours',
+    color: 'FBBC04'
   },
   {
     name: 'Fini',

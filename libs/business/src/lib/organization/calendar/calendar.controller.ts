@@ -56,6 +56,7 @@ export class CalendarController {
     return this.calendarService.getAllCalendarsFromOrg(req.user, org);
   }
 
+
   @Get(':calendarId')
   public async getCalendar(@Request() req,  @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId') calendarId: string) {
     return this.calendarService.getCalendar(req.user, org, calendarId);

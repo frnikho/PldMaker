@@ -202,7 +202,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
             selectedRows,
           }) => (
           <TableContainer>
-            <TableToolbar size={"lg"}>
+            <TableToolbar size={"lg"} style={{marginBottom: 10}}>
               <TableBatchActions {...getBatchActionProps()}>
                 <TableBatchAction
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
@@ -248,6 +248,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                   </TableToolbarAction>
                 </TableToolbarMenu>
                 <Button
+                  style={{borderRadius: 8}}
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                   onClick={this.onClickCreateDod}
                   renderIcon={Add}

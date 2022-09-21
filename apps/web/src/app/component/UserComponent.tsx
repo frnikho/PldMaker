@@ -10,7 +10,7 @@ import { Renew } from "@carbon/icons-react";
 
 import { Stack } from "@carbon/react";
 import { MfaModal } from "../modal/auth/MfaModal";
-import { Mfa, MfaType, Organization } from "@pld/shared";
+import { Mfa, MfaType, Organization, User, UserDomain } from "@pld/shared";
 import { OrganizationApiController } from "../controller/OrganizationApiController";
 
 export type UserComponentProps = RequiredUserContextProps;
@@ -58,20 +58,7 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
   private loadInfo() {
     if (this.props.userContext.user?.firstname === undefined || this.props.userContext.user?.lastname === undefined || this.props.userContext.user.domain === undefined)
       return;
-    this.setState({
-      firstname: {
-        value: this.props.userContext.user.firstname,
-      },
-      lastname: {
-        value: this.props.userContext.user.lastname,
-      },
-      domain: {
-        value: this.props.userContext.user.domain,
-      },
-      timezone: {
-        value: this.props.userContext.user.timezone,
-      }
-    });
+    this.updateUserInfo(this.props.userContext.user);
     OrganizationApiController.getMeOrganizations(this.props.userContext.accessToken, (orgs, error) => {
       if (error) {
         toast(error.message, {type: 'error'})
@@ -79,11 +66,32 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
         this.setState({org: orgs,})
       }
     });
-    UserApiController.getMfa(this.props.userContext.accessToken, (mfa, error) => {
+    this.getMfaInfo(this.props.userContext.accessToken);
+  }
+
+  private getMfaInfo(accessToken: string) {
+    UserApiController.getMfa(accessToken, (mfa, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
       } else {
         this.setState({mfa: mfa});
+      }
+    });
+  }
+
+  private updateUserInfo(user: User) {
+    this.setState({
+      firstname: {
+        value: user.firstname,
+      },
+      lastname: {
+        value: user.lastname,
+      },
+      domain: {
+        value: user.domain ?? [],
+      },
+      timezone: {
+        value: user.timezone,
       }
     });
   }
@@ -101,7 +109,12 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
       }
       if (user !== null) {
         toast('Informations de votre profile mis a jour 👍', {type: 'success'});
-        this.loadInfo();
+        this.props.userContext.refreshUser((user, error) => {
+          console.log(user, error);
+          if (user !== null) {
+            this.updateUserInfo(user);
+          }
+        });
       }
     });
   }
@@ -118,7 +131,7 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
     } else {
       return (<>
         <Tile>OTP actif depuis: {formatLongDate(new Date(mfa.activationDate))}</Tile>
-        <Button kind={"ghost"} onClick={() => this.setState({open: true})}>Désactiver MFA</Button>
+        <Button disabled kind={"ghost"} onClick={() => this.setState({open: true})}>Désactiver MFA</Button>
       </>);
     }
   }
@@ -183,7 +196,11 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
         invalid={this.state.domain.error !== undefined}
         selectedItems={this.state.domain.value.map((domain) => ({label: domain}))}
         invalidText={this.state.domain.error}
-        items={[{label: 'Mobile'}, {label: 'Server'}, {label: 'Web'}, {label: 'Autre'}]}
+        items={Object.keys(UserDomain).map((d) => {
+          return {
+            label: d.charAt(0).toUpperCase() + d.slice(1).toLowerCase()
+          }
+        }).sort()}
         onChange={(e) => {
           this.setState({
             domain: {
@@ -227,6 +244,7 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
       } else {
         this.setState({open: false});
         toast('2FA Activé', {type: 'success'});
+        this.getMfaInfo(token);
       }
     })
   }

@@ -2,21 +2,21 @@ import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {
-  Button, ButtonSet, ClickableTile, Column, DataTableSkeleton, Grid,
+  Button, ClickableTile, Column, DataTableSkeleton, Grid,
   SkeletonPlaceholder,
-  Table,
-  TableBody, TableCell,
-  TableHead,
-  TableHeader,
-  TableRow, Tile
 } from "carbon-components-react";
 import Lottie from "lottie-react";
 import {Stack} from '@carbon/react'
 import {NavigationState, redirectNavigation} from "../../util/Navigation";
-import {Organization, Pld, Dod} from "@pld/shared";
+import { Organization, Pld, Dod, CalendarEvent } from "@pld/shared";
 
-import {View, Add} from '@carbon/icons-react'
+import {Add} from '@carbon/icons-react'
 import { formatShortDate } from "@pld/utils";
+import { UserApiController } from "../../controller/UserApiController";
+import FullCalendar, { EventClickArg } from "@fullcalendar/react";
+import interactionPlugin from "@fullcalendar/interaction";
+import listGridPlugin from "@fullcalendar/list";
+import { parseEvents } from "../../util/Event";
 
 type OrganizationHomeDashboardProps = unknown & RequiredUserContextProps
 
@@ -25,6 +25,7 @@ type OrganizationHomeDashboardState = {
   organization: Organization[];
   pld: Pld[];
   dods: Dod[];
+  calendarEvents: CalendarEvent[];
 } & NavigationState
 
 const orgIllustrations = [
@@ -44,10 +45,12 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
     this.state = {
       loading: true,
       organization: [],
+      calendarEvents: [],
       dods: [],
       pld: [],
     }
     this.onClickCreateOrganization = this.onClickCreateOrganization.bind(this);
+    this.onClickEvent = this.onClickEvent.bind(this);
   }
 
   override componentDidMount() {
@@ -59,6 +62,15 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
           organization: orgs,
           loading: false,
         });
+      } else {
+        //TODO check error
+      }
+    });
+    UserApiController.getEvents(this.props.userContext.accessToken, (event, error) => {
+      if (!error) {
+        this.setState({
+          calendarEvents: event,
+        })
       } else {
         //TODO check error
       }
@@ -83,44 +95,6 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
     )
   }
 
-  private showOrganizations() {
-    if (this.state.organization.length <= 0) {
-      return;
-    }
-    return (
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeader id={"name"} key={"name"}>Nom de l'organisation</TableHeader>
-            <TableHeader id={"description"} key={"description"}>Description</TableHeader>
-            <TableHeader id={"created_date"} key={"created_date"}>Date de création</TableHeader>
-            <TableHeader id={"author"} key={"author"}>Manager</TableHeader>
-            <TableHeader id={"action"} key={"action"}>Action</TableHeader>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {this.state.organization.map((org, index) => (
-            <TableRow key={index}>
-              <TableCell>{org.name}</TableCell>
-              <TableCell>{org.description}</TableCell>
-              <TableCell>{formatShortDate(new Date(org.created_date ?? new Date()))}</TableCell>
-              <TableCell>{org.owner.email}</TableCell>
-              <TableCell>
-                <ButtonSet>
-                  <Button
-                    onClick={() => {this.setState({
-                      navigateUrl: `/organization/${org._id}`
-                    })}}
-                    kind="ghost" renderIcon={View} iconDescription={"Gérer"} hasIconOnly/>
-                </ButtonSet>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    )
-  }
-
   private showOrgCards() {
     return (
       <Grid>
@@ -142,6 +116,38 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
     )
   }
 
+  private onClickEvent(eventArg: EventClickArg) {
+    const event: CalendarEvent | undefined = this.state.calendarEvents.find((evt) => evt._id === eventArg.event.id);
+    if (event === undefined)
+      return;
+    console.log(event);
+  }
+
+  private showNoEvents() {
+    return (
+      <>
+        <p>Vous n'avez pas d'évènements prochainement</p>
+        <Lottie animationData={require('../../../assets/animations/calendar.json')} style={{width: 300}} loop={true}/>
+      </>
+    )
+  }
+
+  private showRecap() {
+    if (this.state.calendarEvents.length <= 0)
+      return this.showNoEvents();
+    return (
+      <FullCalendar
+        eventClick={this.onClickEvent}
+        aspectRatio={4}
+        firstDay={1}
+        locale={'fr'}
+        events={(arg, successCallback) => {successCallback(parseEvents(this.state.calendarEvents))}}
+        plugins={[ interactionPlugin, listGridPlugin ]}
+        initialView="listWeek"
+      />
+    )
+  }
+
   private showNoOrganizations() {
     if (this.state.organization.length !== 0 || this.state.loading)
       return;
@@ -159,10 +165,18 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
         {redirectNavigation(this.state.navigateUrl)}
         {/*<h1>Status</h1>
         {this.showCharts()}*/}
-        <h1 style={style.orgTitle}>Mes organizations <Button kind={"ghost"} onClick={this.onClickCreateOrganization} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h1>
-        {this.showLoading()}
-        {this.showNoOrganizations()}
-        {this.showOrgCards()}
+        <Stack gap={8}>
+          <div>
+            <h1 style={style.orgTitle}>Recap</h1>
+            {this.showRecap()}
+          </div>
+          <div>
+            <h1 style={style.orgTitle}>Mes organizations <Button kind={"ghost"} onClick={this.onClickCreateOrganization} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h1>
+            {this.showLoading()}
+            {this.showNoOrganizations()}
+            {this.showOrgCards()}
+          </div>
+        </Stack>
       </>
     );
   }
@@ -170,7 +184,8 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
 
 const style = {
   orgTitle: {
-    marginBottom: 16,
+    marginBottom: 8,
+    fontWeight: 500
   },
   card: {
     borderRadius: 10,

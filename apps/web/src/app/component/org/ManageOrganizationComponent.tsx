@@ -9,12 +9,12 @@ import {
   Button,
   Column,
   Grid, Link,
-  Table, TableBatchAction, TableBatchActions,
+  Table,
   TableBody,
   TableCell, TableContainer,
   TableHead,
   TableHeader,
-  TableRow, TableSelectAll, TableSelectRow, TableToolbar, TableToolbarContent, TableToolbarMenu, TableToolbarSearch, TextInput,
+  TableRow, TableSelectAll, TableSelectRow, TableToolbar, TableToolbarContent, TextInput,
   Tile
 } from "carbon-components-react";
 import Block from "@uiw/react-color-block";
@@ -31,6 +31,8 @@ import {SocketContext} from "../../context/SocketContext";
 import { CreateOrgSectionModal } from "../../modal/org/CreateOrgSectionModal";
 import { DeleteOrgModal } from "../../modal/org/DeleteOrgModal";
 import { MigrateOrgModal } from "../../modal/org/MigrateOrgModal";
+import { UpdateOrgSectionModal } from "../../modal/org/UpdateOrgSectionModal";
+import { DeleteOrgSectionModal } from "../../modal/org/DeleteOrgSectionModal";
 
 export const headerData = [
   {
@@ -56,6 +58,9 @@ export type ManageOrgState = {
   openSection: boolean;
   openDelete: boolean;
   openMigrate: boolean;
+  openUpdateSection: boolean;
+  openDeleteSection: boolean;
+  selectedSection?: OrganizationSection;
 }
 
 class ManageOrganizationComponent extends React.Component<ManageOrgProps, ManageOrgState> {
@@ -71,6 +76,8 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
       openSection: false,
       openDelete: false,
       openMigrate: false,
+      openUpdateSection: false,
+      openDeleteSection: false,
       org: undefined,
       newUserInput: {
         value: '',
@@ -98,13 +105,7 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
   }
 
   private loadOrg() {
-    OrganizationApiController.getOrgSections(this.props.auth.accessToken, this.props.orgId, (section, error) => {
-      if (error) {
-        toast(error.message, {type: 'error'});
-      } else {
-        this.setState({orgSection: section})
-      }
-    });
+   this.loadSection();
     OrganizationApiController.findOrganizationById(this.props.auth.accessToken, this.props.orgId, (org, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
@@ -113,6 +114,16 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
         this.setState({
           org,
         })
+      }
+    });
+  }
+
+  private loadSection() {
+    OrganizationApiController.getOrgSections(this.props.auth.accessToken, this.props.orgId, (section, error) => {
+      if (error) {
+        toast(error.message, {type: 'error'});
+      } else {
+        this.setState({orgSection: section})
       }
     });
   }
@@ -280,7 +291,11 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
         <p>Une section correspond a la catégorie ou vos DoDs seront rangées.</p>
         <p>par example: La Section '2.6 Map' correspond au parent de toutes les DoDs 2.6.x</p>
         <p style={{fontStyle: 'italic'}}>Vous avez la possibilité de changer en temps réel le nom des section depuis la page de votre Pld</p>
-        <DataTable rows={this.state.orgSection.map((s) => ({...s, id: s._id}))} headers={headerData} isSortable locale={"fr"}>
+        <DataTable rows={this.state.orgSection.map((s) => ({...s, id: s._id})).sort((a, b) => {
+          if (b.section > a.section)
+            return (-1);
+          return 1;
+        })} headers={headerData} isSortable locale={"fr"}>
           {({
               rows,
               headers,
@@ -307,7 +322,6 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableSelectAll {...getSelectionProps()} />
                     {headers.map((header) => (
                       <TableHeader style={{whiteSpace: 'nowrap'}} {...getHeaderProps({ header })}>
                         {header.header}
@@ -318,9 +332,8 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
                 <TableBody>
                   {rows.map((row, index) => (
                     <TableRow {...getRowProps({ row })} key={index}>
-                      <TableSelectRow {...getSelectionProps({ row })} />
                       {row.cells.map((cell) => {
-                        return (<TableCell key={cell.id}>{cell.value}</TableCell>)
+                        return (<TableCell onClick={() => this.setState({selectedSection: this.state.orgSection.find((a) => a._id === row.id), openUpdateSection: true})} key={cell.id}>{cell.value}</TableCell>)
                       })}
                     </TableRow>
                   ))}
@@ -395,6 +408,25 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
         <MigrateOrgModal org={this.state.org} open={this.state.openMigrate} onSuccess={() => {
           this.setState({openMigrate: false});
         }} onClose={() => this.setState({openMigrate: false})} userContext={this.props.auth}/>
+        {this.showSectionModals()}
+      </>
+    )
+  }
+
+  private showSectionModals() {
+    if (this.state.selectedSection === undefined || this.state.org === undefined)
+      return;
+    console.log(this.state.selectedSection);
+    return (
+      <>
+        <UpdateOrgSectionModal open={this.state.openUpdateSection} onDismiss={() => this.setState({openUpdateSection: false})} onSuccess={() => {
+          toast('Section éditer avec succés !', {type: 'success'});
+          this.setState({openUpdateSection: false, selectedSection: undefined});
+        }} org={this.state.org} section={this.state.selectedSection} userContext={this.props.auth}/>
+        <DeleteOrgSectionModal open={this.state.openDeleteSection} onDismiss={() => this.setState({openDeleteSection: false})} onSuccess={() => {
+          toast('Section supprimer avec succés !', {type: 'success'});
+          this.setState({openDeleteSection: false});
+        }} org={this.state.org} section={this.state.selectedSection} userContext={this.props.auth}/>
       </>
     )
   }
@@ -402,16 +434,8 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
   private showOrg() {
     if (this.state.org === undefined)
       return;
-
     return (
       <Stack gap={6}>
-        <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
-          <BreadcrumbItem onClick={() => this.props.navigate('/')}>Dashboard</BreadcrumbItem>
-          <BreadcrumbItem onClick={() => {
-            this.props.navigate(`/organization/${this.props.orgId}`);
-          }}>{this.state.org?.name ?? "Organisation"}</BreadcrumbItem>
-          <BreadcrumbItem onClick={() => null} isCurrentPage>Manage</BreadcrumbItem>
-        </Breadcrumb>
         <h2>Status des DoDs</h2>
         <Tile style={{padding: '18px'}}>
           <Stack>
@@ -441,6 +465,11 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
   override render() {
     return (
       <>
+        <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
+          <BreadcrumbItem onClick={() => this.props.navigate('/')}>Dashboard</BreadcrumbItem>
+          <BreadcrumbItem onClick={() => {this.props.navigate(`/organization/${this.props.orgId}`);}}>Organisation</BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>Manage</BreadcrumbItem>
+        </Breadcrumb>
         {this.showModal()}
         {this.showOrg()}
       </>

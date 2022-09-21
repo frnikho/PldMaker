@@ -15,6 +15,8 @@ export class UserMock {
         devices: [],
         mfa: [],
         timezone: Timezone.CET,
+        firstname: 'abc',
+        lastname: 'def',
       };
     }
 

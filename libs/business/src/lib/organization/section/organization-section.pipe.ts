@@ -12,6 +12,7 @@ export class OrganizationSectionPipe implements PipeTransform {
   }
 
   async transform(value: string, metadata: ArgumentMetadata) {
+    console.log(value);
     value = new ObjectIdPipe().transform(value, metadata);
     const orgSection = await OrganizationSectionHelper.populateAndExecute(this.orgSectionModel.findOne({_id: value}));
     if (orgSection === null || orgSection === undefined)

@@ -2,6 +2,7 @@ import {Color, Deadline} from "@pld/utils";
 import {User} from "../../user/User";
 import {Length} from "class-validator";
 import { CalendarMember } from "./CalendarMember";
+import { Calendar } from "./Calendar";
 
 export class CalendarEvent {
   _id: string;
@@ -15,19 +16,21 @@ export class CalendarEvent {
   owner: User;
   createdDate: Date;
   updatedDate: Date;
+  calendar: Calendar;
 
-  constructor(_id: string, title: string, description: string, allDay: boolean, invitedMembers: CalendarMember[], color: Color, date: Date, deadline: Deadline, owner: User, createdDate: Date, updatedDate: Date) {
-    this._id = _id;
+  constructor(id: string, title: string, description: string, invitedMembers: CalendarMember[], color: Color, date: Date, deadline: Deadline, allDay: boolean, owner: User, createdDate: Date, updatedDate: Date, calendar: Calendar) {
+    this._id = id;
     this.title = title;
     this.description = description;
-    this.allDay = allDay;
-    this.createdDate = createdDate;
-    this.updatedDate = updatedDate;
     this.invitedMembers = invitedMembers;
     this.color = color;
     this.date = date;
     this.deadline = deadline;
+    this.allDay = allDay;
     this.owner = owner;
+    this.createdDate = createdDate;
+    this.updatedDate = updatedDate;
+    this.calendar = calendar;
   }
 }
 

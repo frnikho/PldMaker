@@ -57,4 +57,8 @@ export class CalendarHelper {
     return CalendarHelper.populateAndExecuteEvent(this.eventModel.findOne({calendar: calendar._id, _id: eventId, $or: [{owner: user}, {invitedMembers: {$in: [user._id.toString()]}}]}));
   }
 
+  public async getAllEvents(user: User) {
+    return CalendarHelper.populateAndExecuteEvent(this.eventModel.find({$or: [{owner: user}, {invitedMembers: {$in: [user._id.toString()]}}]}));
+  }
+
 }

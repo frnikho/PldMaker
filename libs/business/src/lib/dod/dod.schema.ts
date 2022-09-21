@@ -53,7 +53,7 @@ export class DodHistory {
 @Schema()
 export class Dod extends DatedObjectSchema {
 
-  @Prop({required: true})
+  @Prop({required: true, validate: (obj) => {new RegExp('[0-9]+\\..*\\.[0-9]+').test(obj)}})
   version: string;
 
   @Prop({required: true})

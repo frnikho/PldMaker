@@ -1,5 +1,5 @@
 import mongoose, {Document} from "mongoose";
-import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
+import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import {Deadline} from "@pld/utils";
 import {Pld} from "../../pld/pld.schema";
 import {User} from "../../user/user.schema";
@@ -34,3 +34,8 @@ export class Calendar extends Document {
 }
 
 export const CalendarSchema = SchemaFactory.createForClass(Calendar);
+
+export const CalendarDefinition: ModelDefinition = {
+  name: Calendar.name,
+  schema: CalendarSchema
+}

@@ -7,14 +7,14 @@ export class User {
   password?: string;
   firstname: string;
   lastname: string;
-  domain?: string[];
+  domain: UserDomain[];
   roles?: string[];
   devices: Device[];
   timezone: Timezone;
   created_date: Date;
   updated_date: Date;
 
-  constructor(id: string, email: string, password: string, firstname: string, lastname: string, domain: string[], roles: string[], devices: Device[], timezone: Timezone, created_date: Date, updated_date: Date) {
+  constructor(id: string, email: string, password: string, firstname: string, lastname: string, domain: UserDomain[], roles: string[], devices: Device[], timezone: Timezone, created_date: Date, updated_date: Date) {
     this._id = id;
     this.email = email;
     this.password = password;
@@ -33,5 +33,8 @@ export enum UserDomain {
   MOBILE = 'Mobile',
   SERVER = 'Server',
   WEB = 'Web',
+  DEVOPS = 'DevOps',
+  CLOUD = 'Cloud',
+  VPS = 'Vps',
   OTHER = 'Autre',
 }

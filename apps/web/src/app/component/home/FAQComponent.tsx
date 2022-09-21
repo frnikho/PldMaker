@@ -43,7 +43,7 @@ export class FAQComponent extends React.Component<FAQProps, FAQState> {
         </Accordion>
         <Button style={{marginTop: 10, display: this.props.home ? 'flex' : 'none'}} kind={"ghost"} onClick={() => {this.setState({redirect: '/faq'})}}>Voir toutes les questions</Button>
         <Tile style={{display: this.props.home ? 'none' : 'flex'}}>
-          <p>Si vous avez d'autre questions ou bien des suggestions a faire, n'hésitez pas a contacter <Link href={config.admin.website}>Votre Administrateur 📧</Link></p>
+          <p>Si vous avez d'autre questions ou bien des suggestions a faire, n'hésitez pas a contacter <Link target="_blank" href={config.admin.website}>Votre Administrateur 📧</Link></p>
         </Tile>
       </>
     )

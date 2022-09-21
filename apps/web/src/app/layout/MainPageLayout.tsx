@@ -20,7 +20,7 @@ import {
 
 import {Layer} from '@carbon/react';
 
-import {Bee, Dashboard, Login, Notification, UserAvatar, Account, Legend} from '@carbon/icons-react'
+import {Bee, Dashboard, Login, UserAvatar, Legend} from '@carbon/icons-react'
 
 import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
 import {NavigationState} from "../util/Navigation";
@@ -123,11 +123,7 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
     } else {
       title = auth.user?.email.split('@')[0] ?? auth.user?.email ?? '';
     }
-    return (<>
-      {/*<HeaderGlobalAction
-        aria-label="Notifications">
-        <Notification/>
-      </HeaderGlobalAction>*/}
+    return (
       <OverflowMenu ariaLabel="overflow-menu" style={{marginTop: 'auto', marginBottom: 'auto'}} menuOffset={{left: -60}} renderIcon={UserAvatar}>
         <OverflowMenuItem itemText={title} requireTitle disabled/>
         <OverflowMenuItem itemText="Mon profile" onClick={() => {
@@ -140,8 +136,7 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
           auth.logout();
           this.props.onRedirectUrl('/');
         }} />
-      </OverflowMenu>
-    </>)
+      </OverflowMenu>)
   }
 
   private showState(auth: UserContextProps) {
@@ -153,29 +148,40 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
   }
 
   private showFavoursPld(auth: UserContextProps, onClickSideNavExpand: () => void) {
-    return auth.favours?.pld.map((pld, index) => {
-      return (
-        <SideNavLink key={index} onClick={() => {
-          onClickSideNavExpand();
-          this.props.onRedirectUrl(`/organization/${pld.owner._id}/pld/${pld._id}`)
-        }}>
-          {pld.title}
-        </SideNavLink>
+    if (auth.favours?.pld === undefined || auth.favours.pld.length <= 0)
+      return;
+    return (
+      <SideNavMenu title="PLD" large>
+        {auth.favours?.pld.map((pld, index) => {
+          return (
+            <SideNavLink key={index} onClick={() => {
+              onClickSideNavExpand();
+              this.props.onRedirectUrl(`/organization/${pld.owner._id}/pld/${pld._id}`)
+            }}>
+              {pld.title}
+            </SideNavLink>
+          )
+        })}
+      </SideNavMenu>
       )
-    })
   }
 
   private showFavoursOrg(auth: UserContextProps, onClickSideNavExpand: () => void) {
-    return auth.favours?.org.map((org, index) => {
-      return (
-        <SideNavMenuItem key={index} onClick={() => {
-          onClickSideNavExpand();
-          this.props.onRedirectUrl(`/organization/${org._id}`)
-        }}>
-          {org.name}
-        </SideNavMenuItem>
-      )
-    })
+    if (auth.favours?.org === undefined || auth.favours.org.length <= 0)
+      return;
+    return (
+      <SideNavMenu title="Organisation" large>
+        {auth.favours?.org.map((org, index) => {
+          return (
+            <SideNavMenuItem key={index} onClick={() => {
+              onClickSideNavExpand();
+              this.props.onRedirectUrl(`/organization/${org._id}`)
+            }}>
+              {org.name}
+            </SideNavMenuItem>
+          )
+        })}
+      </SideNavMenu>);
   }
 
   override render() {
@@ -219,11 +225,6 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
                       renderIcon={Dashboard}>
                       Dashboard
                     </SideNavLink>
-{/*                    <SideNavLink
-                      large
-                      renderIcon={Account}>
-                      Organisations
-                    </SideNavLink>*/}
                     <SideNavLink
                       large
                       onClick={() => {
@@ -234,32 +235,12 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
                       FAQ
                     </SideNavLink>
                     <SideNavDivider/>
-                    <SideNavMenu title="Organisation" large>
-                      <UserContext.Consumer>
-                        {(auth) => this.showFavoursOrg(auth, onClickSideNavExpand)}
-                      </UserContext.Consumer>
-                    </SideNavMenu>
-                    <SideNavMenu title="PLD" large>
-                      <UserContext.Consumer>
-                        {(auth) => this.showFavoursPld(auth, onClickSideNavExpand)}
-                      </UserContext.Consumer>
-                    </SideNavMenu>
-{/*                    <SideNavLink
-                      large
-                      renderIcon={Events}>
-                      Organisation
-                    </SideNavLink>
+                    <UserContext.Consumer>
+                      {(auth) => this.showFavoursOrg(auth, onClickSideNavExpand)}
+                    </UserContext.Consumer>
                     <UserContext.Consumer>
                       {(auth) => this.showFavoursPld(auth, onClickSideNavExpand)}
                     </UserContext.Consumer>
-                    <SideNavLink
-                      large
-                      renderIcon={DocumentBlank}>
-                      PLD
-                    </SideNavLink>
-                    <UserContext.Consumer>
-                      {(auth) => this.showFavoursPld(auth, onClickSideNavExpand)}
-                    </UserContext.Consumer>*/}
                   </SideNavItems>
                 </SideNav>
               </Header>

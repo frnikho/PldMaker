@@ -19,7 +19,7 @@ export class PldController {
     return this.pldService.findPld(req.user, org, pld);
   }
 
-  @Post('create')
+  @Post()
   public async createPld(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Body() body: PldOrgCreateBody) {
     return this.pldService.createForOrgWithBody(req.user, org, body);
   }

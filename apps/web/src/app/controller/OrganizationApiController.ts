@@ -70,15 +70,15 @@ export class OrganizationApiController {
   public static createOrgSection(accessToken: string, orgId: string, body: OrganizationSectionBody, callback: CallbackOrganizationSection) {
     api.post<OrganizationSection>(`organization/${orgId}/section`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
-    }).catch(() => {
-      return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
+    }).catch((err) => {
+      return callback(null, {type: ErrorType.API_ERROR, message: err.response.data.message});
     });
   }
 
   public static updateOrgSection(accessToken: string, orgId: string, sectionId: string, body: OrganizationSectionUpdateBody, callback: CallbackOrganizationSection) {
     api.patch<OrganizationSection>(`organization/${orgId}/section/${sectionId}`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
-    }).catch(() => {
+    }).catch((er) => {
       return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
     });
   }

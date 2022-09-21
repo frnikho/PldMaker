@@ -1,4 +1,4 @@
-import {IsEmail, IsNotEmpty, MaxLength, MinLength} from "class-validator";
+import { IsEmail, IsNotEmpty, Length, MaxLength, MinLength } from "class-validator";
 
 export class RegisterBody {
   @IsEmail({}, {
@@ -15,9 +15,11 @@ export class RegisterBody {
   public password: string;
 
   @IsNotEmpty({message: 'le prénom ne peut pas être vide !'})
+  @Length(2, 32)
   public firstname: string;
 
   @IsNotEmpty({message: 'le nom ne peut pas être vide !'})
+  @Length(2, 32)
   public lastname: string;
 
 

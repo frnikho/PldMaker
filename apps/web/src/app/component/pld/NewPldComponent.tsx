@@ -1,6 +1,7 @@
 import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {
+  Breadcrumb, BreadcrumbItem,
   Button, Column,
   DatePicker,
   DatePickerInput, Grid,
@@ -21,6 +22,7 @@ import {Close, ArrowUp, ArrowDown, TrashCan, Add} from '@carbon/icons-react';
 import {PldApiController} from "../../controller/PldApiController";
 import {HelperText} from "../../util/HelperText";
 import {RequiredLabel} from "../../util/Label";
+import { Navigate } from "react-router-dom";
 
 export type NewPldComponentProps = {
   orgId?: string;
@@ -31,6 +33,7 @@ export type NewPldComponentState = {
   org?: Organization;
   loading: boolean;
   form: NewPldForm;
+  redirectUrl?: string;
 }
 
 export type NewPldForm = {
@@ -243,68 +246,76 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
 
   override render() {
     return (
-      <Stack gap={4}>
-        <h1>Création d'un nouveau PLD</h1>
-        <h4>Informations de base</h4>
-        <RequiredLabel message={"Nom"}/>
-        <TextInput id={"pld-name"} labelText={false}
-                   required
-                   onChange={(e) => this.updateField('name', e.currentTarget.value)}
-                   invalid={this.state.form.name?.error !== undefined}
-                   invalidText={this.state.form.name?.error}
-        />
-        <RequiredLabel message={"Description"}/>
-        <TextArea rows={4} id={"pld-description"} labelText={false}
-                  required
-                  invalid={this.state.form.description?.error !== undefined}
-                  invalidText={this.state.form.description?.error}
-                  onChange={(e) => this.updateField('description', e.currentTarget.value)}/>
-        {this.showManagerSelect()}
-        {this.showTag()}
-        <RequiredLabel message={"Promotion"}/>
-        <NumberInput id={"pld-promotion"}
+      <>
+        {this.state.redirectUrl ? <Navigate to={this.state.redirectUrl}/> : null}
+        <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
+          <BreadcrumbItem onClick={() => this.setState({redirectUrl: '/'})}>Dashboard</BreadcrumbItem>
+          <BreadcrumbItem onClick={() => this.setState({redirectUrl: `/organization/${this.props.orgId}`})}>Organisation</BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>Pld</BreadcrumbItem>
+        </Breadcrumb>
+        <Stack gap={4}>
+          <h1>Création d'un nouveau PLD</h1>
+          <h4>Informations de base</h4>
+          <RequiredLabel message={"Nom"}/>
+          <TextInput id={"pld-name"} labelText={false}
                      required
-                     iconDescription={"Promotion"}
-                     onChange={(e) => {
-                       if (e.imaginaryTarget.value === '')
-                         return;
-                       this.updateField('promotion', parseInt(e.imaginaryTarget.value));}}
-                     value={this.state.form.promotion?.value ?? 0}/>
-        <RequiredLabel message={"Version de début"}/>
-        <NumberInput id={"pld-version"}
-                     required
-                     iconDescription={"Version"}
-                     value={this.state.form.version?.value ?? 0}
-                     min={0}
-                     onChange={(e) => {
-                       if (e.imaginaryTarget.value === '')
-                         return;
-                       this.updateField('version', parseFloat(e.imaginaryTarget.value));}}/>
-        <h4>Info du Sprint</h4>
-        <DatePicker locale={"fr"} datePickerType="range" onChange={(dates) => {
-          if (dates.length < 2)
-            return;
-          this.updateField('sprintDates', dates);
-        }}>
-          <DatePickerInput
-            id="date-picker-input-id-start"
-            placeholder="mm/dd/yyyy"
-            labelText="Début du sprint"
+                     onChange={(e) => this.updateField('name', e.currentTarget.value)}
+                     invalid={this.state.form.name?.error !== undefined}
+                     invalidText={this.state.form.name?.error}
           />
-          <DatePickerInput
-            id="date-picker-input-id-finish"
-            placeholder="mm/dd/yyyy"
-            labelText="Fin du sprint"
-          />
-        </DatePicker>
-        <HelperText type={'help'} title={<h4>Status possible du PLD</h4>}
-                    helpMessage={<>
-                      <p>"Le Pld peut avoir plusieurs états lors de sa conception (ex: Kick-Off, Follow-up...)"</p>
-                      <p>Veuillez noté que l'ordre des status est important !</p>
+          <RequiredLabel message={"Description"}/>
+          <TextArea rows={4} id={"pld-description"} labelText={false}
+                    required
+                    invalid={this.state.form.description?.error !== undefined}
+                    invalidText={this.state.form.description?.error}
+                    onChange={(e) => this.updateField('description', e.currentTarget.value)}/>
+          {this.showManagerSelect()}
+          {this.showTag()}
+          <RequiredLabel message={"Promotion"}/>
+          <NumberInput id={"pld-promotion"}
+                       required
+                       iconDescription={"Promotion"}
+                       onChange={(e) => {
+                         if (e.imaginaryTarget.value === '')
+                           return;
+                         this.updateField('promotion', parseInt(e.imaginaryTarget.value));}}
+                       value={this.state.form.promotion?.value ?? 0}/>
+          <RequiredLabel message={"Version de début"}/>
+          <NumberInput id={"pld-version"}
+                       required
+                       iconDescription={"Version"}
+                       value={this.state.form.version?.value ?? 0}
+                       min={0}
+                       onChange={(e) => {
+                         if (e.imaginaryTarget.value === '')
+                           return;
+                         this.updateField('version', parseFloat(e.imaginaryTarget.value));}}/>
+          <h4>Info du Sprint</h4>
+          <DatePicker locale={"fr"} datePickerType="range" onChange={(dates) => {
+            if (dates.length < 2)
+              return;
+            this.updateField('sprintDates', dates);
+          }}>
+            <DatePickerInput
+              id="date-picker-input-id-start"
+              placeholder="mm/dd/yyyy"
+              labelText="Début du sprint"
+            />
+            <DatePickerInput
+              id="date-picker-input-id-finish"
+              placeholder="mm/dd/yyyy"
+              labelText="Fin du sprint"
+            />
+          </DatePicker>
+          <HelperText type={'help'} title={<h4>Status possible du PLD</h4>}
+                      helpMessage={<>
+                        <p>"Le Pld peut avoir plusieurs états lors de sa conception (ex: Kick-Off, Follow-up...)"</p>
+                        <p>Veuillez noté que l'ordre des status est important !</p>
                       </>} logoSize={14}/>
-        {this.showSteps()}
-        <Button onClick={this.onClickCreate} renderIcon={Add} iconDescription={"Create"}>Créer</Button>
-      </Stack>
+          {this.showSteps()}
+          <Button onClick={this.onClickCreate} renderIcon={Add} iconDescription={"Create"}>Créer</Button>
+        </Stack>
+      </>
     );
   }
 }

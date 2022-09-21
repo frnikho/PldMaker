@@ -2,6 +2,8 @@ import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {
+  Breadcrumb,
+  BreadcrumbItem,
   Button,
   Column,
   FluidForm,
@@ -21,6 +23,7 @@ import {UserApiController} from "../../controller/UserApiController";
 import {HelpLabel, RequiredLabel} from "../../util/Label";
 import {FieldData} from "../../util/FieldData";
 import {validate} from "class-validator";
+import { Navigate } from "react-router-dom";
 
 export type NewOrgComponentProps = {
   onOrgCreated: (org: Organization) => void;
@@ -35,6 +38,7 @@ export type NewOrgComponentState = {
   description: FieldData<string>,
   versionShifting: FieldData<number>,
   error: FieldError,
+  redirectUrl?: string;
 };
 
 export type FieldError = {
@@ -186,7 +190,12 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
 
   override render() {
     return (
-      <Stack>
+      <>
+        {this.state.redirectUrl ? <Navigate to={this.state.redirectUrl}/> : null}
+        <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
+          <BreadcrumbItem onClick={() => this.setState({redirectUrl: '/'})}>Dashboard</BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>Organisation</BreadcrumbItem>
+        </Breadcrumb>
         <h1>Créer votre organisation</h1>
         <p style={{fontSize: 14, marginTop: 10}}>Une organization vous permets de créer, de gérer et de générer les documents de vos PLDs en équipe</p>
         <p style={{fontSize: 14}}>Après la création de votre organisation, vous pourrez gérer les paramètres liés a la confidentialité</p>
@@ -232,7 +241,7 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
         <Button renderIcon={Add} iconDescription={"Create"} style={{marginTop: '20px'}} onClick={this.onClickCreateOrg} disabled={this.state.loadingCreation || this.state.loadingAddingUser}>
           {this.state.loadingCreation ? <InlineLoading description={"Chargement..."}/> : "Créer l'organisation"}
         </Button>
-      </Stack>
+      </>
     );
   }
 

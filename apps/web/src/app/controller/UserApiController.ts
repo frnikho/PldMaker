@@ -1,6 +1,7 @@
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
 import { User, UpdateUserBody, AddFavourBody, Favour, Mfa, MfaOtpBody, PayloadLogin } from "@pld/shared";
 import {AxiosError, AxiosResponse} from "axios";
+import { CallbackEvents } from "./CalendarApiController";
 
 export type CallbackUser = (user: User | null, error?: ApiError) => void;
 export type CallbackFavour = (favour: Favour | null, error?: ApiError) => void;
@@ -116,6 +117,14 @@ export class UserApiController {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       return callback(null, err.response?.data);
+    });
+  }
+
+  public static getEvents(accessToken: string, callback: CallbackEvents) {
+    api.get(`user/events`, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback([], err.response?.data);
     });
   }
 

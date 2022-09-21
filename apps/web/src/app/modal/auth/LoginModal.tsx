@@ -40,6 +40,17 @@ export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalS
     this.onClickCreate = this.onClickCreate.bind(this);
   }
 
+  private resetFields() {
+    this.setState({
+      email: {
+        value: '',
+      },
+      password: {
+        value: ''
+      }
+    })
+  }
+
   public onClickCreate(authContext: UserContextProps) {
     const loginBody = new LoginBody(this.state.email.value, this.state.password.value, navigator.userAgent, navigator.platform, navigator.language);
     this.setState({loading: true});
@@ -59,10 +70,13 @@ export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalS
           if (error.type === ErrorType.MFA_OTP_REQUIRED) {
             this.props.onRedirect('auth/otp');
             this.props.onDismiss();
+            this.resetFields();
+            return;
           }
           toast(ErrorManager.LoginError(error.statusCode ?? -1).message, {type: 'error'});
         } else if (user !== null) {
           this.props.onUserLogged(user);
+          this.resetFields();
         }
       });
     }).then(() => {

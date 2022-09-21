@@ -17,14 +17,14 @@ export class User extends DatedObjectSchema {
   @Prop({select: false, required: true, minlength: 5})
   password: string;
 
-  @Prop({required: true})
+  @Prop({required: false, default: ['user']})
   roles: string[];
 
-  @Prop({required: false, default: undefined})
-  firstname?: string;
+  @Prop({required: true, minlength: 2, maxlength: 32})
+  firstname: string;
 
-  @Prop({required: false, default: undefined})
-  lastname?: string;
+  @Prop({required: true, minlength: 2, maxlength: 32})
+  lastname: string;
 
   @Prop({required: false, default: UserDomain.MOBILE})
   domain?: string[];

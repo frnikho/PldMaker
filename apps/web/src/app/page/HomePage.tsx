@@ -102,7 +102,7 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
       <Stack gap={6}>
         <AuthModalComponent onRedirect={() => this.setState({redirect: 'auth/otp'})} onDismiss={this.onDismissModal} openLoginModal={this.state.login} openRegisterModal={this.state.register} switchModal={this.switchModal} onUserRegistered={this.onUserRegistered} onUserLogged={this.onUserLogged}/>
         <Tile>
-          <h1>Bienvenue sur votre PLD <span style={{fontWeight: 'bold'}}>[Maker]</span></h1>
+          <h1 style={{fontWeight: 500}}>Bienvenue sur votre PLD <span style={{fontWeight: 'bold'}}>[Maker]</span></h1>
           <p style={{marginTop: 10}}>PLD Maker est une web app vous permettant de suivre votre avancement dans votre EIP</p>
         </Tile>
         <Grid>

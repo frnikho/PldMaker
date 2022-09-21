@@ -8,12 +8,10 @@ import {
   AccordionItem,
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbSkeleton,
   Button,
   ButtonSet,
   ButtonSkeleton,
   Column,
-  ExpandableTile,
   Grid,
   NumberInput,
   ProgressIndicator,
@@ -31,8 +29,6 @@ import {
   TextArea,
   TextInput,
   Tile,
-  TileAboveTheFoldContent,
-  TileBelowTheFoldContent,
 } from "carbon-components-react";
 
 import {Stack, Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react';
@@ -211,11 +207,11 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
       <Tile style={style.tile}>
         <Stack gap={6}>
           <div>
-            <h4>Date de création :</h4>
+            <h4 style={{fontWeight: 600}}>Date de création :</h4>
             {this.state.pld === undefined ? <SkeletonText/> : <p>{formatLongDate(new Date(this.state.pld?.created_date ?? ""))}</p>}
           </div>
           <div>
-            <h4 style={{}}>Dernière mise à jour :</h4>
+            <h4 style={{fontWeight: 600}}>Dernière mise à jour :</h4>
             {this.state.pld === undefined ? <SkeletonText/> : <p>{formatLongDate(new Date(this.state.pld?.updated_date ?? ""))}</p>}
             {this.state.pld === undefined ? <SkeletonText/> : <p>par <b>{this.showLastAuthorPld()}</b></p>}
 
@@ -224,11 +220,11 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
             <Stack orientation={"horizontal"}>
               <Column lg={3}>
                 <h4 style={{}}>Version actuelle </h4>
-                {this.state.pld === undefined ? <SkeletonPlaceholder/> : <h1>{this.state.pld?.version}</h1>}
+                {this.state.pld === undefined ? <SkeletonPlaceholder/> : <h1 style={{fontWeight: 'bold'}}>{this.state.pld?.version}</h1>}
               </Column>
               <Column lg={3}>
                 <h4 style={{}}>Nombre de révisions </h4>
-                {this.state.pld === undefined ? <SkeletonPlaceholder/> : <h1>{this.state.pld?.revisions.length}</h1>}
+                {this.state.pld === undefined ? <SkeletonPlaceholder/> : <h1 style={{fontWeight: 'bold'}}>{this.state.pld?.revisions.length}</h1>}
               </Column>
             </Stack>
           </div>
@@ -241,69 +237,71 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.pld === undefined || this.state.org === undefined)
       return;
     return (
-      <Stack gap={6}>
-        <TextInput id={"pld-title"} value={this.state.pld.title} labelText={<RequiredLabel message={"Titre"}/>} onChange={(e) => {
-          if (this.state.pld !== undefined) {
-            this.setState({
-              pld: {
-                ...this.state.pld,
-                title: e.currentTarget.value,
-              }
-            })
-          }
-        }}/>
-        <TextArea rows={4} id={"pld-description"} labelText={<RequiredLabel message={"Description"}/>} value={this.state.pld.description} onChange={(e) => {
-          if (this.state.pld !== undefined) {
-            this.setState({
-              pld: {
-                ...this.state.pld,
-                description: e.currentTarget.value,
-              }
-            })
-          }
-        }}/>
+      <Tile style={style.tile}>
+        <Stack gap={6}>
+          <TextInput id={"pld-title"} value={this.state.pld.title} labelText={<RequiredLabel message={"Titre"}/>} onChange={(e) => {
+            if (this.state.pld !== undefined) {
+              this.setState({
+                pld: {
+                  ...this.state.pld,
+                  title: e.currentTarget.value,
+                }
+              })
+            }
+          }}/>
+          <TextArea rows={4} id={"pld-description"} labelText={<RequiredLabel message={"Description"}/>} value={this.state.pld.description} onChange={(e) => {
+            if (this.state.pld !== undefined) {
+              this.setState({
+                pld: {
+                  ...this.state.pld,
+                  description: e.currentTarget.value,
+                }
+              })
+            }
+          }}/>
 
-        <NumberInput id={"promotion"} iconDescription={""} label={<RequiredLabel message={"Promotion"}/>} value={this.state.pld.promotion} onChange={(e) => {
-          if (this.state.pld !== undefined) {
-            this.setState({
-              pld: {
-                ...this.state.pld,
-                promotion: parseFloat(e.imaginaryTarget.value),
-              }
-            })
-          }
-        }}/>
+          <NumberInput id={"promotion"} iconDescription={""} label={<RequiredLabel message={"Promotion"}/>} value={this.state.pld.promotion} onChange={(e) => {
+            if (this.state.pld !== undefined) {
+              this.setState({
+                pld: {
+                  ...this.state.pld,
+                  promotion: parseFloat(e.imaginaryTarget.value),
+                }
+              })
+            }
+          }}/>
 
-        <Select
-          id="new-pld-manager"
-          onChange={(e) => {
-            if (this.state.pld === undefined || this.state.org === undefined)
-              return;
-            const selectedManager = ([...this.state.org.members, this.state.org.owner]).find((member) => member._id === e.currentTarget.value);
-            if (selectedManager === undefined)
-              return;
-            this.setState({
-              pld: {
-                ...this.state.pld,
-                manager: selectedManager,
-              }
-            })
-          }}
-          labelText={<RequiredLabel message={"Manager"}/>}
-          value={(this.state.pld.manager as User)._id}>
-          <SelectItem text={(this.state.org.owner as User).email} value={(this.state.org.owner as User)._id} />
-          {(this.state.org.members as User[]).map((user, index) => {
-            return (<SelectItem key={index} value={user._id} text={user.email}/>)
-          })}
-        </Select>
+          <Select
+            id="new-pld-manager"
+            onChange={(e) => {
+              if (this.state.pld === undefined || this.state.org === undefined)
+                return;
+              const selectedManager = ([...this.state.org.members, this.state.org.owner]).find((member) => member._id === e.currentTarget.value);
+              if (selectedManager === undefined)
+                return;
+              this.setState({
+                pld: {
+                  ...this.state.pld,
+                  manager: selectedManager,
+                }
+              })
+            }}
+            labelText={<RequiredLabel message={"Manager"}/>}
+            value={(this.state.pld.manager as User)._id}>
+            <SelectItem text={(this.state.org.owner as User).email} value={(this.state.org.owner as User)._id} />
+            {(this.state.org.members as User[]).map((user, index) => {
+              return (<SelectItem key={index} value={user._id} text={user.email}/>)
+            })}
+          </Select>
 
-        <Button style={style.button} onClick={this.onClickUpdatePld} renderIcon={Renew} iconDescription={"Update"}>Mettre à jour</Button>
+          <Button style={style.button} onClick={this.onClickUpdatePld} renderIcon={Renew} iconDescription={"Update"}>Mettre à jour</Button>
 
-        <Accordion>
-          {this.showRevisions()}
-        </Accordion>
-        {this.showAddRevisionButton()}
-      </Stack>
+          <Accordion>
+            {this.showRevisions()}
+          </Accordion>
+          {this.showAddRevisionButton()}
+        </Stack>
+      </Tile>
     )
   }
 
@@ -547,55 +545,35 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     )
   }
 
-  private showBreadcrumb() {
-    const item = (
-      <>
-        <BreadcrumbItem onClick={() => this.props.navigate('/')}>Dashboard</BreadcrumbItem>
-        <BreadcrumbItem onClick={() => {this.props.navigate(`/organization/${this.props.orgId}`);}}>{this.state.org?.name ?? "Organisation"}</BreadcrumbItem>
-        <BreadcrumbItem onClick={() => null} isCurrentPage>{this.state.pld?.title ?? 'PLD'}</BreadcrumbItem>
-      </>);
-    if (this.state.org === undefined) {
-      return (
-        <BreadcrumbSkeleton style={{marginBottom: '40px'}}>
-          {item}
-        </BreadcrumbSkeleton>
-      )
-    } else {
-      return (
-        <Breadcrumb style={{marginBottom: '40px'}}>
-          {item}
-        </Breadcrumb>
-      )
-    }
-  }
-
   override render() {
     return (
       <>
-        {this.showBreadcrumb()}
+        <Breadcrumb style={{marginBottom: 40}}>
+          <BreadcrumbItem onClick={() => this.props.navigate('/')}>Dashboard</BreadcrumbItem>
+          <BreadcrumbItem onClick={() => this.props.navigate(`/organization/${this.props.orgId}`)}>Organisation</BreadcrumbItem>
+          <BreadcrumbItem onClick={() => null} isCurrentPage>Pld</BreadcrumbItem>
+        </Breadcrumb>
+        <div style={{display: 'flex'}}>
+          <h1 style={{fontWeight: 'bold'}}>{this.state.pld?.title}</h1>
+          <div style={{marginLeft: 'auto', marginRight: '0px', textAlign: 'end', marginTop:'auto', marginBottom: 'auto'}}>
+            {this.state.pld !== undefined  ? <ShowFavourIcon type={FavourType.PLD} data={this.state.pld}/> : null}
+          </div>
+        </div>
         <Grid>
           {this.showModals()}
           <Column lg={12} md={8} sm={4}>
             <Stack gap={6}>
+              {this.showInfoPanel()}
               <Tile style={style.tile}>
-                  <div style={{display: 'flex'}}>
-                    <h1 style={{marginBottom: '20px'}}>Informations</h1>
-                    <div style={{marginLeft: 'auto', marginRight: '0px', textAlign: 'end', marginTop:'auto', marginBottom: 'auto'}}>
-                      {this.state.pld !== undefined  ? <ShowFavourIcon type={FavourType.PLD} data={this.state.pld}/> : null}
-                    </div>
-                  </div>
-                {this.showInfoPanel()}
-              </Tile>
-              <Tile style={style.tile}>
-                <h1>DoDs</h1>
+                <h2 style={{fontWeight: 500}}>DoDs</h2>
                 {this.showDataTable()}
               </Tile>
               <Tile style={style.tile}>
-                  <h1>Documents</h1>
-                  <p>Pour le moments, les documents ne sont pas encore disponible.</p>
-                  <Lottie>
-                    <Lottie animationData={require('../../../assets/animations/wip.json')} loop={true} style={{width: '200px'}}/>
-                  </Lottie>
+                <h2 style={{fontWeight: 500}}>Documents</h2>
+                <p>Pour le moments, les documents ne sont pas encore disponible.</p>
+                <Lottie>
+                  <Lottie animationData={require('../../../assets/animations/wip.json')} loop={true} style={{width: '200px'}}/>
+                </Lottie>
               </Tile>
               <ButtonSet style={{marginBottom: '20px', gap: 10}}>
                 {this.showGenerateButton()}

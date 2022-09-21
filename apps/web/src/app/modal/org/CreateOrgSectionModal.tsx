@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Modal, TextInput } from "carbon-components-react";
 
 import {Stack} from '@carbon/react';
+import {Add} from '@carbon/icons-react';
 import { OrganizationApiController } from "../../controller/OrganizationApiController";
 import { Organization, OrganizationSectionBody } from "@pld/shared";
 import { RequiredUserContextProps } from "../../context/UserContext";
@@ -15,18 +16,33 @@ export type OrgSectionModalProps = {
   preselectedSection?: string;
 } & RequiredUserContextProps;
 
-export type OrgSectionModalState = unknown;
+export type OrgSectionModalState = {
+  section: string;
+  name: string;
+};
 
 export class CreateOrgSectionModal extends React.Component<OrgSectionModalProps, OrgSectionModalState> {
 
   constructor(props: OrgSectionModalProps) {
     super(props);
+    this.state = {
+      name: '',
+      section: this.props.preselectedSection ?? '',
+    }
     this.onClickCreate = this.onClickCreate.bind(this);
   }
 
+  override componentDidUpdate(prevProps: Readonly<OrgSectionModalProps>, prevState: Readonly<OrgSectionModalState>) {
+    if (this.props.open && prevProps.open !== this.props.open) {
+      this.setState({
+        name: '',
+        section: this.props.preselectedSection ?? '',
+      })
+    }
+  }
+
   private onClickCreate(event: any) {
-    const elements = event.currentTarget.form?.elements;
-    const body = new OrganizationSectionBody(elements[0].value, elements[1].value);
+    const body = new OrganizationSectionBody(this.state.section, this.state.name);
     OrganizationApiController.createOrgSection(this.props.userContext.accessToken, this.props.org._id, body, (section, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
@@ -45,13 +61,13 @@ export class CreateOrgSectionModal extends React.Component<OrgSectionModalProps,
         onRequestSubmit={this.props.onSuccess}
         passiveModal
         modalHeading="Créer une section">
-        <form>
-          <Stack gap={3}>
-            <TextInput id={"section-input"} defaultValue={this.props.preselectedSection} placeholder={"1.2"} labelText={"Section"}/>
-            <TextInput id={"name-input"} placeholder={"User"} labelText={"Nom"}/>
-            <Button onClick={this.onClickCreate}>Créer</Button>
+        <Stack gap={6}>
+          <Stack gap={2}>
+            <TextInput id={"section-input"} value={this.state.section} placeholder={"1.2"} labelText={"Section"} onChange={(e) => this.setState({section: e.currentTarget.value})}/>
+            <TextInput id={"name-input"} value={this.state.name} placeholder={"User"} labelText={"Nom"} onChange={(e) => this.setState({name: e.currentTarget.value})}/>
           </Stack>
-        </form>
+          <Button renderIcon={Add} onClick={this.onClickCreate}>Créer</Button>
+        </Stack>
       </Modal>
     )
   }

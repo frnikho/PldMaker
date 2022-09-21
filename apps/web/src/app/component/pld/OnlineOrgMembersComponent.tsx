@@ -111,7 +111,7 @@ export class OnlineOrgMembersComponent extends React.Component<OnlineOrgMembersC
     return (
       <Tile style={{borderRadius: 10}}>
         <Stack>
-          <h4>Membres</h4>
+          <h4 style={{fontWeight: 'bold'}}>Membres</h4>
           <p>En ligne</p>
           <StructuredListWrapper selection>
             <StructuredListBody>

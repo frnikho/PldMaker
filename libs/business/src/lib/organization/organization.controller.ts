@@ -68,12 +68,12 @@ export class OrganizationController {
   }
 
   @Patch(':orgId/section/:sectionId')
-  public async updateSection(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param(':sectionId', OrganizationSectionPipe) section: OrganizationSection, @Body() body: OrganizationSectionUpdateBody) {
+  public async updateSection(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('sectionId', OrganizationSectionPipe) section: OrganizationSection, @Body() body: OrganizationSectionUpdateBody) {
     return this.orgSectionService.updateSection(req.user, org, section, body);
   }
 
   @Delete(':orgId/section/:sectionId')
-  public async removeSection(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param(':sectionId', OrganizationSectionPipe) section: OrganizationSection) {
+  public async removeSection(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('sectionId', OrganizationSectionPipe) section: OrganizationSection) {
     return this.orgSectionService.deleteSection(req.user, org, section);
   }
 

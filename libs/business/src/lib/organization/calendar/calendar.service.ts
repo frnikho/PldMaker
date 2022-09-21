@@ -43,4 +43,8 @@ export class CalendarService {
     return this.calendarHelper.getEvent(user, org, calendar, event);
   }
 
+  public getAllEvents(user: User) {
+    return this.calendarHelper.getAllEvents(user);
+  }
+
 }

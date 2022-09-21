@@ -8,7 +8,7 @@ export type PldsCallback = (pld: Pld[], error?: ApiError) => void
 export class PldApiController {
 
   public static createOrgPld(accessToken: string, orgId: string, body: PldOrgCreateBody, callback: PldCallback) {
-    api.post<Pld>(`organization/${orgId}/pld/create`, body, authorize(accessToken)).then((response) => {
+    api.post<Pld>(`organization/${orgId}/pld`, body, authorize(accessToken)).then((response) => {
       callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)

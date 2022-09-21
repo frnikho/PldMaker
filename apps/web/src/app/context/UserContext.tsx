@@ -13,7 +13,7 @@ export type UserContextProps = {
   init: () => void;
   login: (loginBody: LoginBody, callback: (user: User | null , error?: ApiError) => unknown) => void;
   register: (registerBody: RegisterBody, callback: (user: User | null , error?: ApiError) => unknown) => void;
-  refreshUser: () => void;
+  refreshUser: (callback: (user: User | null, error?: ApiError) => unknown) => void;
   refreshFavours: () => void;
   logout: () => void;
   isLogged: LoginState;
@@ -100,16 +100,16 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
     this.loadFavour();
   }
 
-  public refreshUser() {
+  public refreshUser(callback: (user: User | null, error?: ApiError) => void) {
     console.log('Refresh user');
     UserApiController.getMe(this.state.accessToken, (user, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
-      }
-      if (user !== null) {
+      } else if (user !== null) {
         this.setState({
           user: user,
-        })
+        });
+        callback(user);
       }
     });
   }
