@@ -1,4 +1,4 @@
-import { ArrayMinSize, ArrayNotContains, IsNotEmpty, Length, MaxLength } from "class-validator";
+import { ArrayMinSize, ArrayNotContains, IsNotEmpty, Length, Matches, MaxLength } from "class-validator";
 
 export class DodFindPldBody {
   plds: string[];
@@ -11,7 +11,8 @@ export class DodFindPldBody {
 
 export class DodCreateBody {
   @IsNotEmpty({message: 'La version ne peut pas être vide !'})
-  /*@Matches(new RegExp('[0-9]+\\..*\\.[0-9]+'), {message: 'Format invalide !'})*/
+  @Length(2,64)
+  @Matches(new RegExp('[0-9]+\\..*\\.[0-9]+'), {message: 'Format invalide !'})
   version: string;
 
   @IsNotEmpty({message: 'Le titre ne peut pas être vide !'})

@@ -45,7 +45,7 @@ const RevisionRow = (revision: PldRevision, author: string): TableRow => {
   return new TableRow({
     children: [
       RevisionCell(formatDateNumeric(new Date(revision.created_date))),
-      RevisionCell(revision.version),
+      RevisionCell(revision.version.toString()),
       RevisionCell(author),
       RevisionCell(revision.sections.join(', ')),
       RevisionCell(revision.comments ?? 'Non-défini'),

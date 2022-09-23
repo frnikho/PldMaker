@@ -7,6 +7,7 @@ import { AuthModule, OrganizationModule, PldModule, UserModule, JwtAuthGuard, Te
 import { MfaService } from "@pld/business";
 import { JwtModule } from "@nestjs/jwt";
 import { DbExceptionFilter } from "./exception/db.filter";
+import { ValidationFilter } from "./exception/validation.filter";
 
 @Module({
   imports: [
@@ -52,6 +53,10 @@ import { DbExceptionFilter } from "./exception/db.filter";
     {
       provide: 'APP_FILTER',
       useClass: DbExceptionFilter,
+    },
+    {
+      provide: 'APP_FILTER',
+      useClass: ValidationFilter,
     },
   ],
 })

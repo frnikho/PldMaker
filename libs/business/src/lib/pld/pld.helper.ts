@@ -2,7 +2,7 @@ import {Injectable} from "@nestjs/common";
 import { Dod, EditedField } from "../dod/dod.schema";
 import { NewPldHistory } from "./pld.schema";
 import { Model, Query } from "mongoose";
-import { CreatePldRevisionBody, Organization, Pld, PldOrgCreateBody, PldStatus, PldUpdateBody, User } from "@pld/shared";
+import { CreatePldRevisionBody, Organization, Pld, PldOrgCreateBody, PldStatus, PldUpdateBody, UpdatePldRevisionBody, User } from "@pld/shared";
 import { InjectModel } from "@nestjs/mongoose";
 import { PldEvents, PldRevisionAddedEvent, PldUpdatedEvent } from "./pld.event";
 import { EventEmitter2 } from "@nestjs/event-emitter";
@@ -77,8 +77,19 @@ export class PldHelper {
   public async addRevision(user: User, org: Organization, pld: Pld, body: CreatePldRevisionBody) {
     const updatedPld = await PldHelper.populateAndExecute(this.pldModel.findOneAndUpdate({_id: pld._id}, {$addToSet: {revisions: body}, version: body.version, updated_date: new Date()}, {new: true}));
     this.eventEmitter.emit(PldEvents.onPldRevisionAdded, new PldRevisionAddedEvent(body.owner, pld._id, updatedPld.revisions[0]));
-    this.eventEmitter.emit('Pld:Update', pld._id); //TODO Check useless of this
+    this.eventEmitter.emit('Pld:Update', pld._id);
     return updatedPld;
+  }
+
+  public async editRevision(user: User, org: Organization, pld: Pld, body: UpdatePldRevisionBody): Promise<Pld> {
+    await this.pldModel.find({_id: pld._id}).updateOne({'revisions.version': body.version}, {'$set': {
+        'revisions.$.comments': body.comments,
+        'revisions.$.sections': body.sections,
+        'revisions.$.owner': user._id.toString(),
+        'revisions.$.created_date': new Date(),
+      }}).exec();
+    this.eventEmitter.emit('Pld:Update', pld._id);
+    return this.find(pld._id);
   }
 
   public async addHistory(userId: string, history: NewPldHistory) {

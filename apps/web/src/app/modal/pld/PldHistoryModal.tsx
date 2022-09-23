@@ -7,7 +7,7 @@ import {CodeSnippet,
   Tile,
   Tooltip,
 } from "carbon-components-react";
-import {ModalProps} from "../../util/Modal";
+import {ModalComponentProps} from "../../util/Modal";
 
 import {TabList, TabPanels, TabPanel} from '@carbon/react';
 import { ResponsiveCalendar } from "@nivo/calendar";
@@ -43,7 +43,7 @@ export type PldHistoryProps = {
   org: Organization;
   pld: Pld;
   dod: Dod[];
-} & ModalProps;
+} & ModalComponentProps;
 
 export type PldHistoryState = unknown;
 

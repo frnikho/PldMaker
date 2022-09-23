@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {NewPldHistory} from "./pld.schema";
-import { PldOrgCreateBody, CreatePldRevisionBody, PldUpdateBody, Pld, Organization, User } from "@pld/shared";
+import { PldOrgCreateBody, CreatePldRevisionBody, PldUpdateBody, Pld, Organization, User, UpdatePldRevisionBody } from "@pld/shared";
 import {PldHelper} from "./pld.helper";
 import { CheckOrgPerm } from "../organization/organization.util";
 import { CheckPld } from "./pld.util";
@@ -57,6 +57,12 @@ export class PldService {
   @CheckPld()
   public async addRevision(user: User, org: Organization, pld: Pld, body: CreatePldRevisionBody) {
     return this.helper.addRevision(user, org, pld, body);
+  }
+
+  @CheckOrgPerm()
+  @CheckPld()
+  public async editRevision(user: User, org: Organization, pld: Pld, body: UpdatePldRevisionBody) {
+    return this.helper.editRevision(user, org, pld, body);
   }
 
   public async addHistory(userId: string, history: NewPldHistory) {

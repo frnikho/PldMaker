@@ -1,5 +1,5 @@
 import React from "react";
-import {ModalProps} from "../../util/Modal";
+import {ModalComponentProps} from "../../util/Modal";
 import {Modal, MultiSelect, TextArea} from "carbon-components-react";
 import {FieldData} from "../../util/FieldData";
 import {RequiredUserContextProps} from "../../context/UserContext";
@@ -15,7 +15,7 @@ export type AddRevisionPldModalProps = {
   org: Organization;
   pld: Pld;
   versionShifting: number;
-} & ModalProps & RequiredUserContextProps;
+} & ModalComponentProps & RequiredUserContextProps;
 
 export type AddRevisionPldModalState = {
   comments: FieldData<string>;

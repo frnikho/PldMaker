@@ -1,4 +1,4 @@
-import {PldOrgCreateBody, PldOrgFindsBody, CreatePldRevisionBody, Pld, PldUpdateBody} from "@pld/shared";
+import { PldOrgCreateBody, PldOrgFindsBody, CreatePldRevisionBody, Pld, PldUpdateBody, UpdatePldRevisionBody } from "@pld/shared";
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
 import {AxiosError} from "axios";
 
@@ -49,6 +49,16 @@ export class PldApiController {
 
   public static addRevision(accessToken: string, orgId: string, pldId: string, body: CreatePldRevisionBody, callback: PldCallback) {
     api.post(`organization/${orgId}/pld/${pldId}/revision`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      if (err.response?.data !== undefined)
+        return callback(null, err.response.data);
+      return callback(null, {type: ErrorType.API_ERROR, message: ['An error occurred !']});
+    })
+  }
+
+  public static editRevision(accessToken: string, orgId: string, pldId: string, body: UpdatePldRevisionBody, callback: PldCallback) {
+    api.patch(`organization/${orgId}/pld/${pldId}/revision`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       if (err.response?.data !== undefined)

@@ -51,11 +51,23 @@ export class Pld {
 
 export type PldRevision = {
   created_date: Date;
-  version: string;
+  version: number;
   owner: User;
   sections: string[];
   comments?: string;
   currentStep: string;
+}
+
+export class UpdatePldRevisionBody {
+  comments: string;
+  sections: string[];
+  version: number;
+
+  constructor(comments: string, sections: string[], version: number) {
+    this.comments = comments;
+    this.sections = sections;
+    this.version = version;
+  }
 }
 
 export class CreatePldRevisionBody {

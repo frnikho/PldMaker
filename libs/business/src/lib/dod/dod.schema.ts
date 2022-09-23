@@ -5,7 +5,7 @@ import {Pld} from "../pld/pld.schema";
 import {DodStatus} from "@pld/shared";
 import {DodHistoryAction} from "@pld/shared";
 import { DatedObjectSchema } from "../utility/datted_object.utility";
-import { IsUserAlreadyExist } from "./dod.rule";
+import { dodRules } from "./dod.rule";
 
 export type DodDocument = Dod & Document;
 
@@ -54,38 +54,37 @@ export class DodHistory {
 @Schema()
 export class Dod extends DatedObjectSchema {
 
-  @Prop({required: true})
+  @Prop(dodRules.version)
   version: string;
 
-  @Prop({required: true, validate: IsUserAlreadyExist})
-  @IsUserAlreadyExist()
+  @Prop(dodRules.title)
   title: string;
 
-  @Prop({required: true})
+  @Prop(dodRules.skinOf)
   skinOf: string;
 
-  @Prop({required: true})
+  @Prop(dodRules.want)
   want: string;
 
-  @Prop({required: true})
+  @Prop(dodRules.description)
   description: string;
 
-  @Prop({required: true})
+  @Prop(dodRules.descriptionOfDone)
   descriptionOfDone: string[];
 
-  @Prop({required: true})
+  @Prop(dodRules.estimatedWorkTime)
   estimatedWorkTime: EstimatedWorkTime[];
 
-  @Prop({required: true, type: mongoose.Schema.Types.ObjectId, ref: Pld.name})
+  @Prop(dodRules.pldOwner)
   pldOwner: Pld;
 
-  @Prop({type: String, enum: DodStatus, default: DodStatus.TODO})
+  @Prop(dodRules.status)
   status: DodStatus;
 
-  @Prop({required: true, type: mongoose.Schema.Types.ObjectId, ref: User.name})
+  @Prop(dodRules.owner)
   owner: User;
 
-  @Prop({required: false, default: []})
+  @Prop(dodRules.history)
   history: DodHistory[];
 
 }

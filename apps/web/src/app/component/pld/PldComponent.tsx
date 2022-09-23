@@ -2,7 +2,7 @@ import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {PldApiController} from "../../controller/PldApiController";
-import { Organization, Pld, User, Dod, PldStatus, FavourType, OrganizationSection } from "@pld/shared";
+import { Organization, Pld, User, Dod, PldStatus, FavourType, OrganizationSection, PldRevision } from "@pld/shared";
 import {
   Accordion,
   AccordionItem,
@@ -52,6 +52,7 @@ import {RequiredLabel} from "../../util/Label";
 import {formatLongDate} from "@pld/utils";
 import {PldHistoryModal} from "../../modal/pld/PldHistoryModal";
 import { ResumePldModal } from "../../modal/pld/ResumePldModal";
+import { EditRevisionPldModal } from "../../modal/pld/EditRevisionPldModal";
 
 export type PldComponentProps = {
   pldId: string;
@@ -68,6 +69,8 @@ export type PldComponentState = {
   openAddRevisionModal: boolean;
   openChangePldType: boolean;
   openResumeModal: boolean;
+  openEditRevision: boolean;
+  selectedRevision?: PldRevision;
 }
 
 class PldComponent extends React.Component<PldComponentProps, PldComponentState> {
@@ -87,6 +90,8 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
       openChangePldType: false,
       openHistoryModal: false,
       openResumeModal: false,
+      openEditRevision: false,
+      selectedRevision: undefined
     }
     this.onClickUpdatePld = this.onClickUpdatePld.bind(this);
     this.onDodUpdated = this.onDodUpdated.bind(this);
@@ -332,7 +337,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           <TableBody>
             {this.state.pld.revisions.map((revision, index) => {
               return (
-                <TableRow key={index}>
+                <TableRow key={index} style={{cursor: 'pointer'}} onClick={() => this.setState({selectedRevision: revision, openEditRevision: true})}>
                   <TableCell key={index + ':date'}>{formatLongDate(new Date(revision.created_date))}</TableCell>
                   <TableCell key={index + ':revision'}>{revision.version}</TableCell>
                   <TableCell key={index + ':auteur'}>{this.state.org?.name}</TableCell>
@@ -440,6 +445,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
       return;
     return (
       <>
+        {this.showEditRevisionModal()}
         <PldHistoryModal
           pld={this.state.pld}
           org={this.state.org}
@@ -481,6 +487,14 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           onSuccess={(a) => this.onPldTypeUpdated(a)}/>
       </>
     )
+  }
+
+  private showEditRevisionModal() {
+    if (this.state.selectedRevision !== undefined && this.state.pld !== undefined && this.state.org !== undefined)
+      return <EditRevisionPldModal userContext={this.props.userContext} pld={this.state.pld} open={this.state.openEditRevision} revision={this.state.selectedRevision} org={this.state.org} onSuccess={() => {
+        this.setState({openEditRevision: false, selectedRevision: undefined});
+      }} onDismiss={() => this.setState({openEditRevision: false})}/>
+    return null;
   }
 
   private showOnlineMembers() {

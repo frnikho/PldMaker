@@ -1,12 +1,12 @@
 import React from "react";
 import {Modal, Select, SelectItem} from "carbon-components-react";
-import {ModalProps} from "../../util/Modal";
+import {ModalComponentProps} from "../../util/Modal";
 import {Pld} from "@pld/shared";
 import {FieldData} from "../../util/FieldData";
 
 export type ChangePldTypeProps = {
   pld: Pld;
-} & ModalProps;
+} & ModalComponentProps;
 
 export type ChangePldTypeState = {
   typeInput: FieldData<string>;

@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Patch, Post, Request } from "@nestjs/comm
 import { PldService } from "./pld.service";
 import { PldPipe } from "./pld.pipe";
 import { OrganizationPipe } from "../organization/organization.pipe";
-import { PldOrgCreateBody, CreatePldRevisionBody, PldUpdateBody, Organization, Pld } from "@pld/shared";
+import { PldOrgCreateBody, CreatePldRevisionBody, PldUpdateBody, Organization, Pld, UpdatePldRevisionBody } from "@pld/shared";
 
 @Controller('organization/:orgId/pld')
 export class PldController {
@@ -32,6 +32,11 @@ export class PldController {
   @Post(':pldId/revision')
   public async addRevision(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('pldId', PldPipe) pld: Pld, @Body() body: CreatePldRevisionBody) {
     return this.pldService.addRevision(req.user, org, pld, body);
+  }
+
+  @Patch(':pldId/revision')
+  public async editRevision(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('pldId', PldPipe) pld: Pld, @Body() body: UpdatePldRevisionBody) {
+    return this.pldService.editRevision(req.user, org, pld, body);
   }
 
 }
