@@ -1,13 +1,13 @@
 import React from "react";
 import UserContextProvider from "./context/UserContext";
 import {Navigate, Route, Routes, useNavigate} from "react-router-dom";
-import {HomePage} from "./page/HomePage";
+import HomePage from "./page/HomePage";
 import {MainPageLayout} from "./layout/MainPageLayout";
 import {NewOrganizationPage} from "./page/organization/NewOrganizationPage";
 import OrganizationPage from "./page/OrganizationPage";
 import NewPldPage from "./page/organization/pld/NewPldPage";
 import PldPage from "./page/organization/pld/PldPage";
-import {UserPage} from "./page/UserPage";
+import UserPage from "./page/UserPage";
 import {PageNotFound} from "./page/PageNotFound";
 import NewTemplatePage from "./page/organization/template/NewTemplatePage";
 import {ViewMode} from "./component/template/NewTemplateComponent";

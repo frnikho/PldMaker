@@ -1,11 +1,11 @@
 import React from "react";
-import { Modal, ModalFooter, ModalProps } from "carbon-components-react";
+import { Modal, ModalProps } from "carbon-components-react";
 
 export type ModalComponentProps = {
   open: boolean;
   onDismiss: (...args: unknown[]) => void;
   onSuccess: (...args: unknown[]) => void;
-}
+};
 
 export abstract class ModalComponent<T, Z> extends React.Component<ModalComponentProps & T, Z> {
 

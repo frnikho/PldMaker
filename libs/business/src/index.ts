@@ -24,3 +24,7 @@ export * from './lib/pld/pld.schema';
 export * from './lib/organization/calendar/calendar.model';
 
 export * from './lib/alert/alert.module';
+
+export * from './lib/mail/mail.helper';
+export * from './lib/mail/mail.module';
+export * from './lib/mail/mail.service';

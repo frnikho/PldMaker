@@ -17,8 +17,11 @@ import FullCalendar, { EventClickArg } from "@fullcalendar/react";
 import interactionPlugin from "@fullcalendar/interaction";
 import listGridPlugin from "@fullcalendar/list";
 import { parseEvents } from "../../util/Event";
+import { LanguageProps, withLanguage } from "../../context/LanguageContext";
+import { getDataTranslation, language } from "../../language";
+import { ButtonTextCompoundInput } from "@fullcalendar/core";
 
-type OrganizationHomeDashboardProps = unknown & RequiredUserContextProps
+type OrganizationHomeDashboardProps = unknown & RequiredUserContextProps & LanguageProps;
 
 type OrganizationHomeDashboardState = {
   loading: boolean;
@@ -38,7 +41,7 @@ const orgIllustrations = [
   require('../../../assets/illustrations/undraw_teamwork_hpdk.png'),
 ]
 
-export class OrganizationHomeDashboard extends React.Component<OrganizationHomeDashboardProps, OrganizationHomeDashboardState> {
+class OrganizationHomeDashboard extends React.Component<OrganizationHomeDashboardProps, OrganizationHomeDashboardState> {
 
   constructor(props: OrganizationHomeDashboardProps) {
     super(props);
@@ -137,10 +140,12 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
       return this.showNoEvents();
     return (
       <FullCalendar
+        buttonText={getDataTranslation<ButtonTextCompoundInput>(language.calendar, this.props.language.language)}
+        titleFormat={{ year: 'numeric', month: 'long', day: 'numeric' }}
         eventClick={this.onClickEvent}
         aspectRatio={4}
         firstDay={1}
-        locale={'fr'}
+        locale={this.props.language.language}
         events={(arg, successCallback) => {successCallback(parseEvents(this.state.calendarEvents))}}
         plugins={[ interactionPlugin, listGridPlugin ]}
         initialView="listWeek"
@@ -185,7 +190,7 @@ export class OrganizationHomeDashboard extends React.Component<OrganizationHomeD
 const style = {
   orgTitle: {
     marginBottom: 8,
-    fontWeight: 500
+    fontWeight: 600
   },
   card: {
     borderRadius: 10,
@@ -208,3 +213,5 @@ const style = {
     height: 150
   },
 }
+
+export default withLanguage(OrganizationHomeDashboard);

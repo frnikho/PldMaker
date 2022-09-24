@@ -2,6 +2,8 @@ import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Query } from "mongoose";
 import { AddFavourBody, Device, DeviceBody, Favour, FavourType, UpdateUserBody, User } from "@pld/shared";
+import { MailService } from "../mail/mail.service";
+import { AvailableMail } from "../mail/mail.list";
 
 @Injectable()
 export class UserHelper {
@@ -10,7 +12,8 @@ export class UserHelper {
 
   constructor(
     @InjectModel('User') private userModel: Model<User>,
-    @InjectModel('Favour') private favourModel: Model<Favour>) {}
+    @InjectModel('Favour') private favourModel: Model<Favour>,
+    private mailService: MailService) {}
 
   public static populateAndExecute<T>(query: Query<T, any>) {
     return query.exec();
@@ -79,6 +82,7 @@ export class UserHelper {
   public updateWithBody(user: User, body: UpdateUserBody) {
     this.logger.debug(`Updating user content (${user.email} - ${user._id}): `);
     this.logger.debug(body);
+    this.mailService.sendMail(user, AvailableMail.WelcomeMail);
     return UserHelper.populateAndExecute(this.userModel.findOneAndUpdate({_id: user._id}, body, {new: true}));
   }
 
@@ -121,10 +125,10 @@ export class UserHelper {
     return UserHelper.populateAndExecuteFavour(this.favourModel.findOne({owner: user._id}));
   }
 
-  public removeFavour(user: User, favour: Favour) {
+  public async removeFavour(user: User, favour: Favour, itemToDelete: string) {
     this.logger.debug(`Deleting user favour (${user.email} - ${user._id}):`);
     this.logger.debug(favour);
-    return UserHelper.populateAndExecuteFavour(this.favourModel.findOneAndUpdate({owner: user._id}, {$pull: {org: favour._id, pld: favour._id}}, {new: true}));
+    return UserHelper.populateAndExecuteFavour(this.favourModel.findOneAndUpdate({owner: user._id}, {$pull: {org: itemToDelete, pld: itemToDelete}}, {new: true}));
   }
 
 }

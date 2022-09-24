@@ -562,7 +562,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
   override render() {
     return (
       <>
-        <Breadcrumb style={{marginBottom: 40}}>
+        <Breadcrumb noTrailingSlash style={{marginBottom: 40}}>
           <BreadcrumbItem onClick={() => this.props.navigate('/')}>Dashboard</BreadcrumbItem>
           <BreadcrumbItem onClick={() => this.props.navigate(`/organization/${this.props.orgId}`)}>Organisation</BreadcrumbItem>
           <BreadcrumbItem onClick={() => null} isCurrentPage>Pld</BreadcrumbItem>

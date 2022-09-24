@@ -12,13 +12,13 @@ export class Dod {
   descriptionOfDone: string[];
   estimatedWorkTime: UserWorkTime[];
   pldOwner: Pld | string;
-  owner: User | string;
+  owner: User;
   status: DodStatus | string;
   history: DodHistory[];
   created_date: Date;
   updated_date: Date;
 
-  constructor(id: string, version: string, title: string, skinOf: string, want: string, description: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[], pldOwner: Pld | string, owner: User | string, status: DodStatus | string, history: DodHistory[], created_date: Date, updated_date: Date) {
+  constructor(id: string, version: string, title: string, skinOf: string, want: string, description: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[], pldOwner: Pld | string, owner: User, status: DodStatus | string, history: DodHistory[], created_date: Date, updated_date: Date) {
     this._id = id;
     this.version = version;
     this.title = title;

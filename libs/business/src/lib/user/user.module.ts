@@ -9,12 +9,14 @@ import { CalendarService } from "../organization/calendar/calendar.service";
 import { CalendarDefinition } from "../organization/calendar/calendar.model";
 import { CalendarEventDefinition } from "../organization/calendar/calendar_event.model";
 import { CalendarHelper } from "../organization/calendar/calendar.helper";
+import { MailService } from "../mail/mail.service";
+import { MailHelper } from "../mail/mail.helper";
 
 @Module({
   imports: [
     MongooseModule.forFeature([UserDefinition, FavourDefinition, CalendarDefinition, CalendarEventDefinition]),
   ],
-  providers: [UserHelper, UserService, CalendarService, CalendarHelper],
+  providers: [MailService, MailHelper, UserHelper, UserService, CalendarService, CalendarHelper],
   exports: [UserService],
   controllers: [UserController],
 })

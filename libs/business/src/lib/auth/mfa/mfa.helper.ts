@@ -1,10 +1,9 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { MfaOtpBody, MfaType, PayloadLogin, User } from "@pld/shared";
+import { Mfa, MfaDisableType, MfaOtpBody, MfaOtpDisableBody, MfaType, PayloadLogin, User } from "@pld/shared";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Query } from "mongoose";
-import { Mfa } from "./mfa.schema";
-import { authenticator } from 'otplib';
-import * as base32 from 'base32';
+import { authenticator } from "otplib";
+import * as base32 from "base32";
 import { UserService } from "../../user/user.service";
 import { JwtService } from "@nestjs/jwt";
 
@@ -44,13 +43,22 @@ export class MfaHelper {
     if (!mfa)
       throw new BadRequestException('You need to enable MFA before validating token !');
     if (!authenticator.check(body.token, mfa.secret))
-      throw new BadRequestException('Invalid OTP token !');
+      throw new BadRequestException('Invalid OTP Token !');
     await this.mfaModel.findOneAndUpdate({user: user}, {verified: 1, activationDate: new Date(), backupCode: base32.encode(user._id + process.env.MFA_SECRET)}, {new: true}).select('+backupCode');
     return this.jwtService.sign({email: user.email, sub: user._id, mfa: [{secret: mfa.secret, date: new Date()}]} as PayloadLogin);
   }
 
-  public disableMfa(user: User, mfaId: string) {
-    return MfaHelper.populateAndExecute(this.mfaModel.findOneAndDelete({_id: mfaId, user: user}));
+  public async disableMfa(user: User, mfa: Mfa, body: MfaOtpDisableBody) {
+    if (body.type === MfaDisableType.BACKUP_CODE) {
+      return MfaHelper.populateAndExecute(this.mfaModel.findOneAndDelete({_id: mfa._id, user: user, backupCode: body.code}));
+    } else {
+      console.log(authenticator.check(body.code, mfa.secret), body.code);
+      if (!authenticator.check(body.code, mfa.secret)) {
+        throw new BadRequestException('Invalid OTP Token !');
+      }
+      console.log(await this.mfaModel.findOne({_id: mfa._id.toString(), user: user}));
+      return MfaHelper.populateAndExecute(this.mfaModel.findOneAndDelete({_id: mfa._id.toString(), user: user}));
+    }
   }
 
   public getMfa(user: User, select = '') {

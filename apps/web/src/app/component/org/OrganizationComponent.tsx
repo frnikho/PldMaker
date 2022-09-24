@@ -25,7 +25,7 @@ import {OrgHistoryModal} from "../../modal/org/OrgHistoryModal";
 
 import {RequiredLabel} from "../../util/Label";
 
-import { Organization, Pld, Calendar, OrganizationSectionUpdateBody, UpdateOrganizationBody } from "@pld/shared";
+import { Organization, Pld, Calendar, OrganizationSectionUpdateBody, UpdateOrganizationBody, FavourType } from "@pld/shared";
 import { capitalize, formatLongDate } from "@pld/utils";
 import {CalendarApiController} from "../../controller/CalendarApiController";
 import {toast} from "react-toastify";
@@ -33,6 +33,7 @@ import {CircularProgress} from "../utils/CircularProgress";
 
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
+import { ShowFavourIcon } from "../../util/User";
 
 export type OrganizationComponentProps = {
   orgId?: string;
@@ -339,6 +340,19 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     )
   }
 
+  private showTitle() {
+    if (this.state.org)
+      return (
+        <div style={{display: 'flex'}}>
+          <h1 style={{fontWeight: 600}}>{this.state.org?.name}</h1>
+          <div style={{marginLeft: 'auto', marginRight: '0px', textAlign: 'end', marginTop:'auto', marginBottom: 'auto'}}>
+            {this.state.pld !== undefined  ? <ShowFavourIcon type={FavourType.PLD} data={this.state.org}/> : null}
+          </div>
+        </div>
+    )
+    return null;
+  }
+
   override render() {
     return (
       <>
@@ -350,9 +364,9 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
         {this.showCharts()}
         <Stack gap={4}>
           {redirectNavigation(this.state.navigateUrl)}
-          <h1 style={{fontWeight: 600}}>{this.state.org?.name}</h1>
+          {this.showTitle()}
           <Grid>
-            <Column lg={12}>
+            <Column lg={12} xlg={12} md={8} sm={4}>
               <Tile style={{borderRadius: 10}}>
                 {this.showEditableInfo()}
               </Tile>
@@ -366,7 +380,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
               <h2>Documents <Button kind={"ghost"} onClick={this.onClickCreateDocument} hasIconOnly renderIcon={Add} iconDescription={"Créer/Ajouter un document"}/></h2>*/}
               {/*<Editor onSave={(content) => console.log('saved !', content)}/>*/}
             </Column>
-            <Column lg={4}>
+            <Column lg={4} xlg={4} md={8} sm={4}>
               {this.showInfo()}
               {this.showMembers()}
             </Column>

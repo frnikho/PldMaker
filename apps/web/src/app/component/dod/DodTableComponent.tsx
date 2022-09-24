@@ -22,11 +22,10 @@ import {
 import {DataTable} from '@carbon/react';
 
 import {NewDodModal} from "../../modal/dod/NewDodModal";
-import {Dod, Pld, Organization, User} from "@pld/shared";
+import { Dod, Pld, Organization, OrganizationSection } from "@pld/shared";
 import {DodApiController} from "../../controller/DodApiController";
-import {PldGenerator} from "../../docx/PldGenerator";
 
-import {TrashCan, Download, Edit, ImportExport, View, Add} from '@carbon/icons-react'
+import {TrashCan, Edit, ImportExport, Add} from '@carbon/icons-react'
 import {toast} from "react-toastify";
 import {PreviewDodModal} from "../../modal/dod/PreviewDodModal";
 import {formatShortDate} from '@pld/utils';
@@ -41,6 +40,7 @@ export type DodTableComponentProps = {
 } & RequiredUserContextProps
 
 export type DodTableComponentState = {
+  orgSections: OrganizationSection[];
   openCreateModal: boolean;
   editionDod?: Dod;
   openPreviewModal: boolean;
@@ -71,6 +71,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
   constructor(props) {
     super(props);
     this.state = {
+      orgSections: [],
       openCreateModal: false,
       openPreviewModal: false,
       editionDod: undefined,
@@ -298,7 +299,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
   override render() {
     return (
       <>
-        <NewDodModal editionDod={this.state.editionDod} authContext={this.props.userContext} open={this.state.openCreateModal} onDismiss={this.onDismissDodModal} onCreatedDod={this.onCreateDod} lastDod={[]} pld={this.props.pld} org={this.props.org}/>
+        <NewDodModal editionDod={this.state.editionDod} authContext={this.props.userContext} open={this.state.openCreateModal} onDismiss={this.onDismissDodModal} onCreatedDod={this.onCreateDod} lastDod={this.props.dod} pld={this.props.pld} org={this.props.org}/>
         {this.state.editionDod !== undefined ? <PreviewDodModal dod={this.state.editionDod} open={this.state.openPreviewModal} onDismiss={this.onDismissDodModal} onSuccess={() => null}/> : null}
         {this.showDatatable()}
       </>

@@ -73,10 +73,11 @@ export class UserController {
    * Remove favour for logged user
    * @param req NestJS Request
    * @param favour Favour
+   * @param itemToDelete ObjectID to delete from user favour
    */
   @Delete('favours/:favourId')
-  public async removeFavour(@Request() req, @Param('favourId', FavourPipe) favour: Favour) {
-    return this.userService.removeFavour(req.user, favour);
+  public async removeFavour(@Request() req, @Param('favourId', FavourPipe) favour: Favour, @Param('favourId') itemToDelete: string) {
+    return this.userService.removeFavour(req.user, favour, itemToDelete);
   }
 
   /**

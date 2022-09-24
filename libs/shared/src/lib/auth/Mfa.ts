@@ -6,6 +6,7 @@ export enum MfaType {
 }
 
 export class Mfa {
+  _id: string;
   type: MfaType;
   user: User;
   backupCode: string;
@@ -14,7 +15,8 @@ export class Mfa {
   activationDate: Date;
   verified: boolean;
 
-  constructor(type: MfaType, user: User, backupCode: string, secret: string, createdDate: Date, activationDate: Date, verified: boolean) {
+  constructor(_id: string, type: MfaType, user: User, backupCode: string, secret: string, createdDate: Date, activationDate: Date, verified: boolean) {
+    this._id = _id;
     this.type = type;
     this.user = user;
     this.backupCode = backupCode;
@@ -34,5 +36,20 @@ export class MfaOtpBody {
   constructor(token: string, secret: string) {
     this.token = token;
     this.secret = secret;
+  }
+}
+
+export enum MfaDisableType {
+  BACKUP_CODE = 'Backup_Code',
+  AUTH_CODE = 'Auth_Code',
+}
+
+export class MfaOtpDisableBody {
+  code: string;
+  type: MfaDisableType;
+
+  constructor(code: string, type: MfaDisableType) {
+    this.code = code;
+    this.type = type;
   }
 }

@@ -6,18 +6,20 @@ import Lottie from 'lottie-react'
 
 import {Stack} from '@carbon/react';
 import {AuthModalComponent} from "../component/AuthModalComponent";
-import {OrganizationHomeDashboard} from "../component/home/OrganizationHomeDashboard";
+import OrganizationHomeDashboard from "../component/home/OrganizationHomeDashboard";
 import {FAQComponent} from "../component/home/FAQComponent";
 import { Navigate } from "react-router-dom";
+import { LanguageProps, withLanguage } from "../context/LanguageContext";
+import { language } from "../language";
 
-export type HomePageProps = unknown;
+export type HomePageProps = LanguageProps;
 export type HomePageState = {
   login: boolean;
   register: boolean;
   redirect?: string;
 };
 
-export class HomePage extends React.Component<HomePageProps, HomePageState> {
+class HomePage extends React.Component<HomePageProps, HomePageState> {
 
   static override contextType = SocketContext;
   override context!: React.ContextType<typeof SocketContext>;
@@ -102,7 +104,7 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
       <Stack gap={6}>
         <AuthModalComponent onRedirect={() => this.setState({redirect: 'auth/otp'})} onDismiss={this.onDismissModal} openLoginModal={this.state.login} openRegisterModal={this.state.register} switchModal={this.switchModal} onUserRegistered={this.onUserRegistered} onUserLogged={this.onUserLogged}/>
         <Tile>
-          <h1 style={{fontWeight: 500}}>Bienvenue sur votre PLD <span style={{fontWeight: 'bold'}}>[Maker]</span></h1>
+          <h1 style={{fontWeight: 'bold'}}>Bienvenue sur votre PLD <span style={{fontWeight: 'bold'}}>[Maker]</span></h1>
           <p style={{marginTop: 10}}>PLD Maker est une web app vous permettant de suivre votre avancement dans votre EIP</p>
         </Tile>
         <Grid>
@@ -133,13 +135,9 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
   private showDashboard(userContext: UserContextProps) {
     return (
       <Stack>
-        <Tile>
-          <p style={{fontSize: 20}}>Hello World</p>
-          <p style={{fontSize: 14}}>Bienvenue sur votre tableau de bord</p>
-        </Tile>
         <div style={{marginTop: 20}}>
-          <h1>Bienvenue sur votre tableau de bord</h1>
-          <p>Ici vous pouvez suivre l'avancement des PLDs et de leurs DoDs de vos différentes Organisation</p>
+          <h1 style={{fontWeight: 'bold'}}>{this.props.language.getTranslation(language.home.welcomeDashboard.title)}</h1>
+          <p>{this.props.language.getTranslation(language.home.welcomeDashboard.subTitle)}</p>
         </div>
         <div style={{marginTop: 40}}>
           <OrganizationHomeDashboard userContext={userContext}/>
@@ -158,6 +156,7 @@ export class HomePage extends React.Component<HomePageProps, HomePageState> {
       </>
     );
   }
-
 }
+
+export default withLanguage(HomePage);
 

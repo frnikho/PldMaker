@@ -8,6 +8,7 @@ import { MfaService } from "@pld/business";
 import { JwtModule } from "@nestjs/jwt";
 import { DbExceptionFilter } from "./exception/db.filter";
 import { ValidationFilter } from "./exception/validation.filter";
+import { MailModule } from "@pld/business";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ValidationFilter } from "./exception/validation.filter";
         })
       }
     }),
+    MailModule,
     EventEmitterModule.forRoot(),
     AuthModule,
     UserModule,

@@ -12,7 +12,7 @@ export class FavourPipe implements PipeTransform {
 
   async transform(value: string, metadata: ArgumentMetadata) {
     value = new ObjectIdPipe().transform(value, metadata);
-    const favour = await this.favourModel.findOne({_id: value}).exec();
+    const favour = await this.favourModel.findOne({$or: [{pld: value}, {org: value}]}).exec();
     if (favour === null || favour === undefined)
       throw new BadRequestException('Invalid Favour ID');
     return favour;

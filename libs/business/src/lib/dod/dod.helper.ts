@@ -4,6 +4,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Dod, DodCreateBody, DodUpdateBody, Organization, Pld, User } from "@pld/shared";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { PldDodCreatedEvent, PldEvents } from "../pld/pld.event";
+import { DodEvents, DodUpdateEvent } from "./dod.event";
 
 export class DodHelper {
 
@@ -44,6 +45,7 @@ export class DodHelper {
   public async update(user: User, org: Organization, pld: Pld, dod: Dod, body: DodUpdateBody) {
     const updatedDod = await DodHelper.populateAndExecute(this.dodModel.findOneAndUpdate({_id: dod._id, pldOwner: pld}, {...body}, {new: true}));
     this.eventEmitter.emit('Dod:Update', pld._id);
+    this.eventEmitter.emit(DodEvents.onDodUpdate, {editedDod: dod._id, editedBy: user._id, editedFields: this.getEditedFields(dod, updatedDod)} as DodUpdateEvent)
     return updatedDod;
   }
 

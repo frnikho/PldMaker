@@ -1,7 +1,8 @@
 import React from "react";
 import {ModalComponentProps} from "../../util/Modal";
-import {Dod, User} from "@pld/shared";
+import { Dod, User, WorkTimeFormat } from "@pld/shared";
 import {
+  CodeSnippet,
   Column,
   Grid,
   Modal, StructuredListBody, StructuredListCell,
@@ -52,6 +53,16 @@ export class PreviewDodModal extends React.Component<PreviewDodProps, PreviewDod
                 <StructuredListCell>
                   {HistoryHelper.replacePlaceholder(history.action, history.owner, this.props.dod)}
                 </StructuredListCell>
+                {history.editedFields.length > 0 ? <StructuredListCell style={{maxHeight: '100px'}}>
+                  <CodeSnippet aria-multiline={true} style={{height: '100%'}}>
+                    {history.editedFields.map((field, index) => {
+                      return (<div key={index}>
+                        {field.name}: <div style={{display: 'inline', color: 'red'}}>[{field.lastValue}]</div>
+                        <div style={{display: 'inline', color: 'green'}}> [{field.value}]</div>
+                      </div>);
+                    })}
+                  </CodeSnippet>
+                </StructuredListCell> : null}
               </StructuredListRow>
             )
           })}
@@ -65,23 +76,24 @@ export class PreviewDodModal extends React.Component<PreviewDodProps, PreviewDod
     return (
       <Grid>
         <Column lg={9}>
-          <Stack gap={2}>
-            <h4>En tant que</h4>
+          <Stack gap={3}>
+            <h4 style={{fontWeight: 'bold'}}>En tant que</h4>
             <p>{this.props.dod.skinOf}</p>
-            <h4>Je veux</h4>
+            <h4 style={{fontWeight: 'bold'}}>Je veux</h4>
             <p>{this.props.dod.want}</p>
-            <h4>Description:</h4>
+            <h4 style={{fontWeight: 'bold'}}>Description</h4>
             <p>{this.props.dod.description}</p>
-            <h4>Definition Of Done:</h4>
+            <h4 style={{fontWeight: 'bold'}}>Definition Of Done</h4>
             {this.props.dod.descriptionOfDone.map((desc, index) => {
               return <p key={index}>{`\t - ${desc}`}</p>
             })}
-            <h4>Charge estimée:</h4>
+            <h4 style={{fontWeight: 'bold'}}>Charge estimée:</h4>
             {this.props.dod.estimatedWorkTime.map((wt, index) => {
+              console.log(wt);
               return (
                 <p key={index}>
                   - <span style={{fontWeight: 'bold'}}>{wt.value} </span>
-                  <span>{wt.format} </span>
+                  <span>{wt.format ?? WorkTimeFormat.JOUR_HOMME} </span>
                   <span>{(wt.users as User[]).map((user) => {
                     if (user.firstname === undefined || user.lastname === undefined) {
                       return user.email;
@@ -93,10 +105,18 @@ export class PreviewDodModal extends React.Component<PreviewDodProps, PreviewDod
           </Stack>
         </Column>
         <Column lg={3}>
-          <p>DoD crée le</p>
-          <p>{formatShortDate(new Date(this.props.dod.created_date))}</p>
-          <p>Mise à jour le</p>
-          <p>{formatLongDate(new Date(this.props.dod.created_date))}</p>
+          <Stack gap={4}>
+            <div>
+              <p style={{fontWeight: 'bold'}}>DoD crée le :</p>
+              <p>{formatLongDate(new Date(this.props.dod.created_date))}</p>
+              {this.props.dod.owner.email}
+            </div>
+            <div>
+              <p style={{fontWeight: 'bold'}}>Mise à jour le :</p>
+              <p>{formatLongDate(new Date(this.props.dod.created_date))}</p>
+              {this.props.dod.history[this.props.dod.history.length-1].owner.email}
+            </div>
+          </Stack>
         </Column>
       </Grid>
     )
@@ -105,7 +125,7 @@ export class PreviewDodModal extends React.Component<PreviewDodProps, PreviewDod
   override render() {
     return (
       <Modal
-        size={"md"}
+        size={"lg"}
         open={this.props.open}
         onRequestClose={this.props.onDismiss}
         passiveModal

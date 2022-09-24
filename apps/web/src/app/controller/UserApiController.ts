@@ -1,5 +1,5 @@
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
-import { User, UpdateUserBody, AddFavourBody, Favour, Mfa, MfaOtpBody, PayloadLogin } from "@pld/shared";
+import { User, UpdateUserBody, AddFavourBody, Favour, Mfa, MfaOtpBody, PayloadLogin, MfaOtpDisableBody } from "@pld/shared";
 import {AxiosError, AxiosResponse} from "axios";
 import { CallbackEvents } from "./CalendarApiController";
 
@@ -112,8 +112,8 @@ export class UserApiController {
     });
   }
 
-  public static deleteOtp(accessToken: string, otpId: string, callback: CallbackMfa) {
-    api.delete(`auth/mfa/otp/${otpId}`, authorize(accessToken)).then((response) => {
+  public static deleteOtp(accessToken: string, mfaId: string, body: MfaOtpDisableBody, callback: CallbackMfa) {
+    api.post(`auth/mfa/otp/${mfaId}/disable`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {
       return callback(null, err.response?.data);

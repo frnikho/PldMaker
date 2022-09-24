@@ -14,7 +14,7 @@ import {
   TableCell, TableContainer,
   TableHead,
   TableHeader,
-  TableRow, TableSelectAll, TableSelectRow, TableToolbar, TableToolbarContent, TextInput,
+  TableRow, TableToolbar, TableToolbarContent, TextInput,
   Tile
 } from "carbon-components-react";
 import Block from "@uiw/react-color-block";

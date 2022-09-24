@@ -115,7 +115,6 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   }
 
   public loadFavour(accessToken?: string) {
-    console.log('Load favour');
     UserApiController.getFavour(accessToken ?? this.state.accessToken, (favours, error) => {
       if (error) {
         console.log(error);

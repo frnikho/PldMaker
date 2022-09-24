@@ -45,8 +45,12 @@ export class ShowFavourIcon extends React.Component<ShowFavourIconProps, unknown
   }
 
   private showIcon() {
-    if (this.context?.favours?.pld?.some((pld) => {
+    if (this.context.favours === undefined)
+      return ;
+    if (this.context.favours.pld.some((pld) => {
       return pld._id === this.props.data._id
+    }) || this.context.favours.org.some((org) => {
+      return org._id === this.props.data._id
     })) {
       return (<Button kind={"ghost"} hasIconOnly renderIcon={StarFilled} iconDescription={"Favoris"} onClick={this.removeFavour} disabled={this.props.clickable !== undefined && !this.props.clickable}/>);
     } else {

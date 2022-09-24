@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { MfaOtpBody, User } from "@pld/shared";
+import { Mfa, MfaOtpBody, MfaOtpDisableBody, User } from "@pld/shared";
 import { MfaHelper } from "./mfa.helper";
 
 @Injectable()
@@ -15,8 +15,8 @@ export class MfaService {
     return this.mfaHelper.validateOtpCode(user, body);
   }
 
-  public disableMfa(user: User, otpId: string) {
-    return this.mfaHelper.disableMfa(user, otpId);
+  public disableMfa(user: User, mfa: Mfa, body: MfaOtpDisableBody) {
+    return this.mfaHelper.disableMfa(user, mfa, body);
   }
 
   public getMfa(user: User) {

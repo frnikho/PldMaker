@@ -1,0 +1,24 @@
+{
+  "calendar": {
+    "today": {
+      "fr": "Aujourd'hui",
+      "en": "Today"
+    },
+    "month": {
+      "fr": "Mois",
+      "en": "Month"
+    },
+    "week": {
+      "fr": "Semaine",
+      "en": "Week"
+    },
+    "day": {
+      "fr": "Jour",
+      "en": "Day"
+    },
+    "list": {
+      "fr": "List",
+      "en": "List"
+    }
+  }
+}

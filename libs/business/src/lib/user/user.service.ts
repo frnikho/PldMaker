@@ -59,7 +59,7 @@ export class UserService {
       return this.userHelper.addFavourWithBody(user, body);
     }
 
-    public removeFavour(user: User, favour: Favour) {
-     return this.userHelper.removeFavour(user, favour);
+    public removeFavour(user: User, favour: Favour, itemToDelete: string) {
+     return this.userHelper.removeFavour(user, favour, itemToDelete);
     }
 }

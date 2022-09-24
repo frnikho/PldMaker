@@ -1,7 +1,7 @@
 import React from "react";
 import {
   Button,
-  Column,
+  Column, ComboBox,
   FilterableMultiSelect,
   Grid,
   Modal,
@@ -9,19 +9,21 @@ import {
   Select,
   SelectItem,
   TextArea,
-  TextInput,
+  TextInput
 } from "carbon-components-react";
 import {FieldData} from "../../util/FieldData";
 
-import {Stack} from '@carbon/react';
+import {Stack, Layer} from '@carbon/react';
 
 import {Add, Close} from '@carbon/icons-react';
-import {Dod, Pld, Organization, User, DodCreateBody} from "@pld/shared";
+import { Dod, Pld, Organization, User, DodCreateBody, OrganizationSection } from "@pld/shared";
 import {DodApiController} from "../../controller/DodApiController";
 import {UserContextProps} from "../../context/UserContext";
 import {RequiredLabel} from "../../util/Label";
 import {validate} from "class-validator";
 import {ReactFormValidation} from "../../util/Page";
+import { OrganizationApiController } from "../../controller/OrganizationApiController";
+import { toast } from "react-toastify";
 
 export type UserWorkTime = {
   users: string[] | User[];
@@ -54,6 +56,7 @@ export type NewDodModalState = {
   description: FieldData<string>;
   descriptionOfDone: FieldData<string[]>;
   estimatedWorkOfTime: FieldData<UserWorkTime[]>
+  orgSection: OrganizationSection[];
 }
 
 export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodModalState> {
@@ -61,6 +64,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
   constructor(props) {
     super(props);
     this.state = {
+      orgSection: [],
       preview: false,
       version: {
         value: ''
@@ -112,6 +116,13 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
       estimatedWorkOfTime: this.state.estimatedWorkOfTime
     });
     this.prefillField();
+    OrganizationApiController.getOrgSections(this.props.authContext.accessToken, this.props.org._id, (section, error) => {
+      if (error) {
+        toast('Une erreur est survenue lors de la recuperation des sections !', {type: 'error'})
+      } else {
+        this.setState({orgSection: section});
+      }
+    })
   }
 
   private clearField() {
@@ -328,8 +339,8 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
   private showEstimatedWorkTime() {
     return this.state.estimatedWorkOfTime.value.map((dod, index) => {
       return (
-        <Grid key={index} style={{marginTop: '0px', alignItems: 'center'}}>
-          <Column lg={5} md={3}>
+        <Grid key={index} style={{marginBottom: '10px', alignItems: 'center'}}>
+          <Column lg={6} md={3}>
             <FilterableMultiSelect
               invalid={this.state.estimatedWorkOfTime.error !== undefined}
               invalidText={this.state.estimatedWorkOfTime.error}
@@ -348,7 +359,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
               }}
               selectionFeedback="top-after-reopen"/>
           </Column>
-          <Column lg={3} md={2}>
+          <Column lg={5} md={2}>
             <NumberInput id={"dod-estimated-work-time-time"} iconDescription={""} value={this.state.estimatedWorkOfTime.value[index].value} onChange={(e) => {
               const value = this.state.estimatedWorkOfTime.value;
               value[index].value = e.imaginaryTarget.value;
@@ -359,25 +370,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
               })
             }}/>
           </Column>
-          <Column lg={3} md={2}>
-            <Select
-              style={{marginTop: 'auto', marginBottom: 'auto'}}
-              id="dod-estimated-work-time-format"
-              onChange={(e) => {
-                const value = this.state.estimatedWorkOfTime.value;
-                value[index].format = EstimatedWorkTimeFormat[e.currentTarget.value];
-                this.setState({
-                  estimatedWorkOfTime: {
-                    value: value,
-                  }
-                })
-              }}
-              labelText="">
-              <SelectItem value={EstimatedWorkTimeFormat.JOUR_HOMME} text="J/H (Jour Homme)"/>
-              <SelectItem value={EstimatedWorkTimeFormat.HOURS} text="Heures"/>
-            </Select>
-          </Column>
-          <Column lg={1} md={1} style={{}}>
+          <Column lg={1} md={1}>
             <Button iconDescription={"X"} kind={"tertiary"} hasIconOnly renderIcon={Close} onClick={() => this.onClickDeleteEstimatedWorkTime(index)} size={"sm"}/>
           </Column>
         </Grid>
@@ -400,6 +393,44 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
     }
   }
 
+  private getVersionSelection() {
+    const abc = this.state.orgSection.map((section) => {
+      return {
+        name: `${section.section} - ${section.name}`,
+        version: section.section
+      }
+    }).sort((a, b) => {
+      if (a.name > b.name) {
+        return 1;
+      }
+      return -1;
+    });
+    console.log(abc);
+    return abc;
+  }
+
+  private showInputSelect() {
+    if (this.state.version.value === '') {
+      return (
+        <ComboBox id={'select-version'}
+                  placeholder={'1.1.0 ...'}
+                  titleText={<RequiredLabel message={"Version"}/>}
+                  value={this.state.version.value}
+                  onChange={(a) => this.setState({version: {value: a.selectedItem?.version ?? ''}})}
+                  items={this.getVersionSelection()}
+                  itemToString={(item) => (item ? item.name : '')}
+        />);
+    } else {
+      return (
+        <TextInput id={'input-version'} labelText={<RequiredLabel message={"Version"}/>} value={this.state.version.value} onChange={(e) => this.setState({
+          version: {
+            value: e.currentTarget.value
+          }
+        })}/>
+      )
+    }
+  }
+
   private showEdit() {
     if (this.state.preview)
       return;
@@ -408,7 +439,10 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
         <Stack gap={3}>
           <Grid>
             <Column lg={3} md={3}>
-              <TextInput
+              <Layer>
+                {this.showInputSelect()}
+              </Layer>
+              {/*<TextInput
                 onKeyPress={(event) => this.onClickEnter(event, 1)}
                 invalid={this.state.version.error !== undefined}
                 invalidText={this.state.version.error}
@@ -418,10 +452,11 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
                     value: e.currentTarget.value,
                   }
                 })
-              }}/>
+              }}/>*/}
             </Column>
             <Column lg={8} md={5}>
               <TextInput
+                placeholder={'Mettre en place le vps....'}
                 onKeyPress={(event) => this.onClickEnter(event, 2)}
                 invalid={this.state.title.error !== undefined}
                 invalidText={this.state.title.error}
@@ -437,6 +472,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
           <Grid>
             <Column lg={3} md={3}>
               <TextInput
+                placeholder={'Développeur'}
                 onKeyPress={(event) => this.onClickEnter(event, 3)}
                 invalid={this.state.skinOf.error !== undefined}
                 invalidText={this.state.skinOf.error}
@@ -450,6 +486,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
             </Column>
             <Column lg={8} md={5}>
               <TextInput
+                placeholder={'Pouvoir créer une bouton sur le vps'}
                 onKeyPress={(event) => this.onClickEnter(event, 4)}
                 invalid={this.state.want.error !== undefined}
                 invalidText={this.state.want.error}
@@ -463,15 +500,16 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
             </Column>
           </Grid>
           <TextArea
+            placeholder={'En cliquant sur le bouton "X" je souhaite configurer le vps'}
             onKeyPress={(event) => this.onClickEnter(event, 5)}
             invalid={this.state.description.error !== undefined}
             invalidText={this.state.description.error}
             id={"dod-description"} labelText={<RequiredLabel message={"Description"}/>} value={this.state.description.value} onChange={(e) => {
-            this.setState({
-              description: {
-                value: e.currentTarget.value
-              }
-            });
+              this.setState({
+                description: {
+                  value: e.currentTarget.value
+                }
+              });
           }}/>
           <>
             <RequiredLabel message={"Définition of Done"}/>
@@ -484,6 +522,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
             <Button size={"sm"} iconDescription={"Ajouter une définition"} kind={"secondary"}  onClick={this.onClickAddEstimatedWorkTime} hasIconOnly renderIcon={Add}/>
           </div>
         </Stack>
+        <Button style={{marginTop: 28}} onClick={this.onClickCreate} renderIcon={Add}>Créer</Button>
       </form>
     )
   }
@@ -493,8 +532,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
       <Modal
         size={"md"}
         open={this.props.open}
-        primaryButtonText={this.props.editionDod !== undefined ? 'Mettre à jour' : "Créer"}
-        onRequestSubmit={this.onClickCreate}
+        passiveModal
         secondaryButtonText={"Fermer"}
         onRequestClose={this.props.onDismiss}
         modalHeading={this.props.editionDod !== undefined ? 'Modification du dod' : "Créer un nouveau DoD"}>

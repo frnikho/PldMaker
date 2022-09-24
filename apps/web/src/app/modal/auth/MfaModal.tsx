@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Column, Grid, Modal, TextInput } from "carbon-components-react";
+import { Button, Column, Grid, Link, Modal, TextInput } from "carbon-components-react";
 import { RequiredUserContextProps } from "../../context/UserContext";
 import Lottie from 'lottie-react'
 import { Mfa, MfaOtpBody } from "@pld/shared";
@@ -11,6 +11,7 @@ import { QRCodeSVG } from "qrcode.react";
 import {Stack} from '@carbon/react';
 
 import {Checkmark} from '@carbon/icons-react';
+import { RequiredLabel } from "../../util/Label";
 
 export type MfaModalProps = {
   open: boolean;
@@ -21,6 +22,7 @@ export type MfaModalProps = {
 export type MfaModalState = {
   mfa: Data<Mfa>;
   token: string;
+  showManualSecret: boolean;
 }
 
 export class MfaModal extends React.Component<MfaModalProps, MfaModalState> {
@@ -29,6 +31,7 @@ export class MfaModal extends React.Component<MfaModalProps, MfaModalState> {
     super(props);
     this.state = {
       token: '',
+      showManualSecret: false,
       mfa: {
         loading: true,
         value: undefined,
@@ -76,7 +79,7 @@ export class MfaModal extends React.Component<MfaModalProps, MfaModalState> {
     if (this.state.mfa.value === undefined)
       return;
     return (
-      <Stack gap={4}>
+      <Stack gap={6}>
         <Grid>
           <Column xlg={4}>
             <QRCodeSVG style={{marginTop: 10}} value={`otpauth://totp/PLD [Maker]:${this.props.userContext.user?.email}?secret=${this.state.mfa.value.secret}&issuer=PLD [Maker]`} />
@@ -85,7 +88,11 @@ export class MfaModal extends React.Component<MfaModalProps, MfaModalState> {
             Scannez ce QR code avec Google Authenticator ou tout autre application de 2FA
           </Column>
         </Grid>
-        <TextInput id={"otp-input"} labelText={""} placeholder={"123456"} value={this.state.token} onChange={(e) => this.setState({token: e.currentTarget.value})} max={6} maxLength={6}/>
+        <div>
+          <Link onClick={() => this.setState({showManualSecret: !this.state.showManualSecret})}>Afficher le code manuel</Link>
+          <p style={{display: !this.state.showManualSecret ? 'none' : undefined}}>{this.state.mfa.value.secret}</p>
+        </div>
+        <TextInput id={"otp-input"} labelText={<RequiredLabel message={"Code de l'application"}/>} placeholder={"123456"} value={this.state.token} onChange={(e) => this.setState({token: e.currentTarget.value})} max={6} maxLength={6}/>
         <Button renderIcon={Checkmark} iconDescription={"Valid"} onClick={this.onClickOtpValidate}>Valider</Button>
       </Stack>
     );
@@ -100,7 +107,7 @@ export class MfaModal extends React.Component<MfaModalProps, MfaModalState> {
         size={"sm"}>
         <Lottie animationData={require('../../../assets/animations/otp.json')} loop={true} style={{width: '140px', margin: 'auto'}}/>
         <h2 style={{textAlign: 'center'}}>Activer le 2FA</h2>
-        <p style={{textAlign: 'center', padding: 0, fontStyle: 'italic'}}>En activant la vérification en deux étapes, vous renforcer la sécurité de votre compte ainsi que de vos informations personnels</p>
+        <p style={{textAlign: 'center', padding: 0}}>En activant la vérification en deux étapes, vous renforcer la sécurité de votre compte ainsi que de vos informations personnels</p>
         {this.showQrCode()}
       </Modal>
     )

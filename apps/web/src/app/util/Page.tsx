@@ -44,6 +44,4 @@ export abstract class AuthPage<T, Z> extends React.Component<T, Z> {
       </UserContext.Consumer>
     );
   }
-
-
 }

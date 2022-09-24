@@ -2,9 +2,10 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Post, Request, UseGuard
 import {LocalAuthGuard} from "./guard/local-auth.guard";
 import {AuthService} from "./auth.service";
 import { BypassMfa, Public } from "./jwt/public.decorator";
-import { DeviceBody, MfaOtpBody, RegisterBody } from "@pld/shared";
+import { DeviceBody, Mfa, MfaOtpBody, MfaOtpDisableBody, RegisterBody } from "@pld/shared";
 import {UserService} from "../user/user.service";
 import { MfaService } from "./mfa/mfa.service";
+import { MfaPipe } from "./mfa/mfa.pipe";
 
 @Controller('auth')
 export class AuthController {
@@ -51,9 +52,9 @@ export class AuthController {
     return this.mfaService.loginOtp(req.user, body);
   }
 
-  @Delete('mfa/otp/:otpId')
-  public deleteOtp(@Request() req, @Param('otpId') otpId: string) {
-    return this.mfaService.disableMfa(req.user, otpId);
+  @Post('mfa/otp/:otpId/disable')
+  public deleteOtp(@Request() req, @Param('otpId', MfaPipe) mfa: Mfa, @Body() body: MfaOtpDisableBody) {
+    return this.mfaService.disableMfa(req.user, mfa, body);
   }
 
 }

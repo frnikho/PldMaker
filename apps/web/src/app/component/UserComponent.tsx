@@ -12,15 +12,18 @@ import { Stack } from "@carbon/react";
 import { MfaModal } from "../modal/auth/MfaModal";
 import { Mfa, MfaType, Organization, User, UserDomain } from "@pld/shared";
 import { OrganizationApiController } from "../controller/OrganizationApiController";
+import { DisableOtpModal } from "../modal/auth/DisableOtpModal";
+import { LanguageProps } from "../context/LanguageContext";
 
-export type UserComponentProps = RequiredUserContextProps;
+export type UserComponentProps = RequiredUserContextProps & LanguageProps;
 
 export type UserComponentState = {
   firstname: FieldData<string>;
   lastname: FieldData<string>;
   domain: FieldData<string[]>;
   timezone: FieldData<string>;
-  open: boolean;
+  openEnableOtp: boolean;
+  openDisableOtp: boolean;
   mfa: Mfa[];
   org: Organization[];
 }
@@ -45,10 +48,12 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
       timezone: {
         value: '',
       },
-      open: false
+      openEnableOtp: false,
+      openDisableOtp: false,
     }
     this.onClickUpdate = this.onClickUpdate.bind(this);
     this.onMfaEnable = this.onMfaEnable.bind(this);
+    this.onMfaDisable = this.onMfaDisable.bind(this);
   }
 
   override componentDidMount() {
@@ -125,13 +130,13 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
       return (
         <>
           <Tile>Vous n'avez pas activer l'OTP</Tile>
-          <Button onClick={() => this.setState({open: true})}>Ajouter 2FA</Button>
+          <Button onClick={() => this.setState({openEnableOtp: true})}>Ajouter 2FA</Button>
         </>
       );
     } else {
       return (<>
         <Tile>OTP actif depuis: {formatLongDate(new Date(mfa.activationDate))}</Tile>
-        <Button disabled kind={"ghost"} onClick={() => this.setState({open: true})}>Désactiver MFA</Button>
+        <Button kind={"ghost"} onClick={() => this.setState({openDisableOtp: true})}>Désactiver MFA</Button>
       </>);
     }
   }
@@ -242,22 +247,27 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
       if (error) {
         toast('Une erreur est survenue !', {type: 'error'});
       } else {
-        this.setState({open: false});
+        this.setState({openEnableOtp: false});
         toast('2FA Activé', {type: 'success'});
         this.getMfaInfo(token);
       }
     })
   }
 
+  private onMfaDisable() {
+    this.setState({openDisableOtp: false})
+    this.getMfaInfo(this.props.userContext.accessToken);
+  }
+
   override render() {
     return (
       <Stack gap={4}>
-        <MfaModal open={this.state.open} onDismiss={() => this.setState({open: false})} onSuccess={this.onMfaEnable} userContext={this.props.userContext}/>
+        <MfaModal open={this.state.openEnableOtp} onDismiss={() => this.setState({openEnableOtp: false})} onSuccess={this.onMfaEnable} userContext={this.props.userContext}/>
+        <DisableOtpModal userContext={this.props.userContext} mfa={this.state.mfa.find((mfa) => mfa.type === MfaType.OTP)!} open={this.state.openDisableOtp} language={this.props.language} onDismiss={() => this.setState({openDisableOtp: false})} onSuccess={this.onMfaDisable}/>
         {this.showInfo()}
         {this.showSecurity()}
         {this.showDangerZone()}
       </Stack>
     );
   }
-
 }
