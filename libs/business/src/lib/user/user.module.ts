@@ -11,12 +11,15 @@ import { CalendarEventDefinition } from "../organization/calendar/calendar_event
 import { CalendarHelper } from "../organization/calendar/calendar.helper";
 import { MailService } from "../mail/mail.service";
 import { MailHelper } from "../mail/mail.helper";
+import { UserConsumer } from "./user.consumer";
+import { BullModule } from "@nestjs/bull";
 
 @Module({
   imports: [
+    BullModule.registerQueue({name: 'user'}),
     MongooseModule.forFeature([UserDefinition, FavourDefinition, CalendarDefinition, CalendarEventDefinition]),
   ],
-  providers: [MailService, MailHelper, UserHelper, UserService, CalendarService, CalendarHelper],
+  providers: [MailService, MailHelper, UserHelper, UserService, UserConsumer, CalendarService, CalendarHelper],
   exports: [UserService],
   controllers: [UserController],
 })

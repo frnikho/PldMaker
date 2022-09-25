@@ -1,7 +1,7 @@
 import {Injectable, Logger} from "@nestjs/common";
 import {DodService} from "./dod.service";
 import {OnEvent} from "@nestjs/event-emitter";
-import {DodEvents, DodUpdateEvent} from "./dod.event";
+import { DodEvents, DodStatusDeletedEvent, DodUpdateEvent } from "./dod.event";
 import {DodHistoryAction} from "@pld/shared";
 
 @Injectable()
@@ -19,6 +19,11 @@ export class DodListener {
     }).then(() => {
       Logger.log(`Dod Updated: ${event.editedDod} (${event.editedBy})`, DodEvents.onDodUpdate);
     });
+  }
+
+  @OnEvent(DodEvents.onDodStatusDeleted)
+  public onDodStatusDeleted(event: DodStatusDeletedEvent) {
+    return this.dodService.migrateAllDodStatus(event.removedBy, event.orgId, event.dodStatusId);
   }
 
 }

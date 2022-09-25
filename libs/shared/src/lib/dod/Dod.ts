@@ -1,6 +1,7 @@
 import {Pld} from "../pld/Pld";
 import {User} from "../user/User";
 import {DodHistoryAction} from "./DodHistory";
+import { DodStatus } from "./DodStatus";
 
 export class Dod {
   _id: string;
@@ -13,12 +14,12 @@ export class Dod {
   estimatedWorkTime: UserWorkTime[];
   pldOwner: Pld | string;
   owner: User;
-  status: DodStatus | string;
+  status: DodStatus;
   history: DodHistory[];
   created_date: Date;
   updated_date: Date;
 
-  constructor(id: string, version: string, title: string, skinOf: string, want: string, description: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[], pldOwner: Pld | string, owner: User, status: DodStatus | string, history: DodHistory[], created_date: Date, updated_date: Date) {
+  constructor(id: string, version: string, title: string, skinOf: string, want: string, description: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[], pldOwner: Pld | string, owner: User, status: DodStatus, history: DodHistory[], created_date: Date, updated_date: Date) {
     this._id = id;
     this.version = version;
     this.title = title;
@@ -42,14 +43,6 @@ export type UserWorkTime = {
   format: string,
 }
 
-export enum DodStatus {
-  TODO = 'A faire',
-  DOING = 'En cours',
-  TO_TRY = 'A tester',
-  DONE = 'Fini',
-  NOT_FINISH = 'Non fini'
-}
-
 export type EditedField = {
   name: string;
   lastValue: string;
@@ -61,4 +54,8 @@ export type DodHistory = {
   editedFields: EditedField[]
   owner: User;
   action: DodHistoryAction;
+}
+
+export type SetDodStatus = {
+  statusId: string;
 }

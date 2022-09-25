@@ -1,8 +1,8 @@
-import {DodColor} from "@pld/shared";
+import { DodStatus } from "@pld/shared";
 
-export const getDodStatusColor = (dodColors: DodColor[], status: string) => {
-  const color: DodColor | undefined = dodColors.find((dodColor) => {
-    return dodColor.name === status
+export const getDodStatusColor = (dodStatus: DodStatus[], status: string) => {
+  const color: DodStatus | undefined = dodStatus.find((dodStatus) => {
+    return dodStatus.name === status
   });
   if (color === undefined) {
     console.log(status);

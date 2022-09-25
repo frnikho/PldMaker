@@ -59,9 +59,8 @@ export const dodRules: DodRulesType = {
   },
   status: {
     required: false,
-    type: String,
-    enum: DodStatus,
-    default: DodStatus.TODO
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'DodStatus'
   },
   estimatedWorkTime: {
     required: true

@@ -35,11 +35,11 @@ export class NewOrgDodColorModal extends React.Component<NewOrgDodColorProps, Ne
   }
 
   private onClickCreate() {
-    if (this.props.org.dodColors.some((a) => a.name.toLowerCase() === this.state.name.value.toLowerCase())) {
+    /*if (this.props.org.dodColors.some((a) => a.name.toLowerCase() === this.state.name.value.toLowerCase())) {
       toast('Un status avec ce même nom existe deja !', {type: 'error'})
       return;
-    }
-    this.props.org.dodColors.push({
+    }*/
+    /*this.props.org.dodColors.push({
       name: this.state.name.value,
       color: this.state.color.value,
     });
@@ -54,7 +54,7 @@ export class NewOrgDodColorModal extends React.Component<NewOrgDodColorProps, Ne
       } else {
         this.props.onSuccess();
       }
-    })
+    })*/
   }
 
   override render() {

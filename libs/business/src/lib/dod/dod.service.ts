@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import {NewDodHistory} from "./dod.schema";
 import {Model} from "mongoose";
-import { Dod, DodCreateBody, DodUpdateBody, Organization, Pld, User } from "@pld/shared";
+import { Dod, DodCreateBody, DodUpdateBody, Organization, Pld, SetDodStatus, User } from "@pld/shared";
 import {EventEmitter2} from "@nestjs/event-emitter";
 import {DodHelper} from "./dod.helper";
 
@@ -20,6 +20,10 @@ export class DodService {
 
   public async getPldDod(user: User, org: Organization, pld: Pld) {
     return this.helper.getPldDod(user, org, pld);
+  }
+
+  public async updateDodStatus(user: User, org: Organization, pld: Pld, dod: Dod, body: SetDodStatus) {
+    return this.helper.updateDodStatus(user, org, pld, dod, body);
   }
 
   public async getDod(user: User, org: Organization, pld: Pld, dod: Dod) {
@@ -41,6 +45,10 @@ export class DodService {
    */
   public async addHistory(userId: string, history: NewDodHistory) {
     return this.helper.addHistory(userId, history);
+  }
+
+  public migrateAllDodStatus(userId: string, orgId: string, statusId: string) {
+    return this.helper.migrateAllDodStatus(userId, orgId, statusId);
   }
 
 }

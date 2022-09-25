@@ -108,7 +108,7 @@ export class DodDocx {
             margins,
             shading: {
               type: ShadingType.SOLID,
-              color: getDodStatusColor(this.org.dodColors, this.dod.status)
+              color: getDodStatusColor([], 'this.dod.status')
             },
             children: [Title(this.dod.version + ' ' + this.dod.title)],
             width: {

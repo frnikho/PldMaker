@@ -45,3 +45,5 @@ export * from './lib/Template';
 export * from './lib/Mobile'
 
 export * from './lib/auth/Mfa';
+
+export * from './lib/dod/DodStatus';

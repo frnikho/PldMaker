@@ -103,9 +103,9 @@ export class PldResumeDocx {
 
     const userDod = this.dod.filter((dod) => dod.estimatedWorkTime.some((wt) => wt.users.some((user) => user._id === member._id)));
     const dodDones = userDod.filter((dod) => {
-      return dod.status === 'En cours';
+      return dod.status.name === 'En cours';
     });
-    const dodInProgress = userDod.filter((dod) => dod.status === 'Fini');
+    const dodInProgress = userDod.filter((dod) => dod.status.name === 'Fini');
 
     return new TableRow({
       children: [

@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Request } from "@nestjs/common";
-import { Dod, DodCreateBody, DodUpdateBody, Organization, Pld } from "@pld/shared";
+import { Dod, DodCreateBody, DodUpdateBody, Organization, Pld, SetDodStatus } from "@pld/shared";
 import { DodService } from "./dod.service";
 import { OrganizationPipe } from "../organization/organization.pipe";
 import { PldPipe } from "../pld/pld.pipe";
@@ -19,6 +19,11 @@ export class DodController {
   @Post()
   public async createDod(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('pldId', PldPipe) pld: Pld, @Body() dodBody: DodCreateBody) {
     return this.dodService.createWithBody(req.user, org, pld, dodBody);
+  }
+
+  @Patch(':dodId/status')
+  public async updateDodStatus(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('pldId', PldPipe) pld: Pld, @Param('dodId', DodPipe) dod: Dod, @Body() body: SetDodStatus) {
+    return this.dodService.updateDodStatus(req.user, org, pld, dod, body);
   }
 
   @Get()

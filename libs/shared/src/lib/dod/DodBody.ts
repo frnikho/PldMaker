@@ -3,7 +3,6 @@ import { ArrayMinSize, ArrayNotContains, IsNotEmpty, Length, Matches, MaxLength 
 export class DodFindPldBody {
   plds: string[];
 
-
   constructor(plds: string[]) {
     this.plds = plds;
   }

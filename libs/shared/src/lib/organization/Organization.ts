@@ -59,28 +59,21 @@ export class Organization {
   description: string;
   versionShifting: number;
   _id: string;
-  dodColors: DodColor[];
   history: OrgHistory[];
   sections: OrganizationSection[];
   created_date: Date;
   updated_date: Date;
 
-  constructor(members: User[], name: string, owner: User, description: string, versionShifting: number, id: string, dodColors: DodColor[], history: OrgHistory[], sections: OrganizationSection[], created_date: Date, updated_date: Date) {
+  constructor(members: User[], name: string, owner: User, description: string, versionShifting: number, id: string, history: OrgHistory[], sections: OrganizationSection[], created_date: Date, updated_date: Date) {
     this.members = members;
     this.name = name;
     this.owner = owner;
     this.description = description;
     this.versionShifting = versionShifting;
     this._id = id;
-    this.dodColors = dodColors;
     this.history = history;
     this.sections = sections;
     this.created_date = created_date;
     this.updated_date = updated_date;
   }
-}
-
-export type DodColor = {
-  name: string;
-  color: string;
 }

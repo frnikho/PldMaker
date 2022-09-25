@@ -2,7 +2,7 @@ import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {PldApiController} from "../../controller/PldApiController";
-import { Organization, Pld, User, Dod, PldStatus, FavourType, OrganizationSection, PldRevision } from "@pld/shared";
+import { Organization, Pld, User, Dod, PldStatus, FavourType, OrganizationSection, PldRevision, DodStatus } from "@pld/shared";
 import {
   Accordion,
   AccordionItem,
@@ -63,6 +63,7 @@ export type PldComponentState = {
   org?: Organization;
   pld?: Pld;
   dod: Dod[];
+  dodStatus: DodStatus[];
   sections: OrganizationSection[];
   openSignModal: boolean;
   openHistoryModal: boolean;
@@ -82,6 +83,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     super(props);
     this.state = {
       sections: [],
+      dodStatus: [],
       dod: [],
       org: undefined,
       pld: undefined,
@@ -118,7 +120,20 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     this.loadOrg();
     this.loadPld();
     this.loadDod();
+    this.loadDodStats();
     this.registerListeners();
+  }
+
+  private loadDodStats() {
+    OrganizationApiController.getOrgDodStatus(this.props.userContext.accessToken, this.props.orgId, (dodStatus, error) => {
+      if (error) {
+        toast('une erreur est survenue lors de la récupération des statuts !');
+      } else {
+        this.setState({
+          dodStatus: dodStatus
+        })
+      }
+    });
   }
 
   private loadOrg() {
@@ -437,7 +452,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
   private showDataTable() {
     if (this.state.pld === undefined || this.state.org === undefined)
       return <SkeletonPlaceholder/>
-    return <DodTableComponent userContext={this.props.userContext} onCreatedDod={this.onDodCreated} onDeleteDod={this.onDodDeleted} onUpdateDod={this.onDodUpdated} pld={this.state.pld} org={this.state.org} dod={this.state.dod}/>
+    return <DodTableComponent dodStatus={this.state.dodStatus} userContext={this.props.userContext} onCreatedDod={this.onDodCreated} onDeleteDod={this.onDodDeleted} onUpdateDod={this.onDodUpdated} pld={this.state.pld} org={this.state.org} dod={this.state.dod}/>
   }
 
   private showModals() {
@@ -452,7 +467,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           dod={this.state.dod}
           open={this.state.openHistoryModal} onDismiss={() => this.setState({openHistoryModal: false})} onSuccess={() => null}
         />
-        <ResumePldModal reload={() => this.loadOrg()} userContext={this.props.userContext} sections={this.state.sections} pld={this.state.pld} org={this.state.org} dod={this.state.dod} open={this.state.openResumeModal} hide={(show) => this.setState({openResumeModal: show})}/>
+        <ResumePldModal dodColors={[]} reload={() => this.loadOrg()} userContext={this.props.userContext} sections={this.state.sections} pld={this.state.pld} org={this.state.org} dod={this.state.dod} open={this.state.openResumeModal} hide={(show) => this.setState({openResumeModal: show})}/>
         <SignPldModal
           open={this.state.openSignModal}
           onDismiss={() => {

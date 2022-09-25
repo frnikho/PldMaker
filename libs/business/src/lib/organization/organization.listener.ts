@@ -1,6 +1,6 @@
 import {Injectable} from "@nestjs/common";
 import {OnEvent} from "@nestjs/event-emitter";
-import {OrgAddMemberEvent, OrgEvents, OrgRemoveMemberEvent} from "./organization.event";
+import { OrgAddMemberEvent, OrgDodStatusDeletedEvent, OrgEvents, OrgRemoveMemberEvent } from "./organization.event";
 import {OrganizationService} from "./organization.service";
 import {OrgHistoryAction} from "@pld/shared";
 
@@ -27,6 +27,11 @@ export class OrganizationListener {
       member: event.removedMemberId,
       date: new Date(),
     });
+  }
+
+  @OnEvent(OrgEvents.onDodStatusDeleted)
+  public onDodStatusDeleted(event: OrgDodStatusDeletedEvent) {
+
   }
 
 }

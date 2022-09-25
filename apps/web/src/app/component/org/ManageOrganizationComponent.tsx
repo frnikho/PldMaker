@@ -1,7 +1,7 @@
 import React from "react";
 import {UserContextProps} from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
-import { Organization, OrganizationSection, User } from "@pld/shared";
+import { DodStatus, Organization, OrganizationSection, User } from "@pld/shared";
 import {toast} from "react-toastify";
 import {
   Breadcrumb,
@@ -33,8 +33,9 @@ import { DeleteOrgModal } from "../../modal/org/DeleteOrgModal";
 import { MigrateOrgModal } from "../../modal/org/MigrateOrgModal";
 import { UpdateOrgSectionModal } from "../../modal/org/UpdateOrgSectionModal";
 import { DeleteOrgSectionModal } from "../../modal/org/DeleteOrgSectionModal";
+import { ManageOrgDodStatusComponent } from "./manage/ManageOrgDodStatusComponent";
 
-export const headerData = [
+export const sectionHeaderData = [
   {
     key: 'section',
     header: 'Section',
@@ -52,10 +53,12 @@ export type ManageOrgProps = {
 
 export type ManageOrgState = {
   org?: Organization,
+  dodStatus: DodStatus[];
   orgSection: OrganizationSection[];
   newUserInput: FieldData<string>;
   openDodColor: boolean;
   openSection: boolean;
+  openCreateDodStatus: boolean;
   openDelete: boolean;
   openMigrate: boolean;
   openUpdateSection: boolean;
@@ -71,10 +74,12 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
   constructor(props) {
     super(props);
     this.state = {
+      dodStatus: [],
       orgSection: [],
       openDodColor: false,
       openSection: false,
       openDelete: false,
+      openCreateDodStatus: false,
       openMigrate: false,
       openUpdateSection: false,
       openDeleteSection: false,
@@ -84,10 +89,8 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
         error: undefined
       },
     }
-    this.updateDodColor = this.updateDodColor.bind(this);
     this.onClickInviteUser = this.onClickInviteUser.bind(this);
     this.onClickRevokeUser = this.onClickRevokeUser.bind(this);
-    this.onClickDelete = this.onClickDelete.bind(this);
   }
 
   override componentDidMount() {
@@ -104,8 +107,19 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
     });
   }
 
+  private loadDodStatus() {
+    OrganizationApiController.getOrgDodStatus(this.props.auth.accessToken, this.props.orgId, (dodStatus, error) => {
+      if (error) {
+        toast(error.message, {type: 'error'});
+      } else {
+        this.setState({dodStatus: dodStatus});
+      }
+    });
+  }
+
   private loadOrg() {
    this.loadSection();
+   this.loadDodStatus();
     OrganizationApiController.findOrganizationById(this.props.auth.accessToken, this.props.orgId, (org, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
@@ -126,19 +140,6 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
         this.setState({orgSection: section})
       }
     });
-  }
-
-  private updateDodColor() {
-    if (this.state.org === undefined)
-      return;
-    OrganizationApiController.updateOrg(this.props.auth.accessToken, {
-      orgId: this.state.org._id,
-      dodColors: this.state.org.dodColors,
-    }, (org, error) => {
-      if (error) {
-        toast('Une erreur est survenue !', {type: 'error'});
-      }
-    })
   }
 
   private onClickRevokeUser(userId: string) {
@@ -185,11 +186,6 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
         })
       }
     });
-  }
-
-  private onClickDelete(index: number) {
-    this.state.org?.dodColors.splice(index, 1);
-    this.updateDodColor();
   }
 
   private isOwner(): boolean {
@@ -295,7 +291,7 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
           if (b.section > a.section)
             return (-1);
           return 1;
-        })} headers={headerData} isSortable locale={"fr"}>
+        })} headers={sectionHeaderData} isSortable locale={"fr"}>
           {({
               rows,
               headers,
@@ -343,46 +339,6 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
           )}
         </DataTable>
       </Tile>
-    )
-  }
-
-  private showPreferences() {
-    if (this.state.org === undefined)
-      return;
-    return (
-      <Grid style={{padding: '18px'}}>
-        {this.state.org.dodColors?.map((dodColor, index) => {
-          return (
-            <Column lg={4} md={3} sm={3} key={index}>
-              <Tile style={{marginTop: '0px', textAlign: 'center'}}>
-                <Stack orientation={"horizontal"} gap={3}>
-                  <h4 style={{margin: 'auto'}}>{dodColor.name}</h4>
-                  <Link style={{margin: 'auto'}} onClick={() => this.onClickDelete(index)}><TrashCan/></Link>
-                </Stack>
-                <Block
-                  style={{margin: 'auto', marginTop: '20px'}}
-                  color={`#${dodColor.color}`}
-                  title={"abc"}
-                  onChange={(color) => {
-                    if (this.state.org === undefined)
-                      return;
-                    const selectDodColor = this.state.org.dodColors.find((dc) => dc.name === dodColor.name);
-                    if (selectDodColor === undefined)
-                      return;
-                    selectDodColor.color = color.hex.slice(1, 7);
-                    this.setState({
-                      org: {
-                        ...this.state.org,
-                      }
-                    })
-                    this.updateDodColor();
-                  }}
-                />
-              </Tile>
-            </Column>
-          )
-        })}
-      </Grid>
     )
   }
 
@@ -436,20 +392,8 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
       return;
     return (
       <Stack gap={6}>
-        <h2>Status des DoDs</h2>
-        <Tile style={{padding: '18px'}}>
-          <Stack>
-            <div>
-              <p>Le status des DoDs vous permet de vous retrouver dans l'avancement de celle-ci.</p>
-              <p>La couleur choisit est également utiliser lors de la génération du document word.</p>
-              <p style={{fontStyle: 'italic'}}>Il ne faut pas supprimer les status actif de vos DoDs avant de les avoirs changers.</p>
-            </div>
-            <Button iconDescription={"Nouveau"} renderIcon={Add} kind={"ghost"} onClick={() => this.setState({
-              openDodColor: true
-            })}>Créer un nouveau status</Button>
-          </Stack>
-          {this.showPreferences()}
-        </Tile>
+        <h2>Statuts</h2>
+        <ManageOrgDodStatusComponent org={this.state.org} userContext={this.props.auth} dodStatus={this.state.dodStatus} onStatusChanged={() => this.loadDodStatus()}/>
         <h2>Sections des DoDs</h2>
         {this.showSections()}
         <h2>Membres</h2>

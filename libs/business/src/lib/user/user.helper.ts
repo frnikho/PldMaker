@@ -45,6 +45,7 @@ export class UserHelper {
     const createdUser = await this.userModel.create(user);
     this.logger.debug(`New user created: ${createdUser._id}`);
     const createdFavour = await this.favourModel.create({owner: createdUser._id});
+    await this.mailService.sendMail(user, AvailableMail.WelcomeMail);
     this.logger.debug(`Favour's user created: ${createdFavour._id}`);
     return createdUser;
   }
@@ -82,7 +83,6 @@ export class UserHelper {
   public updateWithBody(user: User, body: UpdateUserBody) {
     this.logger.debug(`Updating user content (${user.email} - ${user._id}): `);
     this.logger.debug(body);
-    this.mailService.sendMail(user, AvailableMail.WelcomeMail);
     return UserHelper.populateAndExecute(this.userModel.findOneAndUpdate({_id: user._id}, body, {new: true}));
   }
 

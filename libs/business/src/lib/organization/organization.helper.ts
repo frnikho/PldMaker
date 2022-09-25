@@ -8,6 +8,8 @@ import { InviteUserOrgBody, MigrateOrganizationBody, Organization, RemoveUserOrg
 import { CreateOrganizationBody, User } from "@pld/shared";
 import { OrgAddMemberEvent, OrgEvents, OrgRemoveMemberEvent } from "./organization.event";
 import { UserDocument } from "../user/user.schema";
+import { DodStatusHelper } from "../dod/status/dod-status.helper";
+import { DodStatusService } from "../dod/status/dod-status.service";
 
 @Injectable()
 export class OrganizationHelper {
@@ -17,7 +19,8 @@ export class OrganizationHelper {
   constructor(
     @InjectModel('Organization') private organizationModel: Model<Organization>,
     private userService: UserService,
-    private eventEmitter: EventEmitter2) {}
+    private eventEmitter: EventEmitter2,
+    private dodStatusService: DodStatusService) {}
 
 
   public static populateAndExecute<T>(query: Query<T, any>) {
@@ -36,22 +39,25 @@ export class OrganizationHelper {
     return OrganizationHelper.populateAndExecute(this.organizationModel.findOne({_id: orgId}));
   }
 
-  public createOrg(user: User, org: Organization) {
+  public async createOrg(user: User, org: Organization) {
     this.logger.debug(`Creation of Organization (${user.email} - ${user._id}): `)
     this.logger.debug(org);
+    await this.dodStatusService.initializeDodStatus(user, org);
     return this.organizationModel.create({ ...org });
   }
 
-  public createOrgWithBody(user: User, body: CreateOrganizationBody) {
+  public async createOrgWithBody(user: User, body: CreateOrganizationBody) {
     this.logger.debug(`Creation of Organization (${user.email} - ${user._id}): `)
     this.logger.debug(body);
-    return this.organizationModel.create({
+    const createdOrg = await this.organizationModel.create({
       name: body.name,
       description: body.description,
       members: [],
       owner: user,
       versionShifting: body.versionShifting,
     });
+    await this.dodStatusService.initializeDodStatus(user, createdOrg);
+    return createdOrg;
   }
 
   public deleteOrgWithBody(user: User, org: Organization) {

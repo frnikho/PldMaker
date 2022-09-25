@@ -2,7 +2,7 @@ import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, {Document, ObjectId} from "mongoose";
 import {User} from "../user/user.schema";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
-import {DodColor} from "@pld/shared";
+import { DodStatus } from "@pld/shared";
 import {OrgHistoryAction} from "@pld/shared";
 import { OrganizationSection } from "./section/organization-section.schema";
 
@@ -31,25 +31,6 @@ export class OrgHistory {
   member?: User;
 }
 
-const defaultDodColors: DodColor[] = [
-  {
-    name: 'À faire',
-    color: '2D9BF0'
-  },
-  {
-    name: 'En cours',
-    color: 'FBBC04'
-  },
-  {
-    name: 'Fini',
-    color: '77b243'
-  },
-  {
-    name: 'Non fini',
-    color: 'F08080'
-  }
-];
-
 @Schema()
 export class Organization extends DatedObjectSchema {
 
@@ -67,9 +48,6 @@ export class Organization extends DatedObjectSchema {
 
   @Prop({required: false, default: 1.0})
   versionShifting: number;
-
-  @Prop({required: false, default: defaultDodColors})
-  dodColors?: DodColor[];
 
   @Prop({default: []})
   history: OrgHistory[];

@@ -7,7 +7,7 @@ import {
   RemoveUserOrgBody,
   OrganizationSectionBody,
   OrganizationSection,
-  OrganizationSectionUpdateBody, MigrateOrganizationBody
+  OrganizationSectionUpdateBody, MigrateOrganizationBody, DodStatus, NewDodStatus, UpdateDodStatus
 } from "@pld/shared";
 import {AxiosError} from "axios";
 
@@ -16,6 +16,9 @@ export type CallbackOrganizations = (orgs: Organization[], error?: ApiError) => 
 
 export type CallbackOrganizationSection = (section: OrganizationSection | null, error?: ApiError) => void;
 export type CallbackOrganizationSections = (section: OrganizationSection[], error?: ApiError) => void;
+
+export type CallbackDodStatus = (dodStatus: DodStatus | null, error?: ApiError) => void;
+export type CallbackDodsStatus = (dodStatus: DodStatus[], error?: ApiError) => void;
 
 export class OrganizationApiController {
 
@@ -113,6 +116,38 @@ export class OrganizationApiController {
     }).catch(() => {
       return callback(null, {type: ErrorType.UNAUTHORIZED, message: ['Vous n\'avez les privilèges requit !']});
     });
+  }
+
+  public static getOrgDodStatus(accessToken: string, orgId: string, callback: CallbackDodsStatus) {
+    api.get<DodStatus[]>(`organization/${orgId}/status/`, authorize(accessToken)).then((response) => {
+      return callback(response.data)
+    }).catch(() => {
+      return callback([], {type: ErrorType.API_ERROR, message: ['Une erreur est survenue !']});
+    })
+  }
+
+  public static updateOrgDodStatus(accessToken: string, orgId: string, statusId: string, body: UpdateDodStatus, callback: CallbackDodStatus) {
+    api.patch<DodStatus>(`organization/${orgId}/status/${statusId}`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data)
+    }).catch(() => {
+      return callback(null, {type: ErrorType.API_ERROR, message: ['Une erreur est survenue !']});
+    })
+  }
+
+  public static createOrgDodStatus(accessToken: string, orgId: string, body: NewDodStatus, callback: CallbackDodStatus) {
+    api.post<DodStatus>(`organization/${orgId}/status/`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data)
+    }).catch(() => {
+      return callback(null, {type: ErrorType.API_ERROR, message: ['Une erreur est survenue !']});
+    })
+  }
+
+  public static deleteOrgDodStatus(accessToken: string, orgId: string, dodStatusId: string, callback: CallbackDodStatus) {
+    api.delete<DodStatus>(`organization/${orgId}/status/${dodStatusId}`, authorize(accessToken)).then((response) => {
+      return callback(response.data)
+    }).catch(() => {
+      return callback(null, {type: ErrorType.API_ERROR, message: ['Une erreur est survenue !']});
+    })
   }
 
 }

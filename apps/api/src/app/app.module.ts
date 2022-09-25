@@ -3,15 +3,36 @@ import { Module } from '@nestjs/common';
 import {MongooseModule, MongooseModuleFactoryOptions} from "@nestjs/mongoose";
 import {LoggerModule} from "./logger/logger.module";
 import {EventEmitterModule} from "@nestjs/event-emitter";
-import { AuthModule, OrganizationModule, PldModule, UserModule, JwtAuthGuard, TemplateModule, DocumentModule, GatewayModule, MfaGuard, MfaHelper, MfaSchema, AlertModule } from "@pld/business";
+import {
+  AuthModule,
+  OrganizationModule,
+  PldModule,
+  UserModule,
+  JwtAuthGuard,
+  TemplateModule,
+  DocumentModule,
+  GatewayModule,
+  MfaGuard,
+  MfaHelper,
+  MfaSchema,
+  AlertModule,
+} from "@pld/business";
 import { MfaService } from "@pld/business";
 import { JwtModule } from "@nestjs/jwt";
 import { DbExceptionFilter } from "./exception/db.filter";
 import { ValidationFilter } from "./exception/validation.filter";
 import { MailModule } from "@pld/business";
+import { BullModule } from "@nestjs/bull";
 
 @Module({
   imports: [
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        password: process.env.REDIS_PASSWORD,
+        port: parseInt(process.env.REDIS_PORT, 10)
+      }
+    }),
     MongooseModule.forRootAsync({
       inject: [],
       useFactory: (): MongooseModuleFactoryOptions => {

@@ -36,7 +36,7 @@ export class ChartsDashboard extends React.Component<ChartsDashboardProps, Chart
 
     const dod = this.props.dod.filter((dod) => (dod.pldOwner as Pld)._id === pld._id);
     const data: any[] = [];
-    orgOfPld.dodColors.forEach((dodColors) => {
+    /*orgOfPld.dodColors.forEach((dodColors) => {
       const dods = dod.filter((d) => d.status === dodColors.name);
       data.push({
         group: dodColors.name,
@@ -58,7 +58,7 @@ export class ChartsDashboard extends React.Component<ChartsDashboardProps, Chart
             },
           }}/>
       </>
-    )
+    )*/
   }
 
   override render() {

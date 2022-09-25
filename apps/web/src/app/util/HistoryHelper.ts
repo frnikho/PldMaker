@@ -9,7 +9,7 @@ export class HistoryHelper {
       .replace('%user.email%', owner.email)
       .replace('%dod.version%', dod?.version ?? '')
       .replace('%dod.name%', dod?.title ?? '')
-      .replace('%dod.status%', dod?.status ?? '')
+      //.replace('%dod.status%', dod?.status.name ?? '')
   }
 
   public static getHistoryMessageWithAction = (action: PldHistoryAction | OrgHistoryAction | DodHistoryAction): string => {

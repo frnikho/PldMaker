@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import { Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "carbon-components-react";
-import { Dod, Organization, OrganizationSection, Pld, User } from "@pld/shared";
+import { Dod, DodStatus, Organization, OrganizationSection, Pld, User } from "@pld/shared";
 import { CreateOrgSectionModal } from "../org/CreateOrgSectionModal";
 import { RequiredUserContextProps } from "../../context/UserContext";
 import { UpdateOrgSectionModal } from "../org/UpdateOrgSectionModal";
@@ -18,6 +18,7 @@ export type ResumePldModalProps = {
   org: Organization;
   pld: Pld;
   dod: Dod[];
+  dodColors: DodStatus[];
   sections: OrganizationSection[];
 } & RequiredUserContextProps;
 
@@ -151,7 +152,7 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
 
   private getTableBody() {
     return this.getDods(this.props.dod).map((dod, index) => {
-      const color = this.props.org.dodColors.find((a) => dod.status === a.name);
+      const color = this.props.dodColors.find((a) => dod.status._id === a._id);
       const nextDod: Dod = this.props.dod[index+1];
       return (
         <Fragment key={index}>

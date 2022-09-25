@@ -1,6 +1,7 @@
 import {ObjectId} from "mongoose";
 
 export enum OrgEvents {
+  onDodStatusDeleted = 'Org.Status.Deleted',
   onMemberAdded = 'Org.Member.Added',
   onMemberRemoved = 'Org.Member.Removed',
   onUpdateDodStatus = 'Org.DodStatus.Updated',
@@ -29,4 +30,10 @@ export class OrgRemoveMemberEvent {
     this.removedMemberId = removedMemberId;
     this.removedBy = removedBy;
   }
+}
+
+export class OrgDodStatusDeletedEvent {
+  orgId: string;
+  removedBy: string;
+  dodStatusId: string;
 }

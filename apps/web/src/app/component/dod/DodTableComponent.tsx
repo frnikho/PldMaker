@@ -1,8 +1,7 @@
 import React from "react";
 import {RequiredUserContextProps} from "../../context/UserContext";
 import {
-  Button, Link,
-  Select, SelectItem,
+  Button, Link, Select, SelectItem,
   Table,
   TableBatchAction,
   TableBatchActions,
@@ -16,13 +15,13 @@ import {
   TableSelectRow,
   TableToolbar, TableToolbarAction,
   TableToolbarContent, TableToolbarMenu,
-  TableToolbarSearch,
+  TableToolbarSearch
 } from "carbon-components-react";
 
 import {DataTable} from '@carbon/react';
 
 import {NewDodModal} from "../../modal/dod/NewDodModal";
-import { Dod, Pld, Organization, OrganizationSection } from "@pld/shared";
+import { Dod, Pld, Organization, OrganizationSection, DodStatus, SetDodStatus } from "@pld/shared";
 import {DodApiController} from "../../controller/DodApiController";
 
 import {TrashCan, Edit, ImportExport, Add} from '@carbon/icons-react'
@@ -37,6 +36,7 @@ export type DodTableComponentProps = {
   pld: Pld;
   org: Organization;
   dod: Dod[];
+  dodStatus: DodStatus[];
 } & RequiredUserContextProps
 
 export type DodTableComponentState = {
@@ -135,11 +135,12 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
     this.props.onCreatedDod();
   }
 
-  private showSelectStatus(dodId: string): JSX.Element | null {
+  private showSelectStatus(dodId: string) {
     const currentDod = this.props.dod.find((dod) => dod._id === dodId);
+    console.log(currentDod);
     if (currentDod === undefined)
       return null;
-    const dodColor = this.props.org.dodColors.find((d) => d.name === currentDod.status);
+    const dodColor = this.props.dodStatus.find((status) => status._id === currentDod.status._id);
     return (
       <Select
         inline
@@ -152,9 +153,14 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
           display: 'inline-block',
         }}/>}
         onChange={(e) => {
-          DodApiController.updateDod(this.props.userContext.accessToken, this.props.org._id, this.props.pld._id, dodId, {
-            status: e.currentTarget.value
-          }, (dod, error) => {
+          console.log(e.currentTarget.value);
+          const newFoundStatus = this.props.dodStatus.find((a) => a._id === e.currentTarget.value);
+          if (newFoundStatus === undefined) {
+            toast('Impossible de changer le status !', {type: 'error'});
+            return;
+          }
+          const newStatus: SetDodStatus = {statusId: newFoundStatus._id};
+          DodApiController.updateDodStatus(this.props.userContext.accessToken, this.props.org._id, this.props.pld._id, dodId, newStatus,(dod, error) => {
             if (error) {
               toast(error.error, {type: 'error'});
             }
@@ -169,8 +175,8 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
           value={""}
           text={this.showStatusSelect(dodId)}/>
 
-        {this.props.org.dodColors.map((status, index) => {
-          return (<SelectItem key={index} text={status.name} value={status.name}/>);
+        {this.props.dodStatus.map((status, index) => {
+          return (<SelectItem key={index} text={status.name} value={status._id}/>);
         })}
       </Select>
     );
@@ -180,7 +186,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
     const dod: Dod | undefined = this.props.dod.find((a) => a._id === dodId)
     if (dod === undefined)
       return '';
-    return dod.status;
+    return dod.status.name;
   }
 
   private showDatatable() {

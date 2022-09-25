@@ -10,11 +10,14 @@ import { OrganizationDefinition } from "./organization.schema";
 import { OrganizationSectionDefinition } from "./section/organization-section.schema";
 import { OrganizationSectionHelper } from "./section/organization-section.helper";
 import { OrganizationSectionService } from "./section/organization-section.service";
+import { DodStatusDefinition } from "../dod/status/dod-status.schema";
+import { DodStatusService } from "../dod/status/dod-status.service";
+import { DodStatusHelper } from "../dod/status/dod-status.helper";
 
 @Module({
-  imports: [MongooseModule.forFeature([OrganizationDefinition, OrganizationSectionDefinition]), UserModule, CalendarModule],
+  imports: [MongooseModule.forFeature([DodStatusDefinition, OrganizationDefinition, OrganizationSectionDefinition]), UserModule, CalendarModule],
   controllers: [OrganizationController],
-  providers: [OrganizationHelper, OrganizationService, OrganizationListener, OrganizationSectionHelper, OrganizationSectionService],
+  providers: [OrganizationHelper, OrganizationService, OrganizationListener, OrganizationSectionHelper, OrganizationSectionService, DodStatusService, DodStatusHelper],
   exports: [OrganizationService]
 })
 export class OrganizationModule {}
