@@ -61,4 +61,10 @@ export class CalendarHelper {
     return CalendarHelper.populateAndExecuteEvent(this.eventModel.find({$or: [{owner: user}, {invitedMembers: {$in: [user._id.toString()]}}]}));
   }
 
+  public async deleteAllUserEvents(user: User) {
+    //Delete all owned events
+    await CalendarHelper.populateAndExecuteEvent(this.eventModel.deleteMany({owner: user}));
+    await CalendarHelper.populateAndExecuteEvent(this.eventModel.updateMany({invitedMembers: {$in: [user._id.toString()]}}, {$pullAll: {invitedMembers: {user: user}}}));
+  }
+
 }

@@ -31,7 +31,12 @@ export class DodHelper {
           path: 'owner',
           model: 'User'
         }]
-      }).exec();
+      })
+      .populate({path: 'pldOwner', populate: {
+        path: 'org',
+          model: 'Organization'
+        }})
+      .exec();
   }
 
   public async createWithBody(user: User, org: Organization, pld: Pld, body: DodCreateBody) {
@@ -78,6 +83,18 @@ export class DodHelper {
     if (!dodStatusToReplace)
       return Logger.error('Business error ! org must contains a least one default status !');
     await this.dodModel.updateMany({status: statusId.toString()}, {status: dodStatusToReplace}).exec();
+  }
+
+  public async migrateAllUserDod(user: User) {
+    const ownedDod = await DodHelper.populateAndExecute(this.dodModel.find({owner: user}));
+    for (const dod of ownedDod) {
+      await dod.update({owner: dod.pldOwner.org.owner}).exec();
+    }
+    const implicatedDod = await DodHelper.populateAndExecute(this.dodModel.find({'estimatedWorkTime.users': user}));
+    console.log(implicatedDod);
+    implicatedDod?.forEach((dod) => {
+      dod.update({$pull: {'estimatedWorkTime.users': user}}).exec();
+    })
   }
 
   public getEditedFields(beforeDod: Dod, updatedDod: Dod): EditedField[] {

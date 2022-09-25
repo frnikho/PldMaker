@@ -14,6 +14,7 @@ export class UserMock {
         domain,
         devices: [],
         mfa: [],
+        profile_picture: 'default_profile_picture.png',
         timezone: Timezone.CET,
         firstname: 'abc',
         lastname: 'def',

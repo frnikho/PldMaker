@@ -114,7 +114,7 @@ export class PreviewDodModal extends React.Component<PreviewDodProps, PreviewDod
             <div>
               <p style={{fontWeight: 'bold'}}>Mise à jour le :</p>
               <p>{formatLongDate(new Date(this.props.dod.created_date))}</p>
-              {this.props.dod.history[this.props.dod.history.length-1].owner.email}
+              {this.props.dod.history[this.props.dod.history.length-1]?.owner?.email}
             </div>
           </Stack>
         </Column>

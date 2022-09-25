@@ -1,12 +1,12 @@
 import React from "react";
 import { RequiredUserContextProps } from "../context/UserContext";
-import { Button, MultiSelect, Select, SelectItem, TextInput, Tile } from "carbon-components-react";
+import { Button, Column, FormLabel, Grid, MultiSelect, Select, SelectItem, TextInput, Tile } from "carbon-components-react";
 import { FieldData } from "../util/FieldData";
 import { UserApiController } from "../controller/UserApiController";
 import { toast } from "react-toastify";
 import { formatLongDate, Timezone } from "@pld/utils";
 
-import { Renew } from "@carbon/icons-react";
+import { Renew, TrashCan } from "@carbon/icons-react";
 
 import { Stack } from "@carbon/react";
 import { MfaModal } from "../modal/auth/MfaModal";
@@ -14,6 +14,10 @@ import { Mfa, MfaType, Organization, User, UserDomain } from "@pld/shared";
 import { OrganizationApiController } from "../controller/OrganizationApiController";
 import { DisableOtpModal } from "../modal/auth/DisableOtpModal";
 import { LanguageProps } from "../context/LanguageContext";
+import { DeleteUserModal } from "../modal/DeleteUserModal";
+import { SERVER_URL_ASSETS } from "../util/User";
+import { HelpLabel } from "../util/Label";
+import { UploadUserPictureModal } from "../modal/UploadUserPictureModal";
 
 export type UserComponentProps = RequiredUserContextProps & LanguageProps;
 
@@ -24,6 +28,8 @@ export type UserComponentState = {
   timezone: FieldData<string>;
   openEnableOtp: boolean;
   openDisableOtp: boolean;
+  openDeleteModal: boolean;
+  openFileUpload: boolean;
   mfa: Mfa[];
   org: Organization[];
 }
@@ -50,10 +56,14 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
       },
       openEnableOtp: false,
       openDisableOtp: false,
+      openDeleteModal: false,
+      openFileUpload: false,
     }
     this.onClickUpdate = this.onClickUpdate.bind(this);
     this.onMfaEnable = this.onMfaEnable.bind(this);
     this.onMfaDisable = this.onMfaDisable.bind(this);
+    this.onDeleted = this.onDeleted.bind(this);
+    this.onUploadedPicture = this.onUploadedPicture.bind(this);
   }
 
   override componentDidMount() {
@@ -99,6 +109,10 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
         value: user.timezone,
       }
     });
+  }
+
+  private onDeleted() {
+    this.setState({openDeleteModal: false});
   }
 
   private onClickUpdate() {
@@ -158,25 +172,36 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
   }
 
   private showInfo() {
-    return (<Tile>
+    return (
+      <Tile>
         <h3 style={{marginBottom: '20px'}}>Mes informations</h3>
-      <TextInput disabled id={"created-date-user"} labelText={"Date de création"} value={formatLongDate(new Date(this.props.userContext.user?.created_date ?? ''))}/>
-      <TextInput disabled id={"updated-date-user"} labelText={"Dernière mise a jour"} value={formatLongDate(new Date(this.props.userContext.user?.updated_date ?? ''))}/>
-      <TextInput disabled id={"email-user"} labelText={"Email"} value={this.props.userContext.user?.email}/>
-      <TextInput style={{marginBottom: '20px'}} id={"lastname-input"} labelText={"Nom"} value={this.state.lastname.value} onChange={(e) => {
-        this.setState({
-          lastname: {
-            value: e.currentTarget.value
-          }
-        })
-      }}/>
-      <TextInput id={"firstname-input-disabled"} labelText={"Prénom"} value={this.state.firstname.value} onChange={(e) => {
-        this.setState({
-          firstname: {
-            value: e.currentTarget.value
-          }
-        })
-      }}/>
+        <Grid>
+          <Column xlg={6}>
+            <TextInput id={"created-date-user"} title={'Vous ne pouvez pas changer ce champ !'} labelText={"Date de création"} value={formatLongDate(new Date(this.props.userContext.user?.created_date ?? ''))}/>
+            <TextInput id={"updated-date-user"} title={'Vous ne pouvez pas changer ce champ !'} labelText={"Dernière mise a jour"} value={formatLongDate(new Date(this.props.userContext.user?.updated_date ?? ''))}/>
+            <TextInput id={"email-user"} title={'Vous ne pouvez pas changer ce champ !'} labelText={"Email"} value={this.props.userContext.user?.email}/>
+          </Column>
+          <Column xlg={8}>
+            <Stack orientation={"vertical"}>
+              <FormLabel>Photo de profile</FormLabel>
+              <img style={{padding: 12}} title={'Mettre à jour'} onClick={() => this.setState({openFileUpload: true})} width={225} src={SERVER_URL_ASSETS + this.props.userContext.user?.profile_picture} alt={""}/>
+            </Stack>
+          </Column>
+        </Grid>
+        <TextInput style={{marginBottom: '20px'}} id={"lastname-input"} labelText={"Nom"} value={this.state.lastname.value} onChange={(e) => {
+          this.setState({
+            lastname: {
+              value: e.currentTarget.value
+            }
+          })
+        }}/>
+        <TextInput id={"firstname-input-disabled"} labelText={"Prénom"} value={this.state.firstname.value} onChange={(e) => {
+          this.setState({
+            firstname: {
+              value: e.currentTarget.value
+            }
+          })
+        }}/>
         <Select id={"timezone-input"} labelText={"Timezone"} onChange={(e) => this.setState({timezone: {value: e.currentTarget.value}})} value={this.state.timezone.value}>
           {Object.keys(Timezone).sort((a, b) => {
             if (a > b) {
@@ -232,12 +257,21 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
     )
   }
 
+  private showDelete() {
+    return (
+      <>
+        <p>Si vous supprimer votre compte, vous perdrez toute vos informations personnelles</p>
+        <Button kind={'danger'} renderIcon={TrashCan} onClick={() => this.setState({openDeleteModal: true})}>Supprimer</Button>
+      </>
+    )
+  }
+
   private showDangerZone() {
     const orgOwners = this.state.org.filter((org) => org.owner._id === this.props.userContext.user?._id);
     return (
       <Tile>
         <h3 style={{marginBottom: '20px'}}>⚠ Supprimer mon compte </h3>
-        {orgOwners.length > 0 ? this.showOrgOwners(orgOwners) : null}
+        {orgOwners.length > 0 ? this.showOrgOwners(orgOwners) : this.showDelete()}
       </Tile>
     )
   }
@@ -259,9 +293,21 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
     this.getMfaInfo(this.props.userContext.accessToken);
   }
 
+  private onUploadedPicture() {
+    this.setState({openFileUpload: false});
+    toast('Votre photo de profile va être mis à jour !', {type: 'success'});
+    setTimeout(() => {
+      this.props.userContext.refreshUser((a) => {
+        console.log(a);
+      });
+    }, 1000);
+  }
+
   override render() {
     return (
       <Stack gap={4}>
+        <UploadUserPictureModal open={this.state.openFileUpload} onDismiss={() => this.setState({openFileUpload: false})} onSuccess={this.onUploadedPicture} userContext={this.props.userContext}/>
+        <DeleteUserModal open={this.state.openDeleteModal} onDismiss={() => this.setState({openDeleteModal: false})} onSuccess={this.onDeleted} userContext={this.props.userContext}/>
         <MfaModal open={this.state.openEnableOtp} onDismiss={() => this.setState({openEnableOtp: false})} onSuccess={this.onMfaEnable} userContext={this.props.userContext}/>
         <DisableOtpModal userContext={this.props.userContext} mfa={this.state.mfa.find((mfa) => mfa.type === MfaType.OTP)!} open={this.state.openDisableOtp} language={this.props.language} onDismiss={() => this.setState({openDisableOtp: false})} onSuccess={this.onMfaDisable}/>
         {this.showInfo()}

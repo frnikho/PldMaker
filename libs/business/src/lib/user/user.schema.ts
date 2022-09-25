@@ -32,7 +32,7 @@ export class User extends DatedObjectSchema {
   @Prop({required: false, default: []})
   devices: Device[];
 
-  @Prop({required: false, default: 'default-1'})
+  @Prop({required: false, default: 'default_profile_picture.png'})
   profile_picture?: string;
 
   @Prop({required: false})

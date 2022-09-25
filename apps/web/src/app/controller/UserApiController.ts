@@ -128,4 +128,20 @@ export class UserApiController {
     });
   }
 
+  public static deleteUser(accessToken: string, callback: CallbackUser) {
+    api.delete<User>(`user`, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data);
+    });
+  }
+
+  public static uploadProfilePicture(accessToken: string, data: FormData, callback: CallbackUser) {
+    api.post<User>(`user/upload`, data, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: AxiosError<ApiError>) => {
+      return callback(null, err.response?.data);
+    });
+  }
+
 }

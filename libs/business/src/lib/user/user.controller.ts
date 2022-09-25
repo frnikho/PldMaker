@@ -1,9 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Request } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { UpdateUserBody, AddFavourBody, User, Favour } from "@pld/shared";
 import { UserService } from "./user.service";
 import { UserPipe } from "./user.pipe";
 import { FavourPipe } from "./favour.pipe";
 import { CalendarService } from "../organization/calendar/calendar.service";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Express } from 'express'
+import {Multer} from "multer";
 
 /**
  * @author Nicolas SANS
@@ -22,6 +25,11 @@ export class UserController {
     return req.user;
   }
 
+  @Delete()
+  public async delete(@Request() req) {
+    return this.userService.delete(req.user);
+  }
+
   /**
    * Update user information
    * @param req NestJS Request
@@ -30,6 +38,12 @@ export class UserController {
   @Patch('update')
   public async update(@Request() req, @Body() updateBody: UpdateUserBody) {
     return this.userService.updateByBody(req.user, updateBody);
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('upload')
+  public changePictureProfile(@Request() req, @UploadedFile() file: Express.Multer.File) {
+    return this.userService.uploadProfilePicture(req.user, file);
   }
 
   /**

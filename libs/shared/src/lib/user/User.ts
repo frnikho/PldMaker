@@ -10,11 +10,12 @@ export class User {
   domain: UserDomain[];
   roles?: string[];
   devices: Device[];
+  profile_picture: string;
   timezone: Timezone;
   created_date: Date;
   updated_date: Date;
 
-  constructor(id: string, email: string, password: string, firstname: string, lastname: string, domain: UserDomain[], roles: string[], devices: Device[], timezone: Timezone, created_date: Date, updated_date: Date) {
+  constructor(id: string, email: string, password: string, firstname: string, profile_picture: string, lastname: string, domain: UserDomain[], roles: string[], devices: Device[], timezone: Timezone, created_date: Date, updated_date: Date) {
     this._id = id;
     this.email = email;
     this.password = password;
@@ -26,6 +27,7 @@ export class User {
     this.timezone = timezone;
     this.created_date = created_date;
     this.updated_date = updated_date;
+    this.profile_picture = profile_picture;
   }
 }
 

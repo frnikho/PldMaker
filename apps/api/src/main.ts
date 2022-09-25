@@ -8,6 +8,7 @@ import * as requestIp from 'request-ip';
 import * as io from 'socket.io-client';
 import { Container } from 'typedi';
 import { useContainer, Validator } from 'class-validator';
+import * as path from "path";
 
 class Server {
 
@@ -29,6 +30,8 @@ class Server {
   }
 
   public async config() {
+    console.log(path.join(__dirname, 'assets/static'));
+    this.app.useStaticAssets(path.join(__dirname, 'assets/static'), {prefix: '/assets/'});
     this.app.enableVersioning({
       defaultVersion: '1',
       type: VersioningType.URI,

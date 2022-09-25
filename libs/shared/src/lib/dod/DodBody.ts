@@ -1,4 +1,4 @@
-import { ArrayMinSize, ArrayNotContains, IsNotEmpty, Length, Matches, MaxLength } from "class-validator";
+import { ArrayMinSize, ArrayNotContains, IsNotEmpty, IsOptional, Length, Matches, MaxLength } from "class-validator";
 
 export class DodFindPldBody {
   plds: string[];
@@ -15,19 +15,19 @@ export class DodCreateBody {
   version: string;
 
   @IsNotEmpty({message: 'Le titre ne peut pas être vide !'})
-  @Length(2,64)
+  @Length(2,64, {message: 'le champ doit contenir au minimum 2 caractères et maximum 64 caractères'})
   title: string;
 
   @IsNotEmpty({message: 'Cette section ne peut pas être vide !'})
-  @Length(2,64)
+  @Length(2,64, {message: 'le champ doit contenir au minimum 2 caractères et maximum 64 caractères'})
   skinOf: string;
 
   @IsNotEmpty({message: 'Cette section ne peut pas être vide !'})
-  @Length(2,64)
+  @Length(2,64, {message: 'le champ doit contenir au minimum 2 caractères et maximum 64 caractères'})
   want: string;
 
   @IsNotEmpty({message: 'La description ne peut pas être vide !'})
-  @MaxLength(512)
+  @MaxLength(512, {message: 'la description ne peux pas dépasser 512 caractères !'})
   description: string;
 
   @IsNotEmpty({message: "le PLD owner ne peut pas être vide !"})
@@ -69,7 +69,14 @@ export enum WorkTimeFormat {
 }
 
 export class DodUpdateBody {
+  @IsOptional()
+  @IsNotEmpty({message: 'La version ne peut pas être vide !'})
+  @Length(2,64)
+  @Matches(new RegExp('[0-9]+\\..*\\.[0-9]+'), {message: 'Format invalide !'})
   version?: string;
+
+  @IsNotEmpty({message: 'Le titre ne peut pas être vide !'})
+  @Length(2,64, {message: 'le champ doit contenir au minimum 2 caractères et maximum 64 caractères'})
   title?: string;
   skinOf?: string;
   want?: string;
@@ -78,9 +85,8 @@ export class DodUpdateBody {
   owner?: string;
   descriptionOfDone?: string[];
   estimatedWorkTime?: UserWorkTime[];
-  status?: string;
 
-  constructor(version: string, title: string, skinOf: string, want: string, description: string, pldOwner: string, owner: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[], status: string) {
+  constructor(version: string, title: string, skinOf: string, want: string, description: string, pldOwner: string, owner: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[]) {
     this.version = version;
     this.title = title;
     this.skinOf = skinOf;
@@ -90,6 +96,5 @@ export class DodUpdateBody {
     this.owner = owner;
     this.descriptionOfDone = descriptionOfDone;
     this.estimatedWorkTime = estimatedWorkTime;
-    this.status = status;
   }
 }

@@ -1,6 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import { DeviceBody, AddFavourBody, UpdateUserBody, User, Mfa, Favour } from "@pld/shared";
 import { UserHelper } from "./user.helper";
+import { Express } from "express";
 
 @Injectable()
 export class UserService {
@@ -37,6 +38,10 @@ export class UserService {
 
     public update(user: User) {
       return this.userHelper.update(user);
+    }
+
+    public uploadProfilePicture(user: User, file: Express.Multer.File) {
+      return this.userHelper.uploadProfilePicture(user, file);
     }
 
     public updateByBody(user: User, body: UpdateUserBody) {

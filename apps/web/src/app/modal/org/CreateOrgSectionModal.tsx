@@ -7,6 +7,7 @@ import { OrganizationApiController } from "../../controller/OrganizationApiContr
 import { Organization, OrganizationSectionBody } from "@pld/shared";
 import { RequiredUserContextProps } from "../../context/UserContext";
 import { toast } from "react-toastify";
+import { validate } from "class-validator";
 
 export type OrgSectionModalProps = {
   open: boolean;
@@ -16,9 +17,14 @@ export type OrgSectionModalProps = {
   preselectedSection?: string;
 } & RequiredUserContextProps;
 
+type Error = {
+  [key: string]: string;
+}
+
 export type OrgSectionModalState = {
   section: string;
   name: string;
+  errors: Error;
 };
 
 export class CreateOrgSectionModal extends React.Component<OrgSectionModalProps, OrgSectionModalState> {
@@ -26,6 +32,7 @@ export class CreateOrgSectionModal extends React.Component<OrgSectionModalProps,
   constructor(props: OrgSectionModalProps) {
     super(props);
     this.state = {
+      errors: {},
       name: '',
       section: this.props.preselectedSection ?? '',
     }
@@ -43,11 +50,21 @@ export class CreateOrgSectionModal extends React.Component<OrgSectionModalProps,
 
   private onClickCreate(event: any) {
     const body = new OrganizationSectionBody(this.state.section, this.state.name);
-    OrganizationApiController.createOrgSection(this.props.userContext.accessToken, this.props.org._id, body, (section, error) => {
-      if (error) {
-        toast(error.message, {type: 'error'});
-      } else {
-        this.props.onSuccess();
+    validate(body).then((error) => {
+      const obj: Error = {};
+      error.forEach((err) => {
+        obj[err.property] = Object.values(err.constraints ?? []).join(', ');
+      });
+      this.setState({errors: obj});
+      if (error.length === 0) {
+        this.setState({errors: {}});
+        OrganizationApiController.createOrgSection(this.props.userContext.accessToken, this.props.org._id, body, (section, error) => {
+          if (error) {
+            toast(error.message, {type: 'error'});
+          } else {
+            this.props.onSuccess();
+          }
+        });
       }
     });
   }
@@ -63,8 +80,8 @@ export class CreateOrgSectionModal extends React.Component<OrgSectionModalProps,
         modalHeading="Créer une section">
         <Stack gap={6}>
           <Stack gap={2}>
-            <TextInput id={"section-input"} value={this.state.section} placeholder={"1.2"} labelText={"Section"} onChange={(e) => this.setState({section: e.currentTarget.value})}/>
-            <TextInput id={"name-input"} value={this.state.name} placeholder={"User"} labelText={"Nom"} onChange={(e) => this.setState({name: e.currentTarget.value})}/>
+            <TextInput id={"section-input"} invalid={this.state.errors['section'] !== undefined} invalidText={this.state.errors['section']} value={this.state.section} placeholder={"1.2"} labelText={"Section"} onChange={(e) => this.setState({section: e.currentTarget.value})}/>
+            <TextInput id={"name-input"} invalid={this.state.errors['name'] !== undefined} invalidText={this.state.errors['name']} value={this.state.name} placeholder={"User"} labelText={"Nom"} onChange={(e) => this.setState({name: e.currentTarget.value})}/>
           </Stack>
           <Button renderIcon={Add} onClick={this.onClickCreate}>Créer</Button>
         </Stack>

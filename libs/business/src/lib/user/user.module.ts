@@ -13,13 +13,22 @@ import { MailService } from "../mail/mail.service";
 import { MailHelper } from "../mail/mail.helper";
 import { UserConsumer } from "./user.consumer";
 import { BullModule } from "@nestjs/bull";
+import { DodHelper } from "../dod/dod.helper";
+import { DodDefinition } from "../dod/dod.schema";
+import { DodStatusDefinition } from "../dod/status/dod-status.schema";
+import { DodStatusHelper } from "../dod/status/dod-status.helper";
+import { PldDefinition } from "../pld/pld.schema";
+import { PldHelper } from "../pld/pld.helper";
+import { OrganizationDefinition } from "../organization/organization.schema";
+import { OrganizationHelper } from "../organization/organization.helper";
+import { DodStatusService } from "../dod/status/dod-status.service";
 
 @Module({
   imports: [
     BullModule.registerQueue({name: 'user'}),
-    MongooseModule.forFeature([UserDefinition, FavourDefinition, CalendarDefinition, CalendarEventDefinition]),
+    MongooseModule.forFeature([DodDefinition, PldDefinition, DodStatusDefinition, UserDefinition, FavourDefinition, CalendarDefinition, CalendarEventDefinition, OrganizationDefinition]),
   ],
-  providers: [MailService, MailHelper, UserHelper, UserService, UserConsumer, CalendarService, CalendarHelper],
+  providers: [MailService, MailHelper, UserHelper, UserService, UserConsumer, CalendarService, CalendarHelper, DodHelper, DodStatusService, DodStatusHelper, PldHelper, OrganizationHelper,],
   exports: [UserService],
   controllers: [UserController],
 })

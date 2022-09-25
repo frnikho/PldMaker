@@ -9,7 +9,6 @@ import { CreateOrganizationBody, User } from "@pld/shared";
 import { OrgAddMemberEvent, OrgEvents, OrgRemoveMemberEvent } from "./organization.event";
 import { UserDocument } from "../user/user.schema";
 import { DodStatusHelper } from "../dod/status/dod-status.helper";
-import { DodStatusService } from "../dod/status/dod-status.service";
 
 @Injectable()
 export class OrganizationHelper {
@@ -20,7 +19,7 @@ export class OrganizationHelper {
     @InjectModel('Organization') private organizationModel: Model<Organization>,
     private userService: UserService,
     private eventEmitter: EventEmitter2,
-    private dodStatusService: DodStatusService) {}
+    private dodStatusService: DodStatusHelper) {}
 
 
   public static populateAndExecute<T>(query: Query<T, any>) {
@@ -108,6 +107,10 @@ export class OrganizationHelper {
     this.eventEmitter.emit(OrgEvents.onMemberRemoved, new OrgRemoveMemberEvent(org._id, body.memberId, user._id));
     this.eventEmitter.emit('Org:Update', updatedOrg._id);
     return updatedOrg;
+  }
+
+  public async removeMemberFromAllOrg(user: User) {
+    await this.organizationModel.updateMany({members: {$in: [user]}}, {$pullAll: {members: [user]}}).exec();
   }
 
   public async migrate(user: User, org: Organization, body: MigrateOrganizationBody) {

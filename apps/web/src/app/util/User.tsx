@@ -6,6 +6,8 @@ import {Button} from "carbon-components-react";
 import {Star, StarFilled} from '@carbon/icons-react';
 import {UserApiController} from "../controller/UserApiController";
 
+export const SERVER_URL_ASSETS = process.env["NX_SERVER_HOST"] + 'assets/';
+
 export type ShowFavourIconProps = {
   type: FavourType;
   data: Pld | Organization;

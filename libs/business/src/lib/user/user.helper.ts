@@ -4,6 +4,14 @@ import { Model, Query } from "mongoose";
 import { AddFavourBody, Device, DeviceBody, Favour, FavourType, UpdateUserBody, User } from "@pld/shared";
 import { MailService } from "../mail/mail.service";
 import { AvailableMail } from "../mail/mail.list";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { InjectQueue } from "@nestjs/bull";
+import { Queue } from "bull";
+import { Express } from "express";
+import { randomUUID } from "crypto";
+import * as fs from 'fs';
+import * as path from "path";
+import * as multer from "multer";
 
 @Injectable()
 export class UserHelper {
@@ -13,7 +21,9 @@ export class UserHelper {
   constructor(
     @InjectModel('User') private userModel: Model<User>,
     @InjectModel('Favour') private favourModel: Model<Favour>,
-    private mailService: MailService) {}
+    private mailService: MailService,
+    private eventEmitter: EventEmitter2,
+    @InjectQueue('user') private userQueue: Queue) {}
 
   public static populateAndExecute<T>(query: Query<T, any>) {
     return query.exec();
@@ -50,6 +60,7 @@ export class UserHelper {
     return createdUser;
   }
 
+
   public find(userId: string) {
     return UserHelper.populateAndExecute(this.userModel.findOne({_id: userId}));
   }
@@ -69,21 +80,39 @@ export class UserHelper {
     return UserHelper.populateAndExecute(this.userModel.findOne({email: email}).select('+password'));
   }
 
-  public delete(user: User) {
+  public async delete(user: User) {
     this.logger.debug(`Deleting user (${user.email} - ${user._id})`);
-    return UserHelper.populateAndExecute(this.userModel.findOneAndDelete({_id: user._id}));
+    const job = await this.userQueue.add('delete', {user: user});
+    return user;
+    //return UserHelper.populateAndExecute(this.userModel.findOneAndDelete({_id: user._id}));
   }
 
   public update(user: User) {
     this.logger.debug(`Updating user content: `);
     this.logger.debug(user);
-    return UserHelper.populateAndExecute(this.userModel.findOneAndUpdate({_id: user._id}, user, {new: true}));
+    return UserHelper.populateAndExecute(this.userModel.findOneAndUpdate({_id: user._id}, {...user, updated_date: new Date() }, {new: true}));
+  }
+
+  public uploadProfilePicture(user: User, file: Express.Multer.File) {
+    this.userQueue.add('uploadProfilePicture', { user, file });
+    return user;
+  }
+
+  public changeUserProfile(user: User, file: Express.Multer.File) {
+    const filename = randomUUID();
+    fs.writeFile(path.join(__dirname, './assets/static/', filename), Buffer.from((file.buffer as any).data, 'ascii'), 'binary', (err) => {
+      if (err) {
+        Logger.error('Une erreur est survenue lors de la sauvegarde d\'une photo de profile !');
+      } else {
+        this.userModel.updateOne({_id: user._id}, {profile_picture: filename, updated_date: new Date()}).exec();
+      }
+    });
   }
 
   public updateWithBody(user: User, body: UpdateUserBody) {
     this.logger.debug(`Updating user content (${user.email} - ${user._id}): `);
     this.logger.debug(body);
-    return UserHelper.populateAndExecute(this.userModel.findOneAndUpdate({_id: user._id}, body, {new: true}));
+    return UserHelper.populateAndExecute(this.userModel.findOneAndUpdate({_id: user._id}, { ...body, updated_date: new Date() }, {new: true}));
   }
 
 

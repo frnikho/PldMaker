@@ -107,6 +107,13 @@ export class PldHelper {
     }))
   }
 
+  public async migrateAllUserPld(user: User) {
+    const pldOwned = await PldHelper.populateAndExecute(this.pldModel.find({owner: user}));
+    pldOwned?.forEach((pld) => {
+      pld.update({owner: pld.org.owner}).exec();
+    });
+  }
+
   public getEditedFields(beforePld: Pld, updatedPld: Pld): EditedField[] {
     const editedFields: EditedField[] = [];
     const fields = ['description', 'title', 'currentStep', 'promotion', 'status'];

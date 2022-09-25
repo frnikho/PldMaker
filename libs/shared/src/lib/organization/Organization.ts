@@ -1,6 +1,6 @@
 import {User} from "../user/User";
 import {OrgHistory} from "./OrgHistory";
-import { Length } from "class-validator";
+import { Length, Matches } from "class-validator";
 
 export class MigrateOrganizationBody {
   newOwnerId: string;
@@ -11,7 +11,7 @@ export class MigrateOrganizationBody {
 }
 
 export class OrganizationSectionUpdateBody {
-  @Length(3)
+  @Length(3, 64, {message: 'le nom doit contenir au minimum 3 caractères et maximum 64 caractères.'})
   name: string;
 
   constructor(name: string) {
@@ -20,10 +20,11 @@ export class OrganizationSectionUpdateBody {
 }
 
 export class OrganizationSectionBody {
-  @Length(3, 16)
+  @Length(3, 16, {message: 'la section doit contenir au minimum 3 caractères et maximum 16 caractères.'})
+  @Matches(RegExp('[0-9]+\\..*\\.[0-9]+'), {message: 'format non valide ! (ex: 1.2, 5.3...)'})
   section: string;
 
-  @Length(3, 64)
+  @Length(3, 64, {message: 'le nom doit contenir au minimum 3 caractères et maximum 64 caractères.'})
   name: string;
 
   constructor(section: string, name: string) {

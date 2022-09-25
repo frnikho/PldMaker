@@ -52,6 +52,7 @@ export class AuthService {
       user: {
         roles: [],
         domain: [],
+        profile_picture: 'default_profile_picture.png',
         email: createdUser.email,
         lastname: createdUser.lastname,
         firstname: createdUser.firstname,
