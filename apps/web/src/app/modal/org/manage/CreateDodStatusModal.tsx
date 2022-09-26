@@ -25,7 +25,7 @@ export type CreateDodStatusState = {
 export class CreateDodStatusModal extends ModalComponent<CreateDodStatusProps, CreateDodStatusState> {
 
   constructor(props) {
-    super(props, {passiveModal: true});
+    super(props, {passiveModal: true, size: 'sm'});
     this.state = {
       color: '',
       name: '',
@@ -48,17 +48,17 @@ export class CreateDodStatusModal extends ModalComponent<CreateDodStatusProps, C
   override renderModal(): React.ReactNode {
     return (<Stack gap={6}>
       <h3 >Créer un nouveau statut</h3>
-      <TextInput maxLength={32} minLength={2} id={'status-name-input'} labelText={<RequiredLabel message={"Status"}/>} value={this.state.name} onChange={(e) => this.setState({name: e.currentTarget.value})}/>
-      <Checkbox labelText={'Utiliser par défaut'} id="checkbox-label-1" checked={this.state.useDefault} onChange={(e, {checked, id}) => this.setState({useDefault: checked})}/>
-      <TwitterPicker triangle={'hide'} onChangeComplete={(color) => {
-        console.log(color.hex.slice(1, 7));
-        this.setState({color: color.hex.slice(1, 7)})
-      }} color={`#${this.state.color}`}/>
-      <div>
-        <div className="square" style={{
+      <TextInput helperText={"le statut doit contenir au minimum 2 caractères et maximum 32 caractères"} maxLength={32} minLength={2} id={'status-name-input'} labelText={<RequiredLabel message={"Status"}/>} value={this.state.name} onChange={(e) => this.setState({name: e.currentTarget.value})}/>
+      <Checkbox title={"Utiliser ce statut par défaut lors de la création de nouvelle DoDs ?"} labelText={'Utiliser par défaut'} id="checkbox-label-1" checked={this.state.useDefault} onChange={(e, {checked, id}) => this.setState({useDefault: checked})}/>
+      <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+        <TwitterPicker triangle={'hide'} onChangeComplete={(color) => {
+          console.log(color.hex.slice(1, 7));
+          this.setState({color: color.hex.slice(1, 7)})
+        }} color={`#${this.state.color}`}/>
+        <div title={"Couleur du statut"} className="square" style={{
           height: '40px',
           width: '40px',
-          marginRight: 10,
+          marginLeft: 18,
           backgroundColor: `#${this.state.color}`,
           borderRadius: '50%',
           display: 'inline-block',

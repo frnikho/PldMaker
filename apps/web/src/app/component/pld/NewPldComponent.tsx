@@ -181,11 +181,11 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
     const owner = this.state.org.owner as User;
     return (
       <>
-        <RequiredLabel message={"Manager"}/>
         <Select
           id="new-pld-manager"
           onChange={(e) => {this.updateField('manager', e.currentTarget.value)}}
-          labelText={false}
+          labelText={<RequiredLabel message={"Manager"}/>}
+          helperText={"le manager peut être changer plus tard"}
           invalidText={this.state.form.manager?.error}
           invalid={this.state.form.manager?.error !== undefined}>
           <SelectItem text={owner.email} value={owner._id} />
@@ -254,17 +254,16 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
           <BreadcrumbItem isCurrentPage>Pld</BreadcrumbItem>
         </Breadcrumb>
         <Stack gap={4}>
-          <h1>Création d'un nouveau PLD</h1>
-          <h4>Informations de base</h4>
-          <RequiredLabel message={"Nom"}/>
-          <TextInput id={"pld-name"} labelText={false}
-                     required
+          <h1 style={{fontWeight: 'bold'}}>Création d'un nouveau PLD</h1>
+          <TextInput id={"pld-name"} labelText={<RequiredLabel message={"Nom"}/>}
+                     helperText={"le nom doit contenir au minimum 5 caractères et au maximum 64"}
                      onChange={(e) => this.updateField('name', e.currentTarget.value)}
                      invalid={this.state.form.name?.error !== undefined}
                      invalidText={this.state.form.name?.error}
           />
-          <RequiredLabel message={"Description"}/>
-          <TextArea rows={4} id={"pld-description"} labelText={false}
+          <TextArea rows={4} id={"pld-description"}
+                    labelText={<RequiredLabel message={"Description"}/>}
+                    helperText={"la description doit contenir au minimum 1 caractères et au maximum 512"}
                     required
                     invalid={this.state.form.description?.error !== undefined}
                     invalidText={this.state.form.description?.error}
@@ -273,6 +272,8 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
           {this.showTag()}
           <RequiredLabel message={"Promotion"}/>
           <NumberInput id={"pld-promotion"}
+                       min={1900}
+                       max={2900}
                        required
                        iconDescription={"Promotion"}
                        onChange={(e) => {
@@ -280,12 +281,13 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
                            return;
                          this.updateField('promotion', parseInt(e.imaginaryTarget.value));}}
                        value={this.state.form.promotion?.value ?? 0}/>
-          <RequiredLabel message={"Version de début"}/>
           <NumberInput id={"pld-version"}
                        required
+                       label={<RequiredLabel message={"Version de début"}/>}
                        iconDescription={"Version"}
                        value={this.state.form.version?.value ?? 0}
                        min={0}
+                       step={this.state.org?.versionShifting ?? 0.1}
                        onChange={(e) => {
                          if (e.imaginaryTarget.value === '')
                            return;
@@ -299,12 +301,12 @@ export class NewPldComponent extends React.Component<NewPldComponentProps, NewPl
             <DatePickerInput
               id="date-picker-input-id-start"
               placeholder="mm/dd/yyyy"
-              labelText="Début du sprint"
+              labelText={<RequiredLabel message={"Début du sprint"}/>}
             />
             <DatePickerInput
               id="date-picker-input-id-finish"
               placeholder="mm/dd/yyyy"
-              labelText="Fin du sprint"
+              labelText={<RequiredLabel message={"Fin du sprint"}/>}
             />
           </DatePicker>
           <HelperText type={'help'} title={<h4>Status possible du PLD</h4>}

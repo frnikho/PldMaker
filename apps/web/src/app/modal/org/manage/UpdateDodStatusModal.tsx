@@ -1,5 +1,5 @@
 import { ModalComponent, ModalComponentProps } from "../../../util/Modal";
-import { Button, ButtonSet, Checkbox, TextInput } from "carbon-components-react";
+import { Button, ButtonSet, Checkbox, Column, Grid, TextInput } from "carbon-components-react";
 import { RequiredUserContextProps } from "../../../context/UserContext";
 import { OrganizationApiController } from "../../../controller/OrganizationApiController";
 import { DodStatus, Organization, UpdateDodStatus } from "@pld/shared";
@@ -27,7 +27,7 @@ export type UpdateDodStatusState = {
 export class UpdateDodStatusModal extends ModalComponent<UpdateDodStatusProps, UpdateDodStatusState> {
 
   constructor(props) {
-    super(props, {passiveModal: true});
+    super(props, {passiveModal: true, size: 'sm'});
     this.state = {
       color: '',
       name: '',
@@ -68,18 +68,18 @@ export class UpdateDodStatusModal extends ModalComponent<UpdateDodStatusProps, U
 
   override renderModal(): React.ReactNode {
     return (<Stack gap={6}>
-      <h3 >Mettre à jour le statut</h3>
-      <TextInput maxLength={32} minLength={2} id={'status-name-input'} labelText={<RequiredLabel message={"Status"}/>} value={this.state.name} onChange={(e) => this.setState({name: e.currentTarget.value})}/>
-      <Checkbox labelText={'Utiliser par défaut'} id="defaultValue" checked={this.state.useDefault} onChange={(e, {checked, id}) => this.setState({useDefault: checked})}/>
-      <TwitterPicker triangle={'hide'} onChangeComplete={(color) => {
-        console.log(color.hex.slice(1, 7));
-        this.setState({color: color.hex.slice(1, 7)})
-      }} color={`#${this.state.color}`}/>
-      <div>
-        <div className="square" style={{
+      <h3 >Mettre à jour un statut</h3>
+      <TextInput helperText={"le statut doit contenir au minimum 2 caractères et maximum 32 caractères"} maxLength={32} minLength={2} id={'status-name-input'} labelText={<RequiredLabel message={"Statut"}/>} value={this.state.name} onChange={(e) => this.setState({name: e.currentTarget.value})}/>
+      <Checkbox disabled={this.props.selectedDodStatus.useDefault} title={"Vous devez mettre un autre statut par défaut pour changer le statut"} labelText={'Utiliser par défaut'} id="defaultValue" checked={this.state.useDefault} onChange={(e, {checked, id}) => this.setState({useDefault: checked})}/>
+      <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+        <TwitterPicker triangle={'hide'} onChangeComplete={(color) => {
+          console.log(color.hex.slice(1, 7));
+          this.setState({color: color.hex.slice(1, 7)})
+        }} color={`#${this.state.color}`}/>
+        <div title={"Couleur du statut"} className="square" style={{
           height: '40px',
           width: '40px',
-          marginRight: 10,
+          marginLeft: 18,
           backgroundColor: `#${this.state.color}`,
           borderRadius: '50%',
           display: 'inline-block',

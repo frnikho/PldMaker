@@ -20,6 +20,7 @@ export type UserContextProps = {
   user?: User;
   favours?: Favour;
   accessToken: string;
+  requiredMfa: boolean;
   saveOtpToken: (token: string, callback: (user: User | null, error?: ApiError) => unknown) => void;
 }
 
@@ -44,6 +45,7 @@ export const UserContext = React.createContext<UserContextProps>({
   refreshFavours: () => null,
   accessToken: '',
   saveOtpToken: () => null,
+  requiredMfa: false,
 });
 
 export type UserContextProviderState = UserContextProps
@@ -66,7 +68,8 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
       accessToken: '',
       refreshUser: this.refreshUser.bind(this),
       refreshFavours: this.refreshFavours.bind(this),
-      saveOtpToken: this.saveOtpToken.bind(this)
+      saveOtpToken: this.saveOtpToken.bind(this),
+      requiredMfa: false,
     }
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
@@ -136,6 +139,11 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
         if (user !== null && error === undefined) {
           this.context.emit('LoggedUser:New', ...emitBody(loginBody.access_token));
           return callback({user, accessToken: loginBody.access_token});
+        } else {
+          if (error?.message === 'MFA_OTP_REQUIRED') {
+            this.setState({isLogged: LoginState.not_logged, accessToken: access_token, requiredMfa: true});
+          }
+          callback(undefined, 'abc');
         }
       });
     } else {
@@ -213,7 +221,7 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
             this.saveTokenFromCookies(response.data.access_token, this.props.cookies!);
             this.setState({
               accessToken: response.data.access_token,
-              isLogged: LoginState.logged
+              isLogged: LoginState.not_logged
             })
             return callback(null, {type:ErrorType.MFA_OTP_REQUIRED, message: ['Mfa otp login required !']});
           }

@@ -8,6 +8,7 @@ import { Organization, OrganizationSectionBody } from "@pld/shared";
 import { RequiredUserContextProps } from "../../context/UserContext";
 import { toast } from "react-toastify";
 import { validate } from "class-validator";
+import { RequiredLabel } from "../../util/Label";
 
 export type OrgSectionModalProps = {
   open: boolean;
@@ -80,8 +81,8 @@ export class CreateOrgSectionModal extends React.Component<OrgSectionModalProps,
         modalHeading="Créer une section">
         <Stack gap={6}>
           <Stack gap={2}>
-            <TextInput id={"section-input"} invalid={this.state.errors['section'] !== undefined} invalidText={this.state.errors['section']} value={this.state.section} placeholder={"1.2"} labelText={"Section"} onChange={(e) => this.setState({section: e.currentTarget.value})}/>
-            <TextInput id={"name-input"} invalid={this.state.errors['name'] !== undefined} invalidText={this.state.errors['name']} value={this.state.name} placeholder={"User"} labelText={"Nom"} onChange={(e) => this.setState({name: e.currentTarget.value})}/>
+            <TextInput helperText={"la version doit être au format 'X.X' (X doit obligatoirement être un nombre)"} id={"section-input"} invalid={this.state.errors['section'] !== undefined} invalidText={this.state.errors['section']} value={this.state.section} placeholder={"1.2"} labelText={<RequiredLabel message={"Section"}/>} onChange={(e) => this.setState({section: e.currentTarget.value})}/>
+            <TextInput helperText={"le nom doit contenir au minimum 3 caractères et maximum 64 caractères."} id={"name-input"} invalid={this.state.errors['name'] !== undefined} invalidText={this.state.errors['name']} value={this.state.name} placeholder={"Reflexion primaire"} labelText={<RequiredLabel message={"Nom"}/>} onChange={(e) => this.setState({name: e.currentTarget.value})}/>
           </Stack>
           <Button renderIcon={Add} onClick={this.onClickCreate}>Créer</Button>
         </Stack>

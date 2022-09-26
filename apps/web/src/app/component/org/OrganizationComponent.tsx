@@ -25,7 +25,7 @@ import {OrgHistoryModal} from "../../modal/org/OrgHistoryModal";
 
 import {RequiredLabel} from "../../util/Label";
 
-import { Organization, Pld, Calendar, OrganizationSectionUpdateBody, UpdateOrganizationBody, FavourType } from "@pld/shared";
+import { Organization, Pld, Calendar, UpdateOrganizationBody, FavourType } from "@pld/shared";
 import { capitalize, formatLongDate } from "@pld/utils";
 import {CalendarApiController} from "../../controller/CalendarApiController";
 import {toast} from "react-toastify";
@@ -33,7 +33,7 @@ import {CircularProgress} from "../utils/CircularProgress";
 
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import { ShowFavourIcon } from "../../util/User";
+import { SERVER_URL_ASSETS, ShowFavourIcon } from "../../util/User";
 
 export type OrganizationComponentProps = {
   orgId?: string;
@@ -48,21 +48,6 @@ export type OrganizationComponentState = {
   description: string;
   versionShifting: number;
 } & PageState;
-
-const pldIllustration = [
-  require('../../../assets/illustrations/pld/undraw_content_structure_re_ebkv.png'),
-  require('../../../assets/illustrations/pld/undraw_google_docs_re_evm3.png'),
-  require('../../../assets/illustrations/pld/undraw_live_collaboration_re_60ha.png'),
-  require('../../../assets/illustrations/pld/undraw_blog_post_re_fy5x.png'),
-  require('../../../assets/illustrations/pld/undraw_secure_files_re_6vdh.png'),
-  require('../../../assets/illustrations/pld/undraw_reviewed_docs_re_9lmr.png'),
-  require('../../../assets/illustrations/pld/undraw_personal_documents_re_vcf2.png'),
-  require('../../../assets/illustrations/pld/undraw_online_everywhere_re_n3lr.png'),
-  require('../../../assets/illustrations/pld/undraw_my_personal_files_re_3q0p.png'),
-  require('../../../assets/illustrations/pld/undraw_hiring_re_yk5n.png'),
-  require('../../../assets/illustrations/pld/undraw_folder_files_re_2cbm.png'),
-  require('../../../assets/illustrations/pld/undraw_customer_survey_re_v9cj.png'),
-]
 
 class OrganizationComponent extends React.Component<OrganizationComponentProps, OrganizationComponentState> {
 
@@ -195,6 +180,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
         toast('Une erreur est survenue !', {type: 'error'});
       } else {
         toast('Organisation mis à jour !', {type: 'success'});
+        this.loadOrg();
       }
     })
   }
@@ -205,8 +191,8 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     return (
       <Form>
         <Stack gap={6}>
-          <TextArea rows={4} id={"description"} labelText={"Description"} value={this.state.description} onChange={(a) => this.setState({description: a.currentTarget.value})}/>
-          <NumberInput iconDescription={""} id={"versionShifting"} value={this.state.versionShifting} onChange={(a, {value}) => this.setState({versionShifting: value})} label={<RequiredLabel message={"Versioning"}/>}/>
+          <TextArea rows={4} id={"description"} maxLength={512} labelText={"Description"} value={this.state.description} onChange={(a) => this.setState({description: a.currentTarget.value})}/>
+          <NumberInput iconDescription={""} min={0.01} max={2.0} id={"versionShifting"} value={this.state.versionShifting} onChange={(a, {value}) => this.setState({versionShifting: value})} label={<RequiredLabel message={"Versioning"}/>}/>
           <div style={{display: 'flex', flexDirection: 'row', gap: 10}}>
             <Button renderIcon={Renew} iconDescription={"Update"} style={{borderRadius: 8}} onClick={this.onClickUpdate}>Mettre à jour</Button>
             <Button onClick={() => this.props.navigate('manage')} style={{borderRadius: 8}} renderIcon={Settings} iconDescription={"Settings"}>Paramètre</Button>
@@ -269,7 +255,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
                 <p>{pld.description.substring(0, 160)}</p>
                 <br/>
                 <div style={{width: '100%', textAlign: 'center', marginTop: 20, marginBottom: 20}}>
-                  <img style={{maxWidth: '100%', height: 160}} src={pldIllustration[Math.floor(Math.random() * pldIllustration.length)]}/>
+                  <img style={{maxWidth: '100%', height: 160}} src={SERVER_URL_ASSETS + pld.picture}/>
                 </div>
                 <p>Dernière mise a jour le</p>
                 <p style={{fontWeight: 'bold'}}>{formatLongDate(new Date(pld.updated_date))}</p>
@@ -346,7 +332,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
         <div style={{display: 'flex'}}>
           <h1 style={{fontWeight: 600}}>{this.state.org?.name}</h1>
           <div style={{marginLeft: 'auto', marginRight: '0px', textAlign: 'end', marginTop:'auto', marginBottom: 'auto'}}>
-            {this.state.pld !== undefined  ? <ShowFavourIcon type={FavourType.PLD} data={this.state.org}/> : null}
+            {this.state.pld !== undefined  ? <ShowFavourIcon type={FavourType.ORG} data={this.state.org}/> : null}
           </div>
         </div>
     )

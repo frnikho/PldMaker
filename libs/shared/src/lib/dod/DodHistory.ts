@@ -1,3 +1,4 @@
 export enum  DodHistoryAction {
-  DodUpdated = 'onDodUpdated'
+  DodUpdated = 'onDodUpdated',
+  DodStatusUpdated = 'onDodStatusUpdated',
 }

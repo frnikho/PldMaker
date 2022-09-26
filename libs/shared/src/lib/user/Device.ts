@@ -1,3 +1,5 @@
+import { IsOptional, Length } from "class-validator";
+
 export type DeviceInfo = {
   ip?: string;
   firstConnection?: Date;
@@ -28,8 +30,13 @@ export class Device {
 }
 
 export class DeviceBody {
+  @Length(2, 256)
   agent: string;
+
+  @Length(2, 256)
   os: string;
+
+  @IsOptional()
   language?: string;
 
   constructor(agent: string, os: string, language: string) {

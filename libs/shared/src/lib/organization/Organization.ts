@@ -1,8 +1,11 @@
 import {User} from "../user/User";
 import {OrgHistory} from "./OrgHistory";
-import { Length, Matches } from "class-validator";
+import { Length } from "class-validator";
+import { IsGoodSection } from "../validator/SectionValidator";
+import { IsObjectID } from "../validator/ObjectIdValidator";
 
 export class MigrateOrganizationBody {
+  @IsObjectID()
   newOwnerId: string;
 
   constructor(newOwnerId: string) {
@@ -20,8 +23,7 @@ export class OrganizationSectionUpdateBody {
 }
 
 export class OrganizationSectionBody {
-  @Length(3, 16, {message: 'la section doit contenir au minimum 3 caractères et maximum 16 caractères.'})
-  @Matches(RegExp('[0-9]+\\..*\\.[0-9]+'), {message: 'format non valide ! (ex: 1.2, 5.3...)'})
+  @IsGoodSection({message: 'format non valide ! veuillez utiliser ce format: \'X.X\' (X doit obligatoirement être un nombre)'})
   section: string;
 
   @Length(3, 64, {message: 'le nom doit contenir au minimum 3 caractères et maximum 64 caractères.'})
@@ -64,8 +66,9 @@ export class Organization {
   sections: OrganizationSection[];
   created_date: Date;
   updated_date: Date;
+  picture: string;
 
-  constructor(members: User[], name: string, owner: User, description: string, versionShifting: number, id: string, history: OrgHistory[], sections: OrganizationSection[], created_date: Date, updated_date: Date) {
+  constructor(members: User[], name: string, owner: User, description: string, versionShifting: number, id: string, history: OrgHistory[], sections: OrganizationSection[], created_date: Date, updated_date: Date, picture: string) {
     this.members = members;
     this.name = name;
     this.owner = owner;
@@ -76,5 +79,6 @@ export class Organization {
     this.sections = sections;
     this.created_date = created_date;
     this.updated_date = updated_date;
+    this.picture = picture;
   }
 }

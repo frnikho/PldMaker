@@ -103,27 +103,27 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     return (
       <Stack gap={6}>
         <AuthModalComponent onRedirect={() => this.setState({redirect: 'auth/otp'})} onDismiss={this.onDismissModal} openLoginModal={this.state.login} openRegisterModal={this.state.register} switchModal={this.switchModal} onUserRegistered={this.onUserRegistered} onUserLogged={this.onUserLogged}/>
-        <Tile>
-          <h1 style={{fontWeight: 'bold'}}>Bienvenue sur votre PLD <span style={{fontWeight: 'bold'}}>[Maker]</span></h1>
-          <p style={{marginTop: 10}}>PLD Maker est une web app vous permettant de suivre votre avancement dans votre EIP</p>
+        <Tile style={style.tile}>
+          <h1 style={{fontWeight: 'bold'}}>Bienvenue sur PLD <span style={{fontWeight: 'bold'}}>[Maker]</span></h1>
+          <p style={{marginTop: 10}}>PLD Maker est une application web opensource vous permettant de suivre votre avancement dans votre EIP.</p>
         </Tile>
         <Grid>
           <Column sm={4} md={3} xlg={5}>
-            <ClickableTile onClick={() => this.setState({login: true})}>
-              <h3>Se connecter</h3>
+            <ClickableTile style={style.tile} onClick={() => this.setState({login: true})}>
+              <h3 style={{fontWeight: 'bold'}}>Se connecter</h3>
               <p style={{marginTop: 5, marginBottom: 20}}>Retrouvez l'avancement de vos PLD ainsi que de leurs contenus en vous connectant</p>
               <Lottie animationData={require('../../assets/animations/login.json')} loop={true} style={{height: '300px'}}/>
             </ClickableTile>
           </Column>
           <Column sm={4} md={3} xlg={5}>
-            <ClickableTile onClick={() => this.setState({register: true})}>
-              <h3>Créer mon compte</h3>
+            <ClickableTile style={style.tile} onClick={() => this.setState({register: true})}>
+              <h3 style={{fontWeight: 'bold'}}>Créer mon compte</h3>
               <p style={{marginTop: 5, marginBottom: 20}}>En vous inscrivant, vous pourrez créer et suivre l'avancement de vos PLDs avec votre équipe</p>
               <Lottie animationData={require('../../assets/animations/register.json')} loop={true} style={{height: '300px'}}/>
             </ClickableTile>
           </Column>
           <Column sm={4} md={3} xlg={6}>
-            <Tile>
+            <Tile style={style.tile}>
               <FAQComponent home={true}/>
             </Tile>
           </Column>
@@ -158,5 +158,10 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 }
 
-export default withLanguage(HomePage);
+const style = {
+  tile: {
+    borderRadius: 8,
+  }
+};
 
+export default withLanguage(HomePage);

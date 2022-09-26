@@ -2,21 +2,19 @@ import React from "react";
 import {
   Button,
   Column, ComboBox,
-  FilterableMultiSelect,
   Grid,
-  Modal,
+  Modal, MultiSelect,
   NumberInput,
-  Select,
-  SelectItem,
+  TableBody, TableCell, TableHead, TableHeader, TableRow,
   TextArea,
   TextInput
 } from "carbon-components-react";
 import {FieldData} from "../../util/FieldData";
 
-import {Stack, Layer} from '@carbon/react';
+import {Stack, Layer, Table} from '@carbon/react';
 
 import {Add, Close} from '@carbon/icons-react';
-import { Dod, Pld, Organization, User, DodCreateBody, OrganizationSection } from "@pld/shared";
+import { Dod, Pld, Organization, DodCreateBody, OrganizationSection } from "@pld/shared";
 import {DodApiController} from "../../controller/DodApiController";
 import {UserContextProps} from "../../context/UserContext";
 import {RequiredLabel} from "../../util/Label";
@@ -26,7 +24,10 @@ import { OrganizationApiController } from "../../controller/OrganizationApiContr
 import { toast } from "react-toastify";
 
 export type UserWorkTime = {
-  users: string[] | User[];
+  users: {
+    label: string; //email
+    value: string; //id
+  }[];
   value: number;
   format: EstimatedWorkTimeFormat,
 }
@@ -109,7 +110,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
     }
     this.state.estimatedWorkOfTime.value.push({
       format: EstimatedWorkTimeFormat.JOUR_HOMME,
-      users: [(this.props.org.owner as User)._id],
+      users: [],
       value: 0
     });
     this.setState({
@@ -184,7 +185,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
         value: this.props.editionDod.estimatedWorkTime.map((wt) => {
           return {
             value: wt.value,
-            users: wt.users,
+            users: wt.users.map((a) => ({label: a.email, value: a._id})),
             format: EstimatedWorkTimeFormat[wt.format]
           }
         }),
@@ -205,7 +206,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
       this.props.pld._id,
       this.props.authContext.user?._id ?? '',
       this.state.descriptionOfDone.value,
-      (this.state.estimatedWorkOfTime.value as any)
+      this.state.estimatedWorkOfTime.value.map((wt) => ({format: wt.format, users: wt.users.map((u) => u.value), value: wt.value}))
     );
     validate(body).then((errors) => {
       if (errors.length <= 0)
@@ -272,7 +273,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
     const values: UserWorkTime[] = this.state.estimatedWorkOfTime.value;
     values.push({
       format: EstimatedWorkTimeFormat.JOUR_HOMME,
-      users: [(this.props.org.owner as User)._id],
+      users: [],
       value: 0
     });
     this.setState({
@@ -337,45 +338,59 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
   }
 
   private showEstimatedWorkTime() {
-    return this.state.estimatedWorkOfTime.value.map((dod, index) => {
-      return (
-        <Grid key={index} style={{marginBottom: '10px', alignItems: 'center'}}>
-          <Column lg={6} md={3}>
-            <FilterableMultiSelect
-              invalid={this.state.estimatedWorkOfTime.error !== undefined}
-              invalidText={this.state.estimatedWorkOfTime.error}
-              items={(this.props.org.members as User[]).concat([this.props.org.owner as User]).map((user) => ({label: user.email, value: user._id}))}
-              placeholder={"Email de l'utilisateur..."}
-              id="dod-estimated-work-time-user"
-              selectedItems={dod.users.map((user) => {return {label: user, value: user}})}
-              onChange={(e) => {
-                const value = this.state.estimatedWorkOfTime.value;
-                value[index].users = e.selectedItems.map((item) => (item.value));
-                this.setState({
-                  estimatedWorkOfTime: {
-                    value: value
-                  }
-                })
-              }}
-              selectionFeedback="top-after-reopen"/>
-          </Column>
-          <Column lg={5} md={2}>
-            <NumberInput id={"dod-estimated-work-time-time"} iconDescription={""} value={this.state.estimatedWorkOfTime.value[index].value} onChange={(e) => {
-              const value = this.state.estimatedWorkOfTime.value;
-              value[index].value = e.imaginaryTarget.value;
-              this.setState({
-                estimatedWorkOfTime: {
-                  value: value
-                }
-              })
-            }}/>
-          </Column>
-          <Column lg={1} md={1}>
-            <Button iconDescription={"X"} kind={"tertiary"} hasIconOnly renderIcon={Close} onClick={() => this.onClickDeleteEstimatedWorkTime(index)} size={"sm"}/>
-          </Column>
-        </Grid>
-      )
-    })
+    return (
+      <Table style={{height: this.state.estimatedWorkOfTime.value.length * 150}} size="md" useZebraStyles={false} overflowMenuOnHover={true}>
+        <TableHead>
+          <TableRow>
+            <TableHeader id={'users-'} headers={'Utilisateur'}>
+              Utilisateur
+            </TableHeader>
+            <TableHeader id={'value'} headers={'En J/H'}>
+              En J/H
+            </TableHeader>
+            <TableHeader id={'action'} headers={'Action'}>
+              Actions
+            </TableHeader>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {this.state.estimatedWorkOfTime.value.map((wt, index) => {
+            const availableItems = [...this.props.org.members, this.props.org.owner].map((user) => ({ label: user.email, value: user._id, }));
+            return (
+              <TableRow key={'item-' + index}>
+                <TableCell>
+                  <div style={{marginTop: -16, width: 700}}>
+                    <MultiSelect id={'user-select-worktime'}
+                                 titleText={false}
+                                 items={availableItems}
+                                 label={wt.users.map((user) => user.label).join(', ')}
+                                 selectedItems={wt.users}
+                                 onChange={({selectedItems}) => {
+                                   wt.users = selectedItems;
+                                   this.setState({});
+                                 }}/>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <NumberInput label={false} id={"dod-estimated-work-time-time"} iconDescription={""} value={this.state.estimatedWorkOfTime.value[index].value} onChange={(e) => {
+                    const value = this.state.estimatedWorkOfTime.value;
+                    value[index].value = e.imaginaryTarget.value;
+                    this.setState({
+                      estimatedWorkOfTime: {
+                        value: value
+                      }
+                    })
+                  }}/>
+                </TableCell>
+                <TableCell>
+                  <Button kind={"danger"} renderIcon={Close} onClick={() => this.onClickDeleteEstimatedWorkTime(index)} size={"sm"}>Supprimer</Button>
+                </TableCell>
+              </TableRow>
+            )})}
+        </TableBody>
+      </Table>
+    )
+
   }
 
   private showPreview() {
@@ -530,7 +545,7 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
   override render() {
     return (
       <Modal
-        size={"md"}
+        size={"lg"}
         open={this.props.open}
         passiveModal
         secondaryButtonText={"Fermer"}

@@ -11,7 +11,6 @@ import { Express } from "express";
 import { randomUUID } from "crypto";
 import * as fs from 'fs';
 import * as path from "path";
-import * as multer from "multer";
 
 @Injectable()
 export class UserHelper {

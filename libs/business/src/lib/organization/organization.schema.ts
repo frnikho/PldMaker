@@ -5,6 +5,7 @@ import {DatedObjectSchema} from "../utility/datted_object.utility";
 import { DodStatus } from "@pld/shared";
 import {OrgHistoryAction} from "@pld/shared";
 import { OrganizationSection } from "./section/organization-section.schema";
+import { getOrgPicture } from "../utility/picture.utility";
 
 export type OrganizationDocument = Organization & Document;
 
@@ -45,6 +46,9 @@ export class Organization extends DatedObjectSchema {
 
   @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true})
   owner: User;
+
+  @Prop({required: false, default: () => getOrgPicture()})
+  picture: string;
 
   @Prop({required: false, default: 1.0})
   versionShifting: number;

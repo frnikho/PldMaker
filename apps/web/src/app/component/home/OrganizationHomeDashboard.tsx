@@ -20,6 +20,7 @@ import { parseEvents } from "../../util/Event";
 import { LanguageProps, withLanguage } from "../../context/LanguageContext";
 import { getDataTranslation, language } from "../../language";
 import { ButtonTextCompoundInput } from "@fullcalendar/core";
+import { SERVER_URL_ASSETS } from "../../util/User";
 
 type OrganizationHomeDashboardProps = unknown & RequiredUserContextProps & LanguageProps;
 
@@ -30,16 +31,6 @@ type OrganizationHomeDashboardState = {
   dods: Dod[];
   calendarEvents: CalendarEvent[];
 } & NavigationState
-
-const orgIllustrations = [
-  require('../../../assets/illustrations/undraw_miro_qvwm.png'),
-  require('../../../assets/illustrations/undraw_creative_team_re_85gn.png'),
-  require('../../../assets/illustrations/undraw_shared_goals_re_jvqd.png'),
-  require('../../../assets/illustrations/undraw_work_together_re_5yhn.png'),
-  require('../../../assets/illustrations/undraw_team_collaboration_re_ow29.png'),
-  require('../../../assets/illustrations/undraw_team_up_re_84ok.png'),
-  require('../../../assets/illustrations/undraw_teamwork_hpdk.png'),
-]
 
 class OrganizationHomeDashboard extends React.Component<OrganizationHomeDashboardProps, OrganizationHomeDashboardState> {
 
@@ -109,7 +100,7 @@ class OrganizationHomeDashboard extends React.Component<OrganizationHomeDashboar
               <p style={style.cardTitle}>{org.name}</p>
               <p style={style.cardDescription}>{org.description.substring(0, 120)} {org.description.length > 120 ? '...' : ''}</p>
               <div style={style.cardImageContainer as any}>
-                <img style={style.cardImage} src={orgIllustrations[Math.floor(Math.random() * orgIllustrations.length)]}/>
+                <img style={style.cardImage} src={SERVER_URL_ASSETS + org.picture} alt={"Organization Picture"}/>
               </div>
               <p>Dernière mise a jour: <br/><span style={{fontWeight: 600}}>{formatShortDate(new Date(org.updated_date))}</span></p>
             </ClickableTile>

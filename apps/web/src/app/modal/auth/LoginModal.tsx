@@ -1,5 +1,5 @@
 import React from "react";
-import { InlineLoading, Link, Modal, TextInput } from "carbon-components-react";
+import { Button, InlineLoading, Link, Modal, TextInput } from "carbon-components-react";
 import { Stack } from "@carbon/react";
 import { RequiredUserContextProps, UserContextProps } from "../../context/UserContext";
 import { LoginBody, User } from "@pld/shared";
@@ -9,6 +9,8 @@ import { validate } from "class-validator";
 import { FieldData } from "../../util/FieldData";
 import { ReactFormValidation } from "../../util/Page";
 import { ErrorType } from "../../util/Api";
+
+import {Login} from '@carbon/icons-react';
 
 type LoginModalProps = {
   open: boolean;
@@ -85,30 +87,30 @@ export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalS
   }
 
   override render() {
-      return (<Modal
-        open={this.props.open}
-        onRequestClose={this.props.onDismiss}
-        onRequestSubmit={() => this.onClickCreate(this.props.userContext)}
-        modalHeading={'Se connecter'}
-        shouldSubmitOnEnter={true}
-        primaryButtonText={this.state.loading ? <InlineLoading
-          description={"Chargement ..."}
-          status={this.state.loading ? 'active' : 'finished'}/> : "Connexion"}
-        primaryButtonDisabled={this.state.loading}
-        secondaryButtonText="Annuler"
-        size={"md"}>
-          <Stack gap={4}>
-            <TextInput id="login-email" type={"email"} invalidText={this.state.email.error} invalid={this.state.email.error !== undefined} labelText="Adresse email" onChange={(event) => this.setState({email: {
-              value: event.target.value
-              }})}/>
-            <TextInput id="login-mdp" type={"password"} invalidText={this.state.password.error} invalid={this.state.password.error !== undefined} labelText="Mot de passe" onChange={(event) => this.setState({password: {
-              value: event.target.value}
-            })}/>
-          </Stack>
+    return (<Modal
+      passiveModal
+      open={this.props.open}
+      onRequestClose={this.props.onDismiss}
+      modalHeading={'Se connecter'}
+      shouldSubmitOnEnter={true}
+      primaryButtonText={this.state.loading ? <InlineLoading
+        description={"Chargement ..."}
+        status={this.state.loading ? 'active' : 'finished'}/> : "Connexion"}
+      primaryButtonDisabled={this.state.loading}
+      secondaryButtonText="Annuler"
+      size={"sm"}>
+        <Stack gap={4}>
+          <TextInput id="login-email" type={"email"} invalidText={this.state.email.error} invalid={this.state.email.error !== undefined} labelText="Adresse email" onChange={(event) => this.setState({email: {
+            value: event.target.value
+            }})}/>
+          <TextInput id="login-mdp" type={"password"} invalidText={this.state.password.error} invalid={this.state.password.error !== undefined} labelText="Mot de passe" onChange={(event) => this.setState({password: {
+            value: event.target.value}
+          })}/>
+        </Stack>
         <br />
-        <br />
-        Pas encore de compte ? <Link onClick={() => this.props.switchToRegister()}>Inscrivez vous ici !</Link>
-      </Modal>);
+        <p>Pas encore de compte ? <Link onClick={() => this.props.switchToRegister()}>Inscrivez vous ici !</Link></p>
+        <Button renderIcon={Login} style={{marginTop: 18}} onClick={() => this.onClickCreate(this.props.userContext)}>Se connecter</Button>
+    </Modal>);
   }
 
 }

@@ -7,6 +7,8 @@ import {Stack} from '@carbon/react'
 import { UserApiController } from "../controller/UserApiController";
 import { toast } from "react-toastify";
 import { Navigate } from "react-router-dom";
+import { Link } from "carbon-components-react";
+import { NavProps } from "../util/Navigation";
 
 export type AuthOtpProps = RequiredUserContextProps;
 
@@ -25,13 +27,10 @@ export class AuthOtpComponent extends React.Component<AuthOtpProps, AuthOtpState
   }
 
   private onComplete(value: string) {
-    console.log(this.props.userContext.accessToken);
     UserApiController.loginOtp(this.props.userContext.accessToken, {token: value, secret: ''}, (payload, error) => {
       if (payload !== null) {
         this.props.userContext.saveOtpToken(payload, (user, error) => {
-          if (!error) {
-            this.setState({redirectUrl: '/'});
-          }
+
         })
       } else {
         toast(error?.message, {type: 'error'})
@@ -58,6 +57,8 @@ export class AuthOtpComponent extends React.Component<AuthOtpProps, AuthOtpState
           autoSelect={true}
           regexCriteria={/^[ A-Za-z0-9_@./#&+-]*$/}
         />
+        <p style={{textAlign: 'center'}}>Vous avez perdu l'accès a votre application d'authentification ? <Link onClick={() => null}>Utiliser votre code de recuperation</Link></p>
+
       </Stack>
     )
   }

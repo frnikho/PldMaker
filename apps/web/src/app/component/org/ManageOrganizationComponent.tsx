@@ -17,7 +17,6 @@ import {
   TableRow, TableToolbar, TableToolbarContent, TextInput,
   Tile
 } from "carbon-components-react";
-import Block from "@uiw/react-color-block";
 
 import {DataTable} from '@carbon/react';
 
@@ -29,8 +28,8 @@ import {NavProps, withNav} from "../../util/Navigation";
 import {NewOrgDodColorModal} from "../../modal/org/NewOrgDodColorModal";
 import {SocketContext} from "../../context/SocketContext";
 import { CreateOrgSectionModal } from "../../modal/org/CreateOrgSectionModal";
-import { DeleteOrgModal } from "../../modal/org/DeleteOrgModal";
-import { MigrateOrgModal } from "../../modal/org/MigrateOrgModal";
+import { DeleteOrgModal } from "../../modal/org/manage/DeleteOrgModal";
+import { MigrateOrgModal } from "../../modal/org/manage/MigrateOrgModal";
 import { UpdateOrgSectionModal } from "../../modal/org/UpdateOrgSectionModal";
 import { DeleteOrgSectionModal } from "../../modal/org/DeleteOrgSectionModal";
 import { ManageOrgDodStatusComponent } from "./manage/ManageOrgDodStatusComponent";
@@ -275,7 +274,7 @@ class ManageOrganizationComponent extends React.Component<ManageOrgProps, Manage
               invalid={this.state.newUserInput.error !== undefined}
               invalidText={this.state.newUserInput.error}
             />
-            <Button style={{marginTop: '20px'}} hasIconOnly renderIcon={Add} iconDescription={"Ajouter"} onClick={this.onClickInviteUser}/>
+          <Button style={{marginTop: '20px'}} renderIcon={Add} iconDescription={"Ajouter"} onClick={this.onClickInviteUser}>Ajouter un utilisateur</Button>
           </Stack>
       </Tile>
     )

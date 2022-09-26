@@ -16,7 +16,7 @@ import {
 import {TabPanel, TabPanels, TabList} from '@carbon/react';
 
 import {Stack} from '@carbon/react'
-import {formatDateHistory, formatLongDate, formatShortDate} from "@pld/utils";
+import {formatDateHistory, formatLongDate} from "@pld/utils";
 import {HistoryHelper} from "../../util/HistoryHelper";
 
 export type PreviewDodProps = {

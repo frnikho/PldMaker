@@ -24,6 +24,7 @@ import {HelpLabel, RequiredLabel} from "../../util/Label";
 import {FieldData} from "../../util/FieldData";
 import {validate} from "class-validator";
 import { Navigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export type NewOrgComponentProps = {
   onOrgCreated: (org: Organization) => void;
@@ -39,7 +40,12 @@ export type NewOrgComponentState = {
   versionShifting: FieldData<number>,
   error: FieldError,
   redirectUrl?: string;
+  errors: Error;
 };
+
+type Error = {
+  [key: string]: string;
+}
 
 export type FieldError = {
   name?: string,
@@ -58,6 +64,7 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
   constructor(props: NewOrgComponentProps) {
     super(props);
     this.state = {
+      errors: {},
       invitedUser: [],
       searchUserInputText: '',
       loadingAddingUser: false,
@@ -99,27 +106,25 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
     });
 
     UserApiController.findUserByEmail(this.props.userContext.accessToken, this.state.searchUserInputText, (user, error) => {
-      setTimeout(() => {
-        if (user !== null && !error) {
-          this.state.invitedUser.push({
-            _id: user._id,
-            email: user.email,
-          })
-          this.setState({
-            invitedUser: this.state.invitedUser,
-            error: {
-              searchUserInputText: undefined
-            }
-          })
-        } else {
-          this.setState({
-            error: {searchUserInputText: error?.error}
-          })
-        }
-        this.setState({
-          loadingAddingUser: false,
+      if (user !== null && !error) {
+        this.state.invitedUser.push({
+          _id: user._id,
+          email: user.email,
         })
-      }, 1000);
+        this.setState({
+          invitedUser: this.state.invitedUser,
+          error: {
+            searchUserInputText: undefined
+          }
+        })
+      } else {
+        this.setState({
+          error: {searchUserInputText: error?.error}
+        })
+      }
+      this.setState({
+        loadingAddingUser: false,
+      })
     });
 
   }
@@ -128,34 +133,41 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
     this.setState({
       loadingCreation: true,
     });
-
     const body: CreateOrganizationBody = new CreateOrganizationBody(
       this.state.name.value,
       this.state.description.value,
       this.state.versionShifting.value,
       this.state.invitedUser.map((user) => user._id),
     );
-
     validate(body).then((errors) => {
-      console.log(errors);
-    });
-
-    OrganizationApiController.createUserOrganizations(this.props.userContext.accessToken, {
-      name: this.state.name.value,
-      description: this.state.description.value,
-      versionShifting: this.state.versionShifting.value,
-      invitedMembers: this.state.invitedUser.map((user) => user._id),
-    }, (org, error) => {
-      this.setState({
-        loadingCreation: false,
-      });
-      if (org !== null && error === undefined) {
-        this.props.onOrgCreated(org);
+      const error: Error = {};
+      errors.map((a) => {
+        error[a.property] = Object.values(a.constraints ?? []).join(', ');
+      })
+      this.setState({error});
+      if (errors.length === 0) {
+        OrganizationApiController.createUserOrganizations(this.props.userContext.accessToken, {
+          name: this.state.name.value,
+          description: this.state.description.value,
+          versionShifting: this.state.versionShifting.value,
+          invitedMembers: this.state.invitedUser.map((user) => user._id),
+        }, (org, error) => {
+          this.setState({
+            loadingCreation: false,
+          });
+          if (org !== null && error === undefined) {
+            toast('Votre organisation a été créée', {type: 'error'});
+            this.props.onOrgCreated(org);
+          } else {
+            console.log(error);
+          }
+        });
       } else {
-        //TODO error
+        this.setState({loadingCreation: false});
       }
     });
   }
+
   private showInvitedUser() {
     return (
       <StructuredListWrapper>
@@ -196,17 +208,17 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
           <BreadcrumbItem onClick={() => this.setState({redirectUrl: '/'})}>Dashboard</BreadcrumbItem>
           <BreadcrumbItem isCurrentPage>Organisation</BreadcrumbItem>
         </Breadcrumb>
-        <h1>Créer votre organisation</h1>
+        <h1 style={{fontWeight: 'bold'}}>Créer votre organisation</h1>
         <p style={{fontSize: 14, marginTop: 10}}>Une organization vous permets de créer, de gérer et de générer les documents de vos PLDs en équipe</p>
         <p style={{fontSize: 14}}>Après la création de votre organisation, vous pourrez gérer les paramètres liés a la confidentialité</p>
         <Grid style={{marginTop: 20}}>
           <Column sm={4} md={8} lg={10} xlg={10}>
             <Stack gap={3}>
               <RequiredLabel message={"Nom"}/>
-              <TextInput id={"new-org-name"} labelText={false} invalid={this.state.name.error !== undefined} invalidText={this.state.name.error} required onChange={(event) => this.setState({name: {value: event.currentTarget.value}})}/>
-              <TextArea rows={4} id={"new-org-desc"} invalid={this.state.description.error !== undefined} invalidText={this.state.description.error} labelText={"Description"} onChange={(event) => this.setState({description: {value: event.currentTarget.value}})}/>
+              <TextInput helperText={"le nom doit contenir au minimum 5 caractères et 64 au maximum"} maxLength={64} minLength={5} id={"new-org-name"} labelText={false} invalid={this.state.error['name'] !== undefined} invalidText={this.state.error['name']} required onChange={(event) => this.setState({name: {value: event.currentTarget.value}})}/>
+              <TextArea helperText={"la description ne doit pas dépasser 512 caractères"} maxLength={512} rows={4} id={"new-org-desc"} invalid={this.state.error['description'] !== undefined} invalidText={this.state.error['description']} labelText={"Description"} onChange={(event) => this.setState({description: {value: event.currentTarget.value}})}/>
               <RequiredLabel message={"Versioning"}/>
-              <NumberInput iconDescription={"step de 0.1"} id={"new-org-versionShifting"} invalid={this.state.versionShifting.error !== undefined} invalidText={this.state.versionShifting.error} value={1.0} max={2.0} min={0.1} step={0.1} onChange={(e) => {this.setState({versionShifting: {value: parseFloat(e.imaginaryTarget.value)}});}}/>
+              <NumberInput helperText={"minimum 0.01 et au maximum 2.00"} iconDescription={"step de 0.1"} id={"new-org-versionShifting"} invalid={this.state.error['versionShifting'] !== undefined} invalidText={this.state.error['versionShifting']} value={this.state.versionShifting.value} max={2.0} min={0.01} step={0.1} onChange={(e, {value}) => {this.setState({versionShifting: {value: parseFloat(value)}});}}/>
               <HelpLabel message={'Le versioning correspond aux gap de la monté de version lors de chaque mise à jour de votre pld'}/>
             </Stack>
           </Column>

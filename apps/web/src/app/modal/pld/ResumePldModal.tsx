@@ -46,7 +46,7 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
     this.showSection = this.showSection.bind(this);
   }
 
-  override componentDidMount() {
+  private init() {
     const users: User[] = this.getUsers(this.props.org);
     this.setState({
       resume: users.map((user): UserResume => {
@@ -58,14 +58,22 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
     })
   }
 
+  override componentDidUpdate(prevProps: Readonly<ResumePldModalProps>, prevState: Readonly<ResumePldModalState>) {
+    if (this.props.open && this.props.open !== prevProps.open) {
+      this.init();
+    }
+  }
+
   private getTableHeader() {
     return this.state.resume.map((value) => {
       const hours: number = value.dod.map((dod) => {
-        return dod.estimatedWorkTime.map((wt) => {
+        const abc = dod.estimatedWorkTime.map((wt) => {
           if (wt.users.some((a) => value.user._id === a._id))
             return parseFloat(wt.value as unknown as string);
           return 0;
         })
+        console.log(abc);
+        return abc;
       }).flat().reduce((a, b) => a + b, 0);
       return (
         <TableHeader id={value.user._id} key={value.user._id}>

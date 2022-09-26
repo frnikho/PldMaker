@@ -26,8 +26,10 @@ export class Pld {
   created_date: Date;
   updated_date: Date;
 
+  picture: string;
 
-  constructor(description: string, manager: User, owner: User, org: Organization, promotion: number, revisions: PldRevision[], status: string, tags: string[], title: string, version: number, id: string, steps: string[], startingDate: Date, endingDate: Date, currentStep: string, history: PldHistory[], created_date: Date, updated_date: Date) {
+
+  constructor(description: string, manager: User, owner: User, org: Organization, promotion: number, revisions: PldRevision[], status: string, tags: string[], title: string, version: number, id: string, steps: string[], startingDate: Date, endingDate: Date, currentStep: string, history: PldHistory[], created_date: Date, updated_date: Date, picture: string) {
     this.description = description;
     this.manager = manager;
     this.owner = owner;
@@ -46,6 +48,7 @@ export class Pld {
     this.history = history;
     this.created_date = created_date;
     this.updated_date = updated_date;
+    this.picture = picture;
   }
 }
 

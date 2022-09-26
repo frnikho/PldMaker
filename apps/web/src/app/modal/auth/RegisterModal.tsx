@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Button,
   InlineLoading, Link,
   Modal,
   TextInput
@@ -98,11 +99,7 @@ export class RegisterModal extends ReactFormValidation<RegisterModalProps, Regis
     return (<Modal
       open={this.props.open}
       onRequestClose={this.props.onDismiss}
-      onRequestSubmit={(e) => {
-        if (e.type === 'keydown')
-          return;
-        this.onClickRegister(this.props.userContext);
-      }}
+      passiveModal
       modalHeading={'Créer un compte'}
       shouldSubmitOnEnter={true}
       primaryButtonText={this.state.loading ? <InlineLoading
@@ -135,8 +132,10 @@ export class RegisterModal extends ReactFormValidation<RegisterModalProps, Regis
                      onChange={(event) => this.setState({firstname: {value: event.target.value}})}/>
         </Stack>
       <br/>
-      <br/>
-      Vous avez deja un compte ? <Link onClick={() => this.props.switchToRegister()}>connectez vous ici !</Link>
+      <p>Vous avez deja un compte ? <Link onClick={() => this.props.switchToRegister()}>connectez vous ici !</Link></p>
+      <Button style={{marginTop: 18}} onClick={() => this.onClickRegister(this.props.userContext)}>
+        S'inscrire
+      </Button>
     </Modal>);
   }
 

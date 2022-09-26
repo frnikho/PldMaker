@@ -4,6 +4,7 @@ import {DatedObjectSchema} from "../utility/datted_object.utility";
 import {User} from "../user/user.schema";
 import {Organization} from "../organization/organization.schema";
 import {PldOwnerType, PldStatus, PldStep, PldHistoryAction, EditedField} from "@pld/shared";
+import { getPldPicture } from "../utility/picture.utility";
 
 export type PldDocument = Pld & Document;
 
@@ -133,6 +134,9 @@ export class Pld extends DatedObjectSchema {
 
   @Prop({required: false, default: []})
   history: PldHistory[];
+
+  @Prop({required: false, default: () => getPldPicture()})
+  picture: string;
 
 }
 

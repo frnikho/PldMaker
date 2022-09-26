@@ -29,6 +29,7 @@ export class PldMock {
       startingDate: new Date(),
       endingDate: new Date(),
       history: [],
+      picture: '',
     }
   }
 

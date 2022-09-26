@@ -31,7 +31,7 @@ export class FAQComponent extends React.Component<FAQProps, FAQState> {
     return (
       <>
         {this.state.redirect ? <Navigate to={this.state.redirect}/> : null}
-        <h1>FAQ :</h1>
+        <h3 style={{fontWeight: 'bold'}}>FAQ :</h3>
         <Accordion style={{marginTop: 20}}>
           {this.getFAQ().map((f, index) => {
             return (

@@ -151,12 +151,12 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
     if (auth.favours?.pld === undefined || auth.favours.pld.length <= 0)
       return;
     return (
-      <SideNavMenu title="PLD" large>
+      <SideNavMenu defaultExpanded title="PLD" large>
         {auth.favours?.pld.map((pld, index) => {
           return (
             <SideNavLink key={index} onClick={() => {
               onClickSideNavExpand();
-              this.props.onRedirectUrl(`/organization/${pld.owner._id}/pld/${pld._id}`)
+              this.props.onRedirectUrl(`/organization/${pld.org}/pld/${pld._id}`)
             }}>
               {pld.title}
             </SideNavLink>
@@ -170,7 +170,7 @@ export class MainPageLayout extends React.Component<MainPageLayoutProps, MainPag
     if (auth.favours?.org === undefined || auth.favours.org.length <= 0)
       return;
     return (
-      <SideNavMenu title="Organisation" large>
+      <SideNavMenu defaultExpanded title="Organisation" large>
         {auth.favours?.org.map((org, index) => {
           return (
             <SideNavMenuItem key={index} onClick={() => {

@@ -1,19 +1,20 @@
 import React from "react";
-import { UserContext } from "../context/UserContext";
+import { UserContextProps } from "../context/UserContext";
 import { AuthOtpComponent } from "../component/AuthOtpComponent";
+import { Page } from "../util/Page";
 
 export type AuthOtpPageProps = unknown
-
 export type AuthOtpPageState = unknown
 
-export class AuthOtpPage extends React.Component<AuthOtpPageProps, AuthOtpPageState> {
+export class AuthOtpPage extends Page<AuthOtpPageProps, AuthOtpPageState> {
 
-  override render() {
-    return (
-      <UserContext.Consumer>
-        {value => <AuthOtpComponent userContext={value}/>}
-      </UserContext.Consumer>
-    )
+  renderPage(context: UserContextProps): React.ReactNode {
+    this.navigate('/');
+    return;
+  }
+
+  override renderNotLogged(context: UserContextProps) {
+    return <AuthOtpComponent userContext={context}/>;
   }
 
 }
