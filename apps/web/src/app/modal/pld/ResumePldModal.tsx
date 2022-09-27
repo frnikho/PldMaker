@@ -11,6 +11,14 @@ type UserResume = {
   dod: Dod[];
 }
 
+type DodCell = {
+  type: 'dod' | 'section';
+  version: string;
+  dod: Dod | undefined;
+  section: OrganizationSection | undefined;
+}
+
+
 export type ResumePldModalProps = {
   open: boolean;
   hide: (show: boolean) => void;
@@ -43,7 +51,6 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
       openDodPreview: false,
       resume: []
     }
-    this.showSection = this.showSection.bind(this);
   }
 
   private init() {
@@ -77,7 +84,7 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
       }).flat().reduce((a, b) => a + b, 0);
       return (
         <TableHeader id={value.user._id} key={value.user._id}>
-          <p style={{fontWeight: 'bold'}}>
+          <p style={{ fontWeight: 'bold' }}>
             {value.user.firstname}
           </p>
           <p>
@@ -106,119 +113,120 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
     })
   }
 
-  private hasSection(dod: Dod, nextDod: Dod): boolean {
-    if (nextDod !== undefined) {
-      const dodAV = dod.version.split('.');
-      const dodBV = nextDod.version.split('.');
-      if (dodAV[0] !== dodBV[0] || dodAV[1] !== dodBV[1]) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private showTableCellSection(title: string, orgSection?: OrganizationSection) {
-    if (orgSection === undefined) {
-      return (
-        <TableCell onDoubleClick={() => {
-          this.setState({preselectedSection: title});
-          this.props.hide(false);
-          this.setState({openCreateSection: true})
-        }}>
-          <p style={{fontWeight: 'bold'}}>{title}</p>
-        </TableCell>
-      )
-    } else {
-      return (
-        <TableCell onDoubleClick={() => {
-          this.setState({selectedSection: orgSection});
-          this.props.hide(false);
-          this.setState({openUpdateSection: true})
-        }}>
-          <p style={{fontWeight: 'bold'}}>{title}</p>
-        </TableCell>
-      )
-    }
-  }
-
-  private showSection(index, nextDod: Dod) {
-    const versions = nextDod.version.split('.');
-    const orgSection = this.props.sections.find((sec) => sec.section === `${versions[0]}.${versions[1]}`);
-    let title;
-    if (orgSection === undefined) {
-      title = versions[0] + '.' + versions[1];
-    } else {
-      title = orgSection.section + ' ' + orgSection.name;
-    }
+  private showTableCellSection(section: OrganizationSection) {
     return (
-      <TableRow style={{backgroundColor: 'red', color: 'red'}} id={'sectiondod_' + nextDod._id + 'section_' + nextDod._id} key={'section' + index + nextDod._id}>
-        {this.showTableCellSection(title, orgSection)}
-        {this.getUsers(this.props.org).map((u, index) => <TableCell key={'user_blank_cell_' + index}/>)}
-      </TableRow>
+      <TableCell onDoubleClick={() => {
+        this.setState({ selectedSection: section });
+        this.props.hide(false);
+        this.setState({ openUpdateSection: true })
+      }}>
+        <p style={{ fontWeight: 'bold' }}>{section.section} {section.name}</p>
+      </TableCell>
     )
+
   }
 
   private getTableBody() {
-    return this.getDods(this.props.dod).map((dod, index) => {
-      const color = this.props.dodColors.find((a) => dod.status._id === a._id);
-      const nextDod: Dod = this.props.dod[index+1];
-      return (
-        <Fragment key={index}>
-          <TableRow id={'dod_' + dod._id} key={index + dod._id}>
-            <TableCell style={{cursor: 'pointer'}} onClick={() => {this.props.hide(false); this.setState({openDodPreview: true, selectedDod: dod});}} key={dod._id + '_name'}><div className="square" style={{
-              height: '12px',
-              width: '12px',
-              marginRight: 10,
-              backgroundColor: `#${color?.color}`,
-              borderRadius: '50%',
-              display: 'inline-block',
-            }}/> {dod.version} {dod.title} </TableCell>
-            <TableCell>{dod.estimatedWorkTime.map((a) => a.users.map((u) => parseFloat(String(a.value)))).flat().reduce((a, b) => a + b, 0).toFixed(1)}</TableCell>
-            {this.getUsers(this.props.org).map((user) => {
-              const hours = dod.estimatedWorkTime.map((wt) => {
-                if (wt.users.some((a) => user._id === a._id))
-                  return parseFloat(wt.value as unknown as string);
-                return 0;
-              }).flat().reduce((a, b) => a + b, 0);
-              return (
-                <TableCell key={dod._id + user._id}>
-                  {hours !== 0 ? hours.toFixed(1) : '-'}
-                </TableCell>
-              )
-            })}
-          </TableRow>
-          {this.hasSection(dod, nextDod) ? this.showSection(index, nextDod) : null}
-        </Fragment>
-      )
-    })
+    const section: DodCell[] = this.props.sections.map((section) => ({ type: 'section', section: section, dod: undefined, version: section.section }));
+    const DoDs: DodCell[] = (this.getDods(this.props.dod).map((dod) => ({ dod, type: 'dod', version: dod.version })) as DodCell[]).concat(...section).sort((a, b) => {
+      return this.compare(a.version, b.version);
+    });
+
+    return DoDs.map((a, index) => {
+      if (a.type === 'dod') {
+        const dod = a.dod as Dod;
+        const color = this.props.dodColors.find((a) => dod.status._id === a._id);
+        return (
+          <Fragment key={index}>
+            <TableRow id={'dod_' + dod._id} key={index + dod._id}>
+              <TableCell style={{ cursor: 'pointer' }} onClick={() => {
+                this.props.hide(false);
+                this.setState({ openDodPreview: true, selectedDod: dod });
+              }} key={dod._id + '_name'}>
+                <div className="square" style={{
+                  height: '12px',
+                  width: '12px',
+                  marginRight: 10,
+                  backgroundColor: `#${color?.color}`,
+                  borderRadius: '50%',
+                  display: 'inline-block',
+                }} />
+                {dod.version} {dod.title} </TableCell>
+              <TableCell>{dod.estimatedWorkTime.map((a) => a.users.map(() => parseFloat(String(a.value)))).flat().reduce((a, b) => a + b, 0).toFixed(1)}</TableCell>
+              {this.getUsers(this.props.org).map((user) => {
+                const hours = dod.estimatedWorkTime.map((wt) => {
+                  if (wt.users.some((a) => user._id === a._id))
+                    return parseFloat(wt.value as unknown as string);
+                  return 0;
+                }).flat().reduce((a, b) => a + b, 0);
+                return (
+                  <TableCell key={dod._id + user._id}>
+                    {hours !== 0 ? hours.toFixed(1) : '-'}
+                  </TableCell>
+                )
+              })}
+            </TableRow>
+          </Fragment>
+        )
+      } else {
+        const section = a.section as OrganizationSection;
+        return <TableRow key={index}>
+          {this.showTableCellSection(section)}
+          <TableCell />
+          {this.getUsers(this.props.org).map((u, index) => <TableCell key={'user_blank_cell_' + index} />)}
+        </TableRow>
+      }
+    });
+  }
+
+  private compare(a: string, b: string) {
+
+    // 1. Split the strings into their parts.
+    const a1 = a.split('.');
+    const b1 = b.split('.');
+    // 2. Contingency in case there's a 4th or 5th version
+    const len = Math.min(a1.length, b1.length);
+    // 3. Look through each version number and compare.
+    for (let i = 0; i < len; i++) {
+      const a2 = +a1[i] || 0;
+      const b2 = +b1[i] || 0;
+
+      if (a2 !== b2) {
+        return a2 > b2 ? 1 : -1;
+      }
+    }
+
+    // 4. We hit this if the all checked versions so far are equal
+    //
+    return a1.length - b1.length;
   }
 
   private showModals() {
     return (
       <>
         {this.state.selectedDod ? <PreviewDodModal dod={this.state.selectedDod} open={this.state.openDodPreview} onDismiss={() => {
-          this.setState({openDodPreview: false});
+          this.setState({ openDodPreview: false });
           this.props.hide(true);
         }} onSuccess={() => {
           this.props.hide(true);
-          this.setState({openCreateSection: false})
-        }}/> : null}
+          this.setState({ openCreateSection: false })
+        }} /> : null}
         <CreateOrgSectionModal preselectedSection={this.state.preselectedSection} open={this.state.openCreateSection} onDismiss={() => {
-          this.setState({openCreateSection: false});
+          this.setState({ openCreateSection: false });
           this.props.hide(true);
         }} onSuccess={() => {
           this.props.reload();
           this.props.hide(true);
-          this.setState({openCreateSection: false})
-        }} org={this.props.org} userContext={this.props.userContext}/>
+          this.setState({ openCreateSection: false })
+        }} org={this.props.org} userContext={this.props.userContext} />
         {this.state.selectedSection ? <UpdateOrgSectionModal section={this.state.selectedSection} open={this.state.openUpdateSection} onDismiss={() => {
-          this.setState({openUpdateSection: false});
+          this.setState({ openUpdateSection: false });
           this.props.hide(true);
         }} onSuccess={() => {
           this.props.reload();
           this.props.hide(true);
-          this.setState({openUpdateSection: false})
-        }} org={this.props.org} userContext={this.props.userContext}/> : null}
+          this.setState({ openUpdateSection: false })
+        }} org={this.props.org} userContext={this.props.userContext} /> : null}
       </>
     )
   }
@@ -240,7 +248,7 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
                   DoDs
                 </TableHeader>
                 <TableHeader>
-                  <p style={{fontWeight: 'bold'}}>
+                  <p style={{ fontWeight: 'bold' }}>
                     Total
                   </p>
                   <p>
@@ -258,8 +266,4 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
       </>
     )
   }
-}
-
-const styles = {
-
 }

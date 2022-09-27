@@ -16,7 +16,7 @@ export class DodHelper {
     private dodStatusHelper: DodStatusHelper) {
   }
 
-  public static populateAndExecute(query: Query<any, any>) {
+  public static populateAndExecute<T, Z>(query: Query<T, Z>) {
     return query.populate(['pldOwner', 'owner', 'status'])
       .populate({
         path: 'estimatedWorkTime',
@@ -117,11 +117,15 @@ export class DodHelper {
       }
     })
     if (beforeDod.estimatedWorkTime !== updatedDod.estimatedWorkTime) {
-      //TODO
+      editedFields.push({
+        name: 'Temps estimé',
+        lastValue: beforeDod.estimatedWorkTime.map((wt) => `${wt.users.map((user) => user.email).join(';')}: ${wt.value} J/H`).join(', '),
+        value: updatedDod.estimatedWorkTime.map((wt) => `${wt.users.map((user) => user.email).join(';')}: ${wt.value} J/H`).join(', ')
+      })
     }
     if (beforeDod.descriptionOfDone.join(', ') !== updatedDod.descriptionOfDone.join(', ')) {
       editedFields.push({
-        name: 'descriptionOfDone',
+        name: 'Description of Done',
         value: updatedDod.descriptionOfDone.join(', '),
         lastValue: beforeDod.descriptionOfDone.join(', '),
       })

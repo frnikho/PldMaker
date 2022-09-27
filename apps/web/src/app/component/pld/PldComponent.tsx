@@ -33,7 +33,7 @@ import {
 
 import {Stack, Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react';
 
-import {Classification, DocumentAdd, DocumentTasks, RecentlyViewed, Information, CheckmarkOutline, Incomplete, Renew, Hourglass} from '@carbon/icons-react';
+import {Classification, DocumentAdd, RecentlyViewed, Information, CheckmarkOutline, Incomplete, Renew, Hourglass} from '@carbon/icons-react';
 
 import Lottie from "lottie-react";
 import {DodTableComponent} from "../dod/DodTableComponent";
@@ -376,13 +376,13 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     }
   }
 
-  private showSignButton() {
+  /*private showSignButton() {
    if (this.state.org === undefined || this.state.pld === undefined) {
      return (<ButtonSkeleton/>)
    } else {
      return (<Button renderIcon={DocumentTasks} onClick={() => this.setState({openSignModal: true})}>Signer le PLD</Button>);
    }
-  }
+  }*/
 
   private showChangeStepButton() {
     if (this.state.org === undefined || this.state.pld === undefined) {
@@ -467,7 +467,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
           dod={this.state.dod}
           open={this.state.openHistoryModal} onDismiss={() => this.setState({openHistoryModal: false})} onSuccess={() => null}
         />
-        <ResumePldModal dodColors={[]} reload={() => this.loadOrg()} userContext={this.props.userContext} sections={this.state.sections} pld={this.state.pld} org={this.state.org} dod={this.state.dod} open={this.state.openResumeModal} hide={(show) => this.setState({openResumeModal: show})}/>
+        <ResumePldModal dodColors={this.state.dodStatus} reload={() => this.loadOrg()} userContext={this.props.userContext} sections={this.state.sections} pld={this.state.pld} org={this.state.org} dod={this.state.dod} open={this.state.openResumeModal} hide={(show) => this.setState({openResumeModal: show})}/>
         <SignPldModal
           open={this.state.openSignModal}
           onDismiss={() => {

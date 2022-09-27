@@ -27,10 +27,6 @@ export type PreviewDodState = unknown
 
 export class PreviewDodModal extends React.Component<PreviewDodProps, PreviewDodState> {
 
-  constructor(props) {
-    super(props);
-  }
-
   private showHistory() {
     if (this.props.dod.history.length === 0) {
       return (
@@ -46,7 +42,7 @@ export class PreviewDodModal extends React.Component<PreviewDodProps, PreviewDod
           </StructuredListRow>
         </StructuredListHead>
         <StructuredListBody>
-          {this.props.dod.history.map((history, index) => {
+          {this.props.dod.history.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((history, index) => {
             return (
               <StructuredListRow key={index}>
                 <StructuredListCell noWrap>{formatDateHistory(new Date(history.date))}</StructuredListCell>

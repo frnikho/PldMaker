@@ -43,8 +43,8 @@ export class HistoryHelper {
 
   private static getDodHelperMessage = (action: DodHistoryAction): string => {
     const actions = {
-      [DodHistoryAction.DodUpdated]: '%user.lastname% %user.firstname% a mis à jour la DoD %dod.version% - %dod.name%',
-      [DodHistoryAction.DodStatusUpdated]: '%user.lastname% %user.firstname% a changé le statut de la DoD %dod.version% - %dod.name%'
+      [DodHistoryAction.DodUpdated]: '%user.lastname% %user.firstname% a mis à jour la DoD',
+      [DodHistoryAction.DodStatusUpdated]: '%user.lastname% %user.firstname% a changé le statut de la DoD'
     }
     return actions[action] ?? 'Aucune donnée valable pour cet historique';
   }
