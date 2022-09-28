@@ -11,22 +11,21 @@ import {
   Column,
   Grid,
   MultiSelect,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
   TextInput,
   Tile
 } from "carbon-components-react";
 import { FieldData } from "../../util/FieldData";
 import { OrganizationApiController } from "../../controller/OrganizationApiController";
-import { defaultTemplateDod, defaultTemplateHeader, defaultTemplateResume, defaultTemplateRevision, DodStatus, ObjectID, Organization, Template } from "@pld/shared";
+import { defaultTemplateDod, defaultTemplateHeader, defaultTemplateHeaderSections, defaultTemplateResume, defaultTemplateRevision, DodStatus, ObjectID, Organization, Template } from "@pld/shared";
 import { NavProps } from "../../util/Navigation";
 
 import {Add, View} from '@carbon/icons-react';
 import { toast } from "react-toastify";
+
+type HeaderInput = {
+  generate: boolean;
+  sections: Map<string, string>;
+}
 
 type DodInput = {
   generate: boolean;
@@ -53,7 +52,9 @@ export type NewTemplateState = {
   defaultInput: FieldData<boolean>;
   previewUrl?: string
   result?: Partial<Template>;
+
   dodForms: DodInput;
+  headerForms: HeaderInput;
 }
 
 class NewTemplateComponent extends React.Component<NewTemplateProps, NewTemplateState> {
@@ -65,6 +66,10 @@ class NewTemplateComponent extends React.Component<NewTemplateProps, NewTemplate
         generate: true,
         allStatus: true,
         status: [],
+      },
+      headerForms: {
+        generate: true,
+        sections: defaultTemplateHeaderSections,
       },
       dodStatus: [],
       result: {
@@ -132,7 +137,7 @@ class NewTemplateComponent extends React.Component<NewTemplateProps, NewTemplate
 */
   }
 
-  private showDescriptionFields() {
+  /*private showDescriptionFields() {
     return (
       <Table size="sm" useZebraStyles={false}>
         <TableHead>
@@ -146,7 +151,7 @@ class NewTemplateComponent extends React.Component<NewTemplateProps, NewTemplate
         </TableBody>
       </Table>
     );
-  }
+  }*/
 
   private loadDodStatus() {
     OrganizationApiController.getOrgDodStatus(this.props.userContext.accessToken, this.props.orgId, (dodStatus, error) => {
@@ -176,7 +181,7 @@ class NewTemplateComponent extends React.Component<NewTemplateProps, NewTemplate
     )
   }
 
-  private updateDodField(field: keyof DodInput, value: any) {
+  private updateDodField(field: keyof DodInput, value: unknown) {
     this.setState({dodForms: {
       ...this.state.dodForms,
       [field]: value,

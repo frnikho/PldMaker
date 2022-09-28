@@ -76,7 +76,7 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
       const hours: number = value.dod.map((dod) => {
         const abc = dod.estimatedWorkTime.map((wt) => {
           if (wt.users.some((a) => value.user._id === a._id))
-            return parseFloat(wt.value as unknown as string);
+            return parseFloat(wt.value / wt.users.length as unknown as string);
           return 0;
         })
         console.log(abc);
@@ -152,11 +152,11 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
                   display: 'inline-block',
                 }} />
                 {dod.version} {dod.title} </TableCell>
-              <TableCell>{dod.estimatedWorkTime.map((a) => a.users.map(() => parseFloat(String(a.value)))).flat().reduce((a, b) => a + b, 0).toFixed(1)}</TableCell>
+              <TableCell>{dod.estimatedWorkTime.map((a) => a.users.map(() => parseFloat(String(a.value / a.users.length)))).flat().reduce((a, b) => a + b, 0).toFixed(1)}</TableCell>
               {this.getUsers(this.props.org).map((user) => {
                 const hours = dod.estimatedWorkTime.map((wt) => {
                   if (wt.users.some((a) => user._id === a._id))
-                    return parseFloat(wt.value as unknown as string);
+                    return parseFloat(wt.value / wt.users.length as unknown as string);
                   return 0;
                 }).flat().reduce((a, b) => a + b, 0);
                 return (
@@ -252,7 +252,7 @@ export class ResumePldModal extends React.Component<ResumePldModalProps, ResumeP
                     Total
                   </p>
                   <p>
-                    {this.props.dod.map((dod) => dod.estimatedWorkTime.map((wt) => wt.users.map(() => parseFloat(String(wt.value)))).flat()).flat().reduce((a, b) => a + b, 0)} J/H
+                    {this.props.dod.map((dod) => dod.estimatedWorkTime.map((wt) => wt.users.map(() => parseFloat(String(wt.value / wt.users.length)))).flat()).flat().reduce((a, b) => a + b, 0)} J/H
                   </p>
                 </TableHeader>
                 {this.getTableHeader()}

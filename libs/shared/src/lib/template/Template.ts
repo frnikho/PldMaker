@@ -5,7 +5,6 @@ import { IsOptional, Length } from "class-validator";
 import { IsObjectID } from "../validator/ObjectIdValidator";
 import { ObjectID } from "../Object";
 
-export type TemplateHeaderSection = 'Titre' | 'Object' | 'Auteur' | 'Responsable' | 'E-mail' | 'Mots-clés' | 'promotion' | 'Date de la mise à jour' | 'Version du modèle'
 
 export class TemplateHeader {
   generate: boolean;
@@ -75,11 +74,22 @@ export class Template {
     this.updatedDate = updatedDate;
   }
 }
-
-export const defaultTemplateHeader: TemplateHeader = new TemplateHeader(true, new Map<string, string>);
+export const defaultTemplateHeaderSections: Map<string, string> = new Map([
+  ['Titre', '%pld_title%'],
+  ['Object', 'PLD %pld_status%'],
+  ['Auteur', '%pld_manager%'],
+  ['Responsable', '%responsable_firstname% %responsable_lastname%'],
+  ['E-mail', '%responsable_email%'],
+  ['Mots-clés', '%pld_keyword%'],
+  ['Promotion', '%pld_promotion%'],
+  ['Date de la mise à jour', '%pld_updated_date%'],
+  ['Version du modèle', '%pld_version%'],
+]);
+export const defaultTemplateHeader: TemplateHeader = new TemplateHeader(true, defaultTemplateHeaderSections);
 export const defaultTemplateDod: TemplateDod = new TemplateDod(true, true, []);
 export const defaultTemplateResume: TemplateResume = new TemplateResume(true, true, []);
 export const defaultTemplateRevision: TemplateRevision = new TemplateRevision();
+
 
 export class UpdateTemplateBody {
 
