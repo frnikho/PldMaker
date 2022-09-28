@@ -65,7 +65,7 @@ export function App() {
           </Route>
           <Route path={":id/template"}>
             <Route index element={<Navigate to={"new"}/>}/>
-            <Route path={"new"} element={<NewTemplatePage mode={ViewMode.New}/>}/>
+            <Route path={"new"} element={<NewTemplatePage navigate={navigate} mode={ViewMode.New}/>}/>
             <Route path={":templateId"} element={<Navigate to={"preview"}/>}/>
             <Route path={":templateId/edit"} element={<NewTemplatePage mode={ViewMode.Edit}/>}/>
             <Route path={":templateId/preview"} element={<NewTemplatePage mode={ViewMode.Preview}/>}/>

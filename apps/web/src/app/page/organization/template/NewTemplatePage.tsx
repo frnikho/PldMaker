@@ -1,9 +1,9 @@
 import React from "react";
-import {LoginState, UserContext, UserContextProps} from "../../../context/UserContext";
-import {SkeletonPlaceholder} from "carbon-components-react";
-import {NewTemplateComponent, ViewMode} from "../../../component/template/NewTemplateComponent";
-import {NavigationState, redirectNavigation, withParams} from "../../../util/Navigation";
-import {RouteMatch} from "react-router/lib/router";
+import { UserContextProps } from "../../../context/UserContext";
+import NewTemplateComponent, { ViewMode } from "../../../component/template/NewTemplateComponent";
+import { NavigationState, withParams } from "../../../util/Navigation";
+import { RouteMatch } from "react-router/lib/router";
+import { Page } from "../../../util/Page";
 
 type TemplateUrlParams = {
   id: string;
@@ -16,7 +16,7 @@ export type NewTemplateProps = {
 
 export type NewTemplateState = unknown & NavigationState;
 
-class NewTemplatePage extends React.Component<NewTemplateProps, NewTemplateState> {
+class NewTemplatePage extends Page<NewTemplateProps, NewTemplateState> {
 
   constructor(props) {
     super(props);
@@ -25,26 +25,11 @@ class NewTemplatePage extends React.Component<NewTemplateProps, NewTemplateState
     }
   }
 
-  private showState(auth: UserContextProps) {
-    const params = this.props.params as TemplateUrlParams;
-    if (auth.isLogged === LoginState.not_logged) {
-      return (<h1>Not logged</h1>)
-    } else if (auth.isLogged === LoginState.logged) {
-      return <NewTemplateComponent userContext={auth} mode={ViewMode.New} orgId={params.id} templateId={params.templateId}/>
-    }
-    return (<SkeletonPlaceholder/>)
+  renderPage(context: UserContextProps): React.ReactNode {
+    console.log(this.props.navigate);
+    return <NewTemplateComponent orgId={this.props.params['id'] ?? ''} navigate={this.props.navigate} mode={ViewMode.New} userContext={context}/>
   }
 
-  override render() {
-    return (
-      <>
-        {redirectNavigation(this.state.navigateUrl)}
-        <UserContext.Consumer>
-          {(auth) => this.showState(auth)}
-        </UserContext.Consumer>
-      </>
-    );
-  }
 }
 
 export default withParams(NewTemplatePage);

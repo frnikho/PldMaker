@@ -2,13 +2,37 @@ import React from "react";
 import { RequiredUserContextProps } from "../../context/UserContext";
 
 import { Stack } from "@carbon/react";
-import { Button, ButtonSet, Checkbox, Column, Grid, TextInput, Tile } from "carbon-components-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  Button,
+  ButtonSet,
+  Checkbox,
+  Column,
+  Grid,
+  MultiSelect,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TextInput,
+  Tile
+} from "carbon-components-react";
 import { FieldData } from "../../util/FieldData";
 import { OrganizationApiController } from "../../controller/OrganizationApiController";
-import { Organization } from "@pld/shared";
-import { DodDocx } from "../../docx/DodDocx";
-import { Document, Packer } from "docx";
-import { Timezone } from "@pld/utils";
+import { defaultTemplateDod, defaultTemplateHeader, defaultTemplateResume, defaultTemplateRevision, DodStatus, ObjectID, Organization, Template } from "@pld/shared";
+import { NavProps } from "../../util/Navigation";
+
+import {Add, View} from '@carbon/icons-react';
+import { toast } from "react-toastify";
+
+type DodInput = {
+  generate: boolean;
+  allStatus: boolean;
+  status: ObjectID[];
+}
 
 export enum ViewMode {
   New = 'new',
@@ -18,22 +42,42 @@ export enum ViewMode {
 
 export type NewTemplateProps = {
   mode: ViewMode;
-  templateId?: string;
+  template?: Template;
   orgId: string;
-} & RequiredUserContextProps;
+} & RequiredUserContextProps & NavProps;
 
 export type NewTemplateState = {
   org?: Organization;
+  dodStatus: DodStatus[];
   nameInput: FieldData<string>;
   defaultInput: FieldData<boolean>;
   previewUrl?: string
+  result?: Partial<Template>;
+  dodForms: DodInput;
 }
 
-export class NewTemplateComponent extends React.Component<NewTemplateProps, NewTemplateState> {
+class NewTemplateComponent extends React.Component<NewTemplateProps, NewTemplateState> {
 
   constructor(props) {
     super(props);
     this.state = {
+      dodForms: {
+        generate: true,
+        allStatus: true,
+        status: [],
+      },
+      dodStatus: [],
+      result: {
+        org: undefined,
+        owner: undefined,
+        createdDate: new Date(),
+        title: '',
+        useAsDefault: false,
+        dodTemplate: defaultTemplateDod,
+        headerTemplate: defaultTemplateHeader,
+        resumeTemplate: defaultTemplateResume,
+        revisionTemplate: defaultTemplateRevision,
+      },
       org: undefined,
       defaultInput: {
         value: false,
@@ -48,11 +92,13 @@ export class NewTemplateComponent extends React.Component<NewTemplateProps, NewT
 
   override componentDidMount() {
     this.loadOrg();
+    this.loadDodStatus();
   }
 
   private onClickPreview() {
     if (this.state.org === undefined)
       return;
+    this.transformResult();
     /*const dodDocx = new DodDocx({
       _id: 'abc',
       created_date: new Date(),
@@ -86,60 +132,134 @@ export class NewTemplateComponent extends React.Component<NewTemplateProps, NewT
 */
   }
 
+  private showDescriptionFields() {
+    return (
+      <Table size="sm" useZebraStyles={false}>
+        <TableHead>
+          <TableRow>
+            <TableHeader id={''} key={''}>Champ</TableHeader>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <TableRow key={''}>
+          </TableRow>
+        </TableBody>
+      </Table>
+    );
+  }
+
+  private loadDodStatus() {
+    OrganizationApiController.getOrgDodStatus(this.props.userContext.accessToken, this.props.orgId, (dodStatus, error) => {
+      if (error) {
+        toast('Une erreur est survenue !', {type: 'error'});
+      } else if (dodStatus !== null) {
+        this.setState({dodStatus: dodStatus});
+      }
+    });
+  }
+
   private loadOrg() {
     OrganizationApiController.findOrganizationById(this.props.userContext.accessToken, this.props.orgId, (org, error) => {
       if (error) {
-        console.log(error); //TODO manage error
-      }
-      if (org !== null) {
-        this.setState({
-          org,
-        });
+        toast('Une erreur est survenue !', {type: 'error'});
+      } else if (org !== null) {
+        this.setState({org});
       }
     });
   }
 
   private preview() {
-    if (this.state.org === undefined || this.state.previewUrl === undefined)
-      return;
+    return (
+      <>
 
-/*    const docs = [
-      { uri: this.state.previewUrl },
-    ];*/
+      </>
+    )
+  }
 
-    return null;
+  private updateDodField(field: keyof DodInput, value: any) {
+    this.setState({dodForms: {
+      ...this.state.dodForms,
+      [field]: value,
+      }
+    });
+  }
+
+  private showDodStatusSelect() {
+    const items = this.state.dodStatus.map((dod) => ({label: dod.name, value: dod._id}));
+    return (
+      <MultiSelect disabled={this.state.dodForms.allStatus} id={'dod.status'} label={this.state.dodForms.status.length === 0 ? "Status des Dods a prendre en compte" : items.filter((i) => this.state.dodForms.status.find((a) => a === i.value)).map((a) => a.label).join(', ')} selectedItems={items.filter((i) => this.state.dodForms.status.find((a) => a === i.value))} items={items} onChange={({selectedItems}) => {
+        this.updateDodField('status', selectedItems.map((a) => a.value));
+      }}/>
+    )
   }
 
   private content() {
     if (this.state.org === undefined)
       return;
-    return null;
+    return (
+      <Stack gap={3}>
+        <h4>Description du document</h4>
+        <Stack>
+          <Checkbox id={'description-generate'} labelText={"Générer ?"}/>
+        </Stack>
+        <h4>Tableau des révisions</h4>
+        <Stack>
+          <Checkbox id={'revision-generate'} labelText={"Générer ?"}/>
+        </Stack>
+        <h4>DoDs</h4>
+        <Stack>
+          <Checkbox id={'dod-generate'} labelText={"Générer ?"} checked={this.state.dodForms.generate} onChange={((a, {checked}) => this.updateDodField('generate', checked))}/>
+          <Checkbox id={'dod.all_status'} labelText={"Générer toutes les DoDs ?"} checked={this.state.dodForms.allStatus} onChange={((a, {checked}) => this.updateDodField('allStatus', checked))}/>
+          {this.showDodStatusSelect()}
+        </Stack>
+        <h4>Rapport d'avancement</h4>
+        <Stack>
+          <Checkbox id={'resume-generate'} labelText={"Généré ?"}/>
+        </Stack>
+      </Stack>
+    );
+  }
+
+  private transformResult() {
+    console.log(this.state.dodForms);
   }
 
   override render() {
     return (
-      <Stack gap={6}>
-        <TextInput id={"template-name"} labelText={"Nom du template"}/>
-        <Checkbox id={"template-default"} labelText={"Template par défaut ?"}/>
-        <Grid>
-          <Column lg={8}>
-            <Tile>
-              <h3>Content</h3>
-              {this.content()}
-            </Tile>
-          </Column>
-          <Column lg={8}>
-            <Tile>
-              <h3>Preview</h3>
-              {this.preview()}
-            </Tile>
-          </Column>
-        </Grid>
-        <ButtonSet>
-          <Button>Créer</Button>
-          <Button onClick={this.onClickPreview}>Preview</Button>
-        </ButtonSet>
-      </Stack>
+      <div onKeyDown={(event) => {
+        if (event.ctrlKey && event.key === 'Enter')
+          this.transformResult();
+      }}>
+        <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
+          <BreadcrumbItem onClick={() => this.props.navigate(`/`)}>Dashboard</BreadcrumbItem>
+          <BreadcrumbItem onClick={() => this.props.navigate(`/organization/${this.state.org?._id}`)}>Organisation</BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>Template</BreadcrumbItem>
+        </Breadcrumb>
+        <Stack gap={6}>
+          <h1 style={{fontWeight: 'bold'}}>Créer un nouveau template</h1>
+          <TextInput helperText={"le titre doit contenir au minimum 3 caractères et maximum 128 caractères"} id={"template-name"} labelText={"Nom"}/>
+          <Checkbox id={"template-default"} labelText={"Template par défaut ?"}/>
+          <Grid>
+            <Column lg={8}>
+              <Tile>
+                {this.content()}
+              </Tile>
+            </Column>
+            <Column lg={8}>
+              <Tile>
+                <h3>Preview</h3>
+                {this.preview()}
+              </Tile>
+            </Column>
+          </Grid>
+          <ButtonSet>
+            <Button renderIcon={View} onClick={this.onClickPreview}>Preview</Button>
+            <Button renderIcon={Add}>Créer</Button>
+          </ButtonSet>
+        </Stack>
+      </div>
     );
   }
 }
+
+export default NewTemplateComponent;

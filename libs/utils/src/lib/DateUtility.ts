@@ -1,4 +1,7 @@
 
+export const weeksDay = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+export const months = ['janvier', 'fevrier', 'mars', 'avril', 'may', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
+
 /**
  * Format long date format like '?'
  * @param date

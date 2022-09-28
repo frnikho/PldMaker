@@ -1,39 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import {InjectModel} from "@nestjs/mongoose";
-import {Template} from "./template.schema";
-import {Model} from "mongoose";
-import {TemplateBody} from "@pld/shared";
+import { Template, UpdateTemplateBody } from "@pld/shared";
+import { TemplateHelper } from "./template.helper";
+import { NewTemplateBody, Organization, User } from "@pld/shared";
 
 @Injectable()
 export class TemplateService {
 
-  constructor(@InjectModel(Template.name) private templateModel: Model<Template>) {}
+  constructor(private templateHelper: TemplateHelper) {}
 
-  public find(templateId: string) {
-    return this.templateModel.findOne({_id: templateId})
-      .populate(['org', 'owner'])
-      .exec();
+  public getOrgTemplate(user: User, org: Organization) {
+    return this.templateHelper.getOrgTemplate(user, org);
   }
 
-  public async create(template: Template) {
-    return this.templateModel.create(template);
+  public getTemplate(user: User, org: Organization, template: Template) {
+    return template;
   }
 
-  public async createBody(body: TemplateBody) {
-    return this.templateModel.findOneAndUpdate({_id: body.orgId})
-      .populate(['org', 'owner'])
-      .exec();
+  public async create(user: User, org: Organization, body: NewTemplateBody) {
+    return this.templateHelper.create(user, org, body);
   }
 
-  public update(template: TemplateBody) {
-    return this.templateModel.findOneAndUpdate({_id: template.pldId}, {data: template.data})
-      .populate(['org', 'owner'])
-      .exec();
+  public update(user: User, org: Organization, template: Template, body: UpdateTemplateBody) {
+    return this.templateHelper.update(user, org, template, body);
   }
 
-  public delete(templateId: string) {
-    return this.templateModel.findOneAndDelete({_id: templateId})
-      .exec();
+  public delete(user: User, org: Organization, template: Template) {
+    return this.templateHelper.delete(user, org, template);
   }
 
 }

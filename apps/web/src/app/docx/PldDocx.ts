@@ -1,7 +1,7 @@
 import {Pld, PldRevision, Organization} from "@pld/shared";
 import {Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
-import {formatDateNumeric} from "@pld/utils";
+import { formatDateNumeric, formatShortDate } from "@pld/utils";
 
 const HeaderRevisionCell = (title: string, size: string) => {
   return new TableCell({
@@ -18,7 +18,7 @@ const HeaderRevisionCell = (title: string, size: string) => {
       children: [new TextRun({
         text: title,
         font: 'Roboto',
-        size: '13pt',
+        size: '12pt',
       })]
     })]
   })
@@ -33,7 +33,7 @@ const RevisionCell = (value: string): TableCell => {
           new TextRun({
             font: 'Roboto',
             text: value,
-            size: '13pt'
+            size: '12pt'
           })
         ]
       })
@@ -44,7 +44,7 @@ const RevisionCell = (value: string): TableCell => {
 const RevisionRow = (revision: PldRevision, author: string): TableRow => {
   return new TableRow({
     children: [
-      RevisionCell(formatDateNumeric(new Date(revision.created_date))),
+      RevisionCell(formatShortDate(new Date(revision.created_date))),
       RevisionCell(revision.version.toString()),
       RevisionCell(author),
       RevisionCell(revision.sections.join(', ')),
@@ -141,14 +141,14 @@ export class PldDocx {
       },
       rows: [
         DescCell('Titre', this.pld.title),
-        DescCell('Object', this.pld.description),
+        DescCell('Object', `PLD ${this.pld.status}`),
         DescCell('Auteur', this.org.name),
         DescCell('Responsable', responsable),
-        DescCell('Email', this.pld.manager.email),
+        DescCell('E-mail', this.pld.manager.email),
         DescCell('Mots-clés', this.pld.tags.join(', ')),
         DescCell('Promotion', this.pld.promotion.toString()),
-        DescCell('Date de la mise a jour', formatDateNumeric(new Date(this.pld.updated_date ?? new Date()))),
-        DescCell('Version du modéle', this.pld.version.toString()),
+        DescCell('Date de la mise à jour', formatDateNumeric(new Date(this.pld.updated_date ?? new Date()))),
+        DescCell('Version du modèle', this.pld.version.toFixed(1)),
       ]
     });
   }

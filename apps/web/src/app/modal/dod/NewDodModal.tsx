@@ -105,8 +105,9 @@ export class NewDodModal extends ReactFormValidation<NewDodModalProps, NewDodMod
   }
 
   private onModalOpen() {
-    if (this.props.lastDod.length > 0) {
-      this.props.lastDod.sort((dodA, dodB) => dodB.created_date.getDate() - dodA.created_date.getDate());
+    if (this.props.lastDod.length > 1) {
+      console.log(this.props.lastDod[1]);
+      this.props.lastDod.sort((dodA, dodB) => new Date(dodB.created_date).getTime() - new Date(dodA.created_date).getTime());
     }
     this.state.estimatedWorkOfTime.value.push({
       format: EstimatedWorkTimeFormat.JOUR_HOMME,

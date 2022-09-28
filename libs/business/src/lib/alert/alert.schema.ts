@@ -1,39 +1,39 @@
 import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { AlertAction, AlertPosition, User } from "@pld/shared";
-import mongoose from "mongoose";
+import { AlertAction, AlertTarget, User } from "@pld/shared";
 import { Deadline } from "@pld/utils";
+import { alertRules } from "./alert.rule";
 
 @Schema({versionKey: false})
 export class Alert {
 
-  @Prop({required: true, maxlength: 128})
+  @Prop(alertRules.title)
   title: string;
 
-  @Prop({required: true, maxlength: 2048})
+  @Prop(alertRules.content)
   content: string;
 
-  @Prop({unique: true})
+  @Prop(alertRules.key)
   key: string;
 
-  @Prop({required: true})
+  @Prop(alertRules.enable)
   enable: boolean;
 
-  @Prop({required: true, ref: 'User', type: mongoose.Schema.Types.ObjectId})
+  @Prop(alertRules.owner)
   owner: User;
 
-  @Prop({required: true, enum: AlertPosition})
+  @Prop(alertRules.position)
   position: string;
 
-  @Prop({required: false, default: []})
+  @Prop(alertRules.action)
   action: AlertAction[];
 
-  @Prop({required: false, default: undefined})
+  @Prop(alertRules.deadline)
   deadline?: Deadline;
 
-  @Prop({required: false, default: new Date()})
+  @Prop(alertRules.createdDate)
   createdDate: Date;
 
-  @Prop({required: false, default: new Date()})
+  @Prop(alertRules.updatedDate)
   updatedDate: Date;
 }
 

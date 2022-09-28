@@ -1,8 +1,9 @@
 export enum AlertPosition {
   'ALL' = 'All',
-  'HOME'= 'Home',
-  'USER' = 'User',
+  'HOME'= 'HomePage',
+  'USER' = 'UserPage',
   'ORGANIZATION' = 'OrganizationPage',
+  'PLD' = 'PldPage',
 }
 
 export enum AlertActionType {
@@ -18,7 +19,7 @@ export enum AlertActionTrigger {
 
 export enum AlertTargetType {
   ALL_USERS = 'AllUsers',
-  ONLY_USERS = '',
+  ONLY_USERS = 'OnlyUsers',
   USER_NOT_IN_ORG = 'UserNotInOrg',
   MFA_NOT_ENABLED = 'MfaNotEnabled',
 
@@ -28,7 +29,7 @@ export class AlertTarget {
   sendNotification: boolean;
   type: AlertTargetType;
   data: string | string[];
-  
+
   constructor(sendNotification: boolean, type: AlertTargetType, data: string | string[]) {
     this.sendNotification = sendNotification;
     this.type = type;

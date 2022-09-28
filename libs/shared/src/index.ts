@@ -37,10 +37,9 @@ export * from './lib/organization/calendar/Calendar'
 export * from './lib/organization/calendar/CalendarMember'
 export * from './lib/organization/calendar/CalendarEvent'
 
-export * from './lib/template/TemplateBody';
-export * from './lib/template/TemplateType';
+export * from './lib/template/Template';
 
-export * from './lib/DatedObject';
+export * from './lib/Object';
 export * from './lib/Template';
 export * from './lib/Mobile'
 

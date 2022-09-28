@@ -25,7 +25,7 @@ import {OrgHistoryModal} from "../../modal/org/OrgHistoryModal";
 
 import {RequiredLabel} from "../../util/Label";
 
-import { Organization, Pld, Calendar, UpdateOrganizationBody, FavourType } from "@pld/shared";
+import { Organization, Pld, Calendar, UpdateOrganizationBody, FavourType, Template } from "@pld/shared";
 import { capitalize, formatLongDate } from "@pld/utils";
 import {CalendarApiController} from "../../controller/CalendarApiController";
 import {toast} from "react-toastify";
@@ -44,6 +44,7 @@ export type OrganizationComponentState = {
   org?: Organization;
   pld: FieldData<Pld[]>;
   calendars: FieldData<Calendar[]>;
+  templates: Template[];
   openHistoryDialog: boolean;
   description: string;
   versionShifting: number;
@@ -61,6 +62,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
       description: '',
       versionShifting: 0.1,
       org: undefined,
+      templates: [],
       loading: false,
       navigateUrl: undefined,
       calendars: {
@@ -288,6 +290,28 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     })
   }
 
+  private showTemplates() {
+    return (
+      <Grid>
+        {this.state.templates.map((template, index) => {
+          return (
+            <Column key={index} sm={4} md={8} lg={5}>
+              <ClickableTile onClick={() => {this.setState({navigateUrl: `template/${template._id}`})}} style={{borderRadius: 10}}>
+                <p style={{fontWeight: 600, fontSize: 26}}>{template.title}</p>
+                <br/>
+                <div style={{width: '100%', textAlign: 'center', marginTop: 20, marginBottom: 20}}>
+                  <img style={{maxWidth: '100%', height: 160}} src={SERVER_URL_ASSETS}/>
+                </div>
+                <p>Dernière mise a jour le</p>
+                <p style={{fontWeight: 'bold'}}>{formatLongDate(new Date(template.updatedDate))}</p>
+              </ClickableTile>
+            </Column>
+          )
+        })}
+      </Grid>
+    )
+  }
+
   private showDocuments() {
     return (
       <>
@@ -345,7 +369,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
         {this.showModals()}
         <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
           <BreadcrumbItem onClick={() => this.props.navigate(`/`)}>Dashboard</BreadcrumbItem>
-          <BreadcrumbItem isCurrentPage>Organisation</BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>Organization</BreadcrumbItem>
         </Breadcrumb>
         {this.showCharts()}
         <Stack gap={4}>
@@ -362,8 +386,9 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
               {this.showDocuments()}*/}
               <h2 style={{marginTop: 20, marginBottom: 10}}>Calendriers <Button kind={"ghost"} onClick={this.onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create calendar"}/></h2>
               {this.showCalendars()}
-              {/* <h2>Templates <Button kind={"ghost"} onClick={this.onClickCreateTemplate} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
-              <h2>Documents <Button kind={"ghost"} onClick={this.onClickCreateDocument} hasIconOnly renderIcon={Add} iconDescription={"Créer/Ajouter un document"}/></h2>*/}
+              <h2>Templates <Button kind={"ghost"} onClick={this.onClickCreateTemplate} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
+              {this.showTemplates()}
+              {/*<h2>Documents <Button kind={"ghost"} onClick={this.onClickCreateDocument} hasIconOnly renderIcon={Add} iconDescription={"Créer/Ajouter un document"}/></h2>*/}
               {/*<Editor onSave={(content) => console.log('saved !', content)}/>*/}
             </Column>
             <Column lg={4} xlg={4} md={8} sm={4}>

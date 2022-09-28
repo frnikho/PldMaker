@@ -68,21 +68,26 @@ const DodComp = (...dod: string[]) => {
 const EstimatedCharge = (charges: UserWorkTime[]) => {
 
   return new Paragraph({
-    children: charges.map((charges) => {
+    children: charges.map((wt, index) => {
         return [
           new TextRun({
             font: 'Roboto',
             size: '13pt',
-            text: charges.value + ' '
+            text: wt.value + ' '
           }),
           new TextRun({
             font: 'Roboto',
             size: '13pt',
             bold: true,
-            text: charges.format + ' '
+            text: 'J/H '
           }),
           new TextRun({
-            text: charges.users.map((user) => `${user.firstname}`).join(', '),
+            text: wt.users.map((user) => `${user.firstname}`).join(', '),
+            size: '13pt',
+            font: 'Roboto'
+          }),
+          new TextRun({
+            text: charges[index+1] !== undefined ? ', ' : '',
             size: '13pt',
             font: 'Roboto'
           })
@@ -108,7 +113,7 @@ export class DodDocx {
             margins,
             shading: {
               type: ShadingType.SOLID,
-              color: getDodStatusColor([], 'this.dod.status')
+              color: `#${this.dod.status.color}`
             },
             children: [Title(this.dod.version + ' ' + this.dod.title)],
             width: {

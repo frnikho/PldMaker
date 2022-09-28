@@ -1,5 +1,5 @@
 import React from "react";
-import {Organization, Pld, Dod} from "@pld/shared";
+import { Organization, Pld, Dod, DodStatus } from "@pld/shared";
 import {Button} from "carbon-components-react";
 
 import * as docx from 'docx';
@@ -10,7 +10,8 @@ import {DocumentView} from '@carbon/icons-react'
 export type GenerateComponentProps = {
   org: Organization;
   pld: Pld;
-  dod: Dod[]
+  dod: Dod[];
+  dodStatus: DodStatus[];
 }
 
 export type GenerateComponentState = unknown
@@ -54,7 +55,7 @@ export class GenerateComponent extends React.Component<GenerateComponentProps, G
   }
 
   private onClickCreatePreview() {
-    const generator: PldGenerator = new PldGenerator(this.props.pld, this.props.dod, this.props.org);
+    const generator: PldGenerator = new PldGenerator(this.props.pld, this.props.dod, this.props.org, this.props.dodStatus);
     PldGenerator.getBlobFromDoc(generator.generate(), (blob) => {
       window.open(URL.createObjectURL(blob));
     });

@@ -400,7 +400,7 @@ class PldComponent extends React.Component<PldComponentProps, PldComponentState>
     if (this.state.org === undefined || this.state.pld === undefined) {
       return (<ButtonSkeleton/>)
     } else {
-      return (<GenerateComponent org={this.state.org} pld={this.state.pld} dod={this.state.dod}/>)
+      return (<GenerateComponent dodStatus={this.state.dodStatus} org={this.state.org} pld={this.state.pld} dod={this.state.dod}/>)
     }
   }
 

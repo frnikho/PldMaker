@@ -1,6 +1,7 @@
 import {Organization, Pld, User, Dod} from "@pld/shared";
 import {AlignmentType, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
+import { capitalize, months, weeksDay } from "@pld/utils";
 
 const UserAdv = (): TableRow => {
   return new TableRow({
@@ -117,7 +118,7 @@ export class PldResumeDocx {
           children: [new Paragraph({
             children: [new TextRun({
               font: 'Roboto',
-              size: '14pt',
+              size: '13pt',
               text: title,
             })]
           })]
@@ -133,28 +134,28 @@ export class PldResumeDocx {
                 new TextRun({
                   text: 'En cours :',
                   font: 'Roboto',
-                  size: '13pt'
+                  size: '12pt'
                 }),
                 ...dodInProgress.map((dod) => {
                   return new TextRun({
                     break: 1,
                     font: 'Roboto',
-                    size: '13pt',
-                    text: '\t - ' + dod.version + ' ' + dod.title,
+                    size: '12pt',
+                    text: `\t -  [${dod.version}] ${dod.title}`,
                   })
                 }),
                 new TextRun({
                   break: 1,
                   text: 'Fini :',
                   font: 'Roboto',
-                  size: '13pt'
+                  size: '12pt'
                 }),
                 ...dodDones.map((dod) => {
                   return new TextRun({
                     break: 1,
                     font: 'Roboto',
-                    size: '13pt',
-                    text: '\t - ' + dod.version + ' ' + dod.title,
+                    size: '12pt',
+                    text: `\t -  [${dod.version}] ${dod.title}`,
                   })
                 })
               ]
@@ -165,6 +166,11 @@ export class PldResumeDocx {
     })
   }
 
+  private getResumeTitleDate() {
+    const date = new Date();
+    return `${weeksDay[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()} 17h`
+  }
+
   public generateResumeTable(): Table {
     return new Table({
       width: {
@@ -172,7 +178,7 @@ export class PldResumeDocx {
         size: '100%'
       },
       rows: [
-        MainTitle('Kick-Off', '6 Avril 17h'),
+        MainTitle(capitalize(this.pld.currentStep), this.getResumeTitleDate()),
         UserAdv(),
         ...([...this.org.members, this.org.owner]).map((member) => this.generateMemberAdv(member))
       ]

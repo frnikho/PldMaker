@@ -1,4 +1,4 @@
-import {Pld, Dod, Organization, User} from "@pld/shared";
+import { Pld, Dod, Organization, User, DodStatus } from "@pld/shared";
 import {AlignmentType, Document, Footer, Header, Packer, PageNumber, Paragraph, TextRun, WidthType} from "docx";
 import {DodDocx} from "./DodDocx";
 import {PldDocx} from "./PldDocx";
@@ -32,12 +32,14 @@ export class PldGenerator {
   private readonly dod: Dod[] = [];
   private readonly pld: Pld;
   private readonly org: Organization;
+  private readonly dodStatus: DodStatus[];
 
-  constructor(pld: Pld, dod: Dod[], org: Organization) {
+  constructor(pld: Pld, dod: Dod[], org: Organization, dodStatus: DodStatus[]) {
     this.org = org;
     this.pld = pld;
     this.rawDod = dod;
     this.dod = dod;
+    this.dodStatus = dodStatus;
   }
 
   /*footers: {
@@ -96,13 +98,13 @@ export class PldGenerator {
           first: new Footer({children: [new TextRun({text: ''})]}),
         },
         children: [
-          Title('Tableau des révisions'),
-          Space(),
-          generator.generateRevisionTable(),
-          Space(),
           Title('Description du document'),
           Space(),
           generator.generateDescriptionTable(),
+          Space(),
+          Title('Tableau des révisions'),
+          Space(),
+          generator.generateRevisionTable(),
           Space(),
           Title('Tableau des révisions'),
           Space(),

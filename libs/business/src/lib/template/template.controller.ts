@@ -1,25 +1,37 @@
-import {Body, Controller, Get, Param, Post} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Request } from "@nestjs/common";
 import {TemplateService} from "./template.service";
-import {TemplateBody} from "@pld/shared";
-import {Template} from "./template.schema";
+import { OrganizationPipe } from "../organization/organization.pipe";
+import { NewTemplateBody, Organization, Template, UpdateTemplateBody } from "@pld/shared";
+import { TemplatePipe } from "./template.pipe";
 
-@Controller('template')
+@Controller('organization/:orgId/template')
 export class TemplateController {
 
   constructor(private service: TemplateService) {}
 
-  @Get('find/id/:id')
-  public async find(@Param('id') templateId: string) {
-    return this.service.find(templateId);
+  @Get()
+  public getOrgTemplate(@Request() req, @Param('orgId', OrganizationPipe) org: Organization) {
+    return this.service.getOrgTemplate(req.user, org);
   }
 
-  @Post('update')
-  public async update(@Body() body: Template) {
-    return this.service.create(body);
+  @Get(':templateId')
+  public getTemplate(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param(':templateId', TemplatePipe) template: Template) {
+    return this.service.getTemplate(req.user, org, template);
   }
 
-  @Post('create')
-  public async create(@Body() body: TemplateBody) {
-    return this.service.createBody(body);
+  @Post()
+  public async create(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Body() body: NewTemplateBody) {
+    return this.service.create(req.user, org, body);
   }
+
+  @Patch()
+  public async update(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param(':templateId', TemplatePipe) template: Template, @Body() body: UpdateTemplateBody) {
+    return this.service.update(req.user, org, template, body);
+  }
+
+  @Delete(':templateId')
+  public delete(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param(':templateId', TemplatePipe) template: Template) {
+    return this.service.delete(req.user, org, template);
+  }
+
 }
