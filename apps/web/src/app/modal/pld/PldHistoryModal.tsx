@@ -2,20 +2,14 @@ import React from "react";
 import {CodeSnippet,
   Modal, StructuredListBody, StructuredListCell, StructuredListHead, StructuredListRow,
   StructuredListWrapper,
-  Tab,
-  Tabs,
   Tile,
   Tooltip,
 } from "carbon-components-react";
 import {ModalComponentProps} from "../../util/Modal";
 
-import {TabList, TabPanels, TabPanel} from '@carbon/react';
-import { ResponsiveCalendar } from "@nivo/calendar";
 import {Dod, EditedField, Pld, Organization} from "@pld/shared";
 import {
-  formatDateCharts,
   formatDateHistory,
-  isSameDate
 } from "@pld/utils";
 import {HistoryHelper} from "../../util/HistoryHelper";
 
@@ -51,54 +45,6 @@ export class PldHistoryModal extends React.Component<PldHistoryProps, PldHistory
 
   constructor(props) {
     super(props);
-  }
-
-  private showResume() {
-    const createdDodData = this.props.dod.map((dod) => {
-      return {
-        value: 1,
-        day: formatDateCharts(new Date(dod.created_date))
-      }
-    }).map((dod, index, rest) => {
-      const sameDayDod = rest.filter((otherDod) => {
-        return otherDod.day === dod.day;
-      });
-      return {
-        value: sameDayDod.length,
-        day: dod.day
-      }
-    })
-    return (
-      <>
-        <h4>DoDs crées</h4>
-        <div style={{height: '200px'}}>
-          <ResponsiveCalendar
-            data={createdDodData}
-            from={new Date(this.props.pld.created_date ?? '')}
-            to={new Date()}
-            tooltip={(data) => CustomTooltip(data, this.props.dod.filter((dod) => isSameDate(new Date(dod.created_date), new Date(data.day))))}
-            emptyColor="#eeeeee"
-            colors={[ '#61cdbb', '#97e3d5', '#e8c1a0', '#f47560' ]}
-            margin={{right: 40, left: 40,  top: 10, bottom: 10}}
-            monthBorderColor="#ffffff"
-            dayBorderWidth={2}
-            dayBorderColor="#ffffff"
-            legends={[
-              {
-                anchor: 'bottom-right',
-                direction: 'row',
-                translateY: 36,
-                itemCount: 4,
-                itemWidth: 42,
-                itemHeight: 36,
-                itemsSpacing: 14,
-                itemDirection: 'right-to-left'
-              }
-            ]}
-          />
-        </div>
-      </>
-    )
   }
 
   private showDetails() {
@@ -178,15 +124,7 @@ export class PldHistoryModal extends React.Component<PldHistoryProps, PldHistory
         onRequestSubmit={() => this.props.onSuccess}
         passiveModal
         modalHeading="Derniers changements">
-        <Tabs>
-          <TabList aria-label={"List"}>
-            <Tab>Résumé</Tab>
-            <Tab>Détaillé</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>{this.showResume()}</TabPanel>
-            <TabPanel>{this.showDetails()}</TabPanel>
-          </TabPanels></Tabs>
+        {this.showDetails()}
       </Modal>
     );
   }

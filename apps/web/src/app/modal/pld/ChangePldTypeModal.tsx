@@ -1,50 +1,53 @@
-import React from "react";
-import {Modal, Select, SelectItem} from "carbon-components-react";
+import React, { useContext, useState } from "react";
+import { Button, Modal, Select, SelectItem } from "carbon-components-react";
 import {ModalComponentProps} from "../../util/Modal";
-import {Pld} from "@pld/shared";
-import {FieldData} from "../../util/FieldData";
+import { Organization, Pld } from "@pld/shared";
+import { PldApiController } from "../../controller/PldApiController";
+import { toast } from "react-toastify";
+import { UserContext, UserContextProps } from "../../context/UserContext";
 
-export type ChangePldTypeProps = {
+import { Stack } from '@carbon/react';
+
+type Props = {
   pld: Pld;
+  org: Organization;
 } & ModalComponentProps;
 
-export type ChangePldTypeState = {
-  typeInput: FieldData<string>;
-};
+export const UpdatePldTypeModal = (props: Props) => {
 
-export class ChangePldTypeModal extends React.Component<ChangePldTypeProps, ChangePldTypeState> {
+  const userCtx = useContext<UserContextProps>(UserContext);
+  const [status, setStatus] = useState<string>('');
 
-  constructor(props: ChangePldTypeProps) {
-    super(props);
-    this.state = {
-      typeInput: {
-        value: this.props.pld.currentStep
-      }
+  const onPldTypeUpdated = () => {
+      PldApiController.updatePld(userCtx.accessToken, props.org._id, {
+        pldId: props.pld._id,
+        currentStep: status
+      }, (pld, error) => {
+        if (error) {
+          toast(error.error, {type: 'error'});
+        }
+        if (pld !== null) {
+          toast('PLD mis à jour 👍', {type: 'success'});
+          props.onSuccess();
+        }
+      });
     }
-  }
 
-  override render() {
-    return (
-      <Modal
-        size={"md"}
-        open={this.props.open}
-        primaryButtonText={"Valider"}
-        onSubmit={() => {
-          this.props.onSuccess(this.state.typeInput.value);
-        }}
-        onRequestSubmit={() => this.props.onSuccess(this.state.typeInput.value)}
-        onRequestClose={this.props.onDismiss}
-        modalHeading="Change le status d'advancement">
-
+  return (
+    <Modal
+      size={"sm"}
+      open={props.open}
+      primaryButtonText={"Valider"}
+      onRequestClose={props.onDismiss}
+      passiveModal
+      modalHeading="Change le status d'advancement">
+      <Stack gap={4}>
         <Select
           id="select-chante-type-modal"
-          value={this.state.typeInput.value}
+          value={status}
           labelText=""
-          invalid={this.state.typeInput.error !== undefined}
-          invalidText={this.state.typeInput.error}
-          onChange={(e) => this.setState({typeInput: {value: e.currentTarget.value}})}>
-
-          {this.props.pld.steps.map((step, index) => {
+          onChange={(e) => setStatus(e.currentTarget.value)}>
+          {props.pld.steps.map((step, index) => {
             return (
               <SelectItem
                 key={index}
@@ -53,8 +56,11 @@ export class ChangePldTypeModal extends React.Component<ChangePldTypeProps, Chan
               />
             )
           })}
-          </Select>
-      </Modal>
-    );
-  }
-}
+        </Select>
+        <Button onClick={onPldTypeUpdated}>
+          Valider
+        </Button>
+      </Stack>
+    </Modal>
+  );
+};

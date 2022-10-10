@@ -7,6 +7,7 @@ export type CallbackUser = (user: User | null, error?: ApiError) => void;
 export type CallbackFavour = (favour: Favour | null, error?: ApiError) => void;
 
 export type CallbackMfa = (mfa: Mfa | null, error?: ApiError) => void;
+export type CallbackMfaToken = (mfa: any, error?: ApiError) => void;
 export type CallbackMfas = (mfa: Mfa[], error?: ApiError) => void;
 
 export type CallbackLogin = (mfa: string | null, error?: ApiError) => void;
@@ -96,7 +97,7 @@ export class UserApiController {
     });
   }
 
-  public static verifyOtp(accessToken: string, body: MfaOtpBody, callback: CallbackMfa) {
+  public static verifyOtp(accessToken: string, body: MfaOtpBody, callback: CallbackMfaToken) {
     api.post(`auth/mfa/otp/validate`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: AxiosError<ApiError>) => {

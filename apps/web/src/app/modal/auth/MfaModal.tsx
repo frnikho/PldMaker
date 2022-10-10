@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Column, Grid, Link, Modal, TextInput } from "carbon-components-react";
+import { Button, Column, Grid, Link, Modal } from "carbon-components-react";
 import { RequiredUserContextProps } from "../../context/UserContext";
 import Lottie from 'lottie-react'
 import { Mfa, MfaOtpBody } from "@pld/shared";
@@ -12,11 +12,12 @@ import {Stack} from '@carbon/react';
 
 import {Checkmark} from '@carbon/icons-react';
 import { RequiredLabel } from "../../util/Label";
+import PinInput from "react-pin-input";
 
 export type MfaModalProps = {
   open: boolean;
   onDismiss: () => void;
-  onSuccess: (mfa: Mfa) => void;
+  onSuccess: (newToken: string) => void;
 } & RequiredUserContextProps;
 
 export type MfaModalState = {
@@ -40,7 +41,7 @@ export class MfaModal extends React.Component<MfaModalProps, MfaModalState> {
     this.onClickOtpValidate = this.onClickOtpValidate.bind(this);
   }
 
-  override componentDidUpdate(prevProps: Readonly<MfaModalProps>, prevState: Readonly<MfaModalState>, snapshot?: any) {
+  override componentDidUpdate(prevProps: Readonly<MfaModalProps>, prevState: Readonly<MfaModalState>) {
     if (this.props.open !== prevProps.open && this.props.open) {
       this.init();
     }
@@ -61,10 +62,10 @@ export class MfaModal extends React.Component<MfaModalProps, MfaModalState> {
     });
   }
 
-  private onClickOtpValidate() {
+  private onClickOtpValidate(token?: string) {
     if (this.state.mfa.value === undefined)
       return;
-    UserApiController.verifyOtp(this.props.userContext.accessToken, new MfaOtpBody(this.state.token, this.state.mfa.value.secret), (mfa, error) => {
+    UserApiController.verifyOtp(this.props.userContext.accessToken, new MfaOtpBody(token ?? this.state.token, this.state.mfa.value.secret), (mfa, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
       } else if (mfa !== null) {
@@ -92,8 +93,11 @@ export class MfaModal extends React.Component<MfaModalProps, MfaModalState> {
           <Link onClick={() => this.setState({showManualSecret: !this.state.showManualSecret})}>Afficher le code manuel</Link>
           <p style={{display: !this.state.showManualSecret ? 'none' : undefined}}>{this.state.mfa.value.secret}</p>
         </div>
-        <TextInput id={"otp-input"} labelText={<RequiredLabel message={"Code de l'application"}/>} placeholder={"123456"} value={this.state.token} onChange={(e) => this.setState({token: e.currentTarget.value})} max={6} maxLength={6}/>
-        <Button renderIcon={Checkmark} iconDescription={"Valid"} onClick={this.onClickOtpValidate}>Valider</Button>
+        <div>
+          <RequiredLabel message={"Code de l'application"}/>
+          <PinInput length={6} onComplete={(token) => this.onClickOtpValidate(token)} onChange={(a) => this.setState({token: a})}/>
+        </div>
+        <Button renderIcon={Checkmark} iconDescription={"Valid"} onClick={() => this.onClickOtpValidate()}>Valider</Button>
       </Stack>
     );
   }

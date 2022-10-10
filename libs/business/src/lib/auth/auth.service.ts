@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/
 import { UserService } from "../user/user.service";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
-import { PayloadLogin, RegisterBody, RegisterResponse, User } from "@pld/shared";
+import { defaultPreference, PayloadLogin, RegisterBody, RegisterResponse, User } from "@pld/shared";
 import { Timezone } from "@pld/utils";
 
 @Injectable()
@@ -50,6 +50,7 @@ export class AuthService {
     return {
       accessToken: this.login(createdUser).access_token,
       user: {
+        preference: defaultPreference,
         roles: [],
         domain: [],
         profile_picture: 'default_profile_picture.png',

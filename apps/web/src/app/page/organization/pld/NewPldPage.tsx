@@ -30,7 +30,7 @@ class NewPldPage extends React.Component<NewPldPageProps, NewPldPageState> {
     if (authContext.isLogged === LoginState.not_logged) {
       return (<h1>Not logged</h1>)
     } else if (authContext.isLogged === LoginState.logged) {
-      return (<NewPldComponent onPldCreated={this.onPldCreated} orgId={this.props.params['id']} userContext={authContext}/>)
+      return (<NewPldComponent onPldCreated={this.onPldCreated} orgId={this.props.params['id'] ?? ''}/>)
     }
     return (<CircularProgress style={{margin: 'auto'}}/>)
   }

@@ -8,13 +8,13 @@ export type LanguageContextProps = React.PropsWithChildren<ReactCookieProps>;
 export type LanguageContextState = {
   language: keyof AvailableLangue;
   changeLange: (language: keyof Required<AvailableLangue>) => void;
-  getTranslation: (languageConfig: any) => string;
+  translate: (languageConfig: any) => string;
 }
 
 export const LanguageContext = React.createContext<LanguageContextState>({
   language: DEFAULT_LANGUAGE,
   changeLange: () => null,
-  getTranslation: (languageConfig: any) => getTranslation(languageConfig, DEFAULT_LANGUAGE)
+  translate: (languageConfig: any) => getTranslation(languageConfig, DEFAULT_LANGUAGE)
 });
 
 
@@ -25,7 +25,7 @@ export class LanguageContextProvider extends React.Component<LanguageContextProp
     this.state = {
       language: DEFAULT_LANGUAGE,
       changeLange: this.changeLanguage.bind(this),
-      getTranslation: this.getTranslation.bind(this),
+      translate: this.getTranslation.bind(this),
     }
   }
 
@@ -70,4 +70,3 @@ export const withLanguage = (Component) => {
 }
 
 export default withCookies(LanguageContextProvider);
-

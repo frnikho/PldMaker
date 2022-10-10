@@ -229,11 +229,14 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     return (
       <Tile style={{marginTop: 20, borderRadius: 10}}>
         <Stack>
-          <h4 style={{fontWeight: 600}}>Membres :</h4>
+          <h4 style={{fontWeight: 600, marginBottom: 10}}>Membres :</h4>
           {[...this.state.org.members, this.state.org.owner].map((user, index) => (
-            <div key={index}>
-              <p>{capitalize(user.firstname)} {user.lastname.toUpperCase()}</p>
-              <p style={{fontWeight: 100, fontStyle: 'italic'}}>{user.email}</p>
+            <div key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'start'}}>
+              <img src={SERVER_URL_ASSETS + user.profile_picture} style={{borderRadius: '50%', objectFit: 'cover', width: 50, height: 50}}/>
+              <div style={{marginLeft: 18, display: 'flex', flexDirection: 'column'}}>
+                <p style={{fontWeight: 'bold'}}>{capitalize(user.firstname)} {user.lastname.toUpperCase()}</p>
+                <p style={{fontWeight: 100}}>{user.email}</p>
+              </div>
             </div>
           ))}
         </Stack>
@@ -312,44 +315,6 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
     )
   }
 
-  private showDocuments() {
-    return (
-      <>
-      </>
-    )
-  }
-
-  private showCharts() {
-    return (
-      <div>
-        {/*<ResponsiveCalendar
-          data={data}
-          from={new Date(this.state.org?.created_date ?? new Date())}
-          to={new Date()}
-          emptyColor="#eeeeee"
-          colors={[ '#61cdbb', '#97e3d5', '#e8c1a0', '#f47560' ]}
-          margin={{ right: 40, left: 40 }}
-          yearSpacing={20}
-          monthBorderColor="#ffffff"
-          dayBorderWidth={1}
-          dayBorderColor="#ffffff"
-          legends={[
-            {
-              anchor: 'bottom-right',
-              direction: 'row',
-              translateY: 36,
-              itemCount: 4,
-              itemWidth: 42,
-              itemHeight: 36,
-              itemsSpacing: 14,
-              itemDirection: 'right-to-left'
-            }
-          ]}
-        />*/}
-      </div>
-    )
-  }
-
   private showTitle() {
     if (this.state.org)
       return (
@@ -369,9 +334,8 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
         {this.showModals()}
         <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
           <BreadcrumbItem onClick={() => this.props.navigate(`/`)}>Dashboard</BreadcrumbItem>
-          <BreadcrumbItem isCurrentPage>Organization</BreadcrumbItem>
+          <BreadcrumbItem isCurrentPage>Organisation</BreadcrumbItem>
         </Breadcrumb>
-        {this.showCharts()}
         <Stack gap={4}>
           {redirectNavigation(this.state.navigateUrl)}
           {this.showTitle()}

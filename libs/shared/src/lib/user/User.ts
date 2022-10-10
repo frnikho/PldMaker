@@ -1,5 +1,6 @@
 import {Device} from "./Device";
 import { Timezone } from "@pld/utils";
+import { Preference } from "./Preference";
 
 export class User {
   _id: string;
@@ -14,8 +15,9 @@ export class User {
   timezone: Timezone;
   created_date: Date;
   updated_date: Date;
+  preference: Preference;
 
-  constructor(id: string, email: string, password: string, firstname: string, profile_picture: string, lastname: string, domain: UserDomain[], roles: string[], devices: Device[], timezone: Timezone, created_date: Date, updated_date: Date) {
+  constructor(id: string, email: string, password: string, firstname: string, profile_picture: string, lastname: string, domain: UserDomain[], roles: string[], devices: Device[], timezone: Timezone, created_date: Date, updated_date: Date, preference: Preference) {
     this._id = id;
     this.email = email;
     this.password = password;
@@ -28,6 +30,7 @@ export class User {
     this.created_date = created_date;
     this.updated_date = updated_date;
     this.profile_picture = profile_picture;
+    this.preference = preference;
   }
 }
 

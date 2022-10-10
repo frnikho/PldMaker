@@ -4,7 +4,7 @@ import {CircularProgress} from "../../../component/utils/CircularProgress";
 import {RouteMatch} from "react-router/lib/router";
 import {redirectNavigation, withParams} from "../../../util/Navigation";
 import {PageState} from "../../../util/Page";
-import PldComponent from "../../../component/pld/PldComponent";
+import { PldComponent } from "../../../component/pld/PldComponent";
 
 export type PldPageProps = unknown & RouteMatch;
 export type PldPageState = unknown & PageState;
@@ -23,7 +23,7 @@ class PldPage extends React.Component<PldPageProps, PldPageState> {
     if (authContext.isLogged === LoginState.not_logged) {
       return (<h1>Not logged</h1>)
     } else if (authContext.isLogged === LoginState.logged) {
-      return (<PldComponent userContext={authContext} pldId={this.props.params['pldId'] ?? 'null'} orgId={this.props.params['id'] ?? 'null'}/>)
+      return (<PldComponent pldId={this.props.params['pldId'] ?? 'null'} orgId={this.props.params['id'] ?? 'null'}/>)
     }
     return (<CircularProgress style={{margin: 'auto'}}/>)
   }

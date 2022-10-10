@@ -102,7 +102,7 @@ class OrganizationHomeDashboard extends React.Component<OrganizationHomeDashboar
               <div style={style.cardImageContainer as any}>
                 <img style={style.cardImage} src={SERVER_URL_ASSETS + org.picture} alt={"Organization Picture"}/>
               </div>
-              <p>Dernière mise a jour: <br/><span style={{fontWeight: 600}}>{formatShortDate(new Date(org.updated_date))}</span></p>
+              <p>Dernière mise à jour: <br/><span style={{fontWeight: 600}}>{formatShortDate(new Date(org.updated_date))}</span></p>
             </ClickableTile>
           </Column>
         })}
@@ -150,7 +150,7 @@ class OrganizationHomeDashboard extends React.Component<OrganizationHomeDashboar
     return (
       <Stack>
         <Lottie animationData={require('../../../assets/animations/organization.json')} loop={true} style={{width: '300px'}}/>
-        <h4>Vous n'avez pas rejoin ou créer d'organisation</h4>
+        <h4>Tu n'a pas rejoint ou créer d'organisations</h4>
         <h4><Button kind={"ghost"} onClick={this.onClickCreateOrganization}>Cliquez ici pour en créer une !</Button></h4>
       </Stack>)
   }
@@ -167,7 +167,7 @@ class OrganizationHomeDashboard extends React.Component<OrganizationHomeDashboar
             {this.showRecap()}
           </div>
           <div>
-            <h1 style={style.orgTitle}>Mes organizations <Button kind={"ghost"} onClick={this.onClickCreateOrganization} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h1>
+            <h1 style={style.orgTitle}>Mes organisations <Button kind={"ghost"} onClick={this.onClickCreateOrganization} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h1>
             {this.showLoading()}
             {this.showNoOrganizations()}
             {this.showOrgCards()}

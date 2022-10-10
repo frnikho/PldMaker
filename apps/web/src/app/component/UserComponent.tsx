@@ -1,7 +1,6 @@
 import React from "react";
 import { RequiredUserContextProps } from "../context/UserContext";
-import { Button, Column, FormLabel, Grid, MultiSelect, Select, SelectItem, TextInput, Tile } from "carbon-components-react";
-import { FieldData } from "../util/FieldData";
+import { Button, Checkbox, Column, FormLabel, Grid, MultiSelect, Select, SelectItem, TextInput, Tile } from "carbon-components-react";
 import { UserApiController } from "../controller/UserApiController";
 import { toast } from "react-toastify";
 import { formatLongDate, Timezone } from "@pld/utils";
@@ -16,48 +15,58 @@ import { DisableOtpModal } from "../modal/auth/DisableOtpModal";
 import { LanguageProps } from "../context/LanguageContext";
 import { DeleteUserModal } from "../modal/DeleteUserModal";
 import { SERVER_URL_ASSETS } from "../util/User";
-import { HelpLabel } from "../util/Label";
 import { UploadUserPictureModal } from "../modal/UploadUserPictureModal";
+import { HelpLabel } from "../util/Label";
+import { LoadingButtonComponent } from "./LoadingButton";
+import { getTranslation, language } from "../language";
+import { UserInfoComponent } from "./user/info/UserInfoComponent";
 
 export type UserComponentProps = RequiredUserContextProps & LanguageProps;
 
-export type UserComponentState = {
-  firstname: FieldData<string>;
-  lastname: FieldData<string>;
-  domain: FieldData<string[]>;
-  timezone: FieldData<string>;
+type Modal = {
   openEnableOtp: boolean;
   openDisableOtp: boolean;
   openDeleteModal: boolean;
   openFileUpload: boolean;
+}
+
+type Loading = {
+  loadingUpdateUser: boolean;
+  loadingUpdateEmail: boolean;
+}
+
+export type UserComponentState = {
+  firstname: string;
+  lastname: string;
+  domain: string[];
+  timezone: string;
   mfa: Mfa[];
   org: Organization[];
+  modals: Modal;
+  loadings: Loading;
 }
 
 export class UserComponent extends React.Component<UserComponentProps, UserComponentState> {
-
 
   constructor(props) {
     super(props);
     this.state = {
       org: [],
       mfa: [],
-      firstname: {
-        value: ''
+      firstname: '',
+      lastname: '',
+      domain: [],
+      timezone: '',
+      modals: {
+        openEnableOtp: false,
+        openDisableOtp: false,
+        openDeleteModal: false,
+        openFileUpload: false,
       },
-      lastname: {
-        value: '',
-      },
-      domain: {
-        value: [],
-      },
-      timezone: {
-        value: '',
-      },
-      openEnableOtp: false,
-      openDisableOtp: false,
-      openDeleteModal: false,
-      openFileUpload: false,
+      loadings: {
+        loadingUpdateEmail: false,
+        loadingUpdateUser: false,
+      }
     }
     this.onClickUpdate = this.onClickUpdate.bind(this);
     this.onMfaEnable = this.onMfaEnable.bind(this);
@@ -68,6 +77,24 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
 
   override componentDidMount() {
     this.loadInfo();
+  }
+
+  private dismissModal(key: keyof Modal) {
+    this.setState({
+      modals: {
+        ...this.state.modals,
+        [key]: false,
+      }
+    })
+  }
+
+  private setLoading(key: keyof Loading, value: boolean) {
+    this.setState({
+      loadings: {
+        ...this.state.loadings,
+        [key]: Boolean(value),
+      }
+    })
   }
 
   private loadInfo() {
@@ -96,32 +123,35 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
 
   private updateUserInfo(user: User) {
     this.setState({
-      firstname: {
-        value: user.firstname,
-      },
-      lastname: {
-        value: user.lastname,
-      },
-      domain: {
-        value: user.domain ?? [],
-      },
-      timezone: {
-        value: user.timezone,
-      }
+      firstname: user.firstname,
+      lastname: user.lastname,
+      domain: user.domain ?? [],
+      timezone: user.timezone,
     });
   }
 
+  private openModal(modalToOpen: keyof Modal) {
+    this.setState({
+      modals: {
+        ...this.state.modals,
+        [modalToOpen]: true,
+      }
+    })
+  }
+
   private onDeleted() {
-    this.setState({openDeleteModal: false});
+    this.openModal('openDeleteModal');
   }
 
   private onClickUpdate() {
+    this.setLoading('loadingUpdateUser', true);
     UserApiController.updateUser(this.props.userContext.accessToken, {
-      firstname: this.state.firstname.value,
-      lastname: this.state.lastname.value,
-      domain: this.state.domain.value,
-      timezone: Timezone[this.state.timezone.value]
+      firstname: this.state.firstname,
+      lastname: this.state.lastname,
+      domain: this.state.domain,
+      timezone: Timezone[this.state.timezone]
     }, (user, error) => {
+      this.setLoading('loadingUpdateUser', false);
       if (error) {
         toast('Une erreur est survenue !', {type: 'error'});
         console.error(error);
@@ -143,27 +173,26 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
     if (this.state.mfa.length === 0 || mfa === undefined) {
       return (
         <>
-          <Tile>Vous n'avez pas activer l'OTP</Tile>
-          <Button onClick={() => this.setState({openEnableOtp: true})}>Ajouter 2FA</Button>
+          <Tile style={style.tile}>Vous n'avez pas activer le TOTP</Tile>
+          <Button style={style.button} onClick={() => this.openModal('openEnableOtp')}>Ajouter 2FA</Button>
         </>
       );
     } else {
       return (<>
-        <Tile>OTP actif depuis: {formatLongDate(new Date(mfa.activationDate))}</Tile>
-        <Button kind={"ghost"} onClick={() => this.setState({openDisableOtp: true})}>Désactiver MFA</Button>
+        <Tile style={style.tile}>OTP actif depuis: {formatLongDate(new Date(mfa.activationDate))}</Tile>
+        <Button style={style.button} kind={"ghost"} onClick={() => this.openModal('openDisableOtp')}>Désactiver MFA</Button>
       </>);
     }
   }
 
   private showSecurity() {
     return (
-      <Tile>
+      <Tile style={style.tile}>
         <Stack gap={4}>
-          <h3 style={{marginBottom: 14}}>Sécurité</h3>
           <h4>2FA</h4>
           <p>
             La double authentification permet de renforcer la sécurité de vos comptes en exigeant un troisième élément d'identification, en plus de votre email et de votre mot de passe, pour valider chaque connexion.
-            Pour le moment, seulement l'OTP est disponible pour la double authentification (One Time Password)
+            Pour le moment, seulement le TOTP est disponible pour la double authentification (Time based One Time Password)
           </p>
           {this.showMfaOtp()}
         </Stack>
@@ -171,10 +200,36 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
     )
   }
 
+  private onClickUpdateEmailPreference() {
+
+  }
+
+  private showPrivacy() {
+    return (
+      <Tile style={style.tile}>
+        <Stack gap={4}>
+          <p>Vous avez la possibilité de controller le contenu que vous souhaitez recevoir par email :</p>
+          <div>
+            <Checkbox id={'receive-email'} labelText={"Ne plus recevoir d'emails ?"}/>
+            <HelpLabel message={"Vous ne recevrez plus aucun email (news, connexion...)"}></HelpLabel>
+          </div>
+          <div>
+            <Checkbox id={'receive-login-email'} labelText={"Recevoir des emails lors de nouvelle connexion ?"}/>
+            <HelpLabel message={"Lors de chaque nouvelle connexion, vous recevrez un email vous informant de cette dernière"}/>
+          </div>
+         <div>
+           <Checkbox id={'receive-news-email'} labelText={"Recevoir des emails concernant les nouveautés ??"}/>
+           <HelpLabel message={"Lors d'une nouvelle publication de mise à jour du PLD [Maker], vous recevrez un email comprenant les nouveautés mise en place"}/>
+         </div>
+        <LoadingButtonComponent isloading={this.state.loadings.loadingUpdateEmail} style={style.button} onClick={() => this.onClickUpdateEmailPreference()} renderIcon={Renew}>Mette à jour</LoadingButtonComponent>
+        </Stack>
+      </Tile>
+    )
+  }
+
   private showInfo() {
     return (
-      <Tile>
-        <h3 style={{marginBottom: '20px'}}>Mes informations</h3>
+      <Tile style={style.tile}>
         <Grid>
           <Column xlg={6}>
             <TextInput id={"created-date-user"} title={'Vous ne pouvez pas changer ce champ !'} labelText={"Date de création"} value={formatLongDate(new Date(this.props.userContext.user?.created_date ?? ''))}/>
@@ -184,25 +239,13 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
           <Column xlg={8}>
             <Stack orientation={"vertical"}>
               <FormLabel>Photo de profile</FormLabel>
-              <img style={{padding: 12}} title={'Mettre à jour'} onClick={() => this.setState({openFileUpload: true})} width={225} src={SERVER_URL_ASSETS + this.props.userContext.user?.profile_picture} alt={""}/>
+              <img style={{padding: 12, objectFit: 'cover', width: 200, height: 200}} title={'Mettre à jour'} onClick={() => this.openModal('openFileUpload')} src={SERVER_URL_ASSETS + this.props.userContext.user?.profile_picture} alt={""}/>
             </Stack>
           </Column>
         </Grid>
-        <TextInput style={{marginBottom: '20px'}} id={"lastname-input"} labelText={"Nom"} value={this.state.lastname.value} onChange={(e) => {
-          this.setState({
-            lastname: {
-              value: e.currentTarget.value
-            }
-          })
-        }}/>
-        <TextInput id={"firstname-input-disabled"} labelText={"Prénom"} value={this.state.firstname.value} onChange={(e) => {
-          this.setState({
-            firstname: {
-              value: e.currentTarget.value
-            }
-          })
-        }}/>
-        <Select id={"timezone-input"} labelText={"Timezone"} onChange={(e) => this.setState({timezone: {value: e.currentTarget.value}})} value={this.state.timezone.value}>
+        <TextInput style={{marginBottom: '20px'}} id={"lastname-input"} labelText={"Nom"} value={this.state.lastname} onChange={(e) => this.setState({ lastname: e.currentTarget.value })}/>
+        <TextInput id={"firstname-input-disabled"} labelText={"Prénom"} value={this.state.firstname} onChange={(e) => this.setState({ firstname: e.currentTarget.value })}/>
+        <Select id={"timezone-input"} labelText={"Timezone"} onChange={(e) => this.setState({timezone: e.currentTarget.value})} value={this.state.timezone}>
           {Object.keys(Timezone).sort((a, b) => {
             if (a > b) {
               return 1;
@@ -220,12 +263,10 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
           })}
         </Select>
       <MultiSelect
-        label={this.state.domain.value.join(', ')}
+        label={this.state.domain.join(', ')}
         titleText={"Domaines d'application"}
         id="domain-list"
-        invalid={this.state.domain.error !== undefined}
-        selectedItems={this.state.domain.value.map((domain) => ({label: domain}))}
-        invalidText={this.state.domain.error}
+        selectedItems={this.state.domain.map((domain) => ({label: domain}))}
         items={Object.keys(UserDomain).map((d) => {
           return {
             label: d.charAt(0).toUpperCase() + d.slice(1).toLowerCase()
@@ -233,13 +274,13 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
         }).sort()}
         onChange={(e) => {
           this.setState({
-            domain: {
-              value: e.selectedItems.map((a) => a.label)
-            }
+            domain: e.selectedItems.map((a) => a.label)
           })
         }}
       />
-      <Button style={{marginTop: '20px'}} onClick={this.onClickUpdate} iconDescription={"Update"} renderIcon={Renew}>Mettre a jour</Button>
+      <div style={{marginTop: 24}}>
+        <LoadingButtonComponent isloading={this.state.loadings.loadingUpdateUser}>Mettre a jour</LoadingButtonComponent>
+      </div>
     </Tile>
     )
   }
@@ -261,7 +302,7 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
     return (
       <>
         <p>Si vous supprimer votre compte, vous perdrez toute vos informations personnelles</p>
-        <Button kind={'danger'} renderIcon={TrashCan} onClick={() => this.setState({openDeleteModal: true})}>Supprimer</Button>
+        <Button style={style.button} kind={'danger'} renderIcon={TrashCan} onClick={() => this.openModal('openDeleteModal')}>Supprimer</Button>
       </>
     )
   }
@@ -269,8 +310,7 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
   private showDangerZone() {
     const orgOwners = this.state.org.filter((org) => org.owner._id === this.props.userContext.user?._id);
     return (
-      <Tile>
-        <h3 style={{marginBottom: '20px'}}>⚠ Supprimer mon compte </h3>
+      <Tile style={style.tile}>
         {orgOwners.length > 0 ? this.showOrgOwners(orgOwners) : this.showDelete()}
       </Tile>
     )
@@ -281,7 +321,7 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
       if (error) {
         toast('Une erreur est survenue !', {type: 'error'});
       } else {
-        this.setState({openEnableOtp: false});
+        this.dismissModal('openEnableOtp');
         toast('2FA Activé', {type: 'success'});
         this.getMfaInfo(token);
       }
@@ -289,12 +329,12 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
   }
 
   private onMfaDisable() {
-    this.setState({openDisableOtp: false})
+    this.dismissModal('openDisableOtp');
     this.getMfaInfo(this.props.userContext.accessToken);
   }
 
   private onUploadedPicture() {
-    this.setState({openFileUpload: false});
+    this.dismissModal('openFileUpload');
     toast('Votre photo de profile va être mis à jour !', {type: 'success'});
     setTimeout(() => {
       this.props.userContext.refreshUser((a) => {
@@ -306,14 +346,38 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
   override render() {
     return (
       <Stack gap={4}>
-        <UploadUserPictureModal open={this.state.openFileUpload} onDismiss={() => this.setState({openFileUpload: false})} onSuccess={this.onUploadedPicture} userContext={this.props.userContext}/>
-        <DeleteUserModal open={this.state.openDeleteModal} onDismiss={() => this.setState({openDeleteModal: false})} onSuccess={this.onDeleted} userContext={this.props.userContext}/>
-        <MfaModal open={this.state.openEnableOtp} onDismiss={() => this.setState({openEnableOtp: false})} onSuccess={this.onMfaEnable} userContext={this.props.userContext}/>
-        <DisableOtpModal userContext={this.props.userContext} mfa={this.state.mfa.find((mfa) => mfa.type === MfaType.OTP)!} open={this.state.openDisableOtp} language={this.props.language} onDismiss={() => this.setState({openDisableOtp: false})} onSuccess={this.onMfaDisable}/>
-        {this.showInfo()}
+        <UploadUserPictureModal open={this.state.modals.openFileUpload} onDismiss={() => this.dismissModal('openFileUpload')} onSuccess={this.onUploadedPicture} userContext={this.props.userContext}/>
+        <DeleteUserModal open={this.state.modals.openDeleteModal} onDismiss={() => this.dismissModal('openDeleteModal')} onSuccess={this.onDeleted} userContext={this.props.userContext}/>
+        <MfaModal open={this.state.modals.openEnableOtp} onDismiss={() => this.dismissModal('openEnableOtp')} onSuccess={this.onMfaEnable} userContext={this.props.userContext}/>
+        <DisableOtpModal userContext={this.props.userContext} mfa={this.state.mfa.find((mfa) => mfa.type === MfaType.OTP)!} open={this.state.modals.openDisableOtp} language={this.props.language} onDismiss={() => this.dismissModal('openDisableOtp')} onSuccess={this.onMfaDisable}/>
+        <h2 style={style.title}>{this.props.language.translate(language.pages.myProfile.title)}</h2>
+        <UserInfoComponent onUpdateUser={() => toast('abc')} userContext={this.props.userContext} user={this.props.userContext.user}/>
+        {/*{this.showInfo()}*/}
+        <h3 style={style.title}>{this.props.language.translate(language.pages.myProfile.security.title)}</h3>
         {this.showSecurity()}
+        <h3 style={style.title}>{this.props.language.translate(language.pages.myProfile.preference.title)}</h3>
+        {this.showPrivacy()}
+        <h3 style={style.dangerTitle}>{this.props.language.translate(language.pages.myProfile.delete.title)}</h3>
         {this.showDangerZone()}
       </Stack>
     );
+  }
+}
+
+const style = {
+  dangerTitle: {
+    fontWeight: 'bold',
+    color: '#E74C3C',
+    marginTop: 18,
+  },
+  title: {
+    fontWeight: 'bold',
+    marginTop: 18,
+  },
+  tile: {
+    borderRadius: 8,
+  },
+  button: {
+    borderRadius: 12,
   }
 }

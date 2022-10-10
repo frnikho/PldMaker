@@ -1,4 +1,4 @@
-import {IsNotEmpty, Length, Min} from "class-validator";
+import { ArrayMinSize, IsNotEmpty, Length, MaxLength, Min } from "class-validator";
 
 export class PldOrgFindsBody {
   organizations: string[];
@@ -9,36 +9,38 @@ export class PldOrgFindsBody {
 }
 
 export class PldOrgCreateBody {
-  @IsNotEmpty()
-  @Length(5, 64)
+  @IsNotEmpty({message: 'le titre ne peux pas être vide !'})
+  @Length(5, 64, {message: 'le titre doit contenir au minimum 5 caractères et au maximum 64 caractères'})
   title: string;
 
+  @MaxLength(512, {message: 'la description ne doit pas dépasser 512 caractères'})
   description: string;
 
   @IsNotEmpty()
   @Length(24, 24)
   owner: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({message: 'le manager ne peux pas être vide !'})
   manager: string;
 
-  @IsNotEmpty()
+  @ArrayMinSize(1, {message: 'le pld doit contenir au minimum 1 tag'})
   tags: string[];
 
-  @IsNotEmpty()
+  @IsNotEmpty({message: 'la date de promotion ne doit pas être vide'})
+  @Min(1900, {message: 'la date de promotion ne peux pas être antérieur à 1900'})
   promotion: number;
 
   @IsNotEmpty()
-  @Min(0)
+  @Min(0, {message: 'la version doit être négative'})
   version: number;
 
-  @IsNotEmpty()
+  @IsNotEmpty({message: 'la date de début du sprint doit être renseigner'})
   startingDate: Date;
 
-  @IsNotEmpty()
+  @IsNotEmpty({message: 'la date de fin du sprint doit être renseigner'})
   endingDate: Date;
 
-  @IsNotEmpty()
+  @ArrayMinSize(1, {message: 'vous devez avoir au moins 1 étape !'})
   steps: string[];
 
   constructor(title: string, description: string, owner: string, manager: string, tags: string[], promotion: number, version: number, startingDate: Date, endingDate: Date, steps: string[]) {

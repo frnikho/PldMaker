@@ -25,6 +25,7 @@ export * from './lib/user/UpdateUserBody';
 export * from './lib/user/Gender';
 export * from './lib/user/Device';
 export * from './lib/user/Privacy';
+export * from './lib/user/Preference';
 
 export * from './lib/organization/Organization';
 export * from './lib/organization/CreateOrganizationBody';

@@ -1,4 +1,88 @@
 {
+  "lexical": {
+    "useAsDefault": {
+      "fr": "Utilisé par défaut",
+      "en": "Use as default"
+    }
+  },
+  "modals": {
+    "createDodStatus": {
+
+    }
+  },
+  "pages": {
+    "myProfile": {
+      "title": {
+        "fr": "Mon profile",
+        "en": "My profile"
+      },
+      "security": {
+        "title": {
+          "fr": "Sécurité",
+          "en": "Account security"
+        }
+      },
+      "preference": {
+        "title": {
+          "fr": "Préférence de communication",
+          "en": "Account preference"
+        }
+      },
+      "delete": {
+        "title": {
+          "fr": "Supprimer mon compte",
+          "en": "Delete account"
+        },
+        "hasSomeOrg": {
+          "fr": "Votre compte est actuellement le dirigeant des organisation(s): %orgs%\nVous devez léger ou supprimer ces organisations avant de pouvoir supprimer votre compte.",
+          "en": ""
+        }
+      }
+    }
+  },
+  "user": {
+    "security": {
+
+    },
+    "title": {
+      "fr": "Mon profile",
+      "en": "My profile"
+    }
+  },
+  "home": {
+    "welcomeMessage": {
+      "title": {
+        "fr": "",
+        "en": ""
+      },
+      "subTitle": {
+        "fr": "",
+        "en": ""
+      }
+    },
+    "welcomeDashboard": {
+      "title": {
+        "fr": "Bienvenue sur votre tableau de bord",
+        "en": "Welcome to your dashboard"
+      },
+      "subTitle": {
+        "fr": "Ici vous pouvez suivre l'avancement des PLDs et de leurs DoDs de vos différentes Organisation",
+        "en": ""
+      }
+    },
+    "createOrganization": {
+      "fr": "",
+      "en": ""
+    },
+    "homeCalendarTitle": {
+      "fr": "Mes évènements",
+      "en": "Events"
+    },
+    "homeOrganizationTitle": {
+      "fr": "Mes organizations ",
+      "en": "Organizations"
+    }
+  },
   "calendar": {
     "today": {
       "fr": "Aujourd'hui",

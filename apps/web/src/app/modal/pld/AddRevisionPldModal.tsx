@@ -11,10 +11,8 @@ import {Stack} from '@carbon/react'
 import {RequiredLabel} from "../../util/Label";
 
 export type AddRevisionPldModalProps = {
-  version: number;
   org: Organization;
   pld: Pld;
-  versionShifting: number;
 } & ModalComponentProps & RequiredUserContextProps;
 
 export type AddRevisionPldModalState = {
@@ -41,7 +39,7 @@ export class AddRevisionPldModal extends React.Component<AddRevisionPldModalProp
     PldApiController.addRevision(this.props.userContext.accessToken, this.props.org._id, this.props.pld._id, {
       owner: this.props.userContext.user?._id ?? 'null',
       comments: this.state.comments.value,
-      version: parseFloat((this.props.versionShifting + this.props.version).toFixed(2)),
+      version: parseFloat((this.props.org.versionShifting + this.props.pld.version).toFixed(2)),
       sections: this.state.sections.value,
       created_date: new Date(),
       currentStep: this.props.pld.currentStep,

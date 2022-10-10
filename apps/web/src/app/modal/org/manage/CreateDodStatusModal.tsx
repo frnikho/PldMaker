@@ -1,9 +1,8 @@
-import { ModalComponent } from "../../../util/Modal";
-import { Button, ButtonSet, Checkbox, ModalProps, TextInput } from "carbon-components-react";
+import { Button, Checkbox, Modal, ModalProps, TextInput } from "carbon-components-react";
 import { RequiredUserContextProps } from "../../../context/UserContext";
 import { RequiredLabel } from "../../../util/Label";
 import { TwitterPicker } from "react-color";
-import React from "react";
+import React, { useCallback, useContext, useState } from "react";
 
 import {Stack} from '@carbon/react';
 import {Add} from '@carbon/icons-react';
@@ -11,9 +10,13 @@ import { OrganizationApiController } from "../../../controller/OrganizationApiCo
 import { NewDodStatus, Organization } from "@pld/shared";
 import { DodStatusOperationType } from "../../../component/org/manage/ManageOrgDodStatusComponent";
 import { toast } from "react-toastify";
+import { LanguageContext, LanguageContextState } from "../../../context/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 export type CreateDodStatusProps = {
   org: Organization;
+  onSuccess: (type: DodStatusOperationType) => void;
+  onDismiss: () => void;
 } & ModalProps & RequiredUserContextProps;
 
 export type CreateDodStatusState = {
@@ -22,50 +25,48 @@ export type CreateDodStatusState = {
   useDefault: boolean;
 }
 
-export class CreateDodStatusModal extends ModalComponent<CreateDodStatusProps, CreateDodStatusState> {
+export function CreateDodStatusModal(props: CreateDodStatusProps) {
 
-  constructor(props) {
-    super(props, {passiveModal: true, size: 'sm'});
-    this.state = {
-      color: '',
-      name: '',
-      useDefault: false,
-    }
-    this.onClickCreate = this.onClickCreate.bind(this);
-  }
+  const languageCtx = useContext<LanguageContextState>(LanguageContext);
+  const [form, setForm] = useState<CreateDodStatusState>({color: '', useDefault: false, name: ''});
 
-  private onClickCreate() {
-    const body = new NewDodStatus(this.state.name, this.state.color, this.state.useDefault);
-    OrganizationApiController.createOrgDodStatus(this.props.userContext.accessToken, this.props.org._id, body, (dodStatus, error) => {
+  const setFormField = useCallback((key: keyof CreateDodStatusState, value: unknown) => {
+    setForm({...form, [key]: value});
+  }, [form]);
+
+  const onClickCreate = () => {
+    const body = new NewDodStatus(form.name, form.color, form.useDefault);
+    OrganizationApiController.createOrgDodStatus(props.userContext.accessToken, props.org._id, body, (dodStatus, error) => {
       if (error) {
         toast('Une erreur est survenue !', {type: 'error'});
       } else {
-        this.props.onSuccess(DodStatusOperationType.Created);
+        props.onSuccess(DodStatusOperationType.Created);
       }
     })
   }
 
-  override renderModal(): React.ReactNode {
-    return (<Stack gap={6}>
-      <h3 >Créer un nouveau statut</h3>
-      <TextInput helperText={"le statut doit contenir au minimum 2 caractères et maximum 32 caractères"} maxLength={32} minLength={2} id={'status-name-input'} labelText={<RequiredLabel message={"Status"}/>} value={this.state.name} onChange={(e) => this.setState({name: e.currentTarget.value})}/>
-      <Checkbox title={"Utiliser ce statut par défaut lors de la création de nouvelle DoDs ?"} labelText={'Utiliser par défaut'} id="checkbox-label-1" checked={this.state.useDefault} onChange={(e, {checked, id}) => this.setState({useDefault: checked})}/>
-      <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-        <TwitterPicker triangle={'hide'} onChangeComplete={(color) => {
-          console.log(color.hex.slice(1, 7));
-          this.setState({color: color.hex.slice(1, 7)})
-        }} color={`#${this.state.color}`}/>
-        <div title={"Couleur du statut"} className="square" style={{
-          height: '40px',
-          width: '40px',
-          marginLeft: 18,
-          backgroundColor: `#${this.state.color}`,
-          borderRadius: '50%',
-          display: 'inline-block',
-        }}/>
-      </div>
-      <Button onClick={this.onClickCreate} renderIcon={Add}>Créer</Button>
-    </Stack>);
-  }
+  return (
+    <Modal open={props.open} onRequestClose={props.onDismiss} passiveModal>
+      <Stack gap={6}>
+        <h3 >Créer un nouveau statut</h3>
+        <TextInput helperText={"le statut doit contenir au minimum 2 caractères et maximum 32 caractères"} maxLength={32} minLength={2} id={'status-name-input'} labelText={<RequiredLabel message={"Status"}/>} value={form.name} onChange={(e) => setFormField('name', e.currentTarget.value)}/>
+        <Checkbox title={"Utiliser ce statut par défaut lors de la création de nouvelle DoDs ?"} labelText={'Utiliser par défaut'} id="checkbox-label-1" checked={form.useDefault} onChange={(e, {checked, id}) => setFormField('useDefault', checked)}/>
+        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+          <TwitterPicker triangle={'hide'} onChangeComplete={(color) => {
+            setFormField('color', color.hex.slice(1, 7));
+          }} color={`#${form.color}`}/>
+          <div title={"Couleur du statut"} className="square" style={{
+            height: '40px',
+            width: '40px',
+            marginLeft: 18,
+            backgroundColor: `#${form.color}`,
+            borderRadius: '50%',
+            display: 'inline-block',
+          }}/>
+        </div>
+        <Button onClick={onClickCreate} renderIcon={Add}>Créer</Button>
+      </Stack>
+    </Modal>
+  );
 
 }

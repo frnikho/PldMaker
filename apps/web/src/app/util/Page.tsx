@@ -2,7 +2,8 @@ import { NavigationState, NavProps } from "./Navigation";
 import React from "react";
 import { LoginState, UserContext, UserContextProps } from "../context/UserContext";
 import { CircularProgress } from "../component/utils/CircularProgress";
-import { Navigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { LanguageContext } from "../context/LanguageContext";
 
 export type PageState = {
   loading: boolean;
@@ -49,7 +50,7 @@ export abstract class AuthPage<T, Z> extends React.Component<T, Z> {
 }
 
 
-type PageProps = {
+export type PageProps = {
 
 } & NavProps;
 
@@ -58,6 +59,9 @@ type PageStates = {
 }
 
 export abstract class Page<T, Z> extends React.Component<PageProps & T, Z> {
+
+  static override contextType = LanguageContext;
+  override context!: React.ContextType<typeof LanguageContext>;
 
   protected constructor(props: PageProps & T) {
     super(props);
@@ -100,29 +104,19 @@ export abstract class Page<T, Z> extends React.Component<PageProps & T, Z> {
   }
 }
 
+export function PageComponent({children}) {
 
-type a = {
-
-} & PageProps;
-
-type b = {
-  hello: string;
-} & PageStates;
-
-export class TestPage extends Page<a, b> {
-
-  constructor(props: a) {
-    super(props);
-    this.state = {
-      hello: 'abc',
-    }
-  }
-
-  renderPage(): React.ReactNode {
-    return (<>Logged !</>);
-  }
-
+  return (children);
 
 }
 
+export function Abc() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  console.log(searchParams.get('redirect'));
+  return (
+    <PageComponent>
+      <h1>Test abc</h1>
+    </PageComponent>
+  )
 
+}

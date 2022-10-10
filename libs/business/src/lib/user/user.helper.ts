@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Query } from "mongoose";
-import { AddFavourBody, Device, DeviceBody, Favour, FavourType, UpdateUserBody, User } from "@pld/shared";
+import { AddFavourBody, Device, DeviceBody, Favour, FavourType, UpdatePreference, UpdateUserBody, User } from "@pld/shared";
 import { MailService } from "../mail/mail.service";
 import { AvailableMail } from "../mail/mail.list";
 import { EventEmitter2 } from "@nestjs/event-emitter";
@@ -54,7 +54,7 @@ export class UserHelper {
     const createdUser = await this.userModel.create(user);
     this.logger.debug(`New user created: ${createdUser._id}`);
     const createdFavour = await this.favourModel.create({owner: createdUser._id});
-    await this.mailService.sendMail(user, AvailableMail.WelcomeMail);
+    await this.mailService.sendMail(user, AvailableMail.Welcome);
     this.logger.debug(`Favour's user created: ${createdFavour._id}`);
     return createdUser;
   }
@@ -157,6 +157,10 @@ export class UserHelper {
     this.logger.debug(`Deleting user favour (${user.email} - ${user._id}):`);
     this.logger.debug(favour);
     return UserHelper.populateAndExecuteFavour(this.favourModel.findOneAndUpdate({owner: user._id}, {$pull: {org: itemToDelete, pld: itemToDelete}}, {new: true}));
+  }
+
+  public async updatePreference(user: User, body: UpdatePreference) {
+    return UserHelper.populateAndExecute(this.userModel.findOneAndUpdate({_id: user._id}, {preference: { ...body }}, {new: true}));
   }
 
 }

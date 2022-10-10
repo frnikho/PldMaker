@@ -1,9 +1,10 @@
 import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
 import mongoose, {Document} from "mongoose";
-import { Device, Gender, Mobile, UserDomain } from "@pld/shared";
+import { defaultPreference, Device, Gender, Mobile, UserDomain } from "@pld/shared";
 import { Mfa } from "../auth/mfa/mfa.schema";
 import { Timezone } from "@pld/utils";
+import { Preference } from "@pld/shared";
 
 export type UserDocument = User & Document;
 
@@ -61,6 +62,9 @@ export class User extends DatedObjectSchema {
 
   @Prop({required: false, default: Timezone["Europe/Paris"], enum: Timezone})
   timezone: string;
+
+  @Prop({required: false, default: defaultPreference, select: false})
+  preference: Preference;
 
 }
 

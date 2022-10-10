@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
-import { UpdateUserBody, AddFavourBody, User, Favour } from "@pld/shared";
+import { UpdateUserBody, AddFavourBody, User, Favour, UpdatePreference } from "@pld/shared";
 import { UserService } from "./user.service";
 import { UserPipe } from "./user.pipe";
 import { FavourPipe } from "./favour.pipe";
@@ -38,6 +38,16 @@ export class UserController {
   @Patch('update')
   public async update(@Request() req, @Body() updateBody: UpdateUserBody) {
     return this.userService.updateByBody(req.user, updateBody);
+  }
+
+  /**
+   * Update user preference
+   * @param req NestJS Request
+   * @param body UpdatePreference
+   */
+  @Patch('preference')
+  public async updatePreference(@Request() req, @Body() body: UpdatePreference) {
+    return this.userService.updatePreference(req.user, body);
   }
 
   @UseInterceptors(FileInterceptor('file'))

@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+export const language = require('../assets/languages.json') as LanguageType;
+
 export type AvailableLangue = {
   fr?: string;
   en?: string;
@@ -25,65 +28,43 @@ export function getDataTranslation<T>(object: any, language: keyof AvailableLang
   }, {}) as unknown as T;
 }
 
-const home = {
-  welcomeMessage: {
-    title: {
-      fr: '',
-      en: '',
-    },
-    subTitle: {
-      fr: '',
-      en: ''
+export type LanguageType = {
+  lexical: {
+    useAsDefault: AvailableLangue,
+  },
+  pages: {
+    myProfile: {
+      title: AvailableLangue,
+      security: {
+        title: AvailableLangue,
+      },
+      preference: {
+        title: AvailableLangue,
+      },
+      delete: {
+        title: AvailableLangue,
+        hasSomeOrg: AvailableLangue,
+      }
     }
   },
-  welcomeDashboard: {
-    title: {
-      fr: 'Bienvenue sur votre tableau de bord',
-      en: 'Welcome to your dashboard'
+  home: {
+    welcomeMessage: {
+      title: AvailableLangue,
+      subTitle: AvailableLangue,
     },
-    subTitle: {
-      fr: 'Ici vous pouvez suivre l\'avancement des PLDs et de leurs DoDs de vos différentes Organisation',
-      en: ''
-    }
+    welcomeDashboard: {
+      title: AvailableLangue,
+      subTitle: AvailableLangue,
+    },
+    createOrganization: AvailableLangue,
+    homeCalendarTitle: AvailableLangue,
+    homeOrganizationTitle: AvailableLangue,
   },
-  createOrganization: {
-    fr: '',
-    en: ''
-  },
-  homeCalendarTitle: {
-    fr: 'Mes évènements',
-    en: 'Events'
-  },
-  homeOrganizationTitle: {
-    fr: 'Mes organizations ',
-    en: 'Organizations'
-  },
-}
-
-const calendar = {
-  today: {
-    fr: 'Aujourd\'hui',
-    en: 'Today',
-  },
-  month: {
-    fr: 'Mois',
-    en: 'Month'
-  },
-  week: {
-    fr: 'Semaine',
-    en: 'Week'
-  },
-  day: {
-    fr: 'Jour',
-    en: 'Day'
-  },
-  list: {
-    fr: 'List',
-    en: 'List'
+  calendar: {
+    today: AvailableLangue,
+    month: AvailableLangue,
+    week: AvailableLangue,
+    day: AvailableLangue,
+    list: AvailableLangue,
   }
-}
-
-export const language = {
-  home: home,
-  calendar: calendar,
 }

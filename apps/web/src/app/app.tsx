@@ -18,7 +18,7 @@ import NewCalendarPage from "./page/organization/calendar/NewCalendarPage";
 import CalendarPage from "./page/organization/calendar/CalendarPage";
 import EventPage from "./page/organization/calendar/event/EventPage";
 import { AuthOtpPage } from "./page/AuthOtpPage";
-import { TestPage } from "./util/Page";
+import { Abc } from "./util/Page";
 
 export function App() {
 
@@ -32,7 +32,7 @@ export function App() {
     <UserContextProvider>
       <Routes>
         <Route path={"/abc"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
-          <Route index element={<TestPage navigate={navigate}/>}/>
+          <Route index element={<Abc/>}/>
         </Route>
         <Route path={"/"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
           <Route index element={<HomePage/>}/>

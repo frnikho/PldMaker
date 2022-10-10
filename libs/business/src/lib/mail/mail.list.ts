@@ -1,3 +1,6 @@
 export enum AvailableMail {
-  WelcomeMail = 'WelcomeMail',
+  Welcome = 'WelcomeMail',
+  OtpEnable = 'OtpEnableMail',
+  Goodbye = 'GoodbyeMail',
+  OrgInvitation = 'OrgInvitationMail'
 }

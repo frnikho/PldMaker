@@ -49,7 +49,6 @@ export class UploadUserPictureModal extends ModalComponent<UploadUserPictureModa
       <p className="cds--label-description">
         Le photo doit être au format .png, .jpg ou .jpeg
       </p>
-      <input type="file" onChange={(a) => console.log(a.target.files)} />
       <FileUploaderDropContainer accept={['png', 'jpg', 'jpeg']} onAddFiles={(event, {addedFiles}) => this.setState({selectedFile: addedFiles[0]})}/>
       <p>{this.state.selectedFile?.name}</p>
       <Button onClick={this.onClickUpload}>Valider</Button>

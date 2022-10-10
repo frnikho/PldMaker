@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { User } from "@pld/shared";
+import { Organization, User } from "@pld/shared";
 import { AvailableMail } from "./mail.list";
 import { MailHelper } from "./mail.helper";
 
@@ -10,7 +10,11 @@ export class MailService {
   }
 
   public sendMail(user: User, email: AvailableMail) {
-    return this.mailHelper.sendEmail(user, email);
+    return this.mailHelper.sendWelcomeMail(user, email);
+  }
+
+  public sendInvitationOrg(user: User, org: Organization, invitedByUser: string) {
+    return this.sendInvitationOrg(user, org, invitedByUser);
   }
 
 }

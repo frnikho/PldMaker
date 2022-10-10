@@ -10,8 +10,8 @@ export class CreateOrganizationBody {
   @MaxLength(512, {message: 'la description ne peut pas dépasser 512 caractères'})
   public description?: string;
 
-  @Min(0)
-  @Max(2.00)
+  @Min(0,  {message: 'minimum 0.01'})
+  @Max(2.00, {message: 'maximum 2.00'})
   public versionShifting: number;
 
   @IsOptional()

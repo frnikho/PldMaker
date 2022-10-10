@@ -76,7 +76,7 @@ export class UpdateOrgSectionModal extends React.Component<OrgSectionModalProps,
         onRequestClose={this.props.onDismiss}
         onRequestSubmit={this.props.onSuccess}
         passiveModal
-        modalHeading={`Mettra a jour la section ${this.props.section.section}`}>
+        modalHeading={`Mettre à jour la section ${this.props.section.section}`}>
         <form>
           <Stack gap={3}>
             <TextInput disabled id={"section-input"} value={this.state.section} placeholder={"1.2"} labelText={"Section"}/>

@@ -209,7 +209,7 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
           <BreadcrumbItem isCurrentPage>Organisation</BreadcrumbItem>
         </Breadcrumb>
         <h1 style={{fontWeight: 'bold'}}>Créer votre organisation</h1>
-        <p style={{fontSize: 14, marginTop: 10}}>Une organization vous permets de créer, de gérer et de générer les documents de vos PLDs en équipe</p>
+        <p style={{fontSize: 14, marginTop: 10}}>Une organisation te permet de créer, de gérer et de générer les documents de vos PLDs en équipe</p>
         <p style={{fontSize: 14}}>Après la création de votre organisation, vous pourrez gérer les paramètres liés a la confidentialité</p>
         <Grid style={{marginTop: 20}}>
           <Column sm={4} md={8} lg={10} xlg={10}>
@@ -224,8 +224,8 @@ export class NewOrgComponent extends React.Component<NewOrgComponentProps, NewOr
           </Column>
           <Column sm={4} md={8} lg={5} xlg={6}>
             <Tile style={{padding: 10}}>
-              <h4>Ajouter des utilisateurs dans votre organization</h4>
-              <p style={{fontStyle: 'italic'}}>vous pouvez dés maintenant inviter des utilisateurs a intégrer votre organisation dés la création de celle-ci</p>
+              <h4 style={{fontWeight: 'bold'}}>Ajouter des utilisateurs dans votre organisation</h4>
+              <p style={{fontStyle: 'italic'}}>vous pouvez dès maintenant inviter des utilisateurs à intégrer votre organisation dès la création de celle-ci</p>
               <FluidForm style={{marginTop: '20px'}}>
                 <Grid narrow>
                   <Column sm={3} md={7} lg={4} style={{paddingRight: 20, paddingLeft: 20}}>

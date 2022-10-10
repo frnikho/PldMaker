@@ -1,16 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, InlineLoading, Link, Modal, TextInput } from "carbon-components-react";
 import { Stack } from "@carbon/react";
-import { RequiredUserContextProps, UserContextProps } from "../../context/UserContext";
+import { RequiredUserContextProps } from "../../context/UserContext";
 import { LoginBody, User } from "@pld/shared";
 import ErrorManager from "../../manager/ErrorManager";
 import { toast } from "react-toastify";
 import { validate } from "class-validator";
 import { FieldData } from "../../util/FieldData";
-import { ReactFormValidation } from "../../util/Page";
 import { ErrorType } from "../../util/Api";
 
 import {Login} from '@carbon/icons-react';
+import { useForm } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
 
 type LoginModalProps = {
   open: boolean;
@@ -26,6 +27,76 @@ type LoginModalState = {
   loading: boolean;
 }
 
+type LoginForm = {
+  email: string;
+  password: string;
+}
+
+export function LoginModal(props: LoginModalProps) {
+  const [loading, setLoading] = useState(false);
+  const {
+    register, handleSubmit, watch, setError, reset, formState: {errors}
+  } = useForm<LoginForm>();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const onClickCreate = (form: LoginForm) => {
+    const loginBody = new LoginBody(form.email, form.password, navigator.userAgent, navigator.platform, navigator.language);
+    setLoading(true);
+    validate(loginBody).then((errors) => {
+      if (errors.length <= 0)
+        return true;
+      errors.forEach((error) => {
+        const msg = Object.entries(error.constraints ?? {}).map((a) => a[1]);
+        setError(error.property as keyof LoginForm, {message: msg.join(', ')});
+      })
+      return false;
+    }).then((valid) => {
+      if (!valid)
+        return;
+      props.userContext.login(loginBody, (user, error) => {
+        if (error) {
+          if (error.type === ErrorType.MFA_OTP_REQUIRED) {
+            props.onRedirect('auth/otp');
+            props.onDismiss();
+            reset();
+            return;
+          }
+          toast(ErrorManager.LoginError(error.statusCode ?? -1).message, {type: 'error'});
+        } else if (user !== null) {
+          props.onUserLogged(user);
+          reset();
+        }
+      });
+    }).then(() => {
+      setLoading(false);
+    });
+  }
+
+  return (<Modal
+    passiveModal
+    open={props.open}
+    onRequestClose={props.onDismiss}
+    modalHeading={'Se connecter'}
+    shouldSubmitOnEnter={true}
+    primaryButtonText={loading ? <InlineLoading
+      description={"Chargement ..."}
+      status={loading ? 'active' : 'finished'}/> : "Connexion"}
+    primaryButtonDisabled={loading}
+    secondaryButtonText="Annuler"
+    size={"sm"}>
+    <form onSubmit={handleSubmit(onClickCreate)}>
+      <Stack gap={4}>
+        <TextInput id="login-email" type={"email"} invalidText={errors.email?.message} invalid={errors.email !== undefined} labelText="Adresse email" {...register('email')}/>
+        <TextInput id="login-mdp" type={"password"} invalidText={errors.password?.message} invalid={errors.password !== undefined} labelText="Mot de passe" {...register('password')}/>
+      </Stack>
+      <br />
+      <p>Pas encore de compte ? <Link onClick={() => props.switchToRegister()}>Inscrivez vous ici !</Link></p>
+      <Button type={"submit"} renderIcon={Login} style={{marginTop: 18}}>Se connecter</Button>
+    </form>
+  </Modal>);
+
+}
+/*
 export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalState> {
 
   constructor(props: LoginModalProps) {
@@ -113,4 +184,4 @@ export class LoginModal extends ReactFormValidation<LoginModalProps, LoginModalS
     </Modal>);
   }
 
-}
+}*/

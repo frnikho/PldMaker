@@ -4,7 +4,7 @@ import {UserContextProps} from "../../context/UserContext";
 import {withParams} from "../../util/Navigation";
 import {RouteMatch} from "react-router/lib/router";
 import {CircularProgress} from "../../component/utils/CircularProgress";
-import ManageOrganizationComponent from "../../component/org/ManageOrganizationComponent";
+import { ManageOrganizationComponent } from "../../component/org/ManageOrganizationComponent";
 
 class ManageOrganizationPage extends AuthPage<RouteMatch, unknown> {
 
@@ -13,7 +13,7 @@ class ManageOrganizationPage extends AuthPage<RouteMatch, unknown> {
   }
 
   override showLogged(auth: UserContextProps): JSX.Element {
-    return (<ManageOrganizationComponent auth={auth} orgId={this.props.params['id'] ?? ''}/>);
+    return (<ManageOrganizationComponent orgId={this.props.params['id'] ?? ''}/>);
 
   }
 

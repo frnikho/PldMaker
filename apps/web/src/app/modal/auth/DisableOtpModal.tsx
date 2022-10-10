@@ -12,7 +12,7 @@ import { RequiredUserContextProps } from "../../context/UserContext";
 import { toast } from "react-toastify";
 
 export type DisableOtpProps = {
-  mfa: Mfa,
+  mfa?: Mfa,
 } & LanguageProps & RequiredUserContextProps;
 
 export type DisableOtpState = {
@@ -32,11 +32,12 @@ export class DisableOtpModal extends ModalComponent<DisableOtpProps, DisableOtpS
   }
 
   private onDisable(code: string, type: MfaDisableType) {
+    if (!this.props.mfa)
+      return;
     UserApiController.deleteOtp(this.props.userContext.accessToken, this.props.mfa._id, {code: code, type: type}, (mfa, error) => {
       if (error) {
         toast('Une erreur est survenue lors de la désactivation du TOTP !', {type: 'error'});
       } else {
-        toast('L`authentification TOTP a été désactivé !', {type: 'success'});
         this.props.onSuccess();
       }
     })

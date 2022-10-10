@@ -136,8 +136,8 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     return (
       <Stack>
         <div style={{marginTop: 20}}>
-          <h1 style={{fontWeight: 'bold'}}>{this.props.language.getTranslation(language.home.welcomeDashboard.title)}</h1>
-          <p>{this.props.language.getTranslation(language.home.welcomeDashboard.subTitle)}</p>
+          <h1 style={{fontWeight: 'bold'}}>{this.props.language.translate(language.home.welcomeDashboard.title)}</h1>
+          <p>{this.props.language.translate(language.home.welcomeDashboard.subTitle)}</p>
         </div>
         <div style={{marginTop: 40}}>
           <OrganizationHomeDashboard userContext={userContext}/>
