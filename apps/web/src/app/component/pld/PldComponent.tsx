@@ -31,7 +31,7 @@ import { useNavigate } from "react-router-dom";
 import { PldDoDsComponents } from "./panel/PldDoDsComponents";
 import { PldDocumentsComponent } from "./panel/PldDocumentsComponent";
 import { ButtonStyle } from "../../style/ButtonStyle";
-import { GeneratePldModal } from "../../modal/pld/GeneratePldModal";
+import { GeneratePldModal, ReportForm } from "../../modal/pld/GeneratePldModal";
 import { PldGenerator } from "../../docx/PldGenerator";
 
 type Props = {
@@ -140,12 +140,12 @@ export const PldComponent = (props: Props) => {
     });
   }
 
-  const generate = (template?: Template) => {
+  const generate = (report: ReportForm, template?: Template) => {
     if (!org || !pld) {
       toast('Impossible de récupérer les informations pour générer le document !', {type: 'error'});
       return;
     }
-    const generator = new PldGenerator(org, pld, dod, dodStatus, template);
+    const generator = new PldGenerator(org, pld, dod, dodStatus, report, template);
     PldGenerator.getBlobFromDoc(generator.generate(), (blob) => {
       window.open(URL.createObjectURL(blob));
     });

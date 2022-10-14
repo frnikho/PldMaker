@@ -1,7 +1,8 @@
-import {Pld, PldRevision, Organization} from "@pld/shared";
+import { Pld, PldRevision, Organization, TemplateType, Template, defaultTemplate } from "@pld/shared";
 import {Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
 import { formatDateNumeric, formatShortDate } from "@pld/utils";
+import { getPlaceholder } from "../util/Placeholders";
 
 const HeaderRevisionCell = (title: string, size: string) => {
   return new TableCell({
@@ -38,18 +39,6 @@ const RevisionCell = (value: string): TableCell => {
         ]
       })
     ]
-  })
-}
-
-const RevisionRow = (revision: PldRevision, author: string): TableRow => {
-  return new TableRow({
-    children: [
-      RevisionCell(formatShortDate(new Date(revision.created_date))),
-      RevisionCell(revision.version.toString()),
-      RevisionCell(author),
-      RevisionCell(revision.sections.join(', ')),
-      RevisionCell(revision.comments ?? 'Non-défini'),
-    ],
   })
 }
 
@@ -98,9 +87,24 @@ const DescCell = (title: string, value: string) => {
 
 export class PldDocx {
 
-  constructor(private pld: Pld, private org: Organization) {
+  constructor(private pld: Pld, private org: Organization, private template: TemplateType | Template = defaultTemplate) {
   }
 
+  private getPlaceholders(text: string, revision?: PldRevision): string {
+    return getPlaceholder(text, {pld: this.pld, org: this.org, revision});
+  }
+
+  public generateRevision(revision: PldRevision, author: string): TableRow {
+    return new TableRow({
+      children: [
+        RevisionCell(this.getPlaceholders(this.template.revisionTemplate.date.content.text, revision)),
+        RevisionCell(this.getPlaceholders(this.template.revisionTemplate.version.content.text, revision)),
+        RevisionCell(this.getPlaceholders(this.template.revisionTemplate.author.content.text, revision)),
+        RevisionCell(this.getPlaceholders(this.template.revisionTemplate.sections.content.text, revision)),
+        RevisionCell(this.getPlaceholders(this.template.revisionTemplate.comments.content.text, revision)),
+      ],
+    })
+  }
 
   public generateRevisionTable(): Table {
     return new Table({
@@ -112,43 +116,36 @@ export class PldDocx {
         new TableRow({
           cantSplit: true,
           children: [
-            HeaderRevisionCell('Date', '15%'),
-            HeaderRevisionCell('Version', '10%'),
-            HeaderRevisionCell('Auteur', '15%'),
-            HeaderRevisionCell('Section(s)', '30%'),
-            HeaderRevisionCell('Commentaires', '30%')
+            HeaderRevisionCell(this.getPlaceholders(this.template.revisionTemplate.date.title.text), '15%'),
+            HeaderRevisionCell(this.getPlaceholders(this.template.revisionTemplate.version.title.text), '10%'),
+            HeaderRevisionCell(this.getPlaceholders(this.template.revisionTemplate.author.title.text), '15%'),
+            HeaderRevisionCell(this.getPlaceholders(this.template.revisionTemplate.sections.title.text), '30%'),
+            HeaderRevisionCell(this.getPlaceholders(this.template.revisionTemplate.comments.title.text), '30%')
           ]
         }),
         ...this.pld.revisions.map((revision) => {
-          return RevisionRow(revision, this.org.name);
+          return this.generateRevision(revision, this.org.name);
         })
       ],
     })
   }
 
   public generateDescriptionTable(): Table {
-    let responsable: string;
-    if (this.pld.manager.firstname !== undefined && this.pld.manager.lastname !== undefined) {
-      responsable = this.pld.manager.lastname.toUpperCase() + ' ' + this.pld.manager.firstname;
-    } else {
-      responsable = 'Non définie'
-    }
-
     return new Table({
       width: {
         type: WidthType.PERCENTAGE,
         size: '100%'
       },
       rows: [
-        DescCell('Titre', this.pld.title),
-        DescCell('Object', `PLD ${this.pld.status}`),
-        DescCell('Auteur', this.org.name),
-        DescCell('Responsable', responsable),
-        DescCell('E-mail', this.pld.manager.email),
-        DescCell('Mots-clés', this.pld.tags.join(', ')),
-        DescCell('Promotion', this.pld.promotion.toString()),
-        DescCell('Date de la mise à jour', formatDateNumeric(new Date(this.pld.updated_date ?? new Date()))),
-        DescCell('Version du modèle', this.pld.version.toFixed(1)),
+        DescCell(this.getPlaceholders(this.template.descriptionTemplate.title.title.text), this.getPlaceholders(this.template.descriptionTemplate.title.content.text)),
+        DescCell(this.getPlaceholders(this.template.descriptionTemplate.object.title.text), this.getPlaceholders(this.template.descriptionTemplate.object.content.text)),
+        DescCell(this.getPlaceholders(this.template.descriptionTemplate.author.title.text), this.getPlaceholders(this.template.descriptionTemplate.author.content.text)),
+        DescCell(this.getPlaceholders(this.template.descriptionTemplate.manager.title.text), this.getPlaceholders(this.template.descriptionTemplate.manager.content.text)),
+        DescCell(this.getPlaceholders(this.template.descriptionTemplate.email.title.text), this.getPlaceholders(this.template.descriptionTemplate.email.content.text)),
+        DescCell(this.getPlaceholders(this.template.descriptionTemplate.keywords.title.text), this.getPlaceholders(this.template.descriptionTemplate.keywords.content.text)),
+        DescCell(this.getPlaceholders(this.template.descriptionTemplate.promotion.title.text), this.getPlaceholders(this.template.descriptionTemplate.promotion.content.text)),
+        DescCell(this.getPlaceholders(this.template.descriptionTemplate.updatedDate.title.text), this.getPlaceholders(this.template.descriptionTemplate.updatedDate.content.text)),
+        DescCell(this.getPlaceholders(this.template.descriptionTemplate.version.title.text), this.getPlaceholders(this.template.descriptionTemplate.version.content.text)),
       ]
     });
   }

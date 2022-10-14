@@ -36,7 +36,7 @@ export const getRevisionPlaceholders = (text: string, revision: PldRevision) => 
   newText = newText.replaceAll('%revision_version%', revision.version.toFixed(1));
   newText = newText.replaceAll('%revision_sections%', revision.sections.join(', '));
   newText = getUserPlaceholders(newText, revision.owner, 'revision_owner_');
-  newText = getDatePlaceholders(newText, revision.created_date, 'revision_date');
+  newText = getDatePlaceholders(newText, new Date(revision.created_date), 'revision_date');
   return newText;
 }
 
@@ -97,7 +97,8 @@ export const getHTMLPlaceholders = (text: string) => {
 
 export const getDodWorkTimePlaceholders = (text: string, wt: UserWorkTime) => {
   let newText = '';
-  newText = text.replaceAll('%dod_wt_value%', String(wt.value.toFixed(2)));
+  console.log(wt);
+  newText = text.replaceAll('%dod_wt_value%', String(wt.value));
   return newText;
 }
 
@@ -126,5 +127,6 @@ export const getStatusPlaceholders = (text: string, status: DodStatus) => {
 export const getDocxPlaceholders = (text: string) => {
   let newText = '';
   newText = text.replaceAll('\\t', '    ');
+  newText = newText.replaceAll('\\n', '');
   return newText;
 }

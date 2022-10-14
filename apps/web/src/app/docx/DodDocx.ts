@@ -1,7 +1,9 @@
-import {Dod, UserWorkTime, Organization} from "@pld/shared";
+import { Dod, UserWorkTime, Organization, Template, TemplateType, defaultTemplate, Pld } from "@pld/shared";
 import {Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
-import {getDodStatusColor} from "../util/Preferences";
+import { getPlaceholder, getUserPlaceholders } from "../util/Placeholders";
+import { Text } from "../util/Dom";
+import * as React from "react";
 
 const colors = {
   cellBackground: [
@@ -27,78 +29,67 @@ const SubTitle = (text: string) => {
     })]})
 }
 
-const Description = (description: string) => {
-  return new Paragraph({
-    children: [
-      new TextRun({
-        text: 'Description:',
-        bold: true,
-        size: '13pt',
-        font: 'Roboto',
-      }),
-      new TextRun({
-        break: 2,
-        text: description,
-        font: 'Roboto',
-        size: '13pt'
-      })
-    ]
-  });
-}
+export class DodDocx {
 
-const DodComp = (...dod: string[]) => {
-  return new Paragraph({
-    children: [
-      new TextRun({
-        text: 'Definition Of Done:',
-        bold: true,
-        size: '13pt',
-        font: 'Roboto',
-      }),
-      ...dod.map((dod) => new TextRun({
-        text: `\t - ${dod}`,
-        size: '13pt',
-        font: 'Roboto',
-        break: 1,
-      })),
-    ]
-  });
-}
+  constructor(private dod: Dod, private org: Organization, private pld: Pld, private template: Template | TemplateType = defaultTemplate) {}
 
-const EstimatedCharge = (charges: UserWorkTime[]) => {
+  private getPlaceholder(text: string, definition?: string): string {
+    return getPlaceholder(text, {dod: this.dod, org: this.org, pld: this.pld, definition: definition, docx: true});
+  }
 
-  return new Paragraph({
-    children: charges.map((wt, index) => {
+  private EstimatedCharge(charges: UserWorkTime[]) {
+    return new Paragraph({
+      children: charges.map((wt, index) => {
+        const users = wt.users.map((u) => getUserPlaceholders(this.template.dodTemplate.estimatedWorkTime.content.text, u)).join(', ');
         return [
           new TextRun({
             font: 'Roboto',
             size: '13pt',
-            text: wt.value + ' '
+            text: getPlaceholder(users, {workTime: wt, org: this.org, pld: this.pld, docx: true})
           }),
-          new TextRun({
-            font: 'Roboto',
-            size: '13pt',
-            bold: true,
-            text: 'J/H '
-          }),
-          new TextRun({
-            text: wt.users.map((user) => `${user.firstname}`).join(', '),
-            size: '13pt',
-            font: 'Roboto'
-          }),
-          new TextRun({
-            text: charges[index+1] !== undefined ? ', ' : '',
-            size: '13pt',
-            font: 'Roboto'
-          })
+          charges[index+1] !== undefined ? new TextRun({text: ', '}) : new TextRun(''),
         ]
       }).flat(),
-  })
-}
+    })
+  }
 
-export class DodDocx {
+  private DodComp(...dod: string[]) {
+    return new Paragraph({
+      children: [
+        new TextRun({
+          text: this.getPlaceholder(this.template.dodTemplate.definitionOfDone.title.text),
+          bold: true,
+          size: '13pt',
+          font: 'Roboto',
+        }),
+        ...dod.map((dod) => new TextRun({
+          text: this.getPlaceholder(this.template.dodTemplate.definitionOfDone.content.text, dod),
+          size: '13pt',
+          font: 'Roboto',
+          break: 1,
+        })),
+      ]
+    });
+  }
 
-  constructor(private dod: Dod, private org: Organization) {}
+  private Description() {
+    return new Paragraph({
+      children: [
+        new TextRun({
+          text: this.getPlaceholder(this.template.dodTemplate.description.title.text),
+          bold: true,
+          size: '13pt',
+          font: 'Roboto',
+        }),
+        new TextRun({
+          break: 2,
+          text: this.getPlaceholder(this.template.dodTemplate.description.content.text),
+          font: 'Roboto',
+          size: '13pt'
+        })
+      ]
+    });
+  }
 
   public generateTable() {
     return new Table({
@@ -115,7 +106,7 @@ export class DodDocx {
               type: ShadingType.SOLID,
               color: `#${this.dod.status.color}`
             },
-            children: [Title(this.dod.version + ' ' + this.dod.title)],
+            children: [Title(this.getPlaceholder(this.template.dodTemplate.title.text))],
             width: {
               type: WidthType.PERCENTAGE,
               size: '100%'
@@ -128,25 +119,25 @@ export class DodDocx {
             margins,
             shading: {
               type: ShadingType.SOLID,
-              color: colors.cellBackground[0]
+              color: this.template.colorTemplate.secondaryColor,
             },
             width: {
               type: WidthType.PERCENTAGE,
               size: '50%'
             },
-            children: [SubTitle('En tant que')]
+            children: [SubTitle(this.getPlaceholder(this.template.dodTemplate.skinOf.title.text))]
           }),
           new TableCell({
             margins,
             shading: {
               type: ShadingType.SOLID,
-              color: colors.cellBackground[0]
+              color: this.template.colorTemplate.secondaryColor
             },
             width: {
               type: WidthType.PERCENTAGE,
               size: '50%'
             },
-            children: [SubTitle('Je veux')]
+            children: [SubTitle(this.getPlaceholder(this.template.dodTemplate.wantTo.title.text))]
           }),
         ]}),
         new TableRow({children: [
@@ -156,7 +147,7 @@ export class DodDocx {
               type: WidthType.PERCENTAGE,
               size: '50%'
             },
-            children: [new Paragraph({children: [new TextRun({text: this.dod.skinOf, italics: true, size: '13pt', font: 'Roboto'})]})]
+            children: [new Paragraph({children: [new TextRun({text: this.getPlaceholder(this.template.dodTemplate.skinOf.content.text), italics: true, size: '13pt', font: 'Roboto'})]})]
           })),
           new TableCell(({
             margins,
@@ -164,7 +155,7 @@ export class DodDocx {
               type: WidthType.PERCENTAGE,
               size: '50%'
             },
-            children: [new Paragraph({children: [new TextRun({text: this.dod.want, size: '13pt', font: 'Roboto'})]})]
+            children: [new Paragraph({children: [new TextRun({text: this.getPlaceholder(this.template.dodTemplate.wantTo.content.text), size: '13pt', font: 'Roboto'})]})]
           })),
         ]}),
         new TableRow({
@@ -172,13 +163,13 @@ export class DodDocx {
             margins,
             shading: {
               type: ShadingType.SOLID,
-              color: colors.cellBackground[0]
+              color: this.template.colorTemplate.secondaryColor
             },
             width: {
               type: WidthType.PERCENTAGE,
               size: '100%'
             },
-            children: [Description(this.dod.description)]})]
+            children: [this.Description()]})]
         }),
         new TableRow({
           children: [
@@ -188,7 +179,7 @@ export class DodDocx {
                 type: WidthType.PERCENTAGE,
                 size: '100%'
               },
-              children: [DodComp(...this.dod.descriptionOfDone)]
+              children: [this.DodComp(...this.dod.descriptionOfDone)]
             })
           ]
         }),
@@ -205,7 +196,7 @@ export class DodDocx {
                 size: '50%'
               },
               children: [
-                SubTitle('Charge estimée:')
+                SubTitle(this.getPlaceholder(this.template.dodTemplate.estimatedWorkTime.title.text))
               ]
             }),
             new TableCell({
@@ -218,7 +209,7 @@ export class DodDocx {
                 type: WidthType.PERCENTAGE,
                 size: '50%'
               },
-              children: [EstimatedCharge(this.dod.estimatedWorkTime)]
+              children: [this.EstimatedCharge(this.dod.estimatedWorkTime)]
             })
           ]
         }))

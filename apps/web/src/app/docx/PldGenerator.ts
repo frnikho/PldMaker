@@ -1,8 +1,9 @@
-import { Pld, Dod, Organization, User, DodStatus, Template } from "@pld/shared";
+import { Pld, Dod, Organization, DodStatus, Template } from "@pld/shared";
 import {AlignmentType, Document, Footer, Header, Packer, PageNumber, Paragraph, TextRun, WidthType} from "docx";
 import {DodDocx} from "./DodDocx";
 import {PldDocx} from "./PldDocx";
 import {ReportDocx} from "./ReportDocx";
+import { ReportForm } from "../modal/pld/GeneratePldModal";
 
 export const margins = {
   top: 100,
@@ -22,21 +23,13 @@ export const Title = (title: string): Paragraph => {
 
 export const Space = (): Paragraph => {
   return new Paragraph({
-    children: [new TextRun({text: ' '})]
+    children: [new TextRun({text: '', break: 1})]
   });
 }
 
 export class PldGenerator {
 
-  constructor(private org: Organization, private pld: Pld, private dod: Dod[], private dodStatus: DodStatus[], private template?: Template) {}
-
-  /*footers: {
-    default: {
-      options: {
-        children: [new Paragraph({children: [new TextRun({text: 'ABCDEF'})]})]
-      }
-    }
-  },*/
+  constructor(private org: Organization, private pld: Pld, private dod: Dod[], private dodStatus: DodStatus[], private report: ReportForm, private template?: Template) {}
 
   private getHeader(): Header {
     return new Header({
@@ -74,7 +67,6 @@ export class PldGenerator {
   }
 
   public generate(): Document {
-    //const generator: PldDocx = new PldDocx(this.pld, this.org);
     return new Document({
       styles: {
         paragraphStyles: [
@@ -120,38 +112,43 @@ export class PldGenerator {
               font: 'Roboto',
               size: '12pt'
             },
+          },
+          {
+            id: 'Title',
+            name: 'Title',
+            next: 'Normal',
+            run: {
+              font: 'Roboto',
+              size: '15pt'
+            },
           }
         ],
 
         },
       sections: [{
-       /* headers: {
+        headers: {
           default: this.getHeader(),
         },
         footers: {
           default: this.getFooter(),
           first: new Footer({children: [new TextRun({text: ''})]}),
-        },*/
+        },
         children: [
-          new ReportDocx(this.pld, this.org, this.dod, this.dodStatus, this.template).generate()
-          /*Title('Description du document'),
+          new Paragraph({style: 'Title', children: [new TextRun({text: 'Description du document'})]}),
           Space(),
-          generator.generateDescriptionTable(),
+          new PldDocx(this.pld, this.org, this.template).generateDescriptionTable(),
           Space(),
-          Title('Tableau des révisions'),
+          new Paragraph({style: 'Title', children: [new TextRun({text: 'Tableau des révisions'})]}),
           Space(),
-          generator.generateRevisionTable(),
+          new PldDocx(this.pld, this.org, this.template).generateRevisionTable(),
           Space(),
-          Title('Tableau des révisions'),
+          new Paragraph({style: 'Title', children: [new TextRun({text: 'DoDs'})]}),
           Space(),
-          ...this.dod.map((dod) => {
-            return [new DodDocx(dod, this.org).generateTable(), Space()];
-          }).flat(),
+          ...this.dod.map((d) => new DodDocx(d, this.org, this.pld, this.template).generateTable()),
           Space(),
-          Title('Rapport d’avancement'),
+          new Paragraph({style: 'Title', children: [new TextRun({text: 'Rapport d’avancement'})]}),
           Space(),
-          /!*resume.generateResumeTable(),*!/
-          Space(),*/
+          new ReportDocx(this.pld, this.org, this.dod, this.dodStatus, this.report, this.template).generate()
         ]
       }]
     });

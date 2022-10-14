@@ -1,6 +1,6 @@
 import * as React from "react";
-import { DodStatus, Organization, Pld, Template } from "@pld/shared";
-import { Button, InlineLoading, Link, Modal, Select, SelectItem } from "carbon-components-react";
+import { Organization, Pld, Template, UserDomain } from "@pld/shared";
+import { Button, InlineLoading, Link, Modal, Select, SelectItem, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TextArea, TextInput } from "carbon-components-react";
 import { ModalProps } from "../../util/Modal";
 import { useContext, useEffect, useState } from "react";
 
@@ -12,18 +12,27 @@ import { TemplateApiController } from "../../controller/TemplateApiController";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { RequiredLabel } from "../../util/Label";
+import { useForm } from "react-hook-form";
 
 type Props = {
   pld: Pld
   org: Organization;
-  onClickDownload: (template?: Template) => void;
+  onClickDownload: (value: ReportForm, template?: Template) => void;
 } & ModalProps;
+
+export type ReportForm = {
+  blockingPoints: string;
+  globalComment: string;
+  sectionsProgress: {section: string, progress: string}[];
+}
 
 export const GeneratePldModal = (props: Props) => {
 
   const userCtx = useContext<UserContextProps>(UserContext);
   const [templates, setTemplates] = useState<undefined | Template[]>(undefined);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | undefined>(undefined);
+  const {getValues, watch, register, setValue} = useForm<ReportForm>({defaultValues: {blockingPoints: '', globalComment: '',
+      sectionsProgress: Object.values(UserDomain).map((s) => ({section: s, progress: ''}))}})
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,14 +40,21 @@ export const GeneratePldModal = (props: Props) => {
       if (error) {
         toast('Une erreur est survenue !', {type: 'error'});
       } else {
+        const selectedTemplate = templates.find((t) => t.useAsDefault) ?? templates[0];
         setTemplates(templates);
-        setSelectedTemplate(templates.find((t) => t.useAsDefault) ?? templates[0]);
+        setSelectedTemplate(selectedTemplate);
       }
     })
   }, []);
 
+  useEffect(() => {
+    if (selectedTemplate) {
+      setValue('sectionsProgress', selectedTemplate.reportTemplate.globalProgress.generateSections.map((s) => ({section: s, progress: ''})))
+    }
+  }, [selectedTemplate])
+
   const onClickDownload = () => {
-    props.onClickDownload(selectedTemplate);
+    props.onClickDownload(getValues(), selectedTemplate);
   }
 
   const showTemplates = () => {
@@ -64,6 +80,35 @@ export const GeneratePldModal = (props: Props) => {
     </Select>)
   }
 
+  const showDomainProgress = () =>
+    <Table size="sm">
+      <TableHead>
+        <TableRow id={"DodHeader"} key={"DodHeader"}>
+          <TableHeader id={"DodHeaderName"} key={"DodHeaderName"}>
+            Section
+          </TableHeader>
+          <TableHeader>
+            Progression
+          </TableHeader>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {watch('sectionsProgress').map((v, index) =>
+            <TableRow key={index} >
+              <TableCell>{v.section}</TableCell>
+              <TableCell>
+                <TextInput id={v.section} labelText={""} value={v.progress} onChange={(e) => {
+                  const array = getValues('sectionsProgress');
+                  array[index].progress = e.currentTarget.value;
+                  setValue('sectionsProgress', array);
+                }}/>
+              </TableCell>
+            </TableRow>
+          )}
+      </TableBody>
+    </Table>
+
+
   return (
     <Modal open={props.open}
            onRequestClose={props.onDismiss}
@@ -71,6 +116,9 @@ export const GeneratePldModal = (props: Props) => {
            modalHeading={<div style={style.title}>Télécharger le document word de votre PLD</div>}>
       <Stack gap={6}>
         {showTemplates()}
+        {showDomainProgress()}
+        <TextArea {...register('blockingPoints')} rows={2} labelText={"Points bloquants"}/>
+        <TextArea {...register('globalComment')} rows={2} labelText={"Commentaire général"}/>
         <Button renderIcon={Download} disabled={!templates} onClick={onClickDownload}>
           Télécharger le document
         </Button>
