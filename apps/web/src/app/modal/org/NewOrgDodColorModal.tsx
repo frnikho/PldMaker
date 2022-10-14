@@ -1,5 +1,5 @@
 import React from "react";
-import {ModalComponentProps} from "../../util/Modal";
+import {ModalProps} from "../../util/Modal";
 import {Modal, TextInput} from "carbon-components-react";
 import {FieldData} from "../../util/FieldData";
 
@@ -13,7 +13,7 @@ import { Organization } from "@pld/shared";
 
 type NewOrgDodColorProps = {
   org: Organization;
-} & RequiredUserContextProps & ModalComponentProps;
+} & RequiredUserContextProps & ModalProps;
 
 type NewOrgDodColorsState = {
   color: FieldData<string>;

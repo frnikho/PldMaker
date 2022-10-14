@@ -3,7 +3,7 @@ import {LoginState, UserContext, UserContextProps} from "../../../context/UserCo
 import { NewCalendarComponent } from "../../../component/org/calendar/NewCalendarComponent";
 import {CircularProgress} from "../../../component/utils/CircularProgress";
 import {withParams} from "../../../util/Navigation";
-import {RouteMatch} from "react-router/lib/router";
+import { RouteMatch } from "react-router-dom";
 
 
 export type NewCalendarProps = RouteMatch;

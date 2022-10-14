@@ -1,5 +1,5 @@
 import React from "react";
-import {ModalComponentProps} from "../../util/Modal";
+import {ModalProps} from "../../util/Modal";
 import {Modal, MultiSelect, TextArea} from "carbon-components-react";
 import {FieldData} from "../../util/FieldData";
 import {RequiredUserContextProps} from "../../context/UserContext";
@@ -13,7 +13,7 @@ import {RequiredLabel} from "../../util/Label";
 export type AddRevisionPldModalProps = {
   org: Organization;
   pld: Pld;
-} & ModalComponentProps & RequiredUserContextProps;
+} & ModalProps & RequiredUserContextProps;
 
 export type AddRevisionPldModalState = {
   comments: FieldData<string>;

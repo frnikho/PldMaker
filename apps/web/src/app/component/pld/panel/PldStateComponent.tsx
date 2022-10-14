@@ -3,13 +3,14 @@ import { Tile } from "carbon-components-react";
 import { Pld } from "@pld/shared";
 
 import {Stack} from '@carbon/react';
+import { TileStyle } from "../../../style/TileStyle";
 
 type Props = {
   pld: Pld;
 };
 export const PldStateComponent = (props: Props) => {
   return (
-    <Tile style={style.tile}>
+    <Tile style={TileStyle.default}>
       <Stack gap={6}>
         <h4>Status : {props.pld.status.toUpperCase() ?? ""}</h4>
         {/*{this.showSignButton()}*/}
@@ -17,12 +18,3 @@ export const PldStateComponent = (props: Props) => {
     </Tile>
   )
 };
-
-const style = {
-  tile: {
-    borderRadius: 10,
-  },
-  button: {
-    borderRadius: 6,
-  }
-}

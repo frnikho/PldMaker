@@ -1,11 +1,13 @@
 import * as React from "react";
 import { Button, ProgressIndicator, ProgressStep, Tile } from "carbon-components-react";
-import { IncompleteStatusIcon } from "../../icon/IncompleteStatusIcon";
+import { IncompleteStatusIcon } from "../../../icon/IncompleteStatusIcon";
 import { Organization, Pld, PldStatus } from "@pld/shared";
 import {Stack, Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react';
 import {Information, CheckmarkOutline, Incomplete, Classification} from '@carbon/icons-react';
 import { useState } from "react";
-import { UpdatePldTypeModal } from "../../modal/pld/ChangePldTypeModal";
+import { UpdatePldTypeModal } from "../../../modal/pld/ChangePldTypeModal";
+import { TileStyle } from "../../../style/TileStyle";
+import { ButtonStyle } from "../../../style/ButtonStyle";
 
 type Props = {
   pld: Pld;
@@ -29,7 +31,7 @@ export const PldStepsComponent = (props: Props) => {
         open={modal}
         onDismiss={() => setModal(false)}
         onSuccess={onUpdated}/>
-      <Tile style={style.tile}>
+      <Tile style={TileStyle.default}>
         <div style={{display: 'flex'}}>
           <h4>État d'avancement</h4>
           <div style={{marginLeft: 'auto', marginTop:'auto', marginBottom: 'auto', display: 'flex', justifyContent: 'center'}}>
@@ -76,18 +78,9 @@ export const PldStepsComponent = (props: Props) => {
           />
         </ProgressIndicator>
         <div style={{marginTop: 18}}>
-          <Button style={style.button} renderIcon={Classification} onClick={() => setModal(true)}>Changer l'état d'avancement</Button>
+          <Button style={ButtonStyle.default} renderIcon={Classification} onClick={() => setModal(true)}>Changer l'état d'avancement</Button>
         </div>
       </Tile>
     </>
   )
 };
-
-const style = {
-  tile: {
-
-  },
-  button: {
-
-  }
-}

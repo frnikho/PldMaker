@@ -4,21 +4,21 @@ import {Navigate, Route, Routes, useNavigate} from "react-router-dom";
 import HomePage from "./page/HomePage";
 import {MainPageLayout} from "./layout/MainPageLayout";
 import {NewOrganizationPage} from "./page/organization/NewOrganizationPage";
-import OrganizationPage from "./page/OrganizationPage";
+import OrganizationPage from "./page/organization/OrganizationPage";
 import NewPldPage from "./page/organization/pld/NewPldPage";
 import PldPage from "./page/organization/pld/PldPage";
-import UserPage from "./page/UserPage";
+import UserPage from "./page/user/UserPage";
 import {PageNotFound} from "./page/PageNotFound";
 import NewTemplatePage from "./page/organization/template/NewTemplatePage";
-import {ViewMode} from "./component/template/NewTemplateComponent";
 import ManageOrganizationPage from "./page/organization/ManageOrganizationPage";
-import {DevicePage} from "./page/DevicePage";
+import {DevicePage} from "./page/user/DevicePage";
 import {FAQPage} from "./page/FAQPage";
 import NewCalendarPage from "./page/organization/calendar/NewCalendarPage";
 import CalendarPage from "./page/organization/calendar/CalendarPage";
 import EventPage from "./page/organization/calendar/event/EventPage";
 import { AuthOtpPage } from "./page/AuthOtpPage";
 import { Abc } from "./util/Page";
+import EditTemplatePage from "./page/organization/template/EditTemplatePage";
 
 export function App() {
 
@@ -65,10 +65,8 @@ export function App() {
           </Route>
           <Route path={":id/template"}>
             <Route index element={<Navigate to={"new"}/>}/>
-            <Route path={"new"} element={<NewTemplatePage navigate={navigate} mode={ViewMode.New}/>}/>
-            <Route path={":templateId"} element={<Navigate to={"preview"}/>}/>
-            <Route path={":templateId/edit"} element={<NewTemplatePage mode={ViewMode.Edit}/>}/>
-            <Route path={":templateId/preview"} element={<NewTemplatePage mode={ViewMode.Preview}/>}/>
+            <Route path={"new"} element={<NewTemplatePage navigate={navigate}/>}/>
+            <Route path={":templateId"} element={<EditTemplatePage navigate={navigate}/>}/>
           </Route>
         </Route>
         <Route path='*' element={<MainPageLayout onRedirectUrl={onRedirect}/>}>

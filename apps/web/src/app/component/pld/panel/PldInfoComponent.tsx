@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button, NumberInput, Select, SelectItem, TextArea, TextInput, Tile } from "carbon-components-react";
-import { RequiredLabel } from "../../util/Label";
+import { RequiredLabel } from "../../../util/Label";
 import { Organization, Pld, User } from "@pld/shared";
 import { PldRevisionsComponent } from "./PldRevisionsComponent";
 
@@ -10,9 +10,11 @@ import { Renew } from '@carbon/icons-react';
 
 import { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { PldApiController } from "../../controller/PldApiController";
+import { PldApiController } from "../../../controller/PldApiController";
 import { toast } from "react-toastify";
-import { UserContext, UserContextProps } from "../../context/UserContext";
+import { UserContext, UserContextProps } from "../../../context/UserContext";
+import { TileStyle } from "../../../style/TileStyle";
+import { ButtonStyle } from "../../../style/ButtonStyle";
 
 type Props = {
   pld: Pld
@@ -70,7 +72,7 @@ export const PldInfoComponent = (props: Props) => {
   }
 
   return (
-    <Tile style={style.tile}>
+    <Tile style={TileStyle.default}>
       <Stack gap={6}>
         <TextInput id={"pld-title"} value={watch('title')} labelText={<RequiredLabel message={"Titre"}/>} onChange={(e) => setValue('title', e.currentTarget.value)}/>
         <TextArea rows={4} id={"pld-description"}  labelText={<RequiredLabel message={"Description"}/>} value={watch('description')} onChange={(e) => setValue('description', e.currentTarget.value)}/>
@@ -91,18 +93,9 @@ export const PldInfoComponent = (props: Props) => {
             return (<SelectItem key={index} value={user._id} text={user.email}/>)
           })}
         </Select>
-        <Button style={style.button} onClick={onUpdatePld} renderIcon={Renew} iconDescription={"Update"}>Mettre à jour</Button>
+        <Button style={ButtonStyle.default} onClick={onUpdatePld} renderIcon={Renew} iconDescription={"Update"}>Mettre à jour</Button>
         <PldRevisionsComponent pld={props.pld} org={props.org} loadPld={props.loadPld}/>
       </Stack>
     </Tile>
   );
 };
-
-const style = {
-  tile: {
-
-  },
-  button: {
-
-  }
-}

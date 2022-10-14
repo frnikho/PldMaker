@@ -1,6 +1,6 @@
 import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, {Document} from "mongoose";
-import { TemplateData, TemplateDod, TemplateHeader, TemplateResume, TemplateRevision } from "@pld/shared";
+import {Document} from "mongoose";
+import {TemplateDod, TemplateColor, TemplateReport, TemplateDescription, TemplateRevision } from "@pld/shared";
 import { User } from "../user/user.schema";
 import { Organization } from "../organization/organization.schema";
 import { DatedObjectSchema } from "../utility/datted_object.utility";
@@ -20,20 +20,26 @@ export class Template extends DatedObjectSchema {
   @Prop(templateRules.org)
   org: Organization;
 
+  @Prop(templateRules.picture)
+  picture: string;
+
   @Prop(templateRules.useAsDefault)
   useAsDefault: boolean;
 
   @Prop(templateRules.dodTemplate)
   dodTemplate: TemplateDod;
 
-  @Prop(templateRules.resumeTemplate)
-  resumeTemplate: TemplateResume;
+  @Prop(templateRules.colorTemplate)
+  colorTemplate: TemplateColor;
+
+  @Prop(templateRules.reportTemplate)
+  reportTemplate: TemplateReport;
 
   @Prop(templateRules.revisionTemplate)
   revisionTemplate: TemplateRevision;
 
-  @Prop(templateRules.headerTemplate)
-  headerTemplate: TemplateHeader;
+  @Prop(templateRules.descriptionTemplate)
+  descriptionTemplate: TemplateDescription;
 
   @Prop(templateRules.createdDate)
   createdDate: Date;

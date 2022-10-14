@@ -1,9 +1,10 @@
 import * as React from "react";
-import { DodTableComponent } from "../dod/DodTableComponent";
+import { DodTableComponent } from "../../dod/DodTableComponent";
 import { Dod, DodStatus, Organization, Pld } from "@pld/shared";
-import { UserContext, UserContextProps } from "../../context/UserContext";
+import { UserContext, UserContextProps } from "../../../context/UserContext";
 import { useContext } from "react";
 import { Tile } from "carbon-components-react";
+import { TileStyle } from "../../../style/TileStyle";
 
 type Props = {
   dodStatus: DodStatus[];
@@ -11,7 +12,7 @@ type Props = {
   pld: Pld;
   org: Organization;
 };
-export const PldDodsComponents = (props: Props) => {
+export const PldDoDsComponents = (props: Props) => {
 
   const userCtx = useContext<UserContextProps>(UserContext);
 
@@ -28,18 +29,9 @@ export const PldDodsComponents = (props: Props) => {
   }
 
   return (
-    <Tile style={style.tile}>
+    <Tile style={TileStyle.default}>
       <h2 style={{fontWeight: 500}}>DoDs</h2>
       <DodTableComponent dodStatus={props.dodStatus} userContext={userCtx} onCreatedDod={onDodCreated} onDeleteDod={onDodDeleted} onUpdateDod={onDodUpdated} pld={props.pld} org={props.org} dod={props.dod}/>
     </Tile>
   );
 };
-
-const style = {
-  tile: {
-
-  },
-  button: {
-
-  }
-}

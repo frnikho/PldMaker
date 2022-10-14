@@ -1,10 +1,10 @@
 import React from "react";
 import {LoginState, UserContext, UserContextProps} from "../../../context/UserContext";
 import {CircularProgress} from "../../../component/utils/CircularProgress";
-import {RouteMatch} from "react-router/lib/router";
 import {redirectNavigation, withParams} from "../../../util/Navigation";
 import {PageState} from "../../../util/Page";
 import { PldComponent } from "../../../component/pld/PldComponent";
+import { RouteMatch } from "react-router-dom";
 
 export type PldPageProps = unknown & RouteMatch;
 export type PldPageState = unknown & PageState;

@@ -1,5 +1,5 @@
 import React from "react";
-import {ModalComponentProps} from "../../util/Modal";
+import {ModalProps} from "../../util/Modal";
 import {Organization} from "@pld/shared";
 import {
   Modal,
@@ -13,7 +13,7 @@ import {formatLongDate} from "@pld/utils";
 
 export type OrgHistoryModelProps = {
   org: Organization;
-} & ModalComponentProps
+} & ModalProps
 
 export type OrgHistoryModelState = {
   short: boolean;

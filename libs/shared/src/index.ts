@@ -39,6 +39,13 @@ export * from './lib/organization/calendar/CalendarMember'
 export * from './lib/organization/calendar/CalendarEvent'
 
 export * from './lib/template/Template';
+export * from './lib/template/TemplateDod';
+export * from './lib/template/TemplateReport';
+export * from './lib/template/TemplateRevision';
+export * from './lib/template/TemplateDescription';
+export * from './lib/template/TemplateColor';
+export * from './lib/template/TemplateText';
+export * from './lib/template/Review';
 
 export * from './lib/Object';
 export * from './lib/Template';

@@ -1,11 +1,11 @@
 import React from "react";
-import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
+import {LoginState, UserContext, UserContextProps} from "../../context/UserContext";
 import {Navigate} from "react-router-dom";
 import {formatLongDate} from "@pld/utils";
 import {Button, ClickableTile, Link} from "carbon-components-react";
 import {Stack} from '@carbon/react';
 import Lottie from "lottie-react";
-import {UserApiController} from "../controller/UserApiController";
+import {UserApiController} from "../../controller/UserApiController";
 import {toast} from "react-toastify";
 
 export type DevicePageProps = unknown;
@@ -54,7 +54,7 @@ export class DevicePage extends React.Component<DevicePageProps, DevicePageState
     return (
       <Stack>
         <h4>Vous n'avez pas de devices récents</h4>
-        <Lottie animationData={require('../../assets/animations/devices.json')} loop={true} style={{width: '200px'}}/>
+        <Lottie animationData={require('../../../assets/animations/devices.json')} loop={true} style={{width: '200px'}}/>
       </Stack>
     )
   }

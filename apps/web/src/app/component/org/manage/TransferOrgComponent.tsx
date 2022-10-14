@@ -6,7 +6,7 @@ import { Organization } from "@pld/shared";
 import { useContext, useState } from "react";
 import { UserContext, UserContextProps } from "../../../context/UserContext";
 
-import {Migrate} from '@carbon/react';
+import {Migrate} from '@carbon/icons-react';
 import { MigrateOrgModal } from "../../../modal/org/manage/MigrateOrgModal";
 
 type Props = {
@@ -23,7 +23,7 @@ export const TransferOrgComponent = (props: Props) => {
 
   return (
     <>
-      <MigrateOrgModal org={props.org} open={modal} onSuccess={() => setModal(false)} onClose={() => setModal(false)} userContext={userCtx}/>
+      <MigrateOrgModal org={props.org} open={modal} onSuccess={() => setModal(false)} onDismiss={() => setModal(false)}/>
       <Tile style={{padding: '18px'}}>
         <Stack gap={6}>
           <div>

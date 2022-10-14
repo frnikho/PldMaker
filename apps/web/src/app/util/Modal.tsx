@@ -1,19 +1,19 @@
 import React from "react";
-import { Modal, ModalProps } from "carbon-components-react";
+import { Modal, ModalProps as CarbonModalProps } from "carbon-components-react";
 
-export type ModalComponentProps = {
+export type ModalProps = {
   open: boolean;
-  onDismiss: (...args: unknown[]) => void;
-  onSuccess: (...args: unknown[]) => void;
+  onDismiss: <T,>(args?: T) => void;
+  onSuccess: <T,>(args?: T) => void;
 };
 
-export abstract class ModalComponent<T, Z> extends React.Component<ModalComponentProps & T, Z> {
+export abstract class ModalComponent<T, Z> extends React.Component<ModalProps & T, Z> {
 
-  protected constructor(props: ModalComponentProps & T, private params?: ModalProps) {
+  protected constructor(props: ModalProps & T, private params?: CarbonModalProps) {
     super(props);
   }
 
-  override componentDidUpdate(prevProps: Readonly<ModalComponentProps & T>, prevState: Readonly<Z>) {
+  override componentDidUpdate(prevProps: Readonly<ModalProps & T>, prevState: Readonly<Z>) {
     if (this.props.open !== prevProps.open) {
       if (this.props.open) {
         this.onOpen();

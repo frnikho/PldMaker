@@ -34,6 +34,7 @@ import {CircularProgress} from "../utils/CircularProgress";
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import { SERVER_URL_ASSETS, ShowFavourIcon } from "../../util/User";
+import { TemplateApiController } from "../../controller/TemplateApiController";
 
 export type OrganizationComponentProps = {
   orgId?: string;
@@ -84,6 +85,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
   override componentDidMount() {
     this.loadOrg();
     this.loadCalendars();
+    this.loadTemplates();
   }
 
   private loadCalendars() {
@@ -121,6 +123,20 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
         this.loadPld(org._id);
       }
     });
+  }
+
+  private loadTemplates() {
+    if (this.props.orgId === undefined)
+      return;
+    TemplateApiController.getTemplates(this.props.userContext.accessToken, this.props.orgId, (templates, error) => {
+      if (error) {
+        return this.props.onError(error);
+      } else {
+        this.setState({
+          templates: templates
+        })
+      }
+    })
   }
 
   private loadPld(orgId: string) {
@@ -303,7 +319,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
                 <p style={{fontWeight: 600, fontSize: 26}}>{template.title}</p>
                 <br/>
                 <div style={{width: '100%', textAlign: 'center', marginTop: 20, marginBottom: 20}}>
-                  <img style={{maxWidth: '100%', height: 160}} src={SERVER_URL_ASSETS}/>
+                  <img style={{maxWidth: '100%', height: 160}} src={SERVER_URL_ASSETS + template.picture}/>
                 </div>
                 <p>Dernière mise a jour le</p>
                 <p style={{fontWeight: 'bold'}}>{formatLongDate(new Date(template.updatedDate))}</p>
@@ -352,8 +368,6 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
               {this.showCalendars()}
               <h2>Templates <Button kind={"ghost"} onClick={this.onClickCreateTemplate} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
               {this.showTemplates()}
-              {/*<h2>Documents <Button kind={"ghost"} onClick={this.onClickCreateDocument} hasIconOnly renderIcon={Add} iconDescription={"Créer/Ajouter un document"}/></h2>*/}
-              {/*<Editor onSave={(content) => console.log('saved !', content)}/>*/}
             </Column>
             <Column lg={4} xlg={4} md={8} sm={4}>
               {this.showInfo()}

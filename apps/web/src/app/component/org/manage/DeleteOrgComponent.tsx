@@ -29,7 +29,7 @@ export const DeleteOrgComponent = (props: Props) => {
       <DeleteOrgModal org={props.org} open={modal} onSuccess={() => {
         setModal(false);
         navigate('/');
-      }} onClose={() => setModal(false)} userContext={userCtx}/>
+      }} onDismiss={() => setModal(false)}/>
       <Tile style={{padding: '18px'}}>
         <Stack gap={6}>
           <div>

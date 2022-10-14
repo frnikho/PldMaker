@@ -1,4 +1,4 @@
-import { ModalComponent, ModalComponentProps } from "../../../util/Modal";
+import { ModalComponent, ModalProps } from "../../../util/Modal";
 import { Button, ButtonSet, Checkbox, Column, Grid, TextInput } from "carbon-components-react";
 import { RequiredUserContextProps } from "../../../context/UserContext";
 import { OrganizationApiController } from "../../../controller/OrganizationApiController";
@@ -16,7 +16,7 @@ import {Add, TrashCan} from '@carbon/icons-react';
 export type UpdateDodStatusProps = {
   selectedDodStatus: DodStatus;
   org: Organization;
-} & ModalComponentProps & RequiredUserContextProps;
+} & ModalProps & RequiredUserContextProps;
 
 export type UpdateDodStatusState = {
   name: string;
@@ -91,5 +91,5 @@ export class UpdateDodStatusModal extends ModalComponent<UpdateDodStatusProps, U
       </ButtonSet>
     </Stack>);
   }
-
 }
+

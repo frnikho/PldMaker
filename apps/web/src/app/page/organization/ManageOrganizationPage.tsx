@@ -2,9 +2,9 @@ import React from "react";
 import {AuthPage} from "../../util/Page";
 import {UserContextProps} from "../../context/UserContext";
 import {withParams} from "../../util/Navigation";
-import {RouteMatch} from "react-router/lib/router";
 import {CircularProgress} from "../../component/utils/CircularProgress";
 import { ManageOrganizationComponent } from "../../component/org/ManageOrganizationComponent";
+import { RouteMatch } from "react-router-dom";
 
 class ManageOrganizationPage extends AuthPage<RouteMatch, unknown> {
 

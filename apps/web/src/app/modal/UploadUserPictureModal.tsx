@@ -1,12 +1,12 @@
-import { ModalComponent, ModalComponentProps } from "../util/Modal";
+import { ModalComponent } from "../util/Modal";
 import { RequiredUserContextProps } from "../context/UserContext";
-import { Button, FileUploaderDropContainer } from "carbon-components-react";
+import { Button, FileUploaderDropContainer, ModalProps } from "carbon-components-react";
 import { UserApiController } from "../controller/UserApiController";
 import { toast } from "react-toastify";
 
 export type UploadUserPictureModalProps = {
 
-} & RequiredUserContextProps & ModalComponentProps;
+} & RequiredUserContextProps & ModalProps;
 
 export type UploadUserPictureModalState = {
   selectedFile?: File;

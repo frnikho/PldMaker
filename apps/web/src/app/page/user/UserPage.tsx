@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import { LoginState, UserContext, UserContextProps } from "../context/UserContext";
+import { LoginState, UserContext, UserContextProps } from "../../context/UserContext";
 
 import { Stack } from "@carbon/react";
-import { UserInfoComponent } from "../component/user/info/UserInfoComponent";
+import { UserInfoComponent } from "../../component/user/info/UserInfoComponent";
 import { toast } from "react-toastify";
 import { Mfa, User } from "@pld/shared";
-import { language } from "../language";
-import { LanguageContext, LanguageContextState } from "../context/LanguageContext";
-import { UserSecurityComponent } from "../component/user/security/UserSecurityComponent";
-import { UserApiController } from "../controller/UserApiController";
+import { language } from "../../language";
+import { LanguageContext, LanguageContextState } from "../../context/LanguageContext";
+import { UserSecurityComponent } from "../../component/user/security/UserSecurityComponent";
+import { UserApiController } from "../../controller/UserApiController";
 
 export default function UserPage() {
   const userCtx = useContext<UserContextProps>(UserContext);

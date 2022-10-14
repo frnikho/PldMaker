@@ -9,12 +9,13 @@ import {
 
 import {Stack} from '@carbon/react';
 import {User, Organization} from "@pld/shared";
-import {emitBody, SocketContext} from "../../context/SocketContext";
-import {PageState} from "../../util/Page";
-import {RequiredUserContextProps} from "../../context/UserContext";
+import {emitBody, SocketContext} from "../../../context/SocketContext";
+import {PageState} from "../../../util/Page";
+import {RequiredUserContextProps} from "../../../context/UserContext";
 
 import {UserOnline, Asleep} from '@carbon/icons-react'
 import {formatLongDate} from "@pld/utils";
+import { TileStyle } from "../../../style/TileStyle";
 
 export const defaultRefreshTime = 10 * 1000;
 
@@ -109,7 +110,7 @@ export class OnlineOrgMembersComponent extends React.Component<OnlineOrgMembersC
 
   override render() {
     return (
-      <Tile style={{borderRadius: 10}}>
+      <Tile style={TileStyle.default}>
         <Stack>
           <h4 style={{fontWeight: 'bold'}}>Membres</h4>
           <p>En ligne</p>

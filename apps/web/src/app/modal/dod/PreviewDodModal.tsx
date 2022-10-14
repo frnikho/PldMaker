@@ -1,5 +1,5 @@
 import React from "react";
-import {ModalComponentProps} from "../../util/Modal";
+import {ModalProps} from "../../util/Modal";
 import { Dod, User, WorkTimeFormat } from "@pld/shared";
 import {
   CodeSnippet,
@@ -21,7 +21,7 @@ import {HistoryHelper} from "../../util/HistoryHelper";
 
 export type PreviewDodProps = {
   dod: Dod;
-} & ModalComponentProps;
+} & ModalProps;
 
 export type PreviewDodState = unknown
 

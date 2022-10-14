@@ -4,6 +4,7 @@ import { formatLongDate } from "@pld/utils";
 
 import {Stack} from '@carbon/react';
 import { Organization, Pld } from "@pld/shared";
+import { TileStyle } from "../../../style/TileStyle";
 
 type Props = {
   pld: Pld;
@@ -22,7 +23,7 @@ export const PldQuickInfoComponent = (props: Props) => {
   }
 
   return (
-    <Tile style={style.tile}>
+    <Tile style={TileStyle.default}>
       <Stack gap={6}>
         <div>
           <h4 style={{fontWeight: 600}}>Date de création :</h4>
@@ -50,12 +51,3 @@ export const PldQuickInfoComponent = (props: Props) => {
     </Tile>
   )
 };
-
-const style = {
-  tile: {
-    borderRadius: 10,
-  },
-  button: {
-    borderRadius: 6,
-  }
-}

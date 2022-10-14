@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Button, Modal, Select, SelectItem } from "carbon-components-react";
-import {ModalComponentProps} from "../../util/Modal";
+import {ModalProps} from "../../util/Modal";
 import { Organization, Pld } from "@pld/shared";
 import { PldApiController } from "../../controller/PldApiController";
 import { toast } from "react-toastify";
@@ -11,7 +11,7 @@ import { Stack } from '@carbon/react';
 type Props = {
   pld: Pld;
   org: Organization;
-} & ModalComponentProps;
+} & ModalProps;
 
 export const UpdatePldTypeModal = (props: Props) => {
 

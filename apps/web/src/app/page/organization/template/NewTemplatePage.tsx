@@ -1,9 +1,9 @@
 import React from "react";
 import { UserContextProps } from "../../../context/UserContext";
-import NewTemplateComponent, { ViewMode } from "../../../component/template/NewTemplateComponent";
 import { NavigationState, withParams } from "../../../util/Navigation";
-import { RouteMatch } from "react-router/lib/router";
 import { Page } from "../../../util/Page";
+import { CreateTemplateComponent } from "../../../component/template/CreateTemplateComponent";
+import { RouteMatch } from "react-router-dom";
 
 type TemplateUrlParams = {
   id: string;
@@ -11,7 +11,7 @@ type TemplateUrlParams = {
 }
 
 export type NewTemplateProps = {
-  mode: ViewMode;
+
 } & RouteMatch;
 
 export type NewTemplateState = unknown & NavigationState;
@@ -26,8 +26,7 @@ class NewTemplatePage extends Page<NewTemplateProps, NewTemplateState> {
   }
 
   renderPage(context: UserContextProps): React.ReactNode {
-    console.log(this.props.navigate);
-    return <NewTemplateComponent orgId={this.props.params['id'] ?? ''} navigate={this.props.navigate} mode={ViewMode.New} userContext={context}/>
+    return <CreateTemplateComponent orgId={this.props.params['id'] ?? ''}/>
   }
 
 }

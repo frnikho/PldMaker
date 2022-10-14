@@ -1,6 +1,7 @@
 import * as path from "path";
 
 export const ORG_ASSETS_DIR = './org/'
+export const TEMPLATES_ASSETS_DIR = './templates/'
 export const PLD_ASSETS_DIR = './pld/'
 
 export const ORG_PICTURES = ['undraw_at_the_park_-2-e47.svg',
@@ -53,6 +54,27 @@ export const PLD_PICTURES = ['undraw_annotation_re_h774.svg',
   'undraw_google_docs_re_evm3.svg',
   'undraw_online_cv_re_gn0a.svg',
   'undraw_personal_information_re_vw8a.svg'];
+
+const TEMPLATES_PICTURES = [
+  'undraw_before_dawn_re_hp4m.svg',
+  'undraw_blank_canvas_re_2hwy.svg',
+  'undraw_creative_draft_vb5x.svg',
+  'undraw_designer_girl_re_h54c.svg',
+  'undraw_designer_mindset_re_2w1k.svg',
+  'undraw_designer_re_5v95.svg',
+  'undraw_everyday_design_gy64.svg',
+  'undraw_factory_dy-0-a.svg',
+  'undraw_innovative_re_rr5i.svg',
+  'undraw_interaction_design_odgc.svg',
+  'undraw_learning_sketching_nd4f.svg',
+  'undraw_online_art_re_f1pk.svg',
+  'undraw_sculpting_-1-c9p.svg',
+  'undraw_winter_designer_a-2-m7.svg'
+];
+
+export const getTemplatePicture = (index?: number) => {
+  return path.join(TEMPLATES_ASSETS_DIR, TEMPLATES_PICTURES[index ?? Math.floor(Math.random() * TEMPLATES_PICTURES.length)]);
+}
 
 export const getOrgPicture = (index?: number) => {
   return path.join(ORG_ASSETS_DIR, ORG_PICTURES[index ?? Math.floor(Math.random() * ORG_PICTURES.length)]);

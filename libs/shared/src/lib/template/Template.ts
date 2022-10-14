@@ -1,51 +1,11 @@
 import { User } from "../user/User";
 import {Organization} from '../organization/Organization';
-import { DodStatus } from "../dod/DodStatus";
-import { IsOptional, Length } from "class-validator";
-import { IsObjectID } from "../validator/ObjectIdValidator";
-import { ObjectID } from "../Object";
-
-
-export class TemplateHeader {
-  generate: boolean;
-  sections: Map<string, string>;
-
-  constructor(generate: boolean, sections: Map<string, string>) {
-    this.generate = generate;
-    this.sections = sections;
-  }
-}
-
-export class TemplateDod {
-  generate: boolean;
-  allStatus: boolean;
-  status: DodStatus[];
-
-  constructor(generate: boolean, allStatus: boolean, status: DodStatus[]) {
-    this.generate = generate;
-    this.allStatus = allStatus;
-    this.status = status;
-  }
-}
-
-export class TemplateResume {
-  generate: boolean;
-  @IsOptional()
-  date?: Date;
-  allStatus: boolean;
-  status: DodStatus[];
-
-  constructor(generate: boolean, allStatus: boolean, status: DodStatus[], date?: Date) {
-    this.generate = generate;
-    this.allStatus = allStatus;
-    this.status = status;
-    this.date = date;
-  }
-}
-
-export class TemplateRevision {
-
-}
+import { Length } from "class-validator";
+import { defaultTemplateColor, TemplateColor } from "./TemplateColor";
+import { defaultTemplateReport, TemplateReport } from "./TemplateReport";
+import { defaultTemplateDod, TemplateDod } from "./TemplateDod";
+import { defaultTemplateRevision, TemplateRevision } from "./TemplateRevision";
+import { defaultTemplateDescription, TemplateDescription } from "./TemplateDescription";
 
 export class Template {
   _id: string;
@@ -53,89 +13,90 @@ export class Template {
   org: Organization;
   title: string;
   useAsDefault: boolean;
+  picture: string;
+  colorTemplate: TemplateColor;
   dodTemplate: TemplateDod;
-  resumeTemplate: TemplateResume;
+  reportTemplate: TemplateReport;
   revisionTemplate: TemplateRevision;
-  headerTemplate: TemplateHeader;
+  descriptionTemplate: TemplateDescription;
   createdDate: Date;
   updatedDate: Date;
 
-  constructor(_id: string, owner: User, org: Organization, title: string, useAsDefault: boolean, dodTemplate: TemplateDod, resumeTemplate: TemplateResume, revisionTemplate: TemplateRevision, headerTemplate: TemplateHeader, createdDate: Date, updatedDate: Date) {
-    this._id = _id;
+  constructor(id: string, owner: User, org: Organization, title: string, picture: string, useAsDefault: boolean, colorTemplate: TemplateColor, dodTemplate: TemplateDod, reportTemplate: TemplateReport, revisionTemplate: TemplateRevision, descriptionTemplate: TemplateDescription, createdDate: Date, updatedDate: Date) {
+    this._id = id;
     this.owner = owner;
     this.org = org;
     this.title = title;
     this.useAsDefault = useAsDefault;
+    this.picture = picture;
+    this.colorTemplate = colorTemplate;
     this.dodTemplate = dodTemplate;
-    this.resumeTemplate = resumeTemplate;
+    this.reportTemplate = reportTemplate;
     this.revisionTemplate = revisionTemplate;
-    this.headerTemplate = headerTemplate;
+    this.descriptionTemplate = descriptionTemplate;
     this.createdDate = createdDate;
     this.updatedDate = updatedDate;
   }
 }
-export const defaultTemplateHeaderSections: Map<string, string> = new Map([
-  ['Titre', '%pld_title%'],
-  ['Object', 'PLD %pld_status%'],
-  ['Auteur', '%pld_manager%'],
-  ['Responsable', '%responsable_firstname% %responsable_lastname%'],
-  ['E-mail', '%responsable_email%'],
-  ['Mots-clés', '%pld_keyword%'],
-  ['Promotion', '%pld_promotion%'],
-  ['Date de la mise à jour', '%pld_updated_date%'],
-  ['Version du modèle', '%pld_version%'],
-]);
-export const defaultTemplateHeader: TemplateHeader = new TemplateHeader(true, defaultTemplateHeaderSections);
-export const defaultTemplateDod: TemplateDod = new TemplateDod(true, true, []);
-export const defaultTemplateResume: TemplateResume = new TemplateResume(true, true, []);
-export const defaultTemplateRevision: TemplateRevision = new TemplateRevision();
 
 
 export class UpdateTemplateBody {
 
   title?: string;
   useAsDefault?: boolean;
+  colorTemplate?: TemplateColor;
   dodTemplate?: TemplateDod;
-  resumeTemplate?: TemplateResume;
+  reportTemplate?: TemplateReport;
   revisionTemplate?: TemplateRevision;
-  headerTemplate?: TemplateHeader;
+  descriptionTemplate?: TemplateDescription;
 
-  constructor(title?: string, useAsDefault?: boolean, dodTemplate?: TemplateDod, resumeTemplate?: TemplateResume, revisionTemplate?: TemplateRevision, headerTemplate?: TemplateHeader) {
+  constructor(title?: string, useAsDefault?: boolean, colorTemplate?: TemplateColor, dodTemplate?: TemplateDod, reportTemplate?: TemplateReport, revisionTemplate?: TemplateRevision, descriptionTemplate?: TemplateDescription) {
     this.title = title;
     this.useAsDefault = useAsDefault;
+    this.colorTemplate = colorTemplate;
     this.dodTemplate = dodTemplate;
-    this.resumeTemplate = resumeTemplate;
+    this.reportTemplate = reportTemplate;
     this.revisionTemplate = revisionTemplate;
-    this.headerTemplate = headerTemplate;
+    this.descriptionTemplate = descriptionTemplate;
   }
 }
 
 export class NewTemplateBody {
 
-  @IsObjectID()
-  owner: ObjectID;
-
-  @IsObjectID()
-  org: ObjectID;
-
   @Length(3, 128)
   title: string;
 
   useAsDefault?: boolean;
+
+  colorTemplate?: TemplateColor;
   dodTemplate?: TemplateDod;
-  resumeTemplate?: TemplateResume;
+  reportTemplate?: TemplateReport;
   revisionTemplate?: TemplateRevision;
-  headerTemplate?: TemplateHeader;
+  descriptionTemplate?: TemplateDescription;
 
-
-  constructor(owner: ObjectID, org: ObjectID, title: string, useAsDefault: boolean, dodTemplate?: TemplateDod, resumeTemplate?: TemplateResume, revisionTemplate?: TemplateRevision, headerTemplate?: TemplateHeader) {
-    this.owner = owner;
-    this.org = org;
+  constructor(title: string, useAsDefault?: boolean, colorTemplate?: TemplateColor, dodTemplate?: TemplateDod, reportTemplate?: TemplateReport, revisionTemplate?: TemplateRevision, descriptionTemplate?: TemplateDescription) {
     this.title = title;
     this.useAsDefault = useAsDefault;
+    this.colorTemplate = colorTemplate;
     this.dodTemplate = dodTemplate;
-    this.resumeTemplate = resumeTemplate;
+    this.reportTemplate = reportTemplate;
     this.revisionTemplate = revisionTemplate;
-    this.headerTemplate = headerTemplate;
+    this.descriptionTemplate = descriptionTemplate;
   }
+}
+
+export type TemplateType = {
+  colorTemplate: TemplateColor;
+  dodTemplate: TemplateDod;
+  reportTemplate: TemplateReport;
+  revisionTemplate: TemplateRevision;
+  descriptionTemplate: TemplateDescription;
+}
+
+export const defaultTemplate = {
+  reportTemplate: defaultTemplateReport,
+  colorTemplate: defaultTemplateColor,
+  descriptionTemplate: defaultTemplateDescription,
+  dodTemplate: defaultTemplateDod,
+  revisionTemplate: defaultTemplateRevision,
 }

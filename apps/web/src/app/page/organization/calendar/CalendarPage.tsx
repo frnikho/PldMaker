@@ -1,5 +1,4 @@
 import React from "react";
-import {RouteMatch} from "react-router/lib/router";
 import {withParams} from "../../../util/Navigation";
 import {Data} from "../../../util/FieldData";
 import {Calendar, Organization} from "@pld/shared";
@@ -9,6 +8,7 @@ import {CircularProgress} from "../../../component/utils/CircularProgress";
 import {CalendarComponent} from "../../../component/org/calendar/CalendarComponent";
 import {CalendarApiController} from "../../../controller/CalendarApiController";
 import {toast} from "react-toastify";
+import { RouteMatch } from "react-router-dom";
 
 export type CalendarPageProps = RouteMatch;
 

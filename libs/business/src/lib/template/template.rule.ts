@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import { defaultTemplateDod, defaultTemplateHeader, defaultTemplateResume, defaultTemplateRevision } from "@pld/shared";
+import { defaultTemplateColor, defaultTemplateDod, defaultTemplateReport, defaultTemplateDescription, defaultTemplateRevision } from "@pld/shared";
+import { PropOptions } from "@nestjs/mongoose";
+import { getTemplatePicture } from "../utility/picture.utility";
 
-declare type PropOptions<T = any> = Partial<mongoose.SchemaDefinitionProperty<T>> | mongoose.SchemaType;
-
-type TemplateRules = 'owner' | 'org' | 'title' | 'useAsDefault' | 'dodTemplate' | 'resumeTemplate' | 'revisionTemplate' | 'headerTemplate' | 'createdDate' | 'updatedDate';
+type TemplateRules = 'owner' | 'org' | 'title' | 'picture' | 'useAsDefault' | 'dodTemplate' | 'reportTemplate' | 'revisionTemplate' | 'colorTemplate' | 'descriptionTemplate' | 'createdDate' | 'updatedDate';
 
 export type TemplateRuleType = {
   [key in TemplateRules]: PropOptions;
@@ -25,17 +25,25 @@ export const templateRules: TemplateRuleType = {
     maxlength: 128,
     minlength: 3,
   },
+  picture: {
+    required: false,
+    default: () => getTemplatePicture(),
+  },
   dodTemplate: {
     required: false,
     default: defaultTemplateDod,
   },
-  headerTemplate: {
+  descriptionTemplate: {
     required: false,
-    default: defaultTemplateHeader,
+    default: defaultTemplateDescription,
   },
-  resumeTemplate: {
+  colorTemplate: {
     required: false,
-    default: defaultTemplateResume,
+    default: defaultTemplateColor,
+  },
+  reportTemplate: {
+    required: false,
+    default: defaultTemplateReport,
   },
   revisionTemplate: {
     required: false,

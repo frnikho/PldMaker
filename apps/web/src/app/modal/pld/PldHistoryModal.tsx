@@ -5,7 +5,7 @@ import {CodeSnippet,
   Tile,
   Tooltip,
 } from "carbon-components-react";
-import {ModalComponentProps} from "../../util/Modal";
+import {ModalProps} from "../../util/Modal";
 
 import {Dod, EditedField, Pld, Organization} from "@pld/shared";
 import {
@@ -37,7 +37,7 @@ export type PldHistoryProps = {
   org: Organization;
   pld: Pld;
   dod: Dod[];
-} & ModalComponentProps;
+} & ModalProps;
 
 export type PldHistoryState = unknown;
 

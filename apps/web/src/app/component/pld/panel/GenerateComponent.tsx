@@ -3,9 +3,10 @@ import { Organization, Pld, Dod, DodStatus } from "@pld/shared";
 import {Button} from "carbon-components-react";
 
 import * as docx from 'docx';
-import {PldGenerator} from "../../docx/PldGenerator";
+import {PldGenerator} from "../../../docx/PldGenerator";
 
 import {DocumentView} from '@carbon/icons-react'
+import { ButtonStyle } from "../../../style/ButtonStyle";
 
 export type GenerateComponentProps = {
   org: Organization;
@@ -55,15 +56,15 @@ export class GenerateComponent extends React.Component<GenerateComponentProps, G
   }
 
   private onClickCreatePreview() {
-    const generator: PldGenerator = new PldGenerator(this.props.pld, this.props.dod, this.props.org, this.props.dodStatus);
+    /*const generator: PldGenerator = new PldGenerator(this.props.pld, this.props.dod, this.props.org, this.props.dodStatus);
     PldGenerator.getBlobFromDoc(generator.generate(), (blob) => {
       window.open(URL.createObjectURL(blob));
-    });
+    });*/
   }
 
   override render() {
     return (
-     <Button style={{borderRadius: 6}} renderIcon={DocumentView} onClick={this.onClickCreatePreview}>Générer une preview du PLD </Button>
+     <Button style={ButtonStyle.default} renderIcon={DocumentView} onClick={this.onClickCreatePreview}>Générer une preview du PLD </Button>
     );
   }
 

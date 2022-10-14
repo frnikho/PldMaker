@@ -28,6 +28,7 @@ import {TrashCan, Edit, ImportExport, Add} from '@carbon/icons-react'
 import {toast} from "react-toastify";
 import {PreviewDodModal} from "../../modal/dod/PreviewDodModal";
 import {formatShortDate} from '@pld/utils';
+import { ButtonStyle } from "../../style/ButtonStyle";
 
 export type DodTableComponentProps = {
   onUpdateDod: () => void;
@@ -255,7 +256,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                   </TableToolbarAction>
                 </TableToolbarMenu>
                 <Button
-                  style={{borderRadius: 8}}
+                  style={ButtonStyle.default}
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                   onClick={this.onClickCreateDod}
                   renderIcon={Add}

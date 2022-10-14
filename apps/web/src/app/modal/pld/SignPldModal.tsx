@@ -1,8 +1,8 @@
 import React from "react";
 import {Button, ButtonSet, Modal} from "carbon-components-react";
-import { ModalComponentProps } from "../../util/Modal";
+import { ModalProps } from "../../util/Modal";
 
-export type SignPldModalProps = ModalComponentProps;
+export type SignPldModalProps = ModalProps;
 
 export type SignPldModalState = unknown;
 

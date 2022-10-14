@@ -1,8 +1,8 @@
-import { Pld, Dod, Organization, User, DodStatus } from "@pld/shared";
+import { Pld, Dod, Organization, User, DodStatus, Template } from "@pld/shared";
 import {AlignmentType, Document, Footer, Header, Packer, PageNumber, Paragraph, TextRun, WidthType} from "docx";
 import {DodDocx} from "./DodDocx";
 import {PldDocx} from "./PldDocx";
-import {PldResumeDocx} from "./PldResumeDocx";
+import {ReportDocx} from "./ReportDocx";
 
 export const margins = {
   top: 100,
@@ -28,19 +28,7 @@ export const Space = (): Paragraph => {
 
 export class PldGenerator {
 
-  private readonly rawDod: Dod[] = [];
-  private readonly dod: Dod[] = [];
-  private readonly pld: Pld;
-  private readonly org: Organization;
-  private readonly dodStatus: DodStatus[];
-
-  constructor(pld: Pld, dod: Dod[], org: Organization, dodStatus: DodStatus[]) {
-    this.org = org;
-    this.pld = pld;
-    this.rawDod = dod;
-    this.dod = dod;
-    this.dodStatus = dodStatus;
-  }
+  constructor(private org: Organization, private pld: Pld, private dod: Dod[], private dodStatus: DodStatus[], private template?: Template) {}
 
   /*footers: {
     default: {
@@ -86,19 +74,67 @@ export class PldGenerator {
   }
 
   public generate(): Document {
-    const generator: PldDocx = new PldDocx(this.pld, this.org);
-    const resume: PldResumeDocx = new PldResumeDocx(this.pld, this.org, this.rawDod);
+    //const generator: PldDocx = new PldDocx(this.pld, this.org);
     return new Document({
+      styles: {
+        paragraphStyles: [
+          {
+            id: 'cellTitle',
+            name: 'Cell Title',
+            basedOn: 'Normal',
+            next: 'Normal',
+            run: {
+              font: 'Roboto',
+              size: '18pt',
+            },
+            paragraph: {
+              alignment: AlignmentType.CENTER,
+            }
+          },
+          {
+            id: 'CellSubtitle',
+            name: 'Cell SubTitle',
+            basedOn: 'Normal',
+            next: 'Normal',
+            run: {
+              font: 'Roboto',
+              size: '14pt'
+            },
+          },
+          {
+            id: 'CellContentTitle',
+            name: 'Cell Content Title',
+            basedOn: 'Normal',
+            next: 'Normal',
+            run: {
+              font: 'Roboto',
+              size: '14pt'
+            },
+          },
+          {
+            id: 'CellReportCell',
+            name: 'Cell Report Cell',
+            basedOn: 'Normal',
+            next: 'Normal',
+            run: {
+              font: 'Roboto',
+              size: '12pt'
+            },
+          }
+        ],
+
+        },
       sections: [{
-        headers: {
+       /* headers: {
           default: this.getHeader(),
         },
         footers: {
           default: this.getFooter(),
           first: new Footer({children: [new TextRun({text: ''})]}),
-        },
+        },*/
         children: [
-          Title('Description du document'),
+          new ReportDocx(this.pld, this.org, this.dod, this.dodStatus, this.template).generate()
+          /*Title('Description du document'),
           Space(),
           generator.generateDescriptionTable(),
           Space(),
@@ -114,8 +150,8 @@ export class PldGenerator {
           Space(),
           Title('Rapport d’avancement'),
           Space(),
-          resume.generateResumeTable(),
-          Space(),
+          /!*resume.generateResumeTable(),*!/
+          Space(),*/
         ]
       }]
     });

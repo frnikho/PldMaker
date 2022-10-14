@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { UserContext, UserContextProps } from "../../context/UserContext";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {PldApiController} from "../../controller/PldApiController";
-import { Organization, Pld, Dod, FavourType, OrganizationSection, DodStatus } from "@pld/shared";
+import { Organization, Pld, Dod, FavourType, OrganizationSection, DodStatus, Template } from "@pld/shared";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,23 +14,25 @@ import {
 
 import {Stack} from '@carbon/react';
 
-import {RecentlyViewed, Hourglass} from '@carbon/icons-react';
+import {RecentlyViewed, Hourglass, Download} from '@carbon/icons-react';
 
-import {GenerateComponent} from "./GenerateComponent";
 import {DodApiController} from "../../controller/DodApiController";
 import {toast} from "react-toastify";
 import {SocketContext} from "../../context/SocketContext";
-import {OnlineOrgMembersComponent} from "./OnlineOrgMembersComponent";
+import {OnlineOrgMembersComponent} from "./panel/OnlineOrgMembersComponent";
 import {ShowFavourIcon} from "../../util/User";
 import {PldHistoryModal} from "../../modal/pld/PldHistoryModal";
 import { ResumePldModal } from "../../modal/pld/ResumePldModal";
-import { PldStepsComponent } from "./PldStepsComponent";
-import { PldQuickInfoComponent } from "./PldQuickInfoComponent";
-import { PldStateComponent } from "./PldStateComponent";
-import { PldInfoComponent } from "./PldInfoComponent";
+import { PldStepsComponent } from "./panel/PldStepsComponent";
+import { PldQuickInfoComponent } from "./panel/PldQuickInfoComponent";
+import { PldStateComponent } from "./panel/PldStateComponent";
+import { PldInfoComponent } from "./panel/PldInfoComponent";
 import { useNavigate } from "react-router-dom";
-import { PldDodsComponents } from "./PldDodsComponents";
-import { PldDocumentsComponent } from "./PldDocumentsComponent";
+import { PldDoDsComponents } from "./panel/PldDoDsComponents";
+import { PldDocumentsComponent } from "./panel/PldDocumentsComponent";
+import { ButtonStyle } from "../../style/ButtonStyle";
+import { GeneratePldModal } from "../../modal/pld/GeneratePldModal";
+import { PldGenerator } from "../../docx/PldGenerator";
 
 type Props = {
   pldId: string;
@@ -41,6 +43,7 @@ type Modals = {
   openHistory: boolean;
   openResume: boolean;
   openSign: boolean;
+  openGenerate: boolean;
 }
 
 export const PldComponent = (props: Props) => {
@@ -50,7 +53,7 @@ export const PldComponent = (props: Props) => {
   const [dod, setDod] = useState<Dod[]>([]);
   const [dodStatus, setDodStatus] = useState<DodStatus[]>([]);
   const [sections, setSections] = useState<OrganizationSection[]>([]);
-  const [modals, setModals] = useState<Modals>({openHistory: false, openResume: false, openSign: false});
+  const [modals, setModals] = useState<Modals>({openHistory: false, openResume: false, openSign: false, openGenerate: false});
   const userCtx = useContext<UserContextProps>(UserContext);
   const socketCtx = useContext(SocketContext);
   const navigate = useNavigate();
@@ -137,8 +140,26 @@ export const PldComponent = (props: Props) => {
     });
   }
 
+  const generate = (template?: Template) => {
+    if (!org || !pld) {
+      toast('Impossible de récupérer les informations pour générer le document !', {type: 'error'});
+      return;
+    }
+    const generator = new PldGenerator(org, pld, dod, dodStatus, template);
+    PldGenerator.getBlobFromDoc(generator.generate(), (blob) => {
+      window.open(URL.createObjectURL(blob));
+    });
+  }
+
   return (
     <>
+      {pld && org ? <GeneratePldModal
+        pld={pld}
+        org={org}
+        open={modals.openGenerate}
+        onClickDownload={generate}
+        onDismiss={() => updateModal('openGenerate', false)}
+        onSuccess={() => null}/> : null}
       {pld && org ? <PldHistoryModal
         pld={pld}
         org={org}
@@ -166,12 +187,13 @@ export const PldComponent = (props: Props) => {
         <Column lg={12} md={8} sm={4}>
           <Stack gap={6}>
             {pld && org ? <PldInfoComponent pld={pld} org={org} loadPld={loadPld}/> : null}
-            {pld && org ? <PldDodsComponents pld={pld} org={org} dod={dod} dodStatus={dodStatus}/> : null}
+            {pld && org ? <PldDoDsComponents pld={pld} org={org} dod={dod} dodStatus={dodStatus}/> : null}
             <PldDocumentsComponent/>
             <ButtonSet style={{marginBottom: '20px', gap: 10}}>
-              {org && pld ? <GenerateComponent dodStatus={dodStatus} org={org} pld={pld} dod={dod} /> : null}
-              <Button onClick={() => updateModal('openHistory', true)} renderIcon={RecentlyViewed} iconDescription="">Voir tout les changements</Button>
-              <Button onClick={() => updateModal('openResume', true)} renderIcon={Hourglass} iconDescription="">Voir le résume des J/H</Button>
+              {/*{org && pld ? <GenerateComponent dodStatus={dodStatus} org={org} pld={pld} dod={dod} /> : null}*/}
+              <Button style={ButtonStyle.default} onClick={() => updateModal('openGenerate', true)} renderIcon={Download} iconDescription="">Télécharger le document</Button>
+              <Button style={ButtonStyle.default} onClick={() => updateModal('openHistory', true)} renderIcon={RecentlyViewed} iconDescription="">Voir tout les changements</Button>
+              <Button style={ButtonStyle.default} onClick={() => updateModal('openResume', true)} renderIcon={Hourglass} iconDescription="">Voir le résume des J/H</Button>
             </ButtonSet>
           </Stack>
         </Column>

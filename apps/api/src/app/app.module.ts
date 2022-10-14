@@ -36,8 +36,8 @@ import { BullModule } from "@nestjs/bull";
     MongooseModule.forRootAsync({
       inject: [],
       useFactory: (): MongooseModuleFactoryOptions => {
-        return {
-          uri: `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_HOST}:${process.env.MONGODB_PORT}/${process.env.MONGODB_DB}`
+          return {
+            uri: `mongodb://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_HOST}:${process.env.MONGODB_PORT}/${process.env.MONGODB_DB}`
         };
       }
     }),

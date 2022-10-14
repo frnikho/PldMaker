@@ -1,9 +1,9 @@
 import React from "react";
-import {RouteMatch} from "react-router/lib/router";
 import {withParams} from "../../../../util/Navigation";
 import {LoginState, UserContext, UserContextProps} from "../../../../context/UserContext";
 import {EventComponent} from "../../../../component/org/calendar/event/EventComponent";
 import {CircularProgress} from "../../../../component/utils/CircularProgress";
+import { RouteMatch } from "react-router-dom";
 
 export type EventPageProps = RouteMatch
 

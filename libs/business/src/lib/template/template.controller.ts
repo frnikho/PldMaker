@@ -15,7 +15,7 @@ export class TemplateController {
   }
 
   @Get(':templateId')
-  public getTemplate(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param(':templateId', TemplatePipe) template: Template) {
+  public getTemplate(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('templateId', TemplatePipe) template: Template) {
     return this.service.getTemplate(req.user, org, template);
   }
 
@@ -24,13 +24,13 @@ export class TemplateController {
     return this.service.create(req.user, org, body);
   }
 
-  @Patch()
-  public async update(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param(':templateId', TemplatePipe) template: Template, @Body() body: UpdateTemplateBody) {
+  @Patch(':templateId')
+  public async update(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('templateId', TemplatePipe) template: Template, @Body() body: UpdateTemplateBody) {
     return this.service.update(req.user, org, template, body);
   }
 
   @Delete(':templateId')
-  public delete(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param(':templateId', TemplatePipe) template: Template) {
+  public delete(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('templateId', TemplatePipe) template: Template) {
     return this.service.delete(req.user, org, template);
   }
 

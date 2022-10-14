@@ -2,7 +2,7 @@ import { Button, Checkbox, Modal, ModalProps, TextInput } from "carbon-component
 import { RequiredUserContextProps } from "../../../context/UserContext";
 import { RequiredLabel } from "../../../util/Label";
 import { TwitterPicker } from "react-color";
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import {Stack} from '@carbon/react';
 import {Add} from '@carbon/icons-react';
@@ -10,8 +10,6 @@ import { OrganizationApiController } from "../../../controller/OrganizationApiCo
 import { NewDodStatus, Organization } from "@pld/shared";
 import { DodStatusOperationType } from "../../../component/org/manage/ManageOrgDodStatusComponent";
 import { toast } from "react-toastify";
-import { LanguageContext, LanguageContextState } from "../../../context/LanguageContext";
-import { useNavigate } from "react-router-dom";
 
 export type CreateDodStatusProps = {
   org: Organization;
@@ -27,7 +25,6 @@ export type CreateDodStatusState = {
 
 export function CreateDodStatusModal(props: CreateDodStatusProps) {
 
-  const languageCtx = useContext<LanguageContextState>(LanguageContext);
   const [form, setForm] = useState<CreateDodStatusState>({color: '', useDefault: false, name: ''});
 
   const setFormField = useCallback((key: keyof CreateDodStatusState, value: unknown) => {

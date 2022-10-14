@@ -8,10 +8,11 @@ import {DocumentAdd} from '@carbon/icons-react';
 
 import { Organization, Pld, PldRevision } from "@pld/shared";
 import { toast } from "react-toastify";
-import { AddRevisionPldModal } from "../../modal/pld/AddRevisionPldModal";
+import { AddRevisionPldModal } from "../../../modal/pld/AddRevisionPldModal";
 import { useContext, useState } from "react";
-import { UserContext, UserContextProps } from "../../context/UserContext";
-import { EditRevisionPldModal } from "../../modal/pld/EditRevisionPldModal";
+import { UserContext, UserContextProps } from "../../../context/UserContext";
+import { EditRevisionPldModal } from "../../../modal/pld/EditRevisionPldModal";
+import { ButtonStyle } from "../../../style/ButtonStyle";
 
 type Props = {
   pld: Pld;
@@ -54,7 +55,7 @@ export const PldRevisionsComponent = (props: Props) => {
 
   const showAddRevisionButton = () => {
     return (
-      <Button style={style.button} renderIcon={DocumentAdd} onClick={() => updateModals('openCreateRevision', true)}>
+      <Button style={ButtonStyle.default} renderIcon={DocumentAdd} onClick={() => updateModals('openCreateRevision', true)}>
         Créer une révision
       </Button>
     );
@@ -121,12 +122,3 @@ export const PldRevisionsComponent = (props: Props) => {
     </>
   )
 };
-
-const style = {
-  tile: {
-
-  },
-  button: {
-
-  }
-}

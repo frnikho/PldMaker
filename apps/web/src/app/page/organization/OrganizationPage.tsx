@@ -1,11 +1,11 @@
 import React from "react";
-import {RouteMatch} from "react-router/lib/router";
-import {PageState} from "../util/Page";
-import {redirectNavigation, withParams} from "../util/Navigation";
-import {LoginState, UserContext, UserContextProps} from "../context/UserContext";
-import OrganizationComponent from "../component/org/OrganizationComponent";
-import {ApiError} from "../util/Api";
+import {PageState} from "../../util/Page";
+import {redirectNavigation, withParams} from "../../util/Navigation";
+import {LoginState, UserContext, UserContextProps} from "../../context/UserContext";
+import OrganizationComponent from "../../component/org/OrganizationComponent";
+import {ApiError} from "../../util/Api";
 import {SkeletonPlaceholder} from "carbon-components-react";
+import { RouteMatch } from "react-router-dom";
 
 
 export type OrganizationPageProps = unknown & RouteMatch;
