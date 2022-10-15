@@ -9,7 +9,7 @@ export class MailService {
   constructor(private mailHelper: MailHelper) {
   }
 
-  public sendMail(user: User, email: AvailableMail) {
+  public sendWelcomeMail(user: User, email: AvailableMail) {
     return this.mailHelper.sendWelcomeMail(user, email);
   }
 

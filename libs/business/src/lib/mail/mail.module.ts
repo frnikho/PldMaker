@@ -5,8 +5,6 @@ import { MailService } from "./mail.service";
 import { MailHelper } from "./mail.helper";
 import * as path from "path";
 
-console.log(__dirname + '/assets/mails');
-
 @Module({
   imports: [
     MailerModule.forRoot({
@@ -22,7 +20,7 @@ console.log(__dirname + '/assets/mails');
       defaults: {
         from: '"PLD [Maker]" <noreply@pld.nikho.dev>',
       },
-      preview: true,
+      preview: process.env.PREVIEW_EMAIL === 'true' ?? false,
       template: {
         dir: path.join(__dirname, 'assets/mails'),
         adapter: new HandlebarsAdapter(),

@@ -15,10 +15,10 @@ export class ReportDocx {
   private getDodReport(user: User, dods: Dod[]) {
     return this.template.reportTemplate.generateDodWithStatus.map((status) => {
       const currentStatus = this.dodStatus.find((s) => s._id === status.id);
-      const filteredDods = dods.filter((d) => d.status._id === status.id && d.estimatedWorkTime.find((wt) => wt.users.find((a) => a._id === user._id)));
+      const filteredDoDs = dods.filter((d) => d.status._id === status.id && d.estimatedWorkTime.find((wt) => wt.users.find((a) => a._id === user._id)));
       return new Paragraph({style: 'CellReportCell', children: [
         new TextRun({text: getPlaceholder(this.template.reportTemplate.userDod.status.text, {org: this.org, pld: this.pld, dodStatus: currentStatus, docx: true}),}),
-        ...filteredDods.map((dod) => new TextRun({text: getPlaceholder(this.template.reportTemplate.userDod.dods.text, {dod: dod, org: this.org, pld: this.pld, docx: true}), break: 1})
+        ...filteredDoDs.map((dod) => new TextRun({text: getPlaceholder(this.template.reportTemplate.userDod.dods.text, {dod: dod, org: this.org, pld: this.pld, docx: true}), break: 1})
           )
         ]
       });

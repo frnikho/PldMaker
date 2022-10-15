@@ -17,9 +17,8 @@ export class MailHelper {
       .sendMail({
         to: user.email,
         subject: '👋 Bienvenue sur PLD [Maker]',
-        template: email, // The `.pug`, `.ejs` or `.hbs` extension is appended automatically.
+        template: email,
         context: {
-          // Data to be sent to template engine.
           lastname: user.lastname,
           firstname: user.firstname,
         },

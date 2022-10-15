@@ -6,7 +6,6 @@ import {NestExpressApplication} from "@nestjs/platform-express";
 import {Logger} from "./app/logger/logger";
 import * as requestIp from 'request-ip';
 import * as io from 'socket.io-client';
-import { Container } from 'typedi';
 import { useContainer, Validator } from 'class-validator';
 import * as path from "path";
 
@@ -30,7 +29,6 @@ class Server {
   }
 
   public async config() {
-    console.log(path.join(__dirname, 'assets/static'));
     this.app.useStaticAssets(path.join(__dirname, 'assets/static'), {prefix: '/assets/'});
     this.app.enableVersioning({
       defaultVersion: '1',
@@ -46,11 +44,6 @@ class Server {
   private onServerOpened() {
     new Logger(
     ).log(`Application is running on: http://localhost:${this.port}/`);
-    const socket = io.io('http://localhost:3333/', {path: '/ws', host: 'http://localhost/', transports: ['websocket']});
-    socket.on('connect_error', (err) => {
-      console.log('error', err);
-    })
-    socket.emit('events', 'abc');
   }
 }
 

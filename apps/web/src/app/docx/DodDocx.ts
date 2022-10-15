@@ -2,8 +2,6 @@ import { Dod, UserWorkTime, Organization, Template, TemplateType, defaultTemplat
 import {Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
 import { getPlaceholder, getUserPlaceholders } from "../util/Placeholders";
-import { Text } from "../util/Dom";
-import * as React from "react";
 
 const colors = {
   cellBackground: [

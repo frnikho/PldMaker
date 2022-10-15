@@ -1,5 +1,5 @@
-import React from "react";
-import {RequiredUserContextProps} from "../../context/UserContext";
+import React, { useContext, useState } from "react";
+import { RequiredUserContextProps, UserContext, UserContextProps } from "../../context/UserContext";
 import {
   Button, Link, Select, SelectItem,
   Table,
@@ -30,23 +30,6 @@ import {PreviewDodModal} from "../../modal/dod/PreviewDodModal";
 import {formatShortDate} from '@pld/utils';
 import { ButtonStyle } from "../../style/ButtonStyle";
 
-export type DodTableComponentProps = {
-  onUpdateDod: () => void;
-  onCreatedDod: () => void;
-  onDeleteDod: () => void;
-  pld: Pld;
-  org: Organization;
-  dod: Dod[];
-  dodStatus: DodStatus[];
-} & RequiredUserContextProps
-
-export type DodTableComponentState = {
-  orgSections: OrganizationSection[];
-  openCreateModal: boolean;
-  editionDod?: Dod;
-  openPreviewModal: boolean;
-}
-
 export const headerData = [
   {
     key: 'version',
@@ -66,82 +49,72 @@ export const headerData = [
   },
 ];
 
+type Props = {
+  org: Organization;
+  pld: Pld;
+  dods: Dod[];
+  dodStatus: DodStatus[];
+  onUpdateDod: () => void;
+  onCreatedDod: () => void;
+  onDeleteDod: () => void;
+};
 
-export class DodTableComponent extends React.Component<DodTableComponentProps, DodTableComponentState> {
+type Modals = {
+  openEdition: boolean;
+  openPreview: boolean;
+}
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      orgSections: [],
-      openCreateModal: false,
-      openPreviewModal: false,
-      editionDod: undefined,
-    }
-    this.onClickCreateDod = this.onClickCreateDod.bind(this);
-    this.onDismissDodModal = this.onDismissDodModal.bind(this);
-    this.onCreateDod = this.onCreateDod.bind(this);
-    this.onClickDeleteDod = this.onClickDeleteDod.bind(this);
-    this.onClickUpdateDod = this.onClickUpdateDod.bind(this);
+export const DodTableComponent = (props: Props) => {
+
+  const userCtx = useContext<UserContextProps>(UserContext);
+  const [selectedDod, setSelectedDod] = useState<undefined | Dod>(undefined);
+  const [modals, setModals] = useState<Modals>({openEdition: false, openPreview: false});
+
+  const updateModal = (key: keyof Modals, value: boolean) => {
+    setModals({
+      ...modals,
+      [key]: value,
+    })
   }
 
-  private onClickCreateDod() {
-    this.setState({
-      openCreateModal: true,
-    });
+  const onDodCreated = (createdDod: Dod) => {
+    updateModal('openEdition', false);
+    setSelectedDod(undefined);
+    props.onCreatedDod();
   }
 
-  private onClickDeleteDod(dodId: string) {
-    DodApiController.deleteDod(this.props.userContext.accessToken, this.props.org._id, this.props.pld._id, dodId, (dod, error) => {
+  const onClickDeleteDod = (dodId: string) => {
+    DodApiController.deleteDod(userCtx.accessToken, props.org._id, props.pld._id, dodId, (dod, error) => {
       if (error) {
-        this.props.onDeleteDod();
+        props.onDeleteDod();
       }
     });
   }
 
-  private onClickUpdateDod(dod?: Dod) {
+  const onClickUpdateDod = (dod?: Dod) => {
     if (dod === undefined) {
       toast('Impossible de modifier la dod !', {type: 'error'})
     } else {
-      this.setState({
-        openCreateModal: true,
-        editionDod: dod,
-      });
+      updateModal('openEdition', true);
+      setSelectedDod(dod);
     }
   }
 
-  private onClickPreviewDod(dod?: Dod) {
+  const onClickPreviewDod = (dod?: Dod) => {
     if (dod === undefined) {
       toast('Impossible de preview la DoD !', {type: 'error'})
       return;
     }
-    this.setState({
-      openPreviewModal: true,
-      editionDod: dod
-    });
+    updateModal('openPreview', true);
+    setSelectedDod(dod);
   }
 
-  private onDismissDodModal() {
-    this.setState({
-      openCreateModal: false,
-      openPreviewModal: false,
-      editionDod: undefined,
-    });
-  }
-
-  private onCreateDod(newDod: Dod) {
-    this.setState({
-      openCreateModal: false,
-      editionDod: undefined,
-    });
-    this.props.onCreatedDod();
-  }
-
-  private showSelectStatus(dodId: string) {
-    const currentDod = this.props.dod.find((dod) => dod._id === dodId);
+  const showSelectStatus = (dodId: string) => {
+    const currentDod = props.dods.find((dod) => dod._id === dodId);
     console.log(currentDod);
     if (currentDod === undefined)
       return null;
-    const dodColor = this.props.dodStatus.find((status) => status._id === currentDod.status._id);
+    const dodColor = props.dodStatus.find((status) => status._id === currentDod.status._id);
     return (
       <Select
         inline
@@ -155,13 +128,13 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
         }}/>}
         onChange={(e) => {
           console.log(e.currentTarget.value);
-          const newFoundStatus = this.props.dodStatus.find((a) => a._id === e.currentTarget.value);
+          const newFoundStatus = props.dodStatus.find((a) => a._id === e.currentTarget.value);
           if (newFoundStatus === undefined) {
             toast('Impossible de changer le status !', {type: 'error'});
             return;
           }
           const newStatus: SetDodStatus = {statusId: newFoundStatus._id};
-          DodApiController.updateDodStatus(this.props.userContext.accessToken, this.props.org._id, this.props.pld._id, dodId, newStatus,(dod, error) => {
+          DodApiController.updateDodStatus(userCtx.accessToken, props.org._id, props.pld._id, dodId, newStatus,(dod, error) => {
             if (error) {
               toast(error.error, {type: 'error'});
             }
@@ -174,24 +147,24 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
         <SelectItem
           hidden
           value={""}
-          text={this.showStatusSelect(dodId)}/>
+          text={showStatusSelect(dodId)}/>
 
-        {this.props.dodStatus.map((status, index) => {
+        {props.dodStatus.map((status, index) => {
           return (<SelectItem key={index} text={status.name} value={status._id}/>);
         })}
       </Select>
     );
   }
 
-  private showStatusSelect(dodId: string): string {
-    const dod: Dod | undefined = this.props.dod.find((a) => a._id === dodId)
+  const showStatusSelect = (dodId: string): string => {
+    const dod: Dod | undefined = props.dods.find((a) => a._id === dodId)
     if (dod === undefined)
       return '';
     return dod.status.name;
   }
 
-  private showDatatable() {
-    const rowData = this.props.dod.sort((a, b) => new Date(b.created_date).getDate() - new Date(a.created_date).getDate()).map((dod) =>
+  const showDatatable = () => {
+    const rowData = props.dods.sort((a, b) => new Date(b.created_date).getDate() - new Date(a.created_date).getDate()).map((dod) =>
       ({
         ...dod,
         id: dod._id,
@@ -217,11 +190,11 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                   renderIcon={TrashCan}
                   onClick={() => {
                     const dod: Dod[] = selectedRows.map((row) => {
-                      return this.props.dod.find((a) => row.id === a._id);
+                      return props.dods.find((a) => row.id === a._id);
                     })
                     dod.forEach((dod) => {
-                      this.onClickDeleteDod(dod._id);
-                      this.props.onDeleteDod();
+                      onClickDeleteDod(dod._id);
+                      props.onDeleteDod();
                     })
                   }}
                 >
@@ -247,7 +220,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                   </TableToolbarAction>
                   <TableToolbarAction onClick={() => {
                     const a = document.createElement("a");
-                    const file = new Blob([JSON.stringify(this.props.dod)], {type: "text/plain"});
+                    const file = new Blob([JSON.stringify(props.dods)], {type: "text/plain"});
                     a.href = URL.createObjectURL(file);
                     a.download = 'data.bak';
                     a.click();
@@ -258,7 +231,7 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                 <Button
                   style={ButtonStyle.default}
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-                  onClick={this.onClickCreateDod}
+                  onClick={() => updateModal('openEdition', true)}
                   renderIcon={Add}
                   iconDescription={"Add"}
                   size="sm"
@@ -284,13 +257,13 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
                   <TableRow {...getRowProps({ row })}>
                     <TableSelectRow {...getSelectionProps({ row })} />
                     {row.cells.map((cell) => {
-                      return (<TableCell key={cell.id} style={{cursor: 'pointer'}} onClick={() => this.onClickPreviewDod(this.props.dod.find((dod) => dod._id === row.id))}>{cell.value}</TableCell>)
+                      return (<TableCell key={cell.id} style={{cursor: 'pointer'}} onClick={() => onClickPreviewDod(props.dods.find((dod) => dod._id === row.id))}>{cell.value}</TableCell>)
                     })}
                     <TableCell>
-                      {this.showSelectStatus(row.id)}
+                      {showSelectStatus(row.id)}
                     </TableCell>
                     <TableCell key={"actions"} style={{minWidth: '100px'}}>
-                      <Link renderIcon={Edit} onClick={() => this.onClickUpdateDod(this.props.dod.find((dod) => dod._id === row.id))}/>
+                      <Link renderIcon={Edit} onClick={() => onClickUpdateDod(props.dods.find((dod) => dod._id === row.id))}/>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -303,14 +276,11 @@ export class DodTableComponent extends React.Component<DodTableComponentProps, D
     );
   }
 
-  override render() {
-    return (
-      <>
-        <NewDodModal editionDod={this.state.editionDod} authContext={this.props.userContext} open={this.state.openCreateModal} onDismiss={this.onDismissDodModal} onCreatedDod={this.onCreateDod} lastDod={this.props.dod} pld={this.props.pld} org={this.props.org}/>
-        {this.state.editionDod !== undefined ? <PreviewDodModal dod={this.state.editionDod} open={this.state.openPreviewModal} onDismiss={this.onDismissDodModal} onSuccess={() => null}/> : null}
-        {this.showDatatable()}
-      </>
-    );
-  }
-
-}
+  return (
+    <>
+      <NewDodModal editionDod={selectedDod} authContext={userCtx} open={modals.openEdition} onDismiss={() => updateModal('openEdition', false)} onCreatedDod={onDodCreated} lastDod={props.dods} pld={props.pld} org={props.org}/>
+      {selectedDod !== undefined ? <PreviewDodModal dod={selectedDod} open={modals.openPreview} onDismiss={() => updateModal('openPreview', false)} onSuccess={() => updateModal('openPreview', false)}/> : null}
+      {showDatatable()}
+    </>
+  );
+};

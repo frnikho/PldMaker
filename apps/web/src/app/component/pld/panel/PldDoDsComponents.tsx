@@ -31,7 +31,7 @@ export const PldDoDsComponents = (props: Props) => {
   return (
     <Tile style={TileStyle.default}>
       <h2 style={{fontWeight: 500}}>DoDs</h2>
-      <DodTableComponent dodStatus={props.dodStatus} userContext={userCtx} onCreatedDod={onDodCreated} onDeleteDod={onDodDeleted} onUpdateDod={onDodUpdated} pld={props.pld} org={props.org} dod={props.dod}/>
+      <DodTableComponent dodStatus={props.dodStatus} onCreatedDod={onDodCreated} onDeleteDod={onDodDeleted} onUpdateDod={onDodUpdated} pld={props.pld} org={props.org} dods={props.dod}/>
     </Tile>
   );
 };

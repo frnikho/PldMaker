@@ -54,7 +54,7 @@ export class UserHelper {
     const createdUser = await this.userModel.create(user);
     this.logger.debug(`New user created: ${createdUser._id}`);
     const createdFavour = await this.favourModel.create({owner: createdUser._id});
-    await this.mailService.sendMail(user, AvailableMail.Welcome);
+    await this.mailService.sendWelcomeMail(user, AvailableMail.Welcome);
     this.logger.debug(`Favour's user created: ${createdFavour._id}`);
     return createdUser;
   }
@@ -116,8 +116,7 @@ export class UserHelper {
 
 
   public addDevice(user: User, ip: string, body: DeviceBody) {
-    this.logger.debug(`Adding a new device for user (${user.email} - ${user._id}): `);
-    this.logger.debug(body);
+    this.logger.debug(`Adding a new device for user (${user.email} - ${user._id})`);
     if (user.devices.some((d) => d.agent === body.agent)) {
       user.devices = user.devices.map((d) => {
         if (d.agent !== body.agent)
@@ -137,8 +136,7 @@ export class UserHelper {
   }
 
   public addFavourWithBody(user: User, body: AddFavourBody) {
-    this.logger.debug(`Adding favour for user (${user.email} - ${user._id}): `);
-    this.logger.debug(body);
+    this.logger.debug(`Adding favour for user (${user.email} - ${user._id})`);
     if (body.type === FavourType.CALENDAR) {
       return UserHelper.populateAndExecuteFavour(this.favourModel.findOneAndUpdate({owner: user._id}, {$addToSet: {calendars : body.data_id}}, {new: true}));
     } else if (body.type === FavourType.ORG) {
@@ -154,8 +152,7 @@ export class UserHelper {
   }
 
   public async removeFavour(user: User, favour: Favour, itemToDelete: string) {
-    this.logger.debug(`Deleting user favour (${user.email} - ${user._id}):`);
-    this.logger.debug(favour);
+    this.logger.debug(`Deleting user favour (${user.email} - ${user._id})`);
     return UserHelper.populateAndExecuteFavour(this.favourModel.findOneAndUpdate({owner: user._id}, {$pull: {org: itemToDelete, pld: itemToDelete}}, {new: true}));
   }
 
