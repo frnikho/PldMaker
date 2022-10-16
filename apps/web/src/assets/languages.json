@@ -1,5 +1,78 @@
 {
+  "menu": {
+    "sidebar": {
+      "faq": {
+        "en": "FAQ"
+      },
+      "dashboard": {
+        "en": "Dashboard",
+        "fr": "Tableau de bord"
+      }
+    },
+    "user": {
+      "profile": {
+        "fr": "Mon profile",
+        "en": "My profile"
+      },
+      "devices": {
+        "fr": "Mes appareils",
+        "en": "Devices"
+      },
+      "logout": {
+        "fr": "Se déconnecter",
+        "en": "Logout"
+      },
+      "register": {
+        "fr": "Inscription",
+        "en": "Register"
+      },
+      "login": {
+        "fr": "Connexion",
+        "en": "Login"
+      }
+    }
+  },
+  "actions": {
+    "userLogged": {
+      "fr": "Connexion réalisé avec succès"
+    },
+    "userRegistered": {
+      "fr": "Inscription réalisé avec succès"
+    },
+    "deleteDod": {
+      "fr": "",
+      "en": ""
+    },
+    "createDod": {
+      "fr": "",
+      "en": ""
+    }
+  },
+  "errors": {
+
+  },
+  "DoDsTable": {
+    "header": {
+      "version": {},
+      "title": {},
+      "description": {},
+      "createdDate": {}
+    }
+  },
   "lexical": {
+    "organization": {
+      "fr": "Organisation",
+      "en": "Organization"
+    },
+    "pld": {
+      "en": "PLD"
+    },
+    "dod": {
+      "en": "DoD"
+    },
+    "dods": {
+      "en": "DoDs"
+    },
     "useAsDefault": {
       "fr": "Utilisé par défaut",
       "en": "Use as default"

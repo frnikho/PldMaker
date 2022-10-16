@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { RequiredUserContextProps, UserContext, UserContextProps } from "../../context/UserContext";
+import { UserContext, UserContextProps } from "../../context/UserContext";
 import {
   Button, Link, Select, SelectItem,
   Table,
@@ -21,7 +21,7 @@ import {
 import {DataTable} from '@carbon/react';
 
 import {NewDodModal} from "../../modal/dod/NewDodModal";
-import { Dod, Pld, Organization, OrganizationSection, DodStatus, SetDodStatus } from "@pld/shared";
+import { Dod, Pld, Organization, DodStatus, SetDodStatus } from "@pld/shared";
 import {DodApiController} from "../../controller/DodApiController";
 
 import {TrashCan, Edit, ImportExport, Add} from '@carbon/icons-react'
@@ -29,25 +29,7 @@ import {toast} from "react-toastify";
 import {PreviewDodModal} from "../../modal/dod/PreviewDodModal";
 import {formatShortDate} from '@pld/utils';
 import { ButtonStyle } from "../../style/ButtonStyle";
-
-export const headerData = [
-  {
-    key: 'version',
-    header: 'Version',
-  },
-  {
-    key: 'title',
-    header: 'Nom',
-  },
-  {
-    key: 'description',
-    header: 'Description',
-  },
-  {
-    key: 'created_date',
-    header: 'Date de création'
-  },
-];
+import { useLanguage } from "../../hook/useLanguage";
 
 type Props = {
   org: Organization;
@@ -67,6 +49,7 @@ type Modals = {
 export const DodTableComponent = (props: Props) => {
 
   const userCtx = useContext<UserContextProps>(UserContext);
+  const {getCurrentLanguage} = useLanguage();
   const [selectedDod, setSelectedDod] = useState<undefined | Dod>(undefined);
   const [modals, setModals] = useState<Modals>({openEdition: false, openPreview: false});
 
@@ -75,6 +58,27 @@ export const DodTableComponent = (props: Props) => {
       ...modals,
       [key]: value,
     })
+  }
+
+  const getTableHeader = () => {
+    return [
+      {
+        key: 'version',
+        header: 'Version',
+      },
+      {
+        key: 'title',
+        header: 'Nom',
+      },
+      {
+        key: 'description',
+        header: 'Description',
+      },
+      {
+        key: 'created_date',
+        header: 'Date de création'
+      },
+    ]
   }
 
   const onDodCreated = (createdDod: Dod) => {
@@ -171,7 +175,7 @@ export const DodTableComponent = (props: Props) => {
         created_date: formatShortDate(new Date(dod.created_date))
       }));
     return (
-      <DataTable rows={rowData} headers={headerData} isSortable locale={"fr"}>
+      <DataTable rows={rowData} headers={getTableHeader()} isSortable locale={getCurrentLanguage()}>
         {({
             rows,
             headers,

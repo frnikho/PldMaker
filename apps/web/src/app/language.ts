@@ -3,7 +3,7 @@ export const language = require('../assets/languages.json') as LanguageType;
 
 export type AvailableLangue = {
   fr?: string;
-  en?: string;
+  en: string;
 }
 
 export type AvailableLanguages = {
@@ -29,6 +29,31 @@ export function getDataTranslation<T>(object: any, language: keyof AvailableLang
 }
 
 export type LanguageType = {
+  "menu": {
+    "sidebar": {
+      "faq": AvailableLanguages
+      "dashboard": AvailableLanguages,
+    },
+    "user": {
+      "profile": AvailableLanguages,
+      "devices": AvailableLanguages,
+      "logout": AvailableLanguages,
+      "register": AvailableLanguages,
+      "login": AvailableLanguages
+    }
+  },
+  actions: {
+    deleteDod: AvailableLangue,
+    createDod: AvailableLangue,
+  },
+  errors: {
+    cantUpdateDod: AvailableLangue,
+    cantPreviewDod: AvailableLangue,
+    cantChangeDodStatus: AvailableLangue,
+  },
+  DoDs: {
+    dodUpdated: AvailableLangue,
+  }
   lexical: {
     useAsDefault: AvailableLangue,
   },

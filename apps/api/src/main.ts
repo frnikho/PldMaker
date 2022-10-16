@@ -5,8 +5,7 @@ import {AppModule} from './app/app.module';
 import {NestExpressApplication} from "@nestjs/platform-express";
 import {Logger} from "./app/logger/logger";
 import * as requestIp from 'request-ip';
-import * as io from 'socket.io-client';
-import { useContainer, Validator } from 'class-validator';
+import { useContainer } from 'class-validator';
 import * as path from "path";
 
 class Server {

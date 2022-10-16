@@ -24,32 +24,28 @@ export function App() {
 
   const navigate = useNavigate();
 
-  const onRedirect = (url: string) => {
-    navigate(url);
-  }
-
   return (
     <UserContextProvider>
       <Routes>
-        <Route path={"/abc"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
+        <Route path={"/abc"} element={<MainPageLayout />}>
           <Route index element={<Abc/>}/>
         </Route>
-        <Route path={"/"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
+        <Route path={"/"} element={<MainPageLayout />}>
           <Route index element={<HomePage/>}/>
         </Route>
-        <Route path={"/profile"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
+        <Route path={"/profile"} element={<MainPageLayout />}>
           <Route index element={<UserPage/>}/>
         </Route>
-        <Route path={"/devices"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
+        <Route path={"/devices"} element={<MainPageLayout />}>
           <Route index element={<DevicePage/>}/>
         </Route>
-        <Route path={"/faq"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
+        <Route path={"/faq"} element={<MainPageLayout />}>
           <Route index element={<FAQPage/>}/>
         </Route>
-        <Route path={"/auth/otp"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
+        <Route path={"/auth/otp"} element={<MainPageLayout />}>
           <Route index element={<AuthOtpPage navigate={navigate}/>}/>
         </Route>
-        <Route path={"/organization"} element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
+        <Route path={"/organization"} element={<MainPageLayout />}>
           <Route path={"new"} element={<NewOrganizationPage/>}/>
           <Route path={":id"} element={<OrganizationPage/>}/>
           <Route path={":id/manage"} element={<ManageOrganizationPage/>}/>
@@ -69,7 +65,7 @@ export function App() {
             <Route path={":templateId"} element={<EditTemplatePage navigate={navigate}/>}/>
           </Route>
         </Route>
-        <Route path='*' element={<MainPageLayout onRedirectUrl={onRedirect}/>}>
+        <Route path='*' element={<MainPageLayout />}>
           <Route path={'*'} element={<PageNotFound />}/>
         </Route>
       </Routes>
