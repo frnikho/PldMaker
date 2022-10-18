@@ -29,6 +29,18 @@ export function getDataTranslation<T>(object: any, language: keyof AvailableLang
 }
 
 export type LanguageType = {
+  modals: {
+    login: {
+      title: AvailableLangue,
+      cancel: AvailableLangue,
+      login: AvailableLangue,
+      noAccount: AvailableLangue,
+      forms: {
+        email: AvailableLangue,
+        password: AvailableLangue,
+      }
+    },
+  },
   "menu": {
     "sidebar": {
       "faq": AvailableLanguages
@@ -47,6 +59,14 @@ export type LanguageType = {
     createDod: AvailableLangue,
   },
   errors: {
+    api: {
+      default: AvailableLangue,
+      forbidden: AvailableLangue,
+      invalidObject: AvailableLangue,
+      unauthorized: AvailableLangue,
+      invalidUserToken: AvailableLangue,
+    },
+    cantDisableTOTP: AvailableLangue
     cantUpdateDod: AvailableLangue,
     cantPreviewDod: AvailableLangue,
     cantChangeDodStatus: AvailableLangue,
@@ -55,6 +75,7 @@ export type LanguageType = {
     dodUpdated: AvailableLangue,
   }
   lexical: {
+    loading: AvailableLangue,
     useAsDefault: AvailableLangue,
   },
   pages: {

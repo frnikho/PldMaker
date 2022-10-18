@@ -1,94 +1,77 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, ButtonSet, Modal, TextInput } from "carbon-components-react";
 
 import {Stack} from '@carbon/react';
 import { OrganizationApiController } from "../../controller/OrganizationApiController";
 import { Organization, OrganizationSection, OrganizationSectionUpdateBody } from "@pld/shared";
-import { RequiredUserContextProps } from "../../context/UserContext";
 import { toast } from "react-toastify";
 
 import {TrashCan, Renew} from '@carbon/icons-react';
+import { ModalProps } from "../../util/Modal";
+import { useAuth } from "../../hook/useAuth";
+import { useForm } from "react-hook-form";
 
-export type OrgSectionModalProps = {
-  open: boolean;
-  onDismiss: () => void;
-  onSuccess: () => void;
-  org: Organization;
+type Props = {
   section: OrganizationSection;
-} & RequiredUserContextProps;
+  org: Organization;
+} & ModalProps;
 
-export type OrgSectionModalState = {
-  section: string;
+type Form = {
+  section: string,
   name: string;
-};
-
-export class UpdateOrgSectionModal extends React.Component<OrgSectionModalProps, OrgSectionModalState> {
-
-  constructor(props: OrgSectionModalProps) {
-    super(props);
-    this.state = {
-      section: this.props.section.section,
-      name: this.props.section.name,
-    }
-    this.onClickUpdate = this.onClickUpdate.bind(this);
-    this.onClickDelete = this.onClickDelete.bind(this);
-  }
-
-  override componentDidUpdate(prevProps: Readonly<OrgSectionModalProps>, prevState: Readonly<OrgSectionModalState>) {
-    if (this.props.open && this.props.open !== prevProps.open) {
-      this.init();
-    }
-  }
-
-  private init() {
-    this.setState({
-      section: this.props.section.section,
-      name: this.props.section.name,
-    })
-  }
-
-  private onClickDelete() {
-    OrganizationApiController.deleteOrgSection(this.props.userContext.accessToken, this.props.org._id, this.props.section._id, (section, error) => {
-      if (error) {
-        toast(error.message[0], {type: 'error'});
-      } else {
-        this.props.onSuccess();
-      }
-    });
-  }
-
-  private onClickUpdate(event: any) {
-    const body = new OrganizationSectionUpdateBody(this.state.name);
-    OrganizationApiController.updateOrgSection(this.props.userContext.accessToken, this.props.org._id, this.props.section._id, body, (section, error) => {
-      if (error) {
-        toast(error.message[0], {type: 'error'});
-      } else {
-        this.props.onSuccess();
-      }
-    });
-  }
-
-  override render() {
-    return (
-      <Modal
-        size={"sm"}
-        open={this.props.open}
-        onRequestClose={this.props.onDismiss}
-        onRequestSubmit={this.props.onSuccess}
-        passiveModal
-        modalHeading={`Mettre à jour la section ${this.props.section.section}`}>
-        <form>
-          <Stack gap={3}>
-            <TextInput disabled id={"section-input"} value={this.state.section} placeholder={"1.2"} labelText={"Section"}/>
-            <TextInput id={"name-input"} placeholder={"User"} labelText={"Nom"} value={this.state.name} onChange={(e) => this.setState({name: e.currentTarget.value})}/>
-            <ButtonSet style={{marginTop: 20}}>
-              <Button onClick={this.onClickDelete} kind={'danger'} iconDescription={'Supprimer'} renderIcon={TrashCan}>Supprimer</Button>
-              <Button onClick={this.onClickUpdate} iconDescription={'Mettre à jour'} renderIcon={Renew}>Mettre à jour</Button>
-            </ButtonSet>
-          </Stack>
-        </form>
-      </Modal>
-    )
-  }
-
 }
+
+export const UpdateOrgSectionModal = (props: Props) => {
+
+  const {accessToken} = useAuth();
+  const {getValues, setValue, watch} = useForm<Form>();
+
+  useEffect(() => init(), []);
+
+  const init = () => {
+    setValue('section', props.section.section);
+    setValue('name', props.section.name);
+  }
+
+  const onClickDelete = () => {
+    OrganizationApiController.deleteOrgSection(accessToken, props.org._id, props.section._id, (section, error) => {
+      if (error) {
+        toast(error.message[0], {type: 'error'});
+      } else {
+        props.onSuccess();
+      }
+    });
+  }
+
+  const onClickUpdate = (event: any) => {
+    const body = new OrganizationSectionUpdateBody(getValues('name'));
+    OrganizationApiController.updateOrgSection(accessToken, props.org._id, props.section._id, body, (section, error) => {
+      if (error) {
+        toast(error.message[0], {type: 'error'});
+      } else {
+        props.onSuccess();
+      }
+    });
+  }
+
+  return (
+    <Modal
+      size={"sm"}
+      open={props.open}
+      onRequestClose={props.onDismiss}
+      onRequestSubmit={props.onSuccess}
+      passiveModal
+      modalHeading={`Mettre à jour la section ${props.section.section}`}>
+      <form>
+        <Stack gap={3}>
+          <TextInput disabled id={"section-input"} value={watch('section')} placeholder={"1.2"} labelText={"Section"}/>
+          <TextInput id={"name-input"} placeholder={"User"} labelText={"Nom"} value={watch('name')} onChange={(e) => setValue('name', e.currentTarget.value)}/>
+          <ButtonSet style={{marginTop: 20}}>
+            <Button onClick={onClickDelete} kind={'danger'} iconDescription={'Supprimer'} renderIcon={TrashCan}>Supprimer</Button>
+            <Button onClick={onClickUpdate} iconDescription={'Mettre à jour'} renderIcon={Renew}>Mettre à jour</Button>
+          </ButtonSet>
+        </Stack>
+      </form>
+    </Modal>
+  )
+};

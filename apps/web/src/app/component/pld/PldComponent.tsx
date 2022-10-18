@@ -163,15 +163,16 @@ export const PldComponent = (props: Props) => {
       {pld && org ? <PldHistoryModal
         pld={pld}
         org={org}
-        dod={dod}
+        dods={dod}
         open={modals.openHistory} onDismiss={() => updateModal("openHistory", false)} onSuccess={() => null}
       /> : null}
       {pld && org ? <ResumePldModal
+        onDismiss={() => updateModal('openResume', false)}
         dodColors={dodStatus}
+        onSuccess={() => updateModal('openResume', false)}
         reload={() => loadOrg()}
-        userContext={userCtx}
         sections={sections}
-        pld={pld} org={org} dod={dod} open={modals.openResume} hide={(show) => updateModal('openResume', show)} /> : null}
+        pld={pld} org={org} dods={dod} open={modals.openResume} hide={(show) => updateModal('openResume', show)} /> : null}
       <Breadcrumb noTrailingSlash style={{marginBottom: 40}}>
         <BreadcrumbItem onClick={() => navigate('/')}>Dashboard</BreadcrumbItem>
         <BreadcrumbItem onClick={() => navigate(`/organization/${props.orgId}`)}>Organisation</BreadcrumbItem>
@@ -187,7 +188,7 @@ export const PldComponent = (props: Props) => {
         <Column lg={12} md={8} sm={4}>
           <Stack gap={6}>
             {pld && org ? <PldInfoComponent pld={pld} org={org} loadPld={loadPld}/> : null}
-            {pld && org ? <PldDoDsComponents pld={pld} org={org} dod={dod} dodStatus={dodStatus}/> : null}
+            {pld && org ? <PldDoDsComponents sections={sections} pld={pld} org={org} dod={dod} dodStatus={dodStatus}/> : null}
             <PldDocumentsComponent/>
             <ButtonSet style={{marginBottom: '20px', gap: 10}}>
               {/*{org && pld ? <GenerateComponent dodStatus={dodStatus} org={org} pld={pld} dod={dod} /> : null}*/}

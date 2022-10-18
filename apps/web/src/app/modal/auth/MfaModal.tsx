@@ -1,11 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Column, Grid, Link, Modal } from "carbon-components-react";
-import { RequiredUserContextProps } from "../../context/UserContext";
 import Lottie from 'lottie-react'
 import { Mfa, MfaOtpBody } from "@pld/shared";
 import { UserApiController } from "../../controller/UserApiController";
 import { toast } from "react-toastify";
-import { Data } from "../../util/FieldData";
 import { QRCodeSVG } from "qrcode.react";
 
 import {Stack} from '@carbon/react';
@@ -13,108 +11,82 @@ import {Stack} from '@carbon/react';
 import {Checkmark} from '@carbon/icons-react';
 import { RequiredLabel } from "../../util/Label";
 import PinInput from "react-pin-input";
+import { ModalProps } from "../../util/Modal";
+import { useAuth } from "../../hook/useAuth";
 
-export type MfaModalProps = {
-  open: boolean;
-  onDismiss: () => void;
-  onSuccess: (newToken: string) => void;
-} & RequiredUserContextProps;
+type Props = {
+  onMfaEnabled: (token: string) => void;
+} & ModalProps;
 
-export type MfaModalState = {
-  mfa: Data<Mfa>;
-  token: string;
-  showManualSecret: boolean;
-}
+export const MfaModal = (props: Props) => {
 
-export class MfaModal extends React.Component<MfaModalProps, MfaModalState> {
+  const [mfa, setMfa] = useState<Mfa | undefined>(undefined);
+  const [manual, setManuel] = useState<boolean>(false);
+  const [token, setToken] = useState<string>('');
+  const {accessToken, user} = useAuth();
 
-  constructor(props: MfaModalProps) {
-    super(props);
-    this.state = {
-      token: '',
-      showManualSecret: false,
-      mfa: {
-        loading: true,
-        value: undefined,
-      }
-    }
-    this.onClickOtpValidate = this.onClickOtpValidate.bind(this);
-  }
+  useEffect(() => init(), []);
 
-  override componentDidUpdate(prevProps: Readonly<MfaModalProps>, prevState: Readonly<MfaModalState>) {
-    if (this.props.open !== prevProps.open && this.props.open) {
-      this.init();
-    }
-  }
-
-  private init() {
-    UserApiController.enableOtp(this.props.userContext.accessToken, (mfa, error) => {
+  const init = () => {
+    UserApiController.enableOtp(accessToken, (mfa, error) => {
       if (error) {
         toast('Une erreur est survenue !', {type: 'error'})
       } else if (mfa !== null) {
-        this.setState({
-          mfa: {
-            value: mfa,
-            loading: false,
-          },
-        });
+        setMfa(mfa);
       }
     });
   }
 
-  private onClickOtpValidate(token?: string) {
-    if (this.state.mfa.value === undefined)
+  const onClickOtpValidate = (tokenText?: string) => {
+    if (mfa === undefined)
       return;
-    UserApiController.verifyOtp(this.props.userContext.accessToken, new MfaOtpBody(token ?? this.state.token, this.state.mfa.value.secret), (mfa, error) => {
+    UserApiController.verifyOtp(accessToken, new MfaOtpBody(tokenText ?? token, mfa.secret), (mfa, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
       } else if (mfa !== null) {
-        this.props.onSuccess(mfa);
+        props.onMfaEnabled(mfa);
       } else {
         console.log('gze');
       }
     });
   }
 
-  private showQrCode() {
-    if (this.state.mfa.value === undefined)
+  const showQrCode = () => {
+    if (mfa === undefined)
       return;
     return (
       <Stack gap={6}>
         <Grid>
           <Column xlg={4}>
-            <QRCodeSVG style={{marginTop: 10}} value={`otpauth://totp/PLD [Maker]:${this.props.userContext.user?.email}?secret=${this.state.mfa.value.secret}&issuer=PLD [Maker]`} />
+            <QRCodeSVG style={{marginTop: 10}} value={`otpauth://totp/PLD [Maker]:${user?.email}?secret=${mfa.secret}&issuer=PLD [Maker]`} />
           </Column>
           <Column xlg={6} style={{marginTop: 'auto', marginBottom: 'auto'}}>
             Scannez ce QR code avec Google Authenticator ou tout autre application de 2FA
           </Column>
         </Grid>
         <div>
-          <Link onClick={() => this.setState({showManualSecret: !this.state.showManualSecret})}>Afficher le code manuel</Link>
-          <p style={{display: !this.state.showManualSecret ? 'none' : undefined}}>{this.state.mfa.value.secret}</p>
+          <Link onClick={() => setManuel(!manual)}>Afficher le code manuel</Link>
+          <p style={{display: !manual ? 'none' : undefined}}>{mfa.secret}</p>
         </div>
         <div>
           <RequiredLabel message={"Code de l'application"}/>
-          <PinInput length={6} onComplete={(token) => this.onClickOtpValidate(token)} onChange={(a) => this.setState({token: a})}/>
+          <PinInput length={6} onComplete={(token) => onClickOtpValidate(token)} onChange={(a) => setToken(a)}/>
         </div>
-        <Button renderIcon={Checkmark} iconDescription={"Valid"} onClick={() => this.onClickOtpValidate()}>Valider</Button>
+        <Button renderIcon={Checkmark} iconDescription={"Valid"} onClick={() => onClickOtpValidate()}>Valider</Button>
       </Stack>
     );
   }
 
-  override render() {
-    return (
-      <Modal
-        open={this.props.open}
-        passiveModal
-        onRequestClose={this.props.onDismiss}
-        size={"sm"}>
-        <Lottie animationData={require('../../../assets/animations/otp.json')} loop={true} style={{width: '140px', margin: 'auto'}}/>
-        <h2 style={{textAlign: 'center'}}>Activer le 2FA</h2>
-        <p style={{textAlign: 'center', padding: 0}}>En activant la vérification en deux étapes, vous renforcer la sécurité de votre compte ainsi que de vos informations personnels</p>
-        {this.showQrCode()}
-      </Modal>
-    )
-  }
-
-}
+  return (
+    <Modal
+      open={props.open}
+      passiveModal
+      onRequestClose={props.onDismiss}
+      size={"sm"}>
+      <Lottie animationData={require('../../../assets/animations/otp.json')} loop={true} style={{width: '140px', margin: 'auto'}}/>
+      <h2 style={{textAlign: 'center'}}>Activer le 2FA</h2>
+      <p style={{textAlign: 'center', padding: 0}}>En activant la vérification en deux étapes, vous renforcer la sécurité de votre compte ainsi que de vos informations personnels</p>
+      {showQrCode()}
+    </Modal>
+  )
+};

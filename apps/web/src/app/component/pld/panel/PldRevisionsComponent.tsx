@@ -104,14 +104,13 @@ export const PldRevisionsComponent = (props: Props) => {
   return (
     <>
       {selectedRevision ? <EditRevisionPldModal
-        userContext={userCtx} pld={props.pld}
+        pld={props.pld}
         open={modals.openUpdateRevision}
         revision={selectedRevision}
         org={props.org}
         onSuccess={onRevisionUpdated}
         onDismiss={() => updateModals('openUpdateRevision', false)}/> : null}
       <AddRevisionPldModal
-        userContext={userCtx}
         org={props.org}
         pld={props.pld}
         open={modals.openCreateRevision}

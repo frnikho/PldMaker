@@ -1,97 +1,75 @@
 import React from "react";
 import {ModalProps} from "../../util/Modal";
 import {Modal, MultiSelect, TextArea} from "carbon-components-react";
-import {FieldData} from "../../util/FieldData";
-import {RequiredUserContextProps} from "../../context/UserContext";
 import {PldApiController} from "../../controller/PldApiController";
 import {Organization, Pld} from "@pld/shared";
 import {toast} from "react-toastify";
 
 import {Stack} from '@carbon/react'
 import {RequiredLabel} from "../../util/Label";
+import { useAuth } from "../../hook/useAuth";
+import { useForm } from "react-hook-form";
 
-export type AddRevisionPldModalProps = {
-  org: Organization;
+type Props = {
   pld: Pld;
-} & ModalProps & RequiredUserContextProps;
+  org: Organization;
+} & ModalProps;
 
-export type AddRevisionPldModalState = {
-  comments: FieldData<string>;
-  sections: FieldData<string[]>;
-};
+type Form = {
+  comment: string;
+  sections: string[];
+}
 
-export class AddRevisionPldModal extends React.Component<AddRevisionPldModalProps, AddRevisionPldModalState> {
+export const AddRevisionPldModal = (props: Props) => {
 
-  constructor(props: AddRevisionPldModalProps) {
-    super(props);
-    this.state = {
-      sections: {
-        value: [],
-      },
-      comments: {
-        value: ''
-      },
-    };
-    this.onClickAddRevision = this.onClickAddRevision.bind(this);
-  }
+  const {accessToken, user} = useAuth();
+  const {getValues, watch, setValue, formState: {errors}} = useForm<Form>({defaultValues: {comment: '', sections: []}});
 
-  private onClickAddRevision() {
-    PldApiController.addRevision(this.props.userContext.accessToken, this.props.org._id, this.props.pld._id, {
-      owner: this.props.userContext.user?._id ?? 'null',
-      comments: this.state.comments.value,
-      version: parseFloat((this.props.org.versionShifting + this.props.pld.version).toFixed(2)),
-      sections: this.state.sections.value,
+  const onClickAddRevision = () => {
+    PldApiController.addRevision(accessToken, props.org._id, props.pld._id, {
+      owner: user?._id ?? 'null',
+      comments: getValues('comment'),
+      version: parseFloat((props.org.versionShifting + props.pld.version).toFixed(2)),
+      sections: getValues('sections'),
       created_date: new Date(),
-      currentStep: this.props.pld.currentStep,
+      currentStep: props.pld.currentStep,
     }, (pld, error) => {
       if (error) {
         toast(error.error, {type: 'error'});
       }
       if (pld !== null) {
-        this.props.onSuccess(pld);
+        props.onSuccess(pld);
       }
     })
   }
 
-  override render() {
-    return (
-      <Modal
-        size={"md"}
-        open={this.props.open}
-        primaryButtonText={"Ajouter"}
-        onRequestSubmit={this.onClickAddRevision}
-        secondaryButtonText={"Fermer"}
-        onRequestClose={this.props.onDismiss}
-        modalHeading="Ajouter une révision">
-
-        <Stack gap={4}>
-          <MultiSelect
-            label={this.state.sections.value.length === 0 ? "Veuillez choisir la/les section(s) modifiée(s)" : this.state.sections.value.join(', ')}
-            titleText={<RequiredLabel message={"Sections modifiées"}/>}
-            id="revision-section"
-            invalid={this.state.sections.error !== undefined}
-            invalidText={this.state.sections.error}
-            items={['Toutes', 'DoDs', 'Informations', 'Status'].map((e) => ({label: e}))}
-            onChange={(e) => {
-              this.setState({
-                sections: {
-                  value: e.selectedItems.map((a) => a.label)
-                }
-              })
-            }}
-          />
-          <TextArea
-            labelText={<RequiredLabel message={"Commentaires"}/>}
-            rows={4} id={"comments"} onChange={(e) => {
-            this.setState({
-              comments: {
-                value: e.currentTarget.value,
-              }
-            })
-          }}/>
-        </Stack>
-      </Modal>
-    );
-  }
-
-}
+  return (
+    <Modal
+      size={"md"}
+      open={props.open}
+      primaryButtonText={"Ajouter"}
+      onRequestSubmit={onClickAddRevision}
+      secondaryButtonText={"Fermer"}
+      onRequestClose={props.onDismiss}
+      modalHeading="Ajouter une révision">
+      <Stack gap={4}>
+        <MultiSelect
+          label={watch('sections').length === 0 ? "Veuillez choisir la/les section(s) modifiée(s)" : watch('sections').join(', ')}
+          titleText={<RequiredLabel message={"Sections modifiées"}/>}
+          id="revision-section"
+          invalid={errors.sections?.message !== undefined}
+          invalidText={errors.sections?.message}
+          items={['Toutes', 'DoDs', 'Informations', 'Status'].map((e) => ({label: e}))}
+          onChange={(e) => {
+            setValue('sections', e.selectedItems.map((a) => a.label));
+          }}
+        />
+        <TextArea
+          labelText={<RequiredLabel message={"Commentaires"}/>}
+          rows={4} id={"comments"} onChange={(e) => {
+            setValue('comment', e.currentTarget.value)
+        }}/>
+      </Stack>
+    </Modal>
+  );
+};

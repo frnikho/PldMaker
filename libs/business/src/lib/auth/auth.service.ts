@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { UserService } from "../user/user.service";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
-import { defaultPreference, PayloadLogin, RegisterBody, RegisterResponse, User } from "@pld/shared";
+import { ApiErrorsCodes, buildException, defaultPreference, PayloadLogin, RegisterBody, RegisterResponse, User } from "@pld/shared";
 import { Timezone } from "@pld/utils";
+import { ApiException } from "../exception/api.exception";
 
 @Injectable()
 export class AuthService {
@@ -16,11 +17,11 @@ export class AuthService {
   public async validateUser(email: string, password: string) {
     const user = await this.usersService.findWithPassword({email});
     if (user === null || user === undefined) {
-      throw new UnauthorizedException('User not found');
+      throw new ApiException(buildException(ApiErrorsCodes.USER_NOT_FOUND));
     } else if (await bcrypt.compare(password, user.password)) {
       return user;
     }
-    throw new UnauthorizedException('Invalid password');
+    throw new ApiException(buildException(ApiErrorsCodes.INVALID_PASSWORD));
   }
 
   public login(user: User) {
@@ -33,7 +34,7 @@ export class AuthService {
   public async register(body: RegisterBody): Promise<RegisterResponse> {
     const user = await this.usersService.findByEmail(body.email);
     if (user !== null && user.email === body.email) {
-      throw new BadRequestException('User already exists !');
+      throw new ApiException(buildException(ApiErrorsCodes.USER_ALREADY_EXISTS));
     }
     const hashedPassword = await bcrypt.hash(body.password, 10);
     const createdUser = await this.usersService.create({

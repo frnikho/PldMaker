@@ -8,7 +8,6 @@ import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { UpdateOrgSectionModal } from "../../../modal/org/UpdateOrgSectionModal";
 import { UserContext, UserContextProps } from "../../../context/UserContext";
-import { DeleteOrgSectionModal } from "../../../modal/org/DeleteOrgSectionModal";
 import { CreateOrgSectionModal } from "../../../modal/org/CreateOrgSectionModal";
 
 export const sectionHeaderData = [
@@ -79,9 +78,8 @@ export const ManageOrgSectionsComponent = (props: Props) => {
 
   return (
     <>
-      <CreateOrgSectionModal open={modals.openCreateSection} onDismiss={onDismiss} onSuccess={onSectionCreated} org={props.org} userContext={userCtx}/>
-      {selectedSection ? <UpdateOrgSectionModal open={modals.openUpdateSection} onDismiss={onDismiss} onSuccess={onSectionUpdated} org={props.org} section={selectedSection} userContext={userCtx}/> : null}
-      {selectedSection ? <DeleteOrgSectionModal open={modals.openDeleteSection} onDismiss={onDismiss} onSuccess={onSectionDeleted} org={props.org} section={selectedSection} userContext={userCtx}/> : null}
+      <CreateOrgSectionModal open={modals.openCreateSection} onDismiss={onDismiss} onSuccess={onSectionCreated} org={props.org}/>
+      {selectedSection ? <UpdateOrgSectionModal open={modals.openUpdateSection} onDismiss={onDismiss} onSuccess={onSectionUpdated} org={props.org} section={selectedSection}/> : null}
       <Tile>
         <p>Une section correspond à la catégorie ou vos DoDs seront rangées.</p>
         <p>par exemple: La Section '2.6 Map' correspond au parent de toutes les DoDs 2.6.x</p>

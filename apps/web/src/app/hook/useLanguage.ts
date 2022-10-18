@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { LanguageContext, LanguageContextState } from "../context/LanguageContext";
 import { AvailableLanguages, AvailableLangue, language, LanguageType } from "../language";
 
-type NestedLanguageKeyOf<ObjectType extends object> =
+export type NestedLanguageKeyOf<ObjectType extends object> =
   {[Key in keyof ObjectType & keyof AvailableLanguages]: ObjectType[Key] extends AvailableLanguages
     ? `${Key}` | `${Key}.${NestedLanguageKeyOf<ObjectType[Key]>}`
     : `${Key}`

@@ -1,4 +1,5 @@
 import { ArrayMinSize, ArrayNotContains, IsNotEmpty, IsOptional, Length, Matches, MaxLength } from "class-validator";
+import { IsValidWorkTimeArray } from "../validator/WorkTimeValidator";
 
 export class DodFindPldBody {
   plds: string[];
@@ -37,11 +38,11 @@ export class DodCreateBody {
   owner: string;
 
   @ArrayMinSize(1)
-  @ArrayNotContains([''], {message: 'Mauvais format de Description of Done'})
+  @ArrayNotContains([''], {message: 'Données non valide, vous devez rentrer au minimum une définition'})
   descriptionOfDone: string[];
 
   @ArrayMinSize(1)
-  @ArrayNotContains([{value: 0}, {users: ''}, {users: ''}, {value: 0}])
+  @IsValidWorkTimeArray({message: 'Données non valide, vous devez rentrer au minimum une charges avec un utilisateur'})
   estimatedWorkTime: UserWorkTime[];
 
   constructor(version: string, title: string, skinOf: string, want: string, description: string, pldOwner: string, owner: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[]) {

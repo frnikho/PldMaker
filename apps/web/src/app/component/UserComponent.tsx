@@ -348,8 +348,8 @@ export class UserComponent extends React.Component<UserComponentProps, UserCompo
       <Stack gap={4}>
         <UploadUserPictureModal open={this.state.modals.openFileUpload} onDismiss={() => this.dismissModal('openFileUpload')} onSuccess={this.onUploadedPicture} userContext={this.props.userContext}/>
         <DeleteUserModal open={this.state.modals.openDeleteModal} onDismiss={() => this.dismissModal('openDeleteModal')} onSuccess={this.onDeleted} userContext={this.props.userContext}/>
-        <MfaModal open={this.state.modals.openEnableOtp} onDismiss={() => this.dismissModal('openEnableOtp')} onSuccess={this.onMfaEnable} userContext={this.props.userContext}/>
-        <DisableOtpModal userContext={this.props.userContext} mfa={this.state.mfa.find((mfa) => mfa.type === MfaType.OTP)!} open={this.state.modals.openDisableOtp} language={this.props.language} onDismiss={() => this.dismissModal('openDisableOtp')} onSuccess={this.onMfaDisable}/>
+        <MfaModal onMfaEnabled={() => null} open={this.state.modals.openEnableOtp} onDismiss={() => this.dismissModal('openEnableOtp')} onSuccess={this.onMfaEnable}/>
+        <DisableOtpModal mfa={this.state.mfa.find((mfa) => mfa.type === MfaType.OTP)!} open={this.state.modals.openDisableOtp} onDismiss={() => this.dismissModal('openDisableOtp')} onSuccess={this.onMfaDisable}/>
         <h2 style={style.title}>{this.props.language.translate(language.pages.myProfile.title)}</h2>
         <UserInfoComponent onUpdateUser={() => toast('abc')} userContext={this.props.userContext} user={this.props.userContext.user}/>
         {/*{this.showInfo()}*/}

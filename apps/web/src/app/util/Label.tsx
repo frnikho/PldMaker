@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 
 import {FormLabel} from "carbon-components-react";
 
@@ -39,3 +39,16 @@ export class HelpLabel extends React.Component<HelpLabelProps, any> {
   }
 
 }
+
+type Props = {
+  show: boolean;
+  message?: string;
+};
+
+export const ErrorLabel = (props: Props) => {
+  return (
+    <FormLabel style={{display: props.show ? 'inline' : 'none', color: '#da1e28'}}>
+      {props.message}
+    </FormLabel>
+  );
+};

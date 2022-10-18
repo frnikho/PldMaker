@@ -68,7 +68,7 @@ export class UserService {
      return this.userHelper.removeFavour(user, favour, itemToDelete);
     }
 
-  public async updatePreference(user: User, body: UpdatePreference) {
-      return this.userHelper.updatePreference(user, body);
-  }
+    public async updatePreference(user: User, body: UpdatePreference) {
+        return this.userHelper.updatePreference(user, body);
+    }
 }

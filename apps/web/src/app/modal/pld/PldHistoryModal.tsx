@@ -2,8 +2,6 @@ import React from "react";
 import {CodeSnippet,
   Modal, StructuredListBody, StructuredListCell, StructuredListHead, StructuredListRow,
   StructuredListWrapper,
-  Tile,
-  Tooltip,
 } from "carbon-components-react";
 import {ModalProps} from "../../util/Modal";
 
@@ -20,36 +18,17 @@ export type HistoryDetails = {
   action: string;
 }
 
-const CustomTooltip = (data, dods: Dod[]) => {
-  if (data.value === undefined) return null
-  return (
-    <Tooltip defaultOpen={true} style={{width: '200px'}}>
-      <Tile>
-        <p>{data.day} : {data.value}</p>
-        {dods.map((dod, index) => {
-          return (<p key={index}>{dod.version} {dod.title}</p>)
-        })}
-      </Tile>
-    </Tooltip>);
-}
-
-export type PldHistoryProps = {
+type Props = {
   org: Organization;
   pld: Pld;
-  dod: Dod[];
+  dods: Dod[];
 } & ModalProps;
 
-export type PldHistoryState = unknown;
+export const PldHistoryModal = (props: Props) => {
 
-export class PldHistoryModal extends React.Component<PldHistoryProps, PldHistoryState> {
-
-  constructor(props) {
-    super(props);
-  }
-
-  private showDetails() {
+  const showDetails = () => {
     const details: HistoryDetails[] = [];
-    this.props.dod.forEach((dod) => {
+    props.dods.forEach((dod) => {
       dod.history.forEach((history) => {
         details.push({
           action: history.action,
@@ -59,7 +38,7 @@ export class PldHistoryModal extends React.Component<PldHistoryProps, PldHistory
         })
       })
     })
-    this.props.pld.history.forEach((history) => {
+    props.pld.history.forEach((history) => {
       details.push({
         action: history.action,
         editedFields: history.editedFields,
@@ -99,9 +78,9 @@ export class PldHistoryModal extends React.Component<PldHistoryProps, PldHistory
                   <CodeSnippet aria-multiline={true} style={{height: '100%'}}>
                     {detail.editedFields.map((field, index) => {
                       return (<div key={index}>
-                          {field.name}: <div style={{display: 'inline', color: 'red'}}>[{field.lastValue}]</div>
-                          <div style={{display: 'inline', color: 'green'}}> [{field.value}]</div>
-                        </div>);
+                        {field.name}: <div style={{display: 'inline', color: 'red'}}>[{field.lastValue}]</div>
+                        <div style={{display: 'inline', color: 'green'}}> [{field.value}]</div>
+                      </div>);
                     })}
                   </CodeSnippet>
                 </StructuredListCell> : null}
@@ -115,17 +94,15 @@ export class PldHistoryModal extends React.Component<PldHistoryProps, PldHistory
     )
   }
 
-  override render() {
-    return (
-      <Modal
-        size={"lg"}
-        open={this.props.open}
-        onRequestClose={this.props.onDismiss}
-        onRequestSubmit={() => this.props.onSuccess}
-        passiveModal
-        modalHeading="Derniers changements">
-        {this.showDetails()}
-      </Modal>
-    );
-  }
-}
+  return (
+    <Modal
+      size={"lg"}
+      open={props.open}
+      onRequestClose={props.onDismiss}
+      onRequestSubmit={props.onSuccess}
+      passiveModal
+      modalHeading="Derniers changements">
+      {showDetails()}
+    </Modal>
+  );
+};

@@ -62,8 +62,8 @@ export function UserSecurityComponent(props: UserSecurityProps) {
 
   return (
     <Tile style={style.tile}>
-      <MfaModal open={modal.openEnableMfa} onDismiss={() => setModal({openDisableMfa: false, openEnableMfa: false})} onSuccess={onMfaEnable} userContext={props.userContext}/>
-      <DisableOtpModal language={props.languageCtx} userContext={props.userContext} mfa={props.mfa?.find((mfa) => mfa.type === MfaType.OTP)} open={modal.openDisableMfa} onDismiss={() => setModal({openDisableMfa: false, openEnableMfa: false})} onSuccess={onMfaDisable}/>
+      <MfaModal open={modal.openEnableMfa} onDismiss={() => setModal({openDisableMfa: false, openEnableMfa: false})} onMfaEnabled={onMfaEnable} onSuccess={() => null} />
+      <DisableOtpModal mfa={props.mfa?.find((mfa) => mfa.type === MfaType.OTP)} open={modal.openDisableMfa} onDismiss={() => setModal({openDisableMfa: false, openEnableMfa: false})} onSuccess={onMfaDisable}/>
       <Stack gap={4}>
         <h4>2FA</h4>
         <p>

@@ -1,7 +1,10 @@
 import React, { useContext, useState } from "react";
 import { UserContext, UserContextProps } from "../../context/UserContext";
 import {
-  Button, Link, Select, SelectItem,
+  Button,
+  Link,
+  Select,
+  SelectItem,
   Table,
   TableBatchAction,
   TableBatchActions,
@@ -13,21 +16,23 @@ import {
   TableRow,
   TableSelectAll,
   TableSelectRow,
-  TableToolbar, TableToolbarAction,
-  TableToolbarContent, TableToolbarMenu,
+  TableToolbar,
+  TableToolbarAction,
+  TableToolbarContent,
+  TableToolbarMenu,
   TableToolbarSearch
 } from "carbon-components-react";
 
-import {DataTable} from '@carbon/react';
+import { DataTable } from "@carbon/react";
 
-import {NewDodModal} from "../../modal/dod/NewDodModal";
-import { Dod, Pld, Organization, DodStatus, SetDodStatus } from "@pld/shared";
-import {DodApiController} from "../../controller/DodApiController";
+import { DodType, NewDodModal } from "../../modal/dod/NewDodModal";
+import { Dod, DodStatus, Organization, OrganizationSection, Pld, SetDodStatus } from "@pld/shared";
+import { DodApiController } from "../../controller/DodApiController";
 
-import {TrashCan, Edit, ImportExport, Add} from '@carbon/icons-react'
-import {toast} from "react-toastify";
-import {PreviewDodModal} from "../../modal/dod/PreviewDodModal";
-import {formatShortDate} from '@pld/utils';
+import { Add, Edit, ImportExport, TrashCan } from "@carbon/icons-react";
+import { toast } from "react-toastify";
+import { PreviewDodModal } from "../../modal/dod/PreviewDodModal";
+import { formatShortDate } from "@pld/utils";
 import { ButtonStyle } from "../../style/ButtonStyle";
 import { useLanguage } from "../../hook/useLanguage";
 
@@ -36,6 +41,7 @@ type Props = {
   pld: Pld;
   dods: Dod[];
   dodStatus: DodStatus[];
+  sections: OrganizationSection[];
   onUpdateDod: () => void;
   onCreatedDod: () => void;
   onDeleteDod: () => void;
@@ -52,6 +58,7 @@ export const DodTableComponent = (props: Props) => {
   const {getCurrentLanguage} = useLanguage();
   const [selectedDod, setSelectedDod] = useState<undefined | Dod>(undefined);
   const [modals, setModals] = useState<Modals>({openEdition: false, openPreview: false});
+  const [type, setType] = useState<DodType>(DodType.New);
 
   const updateModal = (key: keyof Modals, value: boolean) => {
     setModals({
@@ -100,6 +107,7 @@ export const DodTableComponent = (props: Props) => {
       toast('Impossible de modifier la dod !', {type: 'error'})
     } else {
       updateModal('openEdition', true);
+      setType(DodType.Edit);
       setSelectedDod(dod);
     }
   }
@@ -110,12 +118,12 @@ export const DodTableComponent = (props: Props) => {
       return;
     }
     updateModal('openPreview', true);
+    setType(DodType.Preview);
     setSelectedDod(dod);
   }
 
   const showSelectStatus = (dodId: string) => {
     const currentDod = props.dods.find((dod) => dod._id === dodId);
-    console.log(currentDod);
     if (currentDod === undefined)
       return null;
     const dodColor = props.dodStatus.find((status) => status._id === currentDod.status._id);
@@ -131,7 +139,6 @@ export const DodTableComponent = (props: Props) => {
           display: 'inline-block',
         }}/>}
         onChange={(e) => {
-          console.log(e.currentTarget.value);
           const newFoundStatus = props.dodStatus.find((a) => a._id === e.currentTarget.value);
           if (newFoundStatus === undefined) {
             toast('Impossible de changer le status !', {type: 'error'});
@@ -235,7 +242,10 @@ export const DodTableComponent = (props: Props) => {
                 <Button
                   style={ButtonStyle.default}
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-                  onClick={() => updateModal('openEdition', true)}
+                  onClick={() => {
+                    setType(DodType.New);
+                    updateModal("openEdition", true);
+                  }}
                   renderIcon={Add}
                   iconDescription={"Add"}
                   size="sm"
@@ -282,7 +292,7 @@ export const DodTableComponent = (props: Props) => {
 
   return (
     <>
-      <NewDodModal editionDod={selectedDod} authContext={userCtx} open={modals.openEdition} onDismiss={() => updateModal('openEdition', false)} onCreatedDod={onDodCreated} lastDod={props.dods} pld={props.pld} org={props.org}/>
+      <NewDodModal dod={selectedDod} sections={props.sections} type={type} onSuccess={(d) => onDodCreated(d as Dod)} open={modals.openEdition} onDismiss={() => updateModal('openEdition', false)} pld={props.pld} org={props.org}/>
       {selectedDod !== undefined ? <PreviewDodModal dod={selectedDod} open={modals.openPreview} onDismiss={() => updateModal('openPreview', false)} onSuccess={() => updateModal('openPreview', false)}/> : null}
       {showDatatable()}
     </>
