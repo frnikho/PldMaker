@@ -28,11 +28,11 @@ export const dodRules: DodRulesType = {
   },
   title: {
     minlength: 3,
-    maxlength: 32,
+    maxlength: 128,
     required: true
   },
   skinOf: {
-    maxlength: 64,
+    maxlength: 128,
     minlength: 2,
     required: true,
   },

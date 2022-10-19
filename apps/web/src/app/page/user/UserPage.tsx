@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { LoginState, UserContext, UserContextProps } from "../../context/UserContext";
+import { LoginState} from "../../context/UserContext";
 
 import { Stack } from "@carbon/react";
 import { UserInfoComponent } from "../../component/user/info/UserInfoComponent";
@@ -9,20 +9,27 @@ import { language } from "../../language";
 import { LanguageContext, LanguageContextState } from "../../context/LanguageContext";
 import { UserSecurityComponent } from "../../component/user/security/UserSecurityComponent";
 import { UserApiController } from "../../controller/UserApiController";
+import { useAuth } from "../../hook/useAuth";
 
 export default function UserPage() {
-  const userCtx = useContext<UserContextProps>(UserContext);
-  useEffect(() => {
-    console.log('Changement de state ', LoginState[userCtx.isLogged])
-    loadMfa();
-  }, [userCtx]);
 
+  const userCtx = useAuth();
   const languageCtx = useContext<LanguageContextState>(LanguageContext);
   const [mfa, setMfa] = useState<Mfa[] | undefined>(undefined);
 
+  useEffect(() => {
+    if (userCtx.isLogged === LoginState.logged) {
+      UserApiController.getMfa(userCtx.accessToken, (mfa, error) => {
+        if (error) {
+          toast(error.message, {type: 'error'});
+        } else {
+          setMfa(mfa);
+        }
+      });
+    }
+  }, [userCtx]);
+
   const loadMfa = () => {
-    if (userCtx.isLogged !== LoginState.logged)
-      return;
     UserApiController.getMfa(userCtx.accessToken, (mfa, error) => {
       if (error) {
         toast(error.message, {type: 'error'});

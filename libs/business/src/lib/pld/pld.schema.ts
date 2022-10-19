@@ -135,7 +135,7 @@ export class Pld extends DatedObjectSchema {
   @Prop({required: false, default: []})
   history: PldHistory[];
 
-  @Prop({required: false, default: () => getPldPicture()})
+  @Prop({required: false, default: () => process.env.NX_SERVER_HOST + getPldPicture()})
   picture: string;
 
 }

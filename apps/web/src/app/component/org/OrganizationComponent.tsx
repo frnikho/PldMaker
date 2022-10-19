@@ -248,7 +248,7 @@ class OrganizationComponent extends React.Component<OrganizationComponentProps, 
           <h4 style={{fontWeight: 600, marginBottom: 10}}>Membres :</h4>
           {[...this.state.org.members, this.state.org.owner].map((user, index) => (
             <div key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'start'}}>
-              <img src={SERVER_URL_ASSETS + user.profile_picture} style={{borderRadius: '50%', objectFit: 'cover', width: 50, height: 50}}/>
+              <img src={user.profile_picture} style={{borderRadius: '50%', objectFit: 'cover', width: 50, height: 50}}/>
               <div style={{marginLeft: 18, display: 'flex', flexDirection: 'column'}}>
                 <p style={{fontWeight: 'bold'}}>{capitalize(user.firstname)} {user.lastname.toUpperCase()}</p>
                 <p style={{fontWeight: 100}}>{user.email}</p>

@@ -27,7 +27,7 @@ export const templateRules: TemplateRuleType = {
   },
   picture: {
     required: false,
-    default: () => getTemplatePicture(),
+    default: () => process.env.NX_SERVER_HOST + getTemplatePicture(),
   },
   dodTemplate: {
     required: false,

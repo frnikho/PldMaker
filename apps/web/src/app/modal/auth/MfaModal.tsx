@@ -25,7 +25,11 @@ export const MfaModal = (props: Props) => {
   const [token, setToken] = useState<string>('');
   const {accessToken, user} = useAuth();
 
-  useEffect(() => init(), []);
+  useEffect(() => {
+    if (props.open) {
+      init();
+    }
+  }, []);
 
   const init = () => {
     UserApiController.enableOtp(accessToken, (mfa, error) => {

@@ -90,7 +90,7 @@ export function UserInfoComponent(props: ShowUserInfoProps) {
             <Column xlg={8}>
               <Stack orientation={"vertical"}>
                 <FormLabel>Photo de profile</FormLabel>
-                <img style={{padding: 12, objectFit: 'cover', width: 200, height: 200}} title={'Mettre à jour'} onClick={() => setModal(true)} src={SERVER_URL_ASSETS + props.user.profile_picture} alt={""}/>
+                <img style={{padding: 12, objectFit: 'cover', width: 200, height: 200}} title={'Mettre à jour'} onClick={() => setModal(true)} src={props.user.profile_picture} alt={""}/>
               </Stack>
             </Column>
           </Grid>

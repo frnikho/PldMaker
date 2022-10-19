@@ -99,13 +99,32 @@ export class UserHelper {
 
   public changeUserProfile(user: User, file: Express.Multer.File) {
     const filename = randomUUID();
-    fs.writeFile(path.join(__dirname, './assets/static/', filename), Buffer.from((file.buffer as any).data, 'ascii'), 'binary', (err) => {
+
+    const client = this.createImageKitClient();
+    console.log('Change user profile');
+    console.log(Buffer.from((file.buffer as any).data, 'ascii'));
+    client.upload({
+      fileName: file.originalname,
+      file: Buffer.from((file.buffer as any).data, 'ascii'),
+    }).then((response) => {
+      if (response.fileType === 'image') {
+        this.userModel.updateOne({_id: user._id}, {profile_picture: response.url, updated_date: new Date()}).exec();
+      } else {
+        client.deleteFile(response.fileId).then((value) => {
+          console.log(value);
+        }).catch((err) => {
+          console.log(err);
+        });
+      }
+    }).catch((err) => {
+      console.log(err);
+    });
+    /*fs.writeFile(path.join(__dirname, './assets/static/', filename), Buffer.from((file.buffer as any).data, 'ascii'), 'binary', (err) => {
       if (err) {
         Logger.error('Une erreur est survenue lors de la sauvegarde d\'une photo de profile !');
       } else {
-        this.userModel.updateOne({_id: user._id}, {profile_picture: filename, updated_date: new Date()}).exec();
       }
-    });
+    });*/
   }
 
   public updateWithBody(user: User, body: UpdateUserBody) {
@@ -113,7 +132,6 @@ export class UserHelper {
     this.logger.debug(body);
     return UserHelper.populateAndExecute(this.userModel.findOneAndUpdate({_id: user._id}, { ...body, updated_date: new Date() }, {new: true}));
   }
-
 
   public addDevice(user: User, ip: string, body: DeviceBody) {
     this.logger.debug(`Adding a new device for user (${user.email} - ${user._id})`);
@@ -158,6 +176,16 @@ export class UserHelper {
 
   public async updatePreference(user: User, body: UpdatePreference) {
     return UserHelper.populateAndExecute(this.userModel.findOneAndUpdate({_id: user._id}, {preference: { ...body }}, {new: true}));
+  }
+
+  private createImageKitClient() {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const ImageKit = require('imagekit');
+    return new ImageKit({
+      privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+      publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+      urlEndpoint: process.env.IMAGEKIT_ENDPOINT
+    });
   }
 
 }

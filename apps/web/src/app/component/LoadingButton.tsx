@@ -19,7 +19,6 @@ export class LoadingButtonComponent extends React.Component<React.PropsWithChild
   }
 
   override render() {
-    console.log(this.props as OnlyButtonProps);
     if (this.props.isloading) {
       return (
         <Button disabled {...this.props}>

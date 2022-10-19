@@ -1,6 +1,6 @@
 import { Mfa, MfaType } from "@pld/shared";
 import { Button, Tile } from "carbon-components-react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import {Stack} from '@carbon/react';
 import { formatLongDate } from "@pld/utils";
@@ -25,10 +25,6 @@ type Modal = {
 export function UserSecurityComponent(props: UserSecurityProps) {
 
   const [modal, setModal] = useState<Modal>({openDisableMfa: false, openEnableMfa: false});
-
-  useEffect(() => {
-    console.log('Update !', props.mfa);
-  }, [props.mfa]);
 
   const onMfaEnable = useCallback((newToken: string) => {
     if (props.onMfaEnabled(newToken)) {
