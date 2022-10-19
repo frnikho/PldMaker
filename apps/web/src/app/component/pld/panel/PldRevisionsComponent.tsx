@@ -9,8 +9,7 @@ import {DocumentAdd} from '@carbon/icons-react';
 import { Organization, Pld, PldRevision } from "@pld/shared";
 import { toast } from "react-toastify";
 import { AddRevisionPldModal } from "../../../modal/pld/AddRevisionPldModal";
-import { useContext, useState } from "react";
-import { UserContext, UserContextProps } from "../../../context/UserContext";
+import { useState } from "react";
 import { EditRevisionPldModal } from "../../../modal/pld/EditRevisionPldModal";
 import { ButtonStyle } from "../../../style/ButtonStyle";
 
@@ -27,7 +26,6 @@ type Modals = {
 
 export const PldRevisionsComponent = (props: Props) => {
 
-  const userCtx = useContext<UserContextProps>(UserContext);
   const [modals, setModals] = useState<Modals>({openCreateRevision: false, openUpdateRevision: false});
   const [selectedRevision, setSelectedRevision] = useState<PldRevision | undefined>(undefined);
 

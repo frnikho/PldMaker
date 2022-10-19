@@ -19,6 +19,7 @@
 - [ ] Mettre à jour le système des templates pour rendre tout dynamique
 - [ ] Création du système de dépendences (w/ Luann)
 - [ ] rework du système de domaine
+- [ ] Ajout de l'effet shimmer lors du chargement des données sur le front
  
 ---
 
@@ -52,5 +53,5 @@ Un utilisateur qui souhaite créer un event aura la possibilité de récuperer l
 
 - Fix du probléme d'ouverture du documents WORD sous windows (a voir pour MacOS)
 - bug sur Google Docs (non prise en charge de la taille des cellules du tableau en pourcentage, non prise en charge des fonts, taille de text et marges)
-  
   solution provisoire: ouvrir le doc avec microsoft word, libreoffice... Sauvegarder le fichier et l'upload sur google drive pour avoir la mise en page correcte.
+- Ajout de l'effet shimmer pour les composants du PLD

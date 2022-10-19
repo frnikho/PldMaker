@@ -7,9 +7,9 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   Button,
-  ButtonSet,
+  ButtonSet, ButtonSkeleton,
   Column,
-  Grid,
+  Grid, SkeletonText,
 } from "carbon-components-react";
 
 import {Stack} from '@carbon/react';
@@ -19,7 +19,7 @@ import {RecentlyViewed, Hourglass, Download} from '@carbon/icons-react';
 import {DodApiController} from "../../controller/DodApiController";
 import {toast} from "react-toastify";
 import {SocketContext} from "../../context/SocketContext";
-import {OnlineOrgMembersComponent} from "./panel/OnlineOrgMembersComponent";
+import {PldOnlineMembersComponent} from "./panel/PldOnlineMembersComponent";
 import {ShowFavourIcon} from "../../util/User";
 import {PldHistoryModal} from "../../modal/pld/PldHistoryModal";
 import { ResumePldModal } from "../../modal/pld/ResumePldModal";
@@ -33,6 +33,12 @@ import { PldDocumentsComponent } from "./panel/PldDocumentsComponent";
 import { ButtonStyle } from "../../style/ButtonStyle";
 import { GeneratePldModal, ReportForm } from "../../modal/pld/GeneratePldModal";
 import { PldGenerator } from "../../docx/PldGenerator";
+import {PldQuickInfoSkeleton} from "./panel/PldQuickInfoSkeleton";
+import {PldInfoSkeleton} from "./panel/PldInfoSkeleton";
+import {PldOnlineMembersSkeleton} from "./panel/PldOnlineMembersSkeleton";
+import {PldStateSkeleton} from "./panel/PldStateSkeleton";
+import {PldStepsSkeleton} from "./panel/PldStepsSkeleton";
+import {PldDoDsSkeleton} from "./panel/PldDoDsSkeleton";
 
 type Props = {
   pldId: string;
@@ -59,12 +65,14 @@ export const PldComponent = (props: Props) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    registerListeners();
-    loadOrg();
-    loadPld();
-    loadDodStats();
-    loadDod();
-    loadSections();
+    setTimeout(() => {
+      registerListeners();
+      loadOrg();
+      loadPld();
+      loadDodStats();
+      loadDod();
+      loadSections();
+    }, 3000);
   }, []);
 
   const registerListeners = () => {
@@ -151,6 +159,34 @@ export const PldComponent = (props: Props) => {
     });
   }
 
+  const showTitle = () => {
+    if (pld !== undefined) {
+      return <h1 style={{fontWeight: 'bold'}}>{pld.title}</h1>
+    } else {
+      return <SkeletonText heading style={{height: '40px', width: '400px'}}/>
+    }
+  }
+
+  const showButtons = () => {
+    if (pld !== undefined && org !== undefined) {
+      return (
+        <ButtonSet style={{marginBottom: '20px', gap: 10}}>
+          <Button style={ButtonStyle.default} onClick={() => updateModal('openGenerate', true)} renderIcon={Download} iconDescription="">Télécharger le document</Button>
+          <Button style={ButtonStyle.default} onClick={() => updateModal('openHistory', true)} renderIcon={RecentlyViewed} iconDescription="">Voir tout les changements</Button>
+          <Button style={ButtonStyle.default} onClick={() => updateModal('openResume', true)} renderIcon={Hourglass} iconDescription="">Voir le résume des J/H</Button>
+        </ButtonSet>
+      )
+    } else {
+      return (
+        <ButtonSet style={{marginBottom: '20px', gap: 10}}>
+          <ButtonSkeleton/>
+          <ButtonSkeleton/>
+          <ButtonSkeleton/>
+        </ButtonSet>
+      )
+    }
+  }
+
   return (
     <>
       {pld && org ? <GeneratePldModal
@@ -179,7 +215,7 @@ export const PldComponent = (props: Props) => {
         <BreadcrumbItem onClick={() => null} isCurrentPage>Pld</BreadcrumbItem>
       </Breadcrumb>
       <div style={{display: 'flex'}}>
-        <h1 style={{fontWeight: 'bold'}}>{pld?.title}</h1>
+        {showTitle()}
         <div style={{marginLeft: 'auto', marginRight: '0px', textAlign: 'end', marginTop:'auto', marginBottom: 'auto'}}>
           {pld !== undefined ? <ShowFavourIcon type={FavourType.PLD} data={pld}/> : null}
         </div>
@@ -187,23 +223,18 @@ export const PldComponent = (props: Props) => {
       <Grid>
         <Column lg={12} md={8} sm={4}>
           <Stack gap={6}>
-            {pld && org ? <PldInfoComponent pld={pld} org={org} loadPld={loadPld}/> : null}
-            {pld && org ? <PldDoDsComponents sections={sections} pld={pld} org={org} dod={dod} dodStatus={dodStatus}/> : null}
+            {pld && org ? <PldInfoComponent pld={pld} org={org} loadPld={loadPld}/> : <PldInfoSkeleton/>}
+            {pld && org ? <PldDoDsComponents sections={sections} pld={pld} org={org} dod={dod} dodStatus={dodStatus}/> : <PldDoDsSkeleton/>}
             <PldDocumentsComponent/>
-            <ButtonSet style={{marginBottom: '20px', gap: 10}}>
-              {/*{org && pld ? <GenerateComponent dodStatus={dodStatus} org={org} pld={pld} dod={dod} /> : null}*/}
-              <Button style={ButtonStyle.default} onClick={() => updateModal('openGenerate', true)} renderIcon={Download} iconDescription="">Télécharger le document</Button>
-              <Button style={ButtonStyle.default} onClick={() => updateModal('openHistory', true)} renderIcon={RecentlyViewed} iconDescription="">Voir tout les changements</Button>
-              <Button style={ButtonStyle.default} onClick={() => updateModal('openResume', true)} renderIcon={Hourglass} iconDescription="">Voir le résume des J/H</Button>
-            </ButtonSet>
+            {showButtons()}
           </Stack>
         </Column>
         <Column lg={4} md={8} sm={4}>
           <Stack gap={6}>
-            {pld && org ? <PldQuickInfoComponent pld={pld} org={org}/> : null}
-            {pld ? <PldStateComponent pld={pld}/> : null}
-            {pld && org ? <PldStepsComponent pld={pld} org={org} onPldStepUpdated={loadPld}/> : null}
-            {org ? <OnlineOrgMembersComponent org={org} userContext={userCtx} /> : null}
+            {pld && org ? <PldQuickInfoComponent pld={pld} org={org}/> : <PldQuickInfoSkeleton/>}
+            {pld ? <PldStateComponent pld={pld}/> : <PldStateSkeleton/>}
+            {pld && org ? <PldStepsComponent pld={pld} org={org} onPldStepUpdated={loadPld}/> : <PldStepsSkeleton/>}
+            {org ? <PldOnlineMembersComponent org={org} /> : <PldOnlineMembersSkeleton/>}
           </Stack>
         </Column>
       </Grid>
