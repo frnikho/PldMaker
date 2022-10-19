@@ -1,5 +1,4 @@
-import React from "react";
-import {RequiredUserContextProps} from "../../context/UserContext";
+import React, {useEffect, useState} from "react";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {
   Button, ClickableTile, Column, DataTableSkeleton, Grid,
@@ -7,8 +6,7 @@ import {
 } from "carbon-components-react";
 import Lottie from "lottie-react";
 import {Stack} from '@carbon/react'
-import {NavigationState, redirectNavigation} from "../../util/Navigation";
-import { Organization, Pld, Dod, CalendarEvent } from "@pld/shared";
+import { Organization, CalendarEvent } from "@pld/shared";
 
 import {Add} from '@carbon/icons-react'
 import { formatShortDate } from "@pld/utils";
@@ -17,70 +15,49 @@ import FullCalendar, { EventClickArg } from "@fullcalendar/react";
 import interactionPlugin from "@fullcalendar/interaction";
 import listGridPlugin from "@fullcalendar/list";
 import { parseEvents } from "../../util/Event";
-import { LanguageProps, withLanguage } from "../../context/LanguageContext";
-import { getDataTranslation, language } from "../../language";
-import { ButtonTextCompoundInput } from "@fullcalendar/core";
 import { SERVER_URL_ASSETS } from "../../util/User";
+import {useAuth} from "../../hook/useAuth";
+import {useLanguage} from "../../hook/useLanguage";
+import {useNavigate} from "react-router-dom";
 
-type OrganizationHomeDashboardProps = unknown & RequiredUserContextProps & LanguageProps;
+export const OrganizationHomeDashboard = () => {
 
-type OrganizationHomeDashboardState = {
-  loading: boolean;
-  organization: Organization[];
-  pld: Pld[];
-  dods: Dod[];
-  calendarEvents: CalendarEvent[];
-} & NavigationState
+  const {accessToken} = useAuth();
+  const {getCurrentLanguage} = useLanguage();
+  const navigate = useNavigate();
+  const [orgs, setOrgs] = useState<Organization[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-class OrganizationHomeDashboard extends React.Component<OrganizationHomeDashboardProps, OrganizationHomeDashboardState> {
+  useEffect(() => {
+    init();
+  }, []);
 
-  constructor(props: OrganizationHomeDashboardProps) {
-    super(props);
-    this.state = {
-      loading: true,
-      organization: [],
-      calendarEvents: [],
-      dods: [],
-      pld: [],
-    }
-    this.onClickCreateOrganization = this.onClickCreateOrganization.bind(this);
-    this.onClickEvent = this.onClickEvent.bind(this);
-  }
-
-  override componentDidMount() {
-    if (this.props.userContext.accessToken === undefined)
-      return;
-    OrganizationApiController.getMeOrganizations(this.props.userContext.accessToken, (orgs, error) => {
+  const init = () => {
+    OrganizationApiController.getMeOrganizations(accessToken, (orgs, error) => {
       if (!error) {
-        this.setState({
-          organization: orgs,
-          loading: false,
-        });
+        setOrgs(orgs);
+        setLoading(false);
       } else {
         //TODO check error
       }
     });
-    UserApiController.getEvents(this.props.userContext.accessToken, (event, error) => {
+    UserApiController.getEvents(accessToken, (event, error) => {
       if (!error) {
-        this.setState({
-          calendarEvents: event,
-        })
+        setEvents(event);
       } else {
         //TODO check error
       }
     });
   }
 
-  private onClickCreateOrganization() {
-    this.setState({
-      navigateUrl: 'organization/new'
-    })
+  const onClickCreateOrganization = () => {
+    navigate('organization/new');
   }
 
-  private showLoading() {
-    if (!this.state.loading) {
+  const showLoading = () => {
+    if (!loading)
       return;
-    }
     return (
       <>
         <SkeletonPlaceholder style={{margin: '10px', height: '60px', width: '100%'}}/>
@@ -89,14 +66,21 @@ class OrganizationHomeDashboard extends React.Component<OrganizationHomeDashboar
     )
   }
 
-  private showOrgCards() {
+  const showNoEvents = () => {
+    return (
+      <>
+        <p>Vous n'avez pas d'évènements prochainement</p>
+        <Lottie animationData={require('../../../assets/animations/calendar.json')} style={{width: 300}} loop={true}/>
+      </>
+    )
+  }
+
+  const showOrgCards = () => {
     return (
       <Grid>
-        {this.state.organization.map((org, index) => {
+        {orgs.map((org, index) => {
           return <Column xlg={4} lg={6} md={4} sm={4} key={index}>
-            <ClickableTile style={style.card} onClick={() => {this.setState({
-                navigateUrl: `/organization/${org._id}`
-              })}}>
+            <ClickableTile style={style.card} onClick={() => navigate(`/organization/${org._id}`)}>
               <p style={style.cardTitle}>{org.name}</p>
               <p style={style.cardDescription}>{org.description.substring(0, 120)} {org.description.length > 120 ? '...' : ''}</p>
               <div style={style.cardImageContainer as any}>
@@ -110,73 +94,56 @@ class OrganizationHomeDashboard extends React.Component<OrganizationHomeDashboar
     )
   }
 
-  private onClickEvent(eventArg: EventClickArg) {
-    const event: CalendarEvent | undefined = this.state.calendarEvents.find((evt) => evt._id === eventArg.event.id);
+  const onClickEvent = (eventArg: EventClickArg) => {
+    const event: CalendarEvent | undefined = events.find((evt) => evt._id === eventArg.event.id);
     if (event === undefined)
       return;
-    console.log(event);
   }
 
-  private showNoEvents() {
-    return (
-      <>
-        <p>Vous n'avez pas d'évènements prochainement</p>
-        <Lottie animationData={require('../../../assets/animations/calendar.json')} style={{width: 300}} loop={true}/>
-      </>
-    )
-  }
-
-  private showRecap() {
-    if (this.state.calendarEvents.length <= 0)
-      return this.showNoEvents();
+  const showRecap = () => {
+    if (events.length <= 0)
+      return showNoEvents();
     return (
       <FullCalendar
-        buttonText={getDataTranslation<ButtonTextCompoundInput>(language.calendar, this.props.language.language)}
         titleFormat={{ year: 'numeric', month: 'long', day: 'numeric' }}
-        eventClick={this.onClickEvent}
+        eventClick={onClickEvent}
         aspectRatio={4}
         firstDay={1}
-        locale={this.props.language.language}
-        events={(arg, successCallback) => {successCallback(parseEvents(this.state.calendarEvents))}}
+        locale={getCurrentLanguage()}
+        events={(arg, successCallback) => {successCallback(parseEvents(events))}}
         plugins={[ interactionPlugin, listGridPlugin ]}
         initialView="listWeek"
       />
     )
   }
 
-  private showNoOrganizations() {
-    if (this.state.organization.length !== 0 || this.state.loading)
+  const showNoOrganizations = () => {
+    if (orgs.length !== 0 || loading)
       return;
     return (
       <Stack>
         <Lottie animationData={require('../../../assets/animations/organization.json')} loop={true} style={{width: '300px'}}/>
         <h4>Tu n'a pas rejoint ou créer d'organisations</h4>
-        <h4><Button kind={"ghost"} onClick={this.onClickCreateOrganization}>Cliquez ici pour en créer une !</Button></h4>
+        <h4><Button kind={"ghost"} onClick={onClickCreateOrganization}>Cliquez ici pour en créer une !</Button></h4>
       </Stack>)
   }
 
-  override render() {
-    return (
-      <>
-        {redirectNavigation(this.state.navigateUrl)}
-        {/*<h1>Status</h1>
-        {this.showCharts()}*/}
-        <Stack gap={8}>
-          <div>
-            <h1 style={style.orgTitle}>Recap</h1>
-            {this.showRecap()}
-          </div>
-          <div>
-            <h1 style={style.orgTitle}>Mes organisations <Button kind={"ghost"} onClick={this.onClickCreateOrganization} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h1>
-            {this.showLoading()}
-            {this.showNoOrganizations()}
-            {this.showOrgCards()}
-          </div>
-        </Stack>
-      </>
-    );
-  }
-}
+  return (
+    <Stack gap={8}>
+      <div>
+        <h1 style={style.orgTitle}>Recap</h1>
+        {showRecap()}
+      </div>
+      <div>
+        <h1 style={style.orgTitle}>Mes organisations <Button kind={"ghost"} onClick={onClickCreateOrganization} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h1>
+        {showLoading()}
+        {showNoOrganizations()}
+        {showOrgCards()}
+      </div>
+    </Stack>
+  );
+};
+
 
 const style = {
   orgTitle: {
@@ -204,5 +171,3 @@ const style = {
     height: 150
   },
 }
-
-export default withLanguage(OrganizationHomeDashboard);

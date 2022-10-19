@@ -2,7 +2,7 @@ import * as React from "react";
 import { Button, ProgressIndicator, ProgressStep, Tile } from "carbon-components-react";
 import { IncompleteStatusIcon } from "../../../icon/IncompleteStatusIcon";
 import { Organization, Pld, PldStatus } from "@pld/shared";
-import {Stack, Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react';
+import {Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react';
 import {Information, CheckmarkOutline, Incomplete, Classification} from '@carbon/icons-react';
 import { useState } from "react";
 import { UpdatePldTypeModal } from "../../../modal/pld/ChangePldTypeModal";
@@ -33,7 +33,7 @@ export const PldStepsComponent = (props: Props) => {
         onSuccess={onUpdated}/>
       <Tile style={TileStyle.default}>
         <div style={{display: 'flex'}}>
-          <h4>État d'avancement</h4>
+          <h4 style={{fontWeight: 'bold'}}>État d'avancement</h4>
           <div style={{marginLeft: 'auto', marginTop:'auto', marginBottom: 'auto', display: 'flex', justifyContent: 'center'}}>
             <Toggletip>
               <ToggletipButton>

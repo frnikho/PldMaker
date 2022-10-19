@@ -6,11 +6,11 @@ import Lottie from 'lottie-react'
 
 import {Stack} from '@carbon/react';
 import {AuthModalComponent} from "../component/AuthModalComponent";
-import OrganizationHomeDashboard from "../component/home/OrganizationHomeDashboard";
 import {FAQComponent} from "../component/home/FAQComponent";
 import { Navigate } from "react-router-dom";
 import { LanguageProps, withLanguage } from "../context/LanguageContext";
 import { language } from "../language";
+import {OrganizationHomeDashboard} from "../component/home/OrganizationHomeDashboard";
 
 export type HomePageProps = LanguageProps;
 export type HomePageState = {
@@ -140,7 +140,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
           <p>{this.props.language.translate(language.home.welcomeDashboard.subTitle)}</p>
         </div>
         <div style={{marginTop: 40}}>
-          <OrganizationHomeDashboard userContext={userContext}/>
+          <OrganizationHomeDashboard/>
         </div>
       </Stack>
     )

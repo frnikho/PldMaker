@@ -11,7 +11,7 @@ export const PldStepsSkeleton = () => {
   return (
     <Tile style={TileStyle.default}>
       <div style={{display: 'flex'}}>
-        <h4>État d'avancement</h4>
+        <h4 style={{fontWeight: 'bold'}}>État d'avancement</h4>
         <div style={{marginLeft: 'auto', marginTop:'auto', marginBottom: 'auto', display: 'flex', justifyContent: 'center'}}>
           <Toggletip>
             <ToggletipButton>

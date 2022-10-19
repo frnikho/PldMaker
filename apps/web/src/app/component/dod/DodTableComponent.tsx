@@ -96,7 +96,7 @@ export const DodTableComponent = (props: Props) => {
 
   const onClickDeleteDod = (dodId: string) => {
     DodApiController.deleteDod(userCtx.accessToken, props.org._id, props.pld._id, dodId, (dod, error) => {
-      if (error) {
+      if (!error) {
         props.onDeleteDod();
       }
     });
@@ -104,7 +104,7 @@ export const DodTableComponent = (props: Props) => {
 
   const onClickUpdateDod = (dod?: Dod) => {
     if (dod === undefined) {
-      toast('Impossible de modifier la dod !', {type: 'error'})
+      toast('Impossible de modifier la dod !', {type: 'error'});
     } else {
       updateModal('openEdition', true);
       setType(DodType.Edit);
@@ -205,7 +205,6 @@ export const DodTableComponent = (props: Props) => {
                     })
                     dod.forEach((dod) => {
                       onClickDeleteDod(dod._id);
-                      props.onDeleteDod();
                     })
                   }}
                 >

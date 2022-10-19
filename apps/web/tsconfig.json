@@ -3,7 +3,8 @@
   "compilerOptions": {
     "noImplicitAny": false,
     "lib": [
-      "ES2021.String"
+      "ES2021.String",
+      "dom"
     ],
     "jsx": "react-jsx",
     "resolveJsonModule": true,

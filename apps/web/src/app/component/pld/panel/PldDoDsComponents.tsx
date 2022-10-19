@@ -1,10 +1,9 @@
 import * as React from "react";
 import { DodTableComponent } from "../../dod/DodTableComponent";
 import { Dod, DodStatus, Organization, OrganizationSection, Pld } from "@pld/shared";
-import { UserContext, UserContextProps } from "../../../context/UserContext";
-import { useContext } from "react";
 import { Tile } from "carbon-components-react";
 import { TileStyle } from "../../../style/TileStyle";
+import { toast } from "react-toastify";
 
 type Props = {
   dodStatus: DodStatus[];
@@ -12,21 +11,23 @@ type Props = {
   pld: Pld;
   org: Organization;
   sections: OrganizationSection[];
+  reloadDoDs: () => void;
 };
 export const PldDoDsComponents = (props: Props) => {
 
-  const userCtx = useContext<UserContextProps>(UserContext);
-
   const onDodCreated = () => {
-
+    toast('DoD crée avec succès', {type: 'success'});
+    props.reloadDoDs();
   }
 
   const onDodUpdated = () => {
-
+    toast('DoD mise à jour avec succès', {type: 'success'});
+    props.reloadDoDs();
   }
 
   const onDodDeleted = () => {
-
+    toast('DoD supprimée avec succès', {type: 'success'});
+    props.reloadDoDs();
   }
 
   return (

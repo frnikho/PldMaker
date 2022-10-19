@@ -65,14 +65,12 @@ export const PldComponent = (props: Props) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setTimeout(() => {
-      registerListeners();
-      loadOrg();
-      loadPld();
-      loadDodStats();
-      loadDod();
-      loadSections();
-    }, 3000);
+    registerListeners();
+    loadOrg();
+    loadPld();
+    loadDodStats();
+    loadDod();
+    loadSections();
   }, []);
 
   const registerListeners = () => {
@@ -224,7 +222,7 @@ export const PldComponent = (props: Props) => {
         <Column lg={12} md={8} sm={4}>
           <Stack gap={6}>
             {pld && org ? <PldInfoComponent pld={pld} org={org} loadPld={loadPld}/> : <PldInfoSkeleton/>}
-            {pld && org ? <PldDoDsComponents sections={sections} pld={pld} org={org} dod={dod} dodStatus={dodStatus}/> : <PldDoDsSkeleton/>}
+            {pld && org ? <PldDoDsComponents reloadDoDs={() => loadDod()} sections={sections} pld={pld} org={org} dod={dod} dodStatus={dodStatus}/> : <PldDoDsSkeleton/>}
             <PldDocumentsComponent/>
             {showButtons()}
           </Stack>

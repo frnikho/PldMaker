@@ -20,6 +20,7 @@
 - [ ] Création du système de dépendences (w/ Luann)
 - [ ] rework du système de domaine
 - [ ] Ajout de l'effet shimmer lors du chargement des données sur le front
+- [ ] ajout de + de placeholder, ajouter aussi des wrappers de style (bold, italic...)
  
 ---
 
