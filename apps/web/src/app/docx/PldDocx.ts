@@ -1,8 +1,7 @@
-import { Pld, PldRevision, Organization, TemplateType, Template, defaultTemplate } from "@pld/shared";
+import {defaultTemplate, Organization, Pld, PldRevision, Template, TemplateType} from "@pld/shared";
 import {Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
-import { formatDateNumeric, formatShortDate } from "@pld/utils";
-import { getPlaceholder } from "../util/Placeholders";
+import {getPlaceholder} from "../util/Placeholders";
 
 const HeaderRevisionCell = (title: string, size: string) => {
   return new TableCell({
@@ -46,14 +45,14 @@ const DescCell = (title: string, value: string) => {
   return new TableRow({
     children: [
       new TableCell({
+        width: {
+          type: WidthType.PERCENTAGE,
+          size: '50%'
+        },
         margins,
         shading: {
           type: ShadingType.SOLID,
           color: '77b243'
-        },
-        width: {
-          type: WidthType.PERCENTAGE,
-          size: '50%'
         },
         children: [
           new Paragraph({
@@ -94,7 +93,7 @@ export class PldDocx {
     return getPlaceholder(text, {pld: this.pld, org: this.org, revision});
   }
 
-  public generateRevision(revision: PldRevision, author: string): TableRow {
+  public generateRevision(revision: PldRevision): TableRow {
     return new TableRow({
       children: [
         RevisionCell(this.getPlaceholders(this.template.revisionTemplate.date.content.text, revision)),
@@ -108,10 +107,6 @@ export class PldDocx {
 
   public generateRevisionTable(): Table {
     return new Table({
-      width: {
-        type: WidthType.PERCENTAGE,
-        size: '100%'
-      },
       rows: [
         new TableRow({
           cantSplit: true,
@@ -124,7 +119,7 @@ export class PldDocx {
           ]
         }),
         ...this.pld.revisions.map((revision) => {
-          return this.generateRevision(revision, this.org.name);
+          return this.generateRevision(revision);
         })
       ],
     })
@@ -133,8 +128,8 @@ export class PldDocx {
   public generateDescriptionTable(): Table {
     return new Table({
       width: {
+        size: '100%',
         type: WidthType.PERCENTAGE,
-        size: '100%'
       },
       rows: [
         DescCell(this.getPlaceholders(this.template.descriptionTemplate.title.title.text), this.getPlaceholders(this.template.descriptionTemplate.title.content.text)),
@@ -151,3 +146,112 @@ export class PldDocx {
   }
 
 }
+
+export const table = new Table({
+  columnWidths: [2505, 6505],
+  rows: [
+    new TableRow({
+      children: [
+        new TableCell({
+          width: {
+            size: 3505,
+            type: WidthType.DXA,
+          },
+          children: [new Paragraph("Hello")],
+        }),
+        new TableCell({
+          width: {
+            size: 5505,
+            type: WidthType.DXA,
+          },
+          children: [],
+        }),
+      ],
+    }),
+    new TableRow({
+      children: [
+        new TableCell({
+          width: {
+            size: 3505,
+            type: WidthType.DXA,
+          },
+          children: [],
+        }),
+        new TableCell({
+          width: {
+            size: 5505,
+            type: WidthType.DXA,
+          },
+          children: [new Paragraph("World")],
+        }),
+      ],
+    }),
+  ],
+});
+
+export const table2 = new Table({
+  columnWidths: [4505, 4505],
+  rows: [
+    new TableRow({
+      children: [
+        new TableCell({
+          width: {
+            size: 4505,
+            type: WidthType.DXA,
+          },
+          children: [new Paragraph("Hello")],
+        }),
+        new TableCell({
+          width: {
+            size: 4505,
+            type: WidthType.DXA,
+          },
+          children: [],
+        }),
+      ],
+    }),
+    new TableRow({
+      children: [
+        new TableCell({
+          width: {
+            size: 4505,
+            type: WidthType.DXA,
+          },
+          children: [],
+        }),
+        new TableCell({
+          width: {
+            size: 4505,
+            type: WidthType.DXA,
+          },
+          children: [new Paragraph("World")],
+        }),
+      ],
+    }),
+  ],
+});
+
+export const table3 = new Table({
+  rows: [
+    new TableRow({
+      children: [
+        new TableCell({
+          children: [new Paragraph("Hello")],
+        }),
+        new TableCell({
+          children: [],
+        }),
+      ],
+    }),
+    new TableRow({
+      children: [
+        new TableCell({
+          children: [],
+        }),
+        new TableCell({
+          children: [new Paragraph("World")],
+        }),
+      ],
+    }),
+  ],
+});

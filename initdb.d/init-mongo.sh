@@ -1,4 +1,4 @@
-set -e
+set
 
 mongo <<EOF
 use $MONGODB_DB

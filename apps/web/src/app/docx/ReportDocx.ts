@@ -1,8 +1,8 @@
-import { defaultTemplate, Dod, DodStatus, Organization, Pld, Template, TemplateType, User } from "@pld/shared";
-import { AlignmentType, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType } from "docx";
-import { getPlaceholder } from "../util/Placeholders";
-import { ReportForm } from "../modal/pld/GeneratePldModal";
-import { margins } from "./PldGenerator";
+import {defaultTemplate, Dod, DodStatus, Organization, Pld, Template, TemplateType, User} from "@pld/shared";
+import {AlignmentType, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
+import {getPlaceholder} from "../util/Placeholders";
+import {ReportForm} from "../modal/pld/GeneratePldModal";
+import {margins} from "./PldGenerator";
 
 export class ReportDocx {
 
@@ -34,8 +34,8 @@ export class ReportDocx {
     return members.map((u) => {
       return new TableRow({
         children: [
-          new TableCell({margins, children: [new Paragraph({style: 'CellReportCell', children: [new TextRun({text: getPlaceholder(this.template.reportTemplate.userDod.user.text, {org: this.org, user: u.user, pld: this.pld})})]})]}),
-          new TableCell({margins, children: [...this.getDodReport(u.user, this.dod)]})
+          new TableCell({margins, width: {size: '50%', type: WidthType.PERCENTAGE}, children: [new Paragraph({style: 'CellReportCell', children: [new TextRun({text: getPlaceholder(this.template.reportTemplate.userDod.user.text, {org: this.org, user: u.user, pld: this.pld})})]})]}),
+          new TableCell({margins, width: {size: '50%', type: WidthType.PERCENTAGE}, children: [...this.getDodReport(u.user, this.dod)]})
         ],
       })
     });
@@ -54,16 +54,13 @@ export class ReportDocx {
 
   public generate(): Table {
     return new Table({
-      width: {
-        type: WidthType.PERCENTAGE,
-        size: '100%'
-      },
       rows: [
         this.getMainTitle(),
         new TableRow({
           children: [
             new TableCell({
               margins,
+              columnSpan: 2,
               children: [
                 new Paragraph({
                   style: 'CellSubtitle',
@@ -78,6 +75,7 @@ export class ReportDocx {
         new TableRow({
           children: [new TableCell({
             margins,
+            columnSpan: 2,
             children: [...this.generateSection()]
           })]
         }),
@@ -85,6 +83,10 @@ export class ReportDocx {
           children: [
             new TableCell({
               margins,
+              width: {
+                size: '50%',
+                type: WidthType.PERCENTAGE
+              },
               shading: {
                 type: ShadingType.SOLID,
                 color: this.template.colorTemplate.mainColor,
@@ -100,6 +102,10 @@ export class ReportDocx {
             }),
             new TableCell({
               margins,
+              width: {
+                size: '50%',
+                type: WidthType.PERCENTAGE
+              },
               shading: {
                 type: ShadingType.SOLID,
                 color: this.template.colorTemplate.mainColor,
@@ -120,6 +126,7 @@ export class ReportDocx {
           children: [
             new TableCell({
               margins,
+              columnSpan: 2,
               shading: {
                 type: ShadingType.SOLID,
                 color: this.template.colorTemplate.mainColor.slice(1, 7),
@@ -138,6 +145,7 @@ export class ReportDocx {
           children: [
             new TableCell({
               margins,
+              columnSpan: 2,
               children: [
                 new Paragraph({
                   style: 'CellSubtitle',
@@ -151,6 +159,7 @@ export class ReportDocx {
           children: [
             new TableCell({
               margins,
+              columnSpan: 2,
               shading: {
                 type: ShadingType.SOLID,
                 color: this.template.colorTemplate.mainColor.slice(1, 7),
@@ -169,6 +178,7 @@ export class ReportDocx {
           children: [
             new TableCell({
               margins,
+              columnSpan: 2,
               children: [
                 new Paragraph({
                   style: 'CellSubtitle',
@@ -187,6 +197,7 @@ export class ReportDocx {
       children: [
         new TableCell({
           margins,
+          columnSpan: 2,
           shading: {
             type: ShadingType.SOLID,
             color: this.template.colorTemplate.mainColor.slice(1, 7),

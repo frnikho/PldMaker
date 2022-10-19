@@ -1,14 +1,16 @@
 import { Pld, Dod, Organization, DodStatus, Template } from "@pld/shared";
-import {AlignmentType, Document, Footer, Header, Packer, PageNumber, Paragraph, TextRun, WidthType} from "docx";
+import {AlignmentType, Document, Header, Packer, Paragraph, TextRun, WidthType} from "docx";
 import {DodDocx} from "./DodDocx";
 import {PldDocx} from "./PldDocx";
 import {ReportDocx} from "./ReportDocx";
 import { ReportForm } from "../modal/pld/GeneratePldModal";
 
 export const margins = {
-  top: 100,
-  bottom: 100,
-  marginUnitType: WidthType.NIL
+  top: 80,
+  left: 80,
+  bottom: 80,
+  right: 80,
+  marginUnitType: WidthType.DXA,
 }
 
 export const Title = (title: string): Paragraph => {
@@ -48,24 +50,6 @@ export class PldGenerator {
       ]
     });
   }
-
-  private getFooter() {
-    return new Footer({
-      children: [
-        new Paragraph({
-          alignment: AlignmentType.RIGHT,
-          children: [
-            new TextRun({
-              font: 'Arial',
-              size: '13pt',
-              children: [PageNumber.CURRENT]
-            }),
-          ],
-        }),
-      ],
-    });
-  }
-
   public generate(): Document {
     return new Document({
       styles: {
@@ -123,15 +107,11 @@ export class PldGenerator {
             },
           }
         ],
-
         },
       sections: [{
+        properties: {},
         headers: {
           default: this.getHeader(),
-        },
-        footers: {
-          default: this.getFooter(),
-          first: new Footer({children: [new TextRun({text: ''})]}),
         },
         children: [
           new Paragraph({style: 'Title', children: [new TextRun({text: 'Description du document'})]}),

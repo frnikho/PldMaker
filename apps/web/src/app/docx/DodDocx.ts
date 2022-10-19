@@ -1,7 +1,7 @@
-import { Dod, UserWorkTime, Organization, Template, TemplateType, defaultTemplate, Pld } from "@pld/shared";
+import {defaultTemplate, Dod, Organization, Pld, Template, TemplateType, UserWorkTime} from "@pld/shared";
 import {Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import {margins} from "./PldGenerator";
-import { getPlaceholder, getUserPlaceholders } from "../util/Placeholders";
+import {getPlaceholder, getUserPlaceholders} from "../util/Placeholders";
 
 const colors = {
   cellBackground: [
@@ -99,16 +99,13 @@ export class DodDocx {
         new TableRow({
           children: [
           new TableCell({
+            columnSpan: 2,
             margins,
             shading: {
               type: ShadingType.SOLID,
               color: `#${this.dod.status.color}`
             },
             children: [Title(this.getPlaceholder(this.template.dodTemplate.title.text))],
-            width: {
-              type: WidthType.PERCENTAGE,
-              size: '100%'
-            },
           }),
           ]}),
         new TableRow({
@@ -119,10 +116,6 @@ export class DodDocx {
               type: ShadingType.SOLID,
               color: this.template.colorTemplate.secondaryColor,
             },
-            width: {
-              type: WidthType.PERCENTAGE,
-              size: '50%'
-            },
             children: [SubTitle(this.getPlaceholder(this.template.dodTemplate.skinOf.title.text))]
           }),
           new TableCell({
@@ -131,28 +124,24 @@ export class DodDocx {
               type: ShadingType.SOLID,
               color: this.template.colorTemplate.secondaryColor
             },
-            width: {
-              type: WidthType.PERCENTAGE,
-              size: '50%'
-            },
             children: [SubTitle(this.getPlaceholder(this.template.dodTemplate.wantTo.title.text))]
           }),
         ]}),
         new TableRow({children: [
           new TableCell(({
-            margins,
             width: {
+              size: '50%',
               type: WidthType.PERCENTAGE,
-              size: '50%'
             },
+            margins,
             children: [new Paragraph({children: [new TextRun({text: this.getPlaceholder(this.template.dodTemplate.skinOf.content.text), italics: true, size: '13pt', font: 'Roboto'})]})]
           })),
           new TableCell(({
-            margins,
             width: {
+              size: '50%',
               type: WidthType.PERCENTAGE,
-              size: '50%'
             },
+            margins,
             children: [new Paragraph({children: [new TextRun({text: this.getPlaceholder(this.template.dodTemplate.wantTo.content.text), size: '13pt', font: 'Roboto'})]})]
           })),
         ]}),
@@ -163,20 +152,14 @@ export class DodDocx {
               type: ShadingType.SOLID,
               color: this.template.colorTemplate.secondaryColor
             },
-            width: {
-              type: WidthType.PERCENTAGE,
-              size: '100%'
-            },
+            columnSpan: 2,
             children: [this.Description()]})]
         }),
         new TableRow({
           children: [
             new TableCell({
               margins,
-              width: {
-                type: WidthType.PERCENTAGE,
-                size: '100%'
-              },
+              columnSpan: 2,
               children: [this.DodComp(...this.dod.descriptionOfDone)]
             })
           ]
@@ -185,13 +168,13 @@ export class DodDocx {
           children: [
             new TableCell({
               margins,
+              width: {
+                size: '50%',
+                type: WidthType.PERCENTAGE,
+              },
               shading: {
                 type: ShadingType.SOLID,
                 color: colors.cellBackground[0]
-              },
-              width: {
-                type: WidthType.PERCENTAGE,
-                size: '50%'
               },
               children: [
                 SubTitle(this.getPlaceholder(this.template.dodTemplate.estimatedWorkTime.title.text))
@@ -199,13 +182,13 @@ export class DodDocx {
             }),
             new TableCell({
               margins,
+              width: {
+                size: '50%',
+                type: WidthType.PERCENTAGE,
+              },
               shading: {
                 type: ShadingType.SOLID,
                 color: colors.cellBackground[0]
-              },
-              width: {
-                type: WidthType.PERCENTAGE,
-                size: '50%'
               },
               children: [this.EstimatedCharge(this.dod.estimatedWorkTime)]
             })
@@ -214,5 +197,4 @@ export class DodDocx {
       ]
     });
   }
-
 }

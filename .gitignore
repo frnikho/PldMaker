@@ -42,3 +42,5 @@ Thumbs.db
 .vscode
 .idea
 yarn.lock
+
+.workspace/obsidian/.obsidian
