@@ -18,6 +18,7 @@
       "@pld/business": ["libs/business/src/index.ts"],
       "@pld/editor": ["libs/editor/src/index.ts"],
       "@pld/shared": ["libs/shared/src/index.ts"],
+      "@pld/ui": ["libs/ui/src/index.ts"],
       "@pld/utils": ["libs/utils/src/index.ts"]
     }
   },

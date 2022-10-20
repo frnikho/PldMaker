@@ -1,7 +1,7 @@
 import * as React from "react";
 import Lottie from "lottie-react";
 import { Tile } from "carbon-components-react";
-import { TileStyle } from "../../../style/TileStyle";
+import { TileStyle } from "@pld/ui";
 
 export const PldDocumentsComponent = () => {
   return (

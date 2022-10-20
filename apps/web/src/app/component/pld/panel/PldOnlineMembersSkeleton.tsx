@@ -5,7 +5,7 @@ import {
 } from "carbon-components-react";
 
 import {Stack} from '@carbon/react';
-import { TileStyle } from "../../../style/TileStyle";
+import { TileStyle } from "@pld/ui";
 
 export const PldOnlineMembersSkeleton = () => {
 

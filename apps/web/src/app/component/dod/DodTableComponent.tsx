@@ -33,7 +33,7 @@ import { Add, Edit, ImportExport, TrashCan } from "@carbon/icons-react";
 import { toast } from "react-toastify";
 import { PreviewDodModal } from "../../modal/dod/PreviewDodModal";
 import { formatShortDate } from "@pld/utils";
-import { ButtonStyle } from "../../style/ButtonStyle";
+import { ButtonStyle } from "@pld/ui";
 import { useLanguage } from "../../hook/useLanguage";
 
 type Props = {
@@ -175,14 +175,14 @@ export const DodTableComponent = (props: Props) => {
   }
 
   const showDatatable = () => {
-    const rowData = props.dods.sort((a, b) => new Date(b.created_date).getDate() - new Date(a.created_date).getDate()).map((dod) =>
+    const rowData = props.dods.sort((a, b) => a.version.localeCompare(b.version)).map((dod) =>
       ({
         ...dod,
         id: dod._id,
         created_date: formatShortDate(new Date(dod.created_date))
       }));
     return (
-      <DataTable rows={rowData} headers={getTableHeader()} isSortable locale={getCurrentLanguage()}>
+      <DataTable rows={rowData} headers={getTableHeader()} isSortable locale={'fr'}>
         {({
             rows,
             headers,
@@ -195,7 +195,15 @@ export const DodTableComponent = (props: Props) => {
           }) => (
           <TableContainer>
             <TableToolbar size={"lg"} style={{marginBottom: 10}}>
-              <TableBatchActions {...getBatchActionProps()}>
+              <TableBatchActions {...getBatchActionProps()} translateWithId={(messageId, args) => {
+                if (messageId === 'carbon.table.batch.cancel') {
+                  return `Annuler`;
+                } else if (messageId === 'carbon.table.batch.items.selected') {
+                  return `${args?.totalSelected} DoDs sélectionnées`
+                } else {
+                  return '';
+                }
+              }}>
                 <TableBatchAction
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
                   renderIcon={TrashCan}

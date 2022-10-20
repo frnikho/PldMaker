@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import { AddRevisionPldModal } from "../../../modal/pld/AddRevisionPldModal";
 import { useState } from "react";
 import { EditRevisionPldModal } from "../../../modal/pld/EditRevisionPldModal";
-import { ButtonStyle } from "../../../style/ButtonStyle";
+import { ButtonStyle } from "@pld/ui";
 
 type Props = {
   pld: Pld;

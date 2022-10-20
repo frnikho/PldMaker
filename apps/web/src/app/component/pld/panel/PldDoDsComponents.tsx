@@ -2,7 +2,7 @@ import * as React from "react";
 import { DodTableComponent } from "../../dod/DodTableComponent";
 import { Dod, DodStatus, Organization, OrganizationSection, Pld } from "@pld/shared";
 import { Tile } from "carbon-components-react";
-import { TileStyle } from "../../../style/TileStyle";
+import { TileStyle } from "@pld/ui";
 import { toast } from "react-toastify";
 
 type Props = {

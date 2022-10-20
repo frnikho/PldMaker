@@ -1,14 +1,14 @@
 ### To Do:
 
-- [ ] Système de planification de réu (voir avec Victor le 17/10 à 18h30)
+- [ ] Système de planification de réu (voir réu w/ Victor le 17/10 à 18h30)
 - [ ] Rework de tout les composants pour passer en function component
     - [x] Modals
     - [ ] Page
     - [ ] Components
     - [ ] Utils
-- [ ] Test de la génération des documents word sur Windows et MacOS
+- [x] Test de la génération des documents word sur Windows et MacOS
     - [x] Microsoft word sous windows
-    - [ ] Microsoft word sous MacOS
+    - [x] Microsoft word sous MacOS
 - [x] Rework de la modal de création des DoDs
      - [x] Gestion d'erreur de chaque input
      - [x] Rework en fonctional component
@@ -21,6 +21,7 @@
 - [ ] rework du système de domaine
 - [ ] Ajout de l'effet shimmer lors du chargement des données sur le front
 - [ ] ajout de + de placeholder, ajouter aussi des wrappers de style (bold, italic...)
+- [ ] créer un système de changelog
  
 ---
 
@@ -56,3 +57,9 @@ Un utilisateur qui souhaite créer un event aura la possibilité de récuperer l
 - bug sur Google Docs (non prise en charge de la taille des cellules du tableau en pourcentage, non prise en charge des fonts, taille de text et marges)
   solution provisoire: ouvrir le doc avec microsoft word, libreoffice... Sauvegarder le fichier et l'upload sur google drive pour avoir la mise en page correcte.
 - Ajout de l'effet shimmer pour les composants du PLD
+
+
+
+### 20/10/2022
+
+- rework de components, ajout de la modification des tags sur la page d'un PLD

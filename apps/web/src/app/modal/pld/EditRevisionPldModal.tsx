@@ -10,6 +10,7 @@ import { PldApiController } from "../../controller/PldApiController";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../hook/useAuth";
+import { errorToast, successToast } from "../../manager/ToastManager";
 
 type Props = {
   org: Organization;
@@ -32,9 +33,9 @@ export const EditRevisionPldModal = (props: Props) => {
     PldApiController.editRevision(accessToken, props.org._id, props.pld._id, body, (pld, error) => {
       if (error) {
         console.log(error)
-        toast('Error', {type: 'error'});
+        errorToast('Une erreur est survenue !');
       } else {
-        toast(`Section ${props.revision.version} mis à jour`, {type: 'success'})
+        successToast(`Révision ${props.revision.version} mise à jour`);
         props.onSuccess();
       }
     })

@@ -71,8 +71,8 @@ export default function UserPage() {
       <UserInfoComponent onUpdateUser={onUserUpdated} userContext={userCtx} user={userCtx.user}/>
       <h3 style={style.title}>{languageCtx.translate(language.pages.myProfile.security.title)}</h3>
       <UserSecurityComponent onMfaEnabled={onMfaEnabled} onMfaDisabled={onMfaDisable} userContext={userCtx} languageCtx={languageCtx} mfa={mfa}/>
-      <h3 style={style.title}>{languageCtx.translate(language.pages.myProfile.preference.title)}</h3>
-      <h3 style={style.dangerTitle}>{languageCtx.translate(language.pages.myProfile.delete.title)}</h3>
+{/*      <h3 style={style.title}>{languageCtx.translate(language.pages.myProfile.preference.title)}</h3>
+      <h3 style={style.dangerTitle}>{languageCtx.translate(language.pages.myProfile.delete.title)}</h3>*/}
     </Stack>
   );
 }

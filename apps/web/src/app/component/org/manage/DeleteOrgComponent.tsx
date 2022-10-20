@@ -9,6 +9,7 @@ import { UserContext, UserContextProps } from "../../../context/UserContext";
 import { Organization } from "@pld/shared";
 import { DeleteOrgModal } from "../../../modal/org/manage/DeleteOrgModal";
 import { useNavigate } from "react-router-dom";
+import { ButtonStyle, TileStyle } from "@pld/ui";
 
 type Props = {
   org: Organization;
@@ -30,7 +31,7 @@ export const DeleteOrgComponent = (props: Props) => {
         setModal(false);
         navigate('/');
       }} onDismiss={() => setModal(false)}/>
-      <Tile style={{padding: '18px'}}>
+      <Tile style={TileStyle.default}>
         <Stack gap={6}>
           <div>
             <p>Tous les utilisateurs encore présents dans l'organisation ne pourront plus récupérer des éléments une fois l'organisation supprimer, elle n'apparaîtra plus dans leurs organisations active.</p>
@@ -38,7 +39,7 @@ export const DeleteOrgComponent = (props: Props) => {
             <br/>
             <p style={{fontWeight: 'bold'}}>Attention, cette opération est irréversible.</p>
           </div>
-          <Button disabled={!isOwner()} onClick={() => setModal(true)} kind={'danger'} renderIcon={Fire} iconDescription={"delete"}>
+          <Button style={ButtonStyle.default} disabled={!isOwner()} onClick={() => setModal(true)} kind={'danger'} renderIcon={Fire} iconDescription={"delete"}>
             Supprimer
           </Button>
         </Stack>

@@ -4,7 +4,7 @@ import { formatLongDate } from "@pld/utils";
 
 import {Stack} from '@carbon/react';
 import { Organization, Pld } from "@pld/shared";
-import { TileStyle } from "../../../style/TileStyle";
+import { TileStyle } from "@pld/ui";
 
 type Props = {
   pld: Pld;

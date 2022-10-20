@@ -19,6 +19,7 @@ import EventPage from "./page/organization/calendar/event/EventPage";
 import { AuthOtpPage } from "./page/AuthOtpPage";
 import { Abc } from "./util/Page";
 import EditTemplatePage from "./page/organization/template/EditTemplatePage";
+import { ChangelogPage } from "./page/ChangelogPage";
 
 export function App() {
 
@@ -41,6 +42,9 @@ export function App() {
         </Route>
         <Route path={"/faq"} element={<MainPageLayout />}>
           <Route index element={<FAQPage/>}/>
+        </Route>
+        <Route path={"/changelog"} element={<MainPageLayout />}>
+          <Route index element={<ChangelogPage/>}/>
         </Route>
         <Route path={"/auth/otp"} element={<MainPageLayout />}>
           <Route index element={<AuthOtpPage navigate={navigate}/>}/>

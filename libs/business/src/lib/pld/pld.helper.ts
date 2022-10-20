@@ -64,7 +64,7 @@ export class PldHelper {
   }
 
   public async updateWithBody(user: User, org: Organization, pld: Pld, body: PldUpdateBody) {
-    const pldUpdated = await PldHelper.populateAndExecute(this.pldModel.findOneAndUpdate({_id: pld._id}, {updated_date: new Date(), title: body.title, description: body.description, manager: body.manager, promotion: body.promotion, currentStep: body.currentStep}, {new: true}));
+    const pldUpdated = await PldHelper.populateAndExecute(this.pldModel.findOneAndUpdate({_id: pld._id}, {updated_date: new Date(), title: body.title, description: body.description, manager: body.manager, promotion: body.promotion, currentStep: body.currentStep, tags: body.tags}, {new: true}));
     this.eventEmitter.emit(PldEvents.onPldUpdate, new PldUpdatedEvent(user._id, body.pldId, this.getEditedFields(pld, pldUpdated)));
     this.eventEmitter.emit('Pld:Update', body.pldId); //TODO Check useless of this
     return pldUpdated;

@@ -3,7 +3,7 @@ import { Tile } from "carbon-components-react";
 import { Pld } from "@pld/shared";
 
 import {Stack} from '@carbon/react';
-import { TileStyle } from "../../../style/TileStyle";
+import { TileStyle } from "@pld/ui";
 
 type Props = {
   pld: Pld;

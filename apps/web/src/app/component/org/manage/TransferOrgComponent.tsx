@@ -8,6 +8,7 @@ import { UserContext, UserContextProps } from "../../../context/UserContext";
 
 import {Migrate} from '@carbon/icons-react';
 import { MigrateOrgModal } from "../../../modal/org/manage/MigrateOrgModal";
+import { ButtonStyle, TileStyle } from "@pld/ui";
 
 type Props = {
   org: Organization;
@@ -24,7 +25,7 @@ export const TransferOrgComponent = (props: Props) => {
   return (
     <>
       <MigrateOrgModal org={props.org} open={modal} onSuccess={() => setModal(false)} onDismiss={() => setModal(false)}/>
-      <Tile style={{padding: '18px'}}>
+      <Tile style={TileStyle.default}>
         <Stack gap={6}>
           <div>
             <p>Vous pouvez transférer vos droits à l'un des utilisateurs de cette organisation.</p>
@@ -32,7 +33,7 @@ export const TransferOrgComponent = (props: Props) => {
             <br/>
             <p style={{fontWeight: 'bold'}}>Attention, cette opération est irréversible.</p>
           </div>
-          <Button disabled={!isOwner()} onClick={() => setModal(true)} kind={'danger'} renderIcon={Migrate} iconDescription={"migrate"}>
+          <Button style={ButtonStyle.default} disabled={!isOwner()} onClick={() => setModal(true)} kind={'danger'} renderIcon={Migrate} iconDescription={"migrate"}>
             Transférer
           </Button>
         </Stack>

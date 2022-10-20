@@ -47,7 +47,7 @@ export class Organization extends DatedObjectSchema {
   @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true})
   owner: User;
 
-  @Prop({required: false, default: () => process.env.NX_SERVER_HOST + getOrgPicture()})
+  @Prop({required: false, default: () => process.env.NX_SERVER_HOST + 'assets/' + getOrgPicture()})
   picture: string;
 
   @Prop({required: false, default: 1.0})

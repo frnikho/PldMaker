@@ -9,6 +9,7 @@ import { useContext } from "react";
 import { UserContext, UserContextProps } from "../../../context/UserContext";
 import { OrganizationApiController } from "../../../controller/OrganizationApiController";
 import { useForm } from "react-hook-form";
+import { ButtonStyle, TileStyle } from "@pld/ui";
 
 type Props = {
   org: Organization;
@@ -55,7 +56,7 @@ export const ManageOrgMembersComponent = (props: Props) => {
   }
 
   return (
-    <Tile style={{padding: '18px'}}>
+    <Tile style={TileStyle.default}>
       <Stack gap={2}>
         <Table style={{marginTop: '20px', marginBottom: '20px'}} >
           <TableHead>
@@ -86,13 +87,14 @@ export const ManageOrgMembersComponent = (props: Props) => {
           </TableBody>
         </Table>
         <TextInput
+          style={{marginBottom: 18}}
           disabled={!isOwner()}
           helperText={!isOwner() ? "Seulement le créateur peut ajouter des utilisateurs dans l'organisation !" : null}
           id={"org-invite-user"} labelText={"Ajouter un utilisateur à l'organisation"} onChange={(e) => setValue('invitedUser', e.currentTarget.value)}
           invalid={errors.invitedUser?.message !== undefined}
           invalidText={errors.invitedUser?.message}
         />
-        <Button style={{marginTop: '20px'}} renderIcon={Add} iconDescription={"Ajouter"} onClick={onClickInviteUser}>Ajouter un utilisateur</Button>
+        <Button style={ButtonStyle.default} renderIcon={Add} iconDescription={"Ajouter"} onClick={onClickInviteUser}>Ajouter un utilisateur</Button>
       </Stack>
     </Tile>
   )

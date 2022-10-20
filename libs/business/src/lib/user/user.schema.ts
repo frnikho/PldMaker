@@ -33,7 +33,7 @@ export class User extends DatedObjectSchema {
   @Prop({required: false, default: []})
   devices: Device[];
 
-  @Prop({required: false, default: 'default_profile_picture.png'})
+  @Prop({required: false, default: () => process.env.NX_SERVER_HOST + 'assets/' + 'default_profile_picture.png'})
   profile_picture?: string;
 
   @Prop({required: false})

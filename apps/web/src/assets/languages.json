@@ -1,6 +1,9 @@
 {
   "menu": {
     "sidebar": {
+      "changelog": {
+        "en": "Changelog"
+      },
       "faq": {
         "en": "FAQ"
       },

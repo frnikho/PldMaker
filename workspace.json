@@ -5,10 +5,11 @@
     "api": "apps/api",
     "backend-testing": "apps/backend-testing",
     "business": "libs/business",
-    "web": "apps/web",
     "front-e2e": "apps/front-e2e",
     "shared": "libs/shared",
-    "utils": "libs/utils"
+    "ui": "libs/ui",
+    "utils": "libs/utils",
+    "web": "apps/web"
   },
   "webpackConfig": "@nrwl/react/plugins/babel"
 }

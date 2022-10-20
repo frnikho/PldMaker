@@ -30,7 +30,6 @@ import { PldInfoComponent } from "./panel/PldInfoComponent";
 import { useNavigate } from "react-router-dom";
 import { PldDoDsComponents } from "./panel/PldDoDsComponents";
 import { PldDocumentsComponent } from "./panel/PldDocumentsComponent";
-import { ButtonStyle } from "../../style/ButtonStyle";
 import { GeneratePldModal, ReportForm } from "../../modal/pld/GeneratePldModal";
 import { PldGenerator } from "../../docx/PldGenerator";
 import {PldQuickInfoSkeleton} from "./panel/PldQuickInfoSkeleton";
@@ -39,6 +38,7 @@ import {PldOnlineMembersSkeleton} from "./panel/PldOnlineMembersSkeleton";
 import {PldStateSkeleton} from "./panel/PldStateSkeleton";
 import {PldStepsSkeleton} from "./panel/PldStepsSkeleton";
 import {PldDoDsSkeleton} from "./panel/PldDoDsSkeleton";
+import { ButtonStyle } from "@pld/ui";
 
 type Props = {
   pldId: string;
@@ -230,7 +230,7 @@ export const PldComponent = (props: Props) => {
         <Column lg={4} md={8} sm={4}>
           <Stack gap={6}>
             {pld && org ? <PldQuickInfoComponent pld={pld} org={org}/> : <PldQuickInfoSkeleton/>}
-            {pld ? <PldStateComponent pld={pld}/> : <PldStateSkeleton/>}
+            {/*{pld ? <PldStateComponent pld={pld}/> : <PldStateSkeleton/>}*/}
             {pld && org ? <PldStepsComponent pld={pld} org={org} onPldStepUpdated={loadPld}/> : <PldStepsSkeleton/>}
             {org ? <PldOnlineMembersComponent org={org} /> : <PldOnlineMembersSkeleton/>}
           </Stack>

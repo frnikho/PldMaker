@@ -11,6 +11,8 @@ import { CreateDodStatusModal } from "../../../modal/org/manage/CreateDodStatusM
 import { UpdateDodStatusModal } from "../../../modal/org/manage/UpdateDodStatusModal";
 import { LanguageContext, LanguageContextState } from "../../../context/LanguageContext";
 import { language } from "../../../language";
+import { TileStyle } from "@pld/ui";
+import { ButtonStyle } from "@pld/ui";
 
 export enum DodStatusOperationType {
   Created,
@@ -88,7 +90,7 @@ export function ManageOrgDodStatusComponent(props: ManageOrgDodStatusProps) {
         onDismissModal('openUpdate');
         props.onStatusChanged(status as unknown as DodStatusOperationType);
       }}/> : null}
-      <Tile style={style.tile}>
+      <Tile style={TileStyle.default}>
         <div>
           <p>Le statut des DoDs vous permet de vous retrouver dans l'avancement de celle-ci.</p>
           <p>La couleur choisit est également utilisé lors de la génération du document word.</p>
@@ -103,8 +105,9 @@ export function ManageOrgDodStatusComponent(props: ManageOrgDodStatusProps) {
             }) => (
             <TableContainer>
               <TableToolbar size={"lg"}>
-                <TableToolbarContent>
+                <TableToolbarContent style={{marginBottom: 12}}>
                   <Button
+                    style={ButtonStyle.default}
                     tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                     onClick={() => {setModal({openCreate: true, openUpdate: false})}}
                     renderIcon={Add}
@@ -138,13 +141,4 @@ export function ManageOrgDodStatusComponent(props: ManageOrgDodStatusProps) {
       </Tile>
     </>
   )
-}
-
-const style = {
-  tile: {
-    borderRadius: 8,
-  },
-  button: {
-    borderRadius: 12
-  }
 }

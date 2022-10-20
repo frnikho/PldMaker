@@ -43,6 +43,7 @@ export type LanguageType = {
   },
   "menu": {
     "sidebar": {
+      "changelog": AvailableLangue,
       "faq": AvailableLanguages
       "dashboard": AvailableLanguages,
     },

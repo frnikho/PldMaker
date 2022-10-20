@@ -1,6 +1,6 @@
 import * as React from "react";
 import {DataTableSkeleton, Tile } from "carbon-components-react";
-import { TileStyle } from "../../../style/TileStyle";
+import { TileStyle } from "@pld/ui";
 
 export const PldDoDsSkeleton = () => {
 

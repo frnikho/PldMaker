@@ -10,7 +10,7 @@ import {
 
 import { Stack } from '@carbon/react';
 
-import { TileStyle } from "../../../style/TileStyle";
+import { TileStyle } from "@pld/ui";
 import {PldRevisionsSkeleton} from "./PldRevisionsSkeleton";
 
 export const PldInfoSkeleton = () => {

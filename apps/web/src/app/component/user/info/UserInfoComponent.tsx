@@ -1,8 +1,7 @@
 import { RequiredUserContextProps } from "../../../context/UserContext";
 import { User, UserDomain } from "@pld/shared";
-import { Column, FormLabel, Grid, MultiSelect, Select, SelectItem, TextInput, TextInputSkeleton, Tile } from "carbon-components-react";
+import { Column, FormLabel, Grid, MultiSelect, Select, SelectItem, TextInput, Tile } from "carbon-components-react";
 import { formatLongDate, Timezone } from "@pld/utils";
-import { SERVER_URL_ASSETS } from "../../../util/User";
 import { LoadingButtonComponent } from "../../LoadingButton";
 import React, { useCallback, useEffect, useState } from "react";
 
@@ -34,7 +33,7 @@ const defaultUserForm: UserForm = {
 
 export function UserInfoComponent(props: ShowUserInfoProps) {
 
-  const {formState: {errors}, watch, register, getValues, setValue, reset, handleSubmit} = useForm<UserForm>({ defaultValues: defaultUserForm });
+  const {watch, register, getValues, setValue, handleSubmit} = useForm<UserForm>({ defaultValues: defaultUserForm });
   const [modal, setModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -73,13 +72,13 @@ export function UserInfoComponent(props: ShowUserInfoProps) {
     toast('Votre photo de profile va être mis à jour !', {type: 'success'});
     setTimeout(() => {
       props.onUpdateUser(props.user!);
-    }, 1000);
+    }, 2000);
   }, []);
 
   if (props.user) {
     return (
       <Tile style={style.tile}>
-        <UploadUserPictureModal open={modal} onDismiss={() => setModal(false)} onSuccess={onUploadedPicture} userContext={props.userContext}/>
+        <UploadUserPictureModal open={modal} onDismiss={() => setModal(false)} onSuccess={onUploadedPicture}/>
         <form onSubmit={handleSubmit(onUpdate)}>
           <Grid>
             <Column xlg={6}>

@@ -3,7 +3,7 @@ import {ButtonSkeleton, SkeletonPlaceholder, Tile} from "carbon-components-react
 import { IncompleteStatusIcon } from "../../../icon/IncompleteStatusIcon";
 import {Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react';
 import {Information, CheckmarkOutline, Incomplete} from '@carbon/icons-react';
-import { TileStyle } from "../../../style/TileStyle";
+import { TileStyle } from "@pld/ui";
 
 
 export const PldStepsSkeleton = () => {

@@ -2,7 +2,7 @@ import React from "react";
 import {PageState} from "../../util/Page";
 import {redirectNavigation, withParams} from "../../util/Navigation";
 import {LoginState, UserContext, UserContextProps} from "../../context/UserContext";
-import OrganizationComponent from "../../component/org/OrganizationComponent";
+import { OrganizationComponent } from "../../component/org/OrganizationComponent";
 import {ApiError} from "../../util/Api";
 import {SkeletonPlaceholder} from "carbon-components-react";
 import { RouteMatch } from "react-router-dom";
@@ -31,7 +31,7 @@ class OrganizationPage extends React.Component<OrganizationPageProps, Organizati
     if (authContext.isLogged === LoginState.not_logged) {
       return <h1>Not logged</h1>
     } else if (authContext.isLogged === LoginState.logged) {
-      return <OrganizationComponent onError={this.onError} orgId={this.props.params['id']}  userContext={authContext}/>
+      return <OrganizationComponent orgId={this.props.params['id'] ?? ''}/>
     }
     return (
       <SkeletonPlaceholder style={{height: '20px', width: '20%'}}/>

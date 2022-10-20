@@ -4,11 +4,11 @@ import { DataTable } from '@carbon/react';
 import { Organization, OrganizationSection } from "@pld/shared";
 
 import { Add } from '@carbon/icons-react';
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { UpdateOrgSectionModal } from "../../../modal/org/UpdateOrgSectionModal";
-import { UserContext, UserContextProps } from "../../../context/UserContext";
 import { CreateOrgSectionModal } from "../../../modal/org/CreateOrgSectionModal";
+import { ButtonStyle, TileStyle } from "@pld/ui";
 
 export const sectionHeaderData = [
   {
@@ -38,15 +38,12 @@ export const ManageOrgSectionsComponent = (props: Props) => {
   const [modals, setModals] = useState<Modals>({openCreateSection: false, openUpdateSection: false, openDeleteSection: false});
   const [selectedSection, setSelectedSection] = useState<undefined | OrganizationSection>(undefined);
 
-  const userCtx = useContext<UserContextProps>(UserContext);
-
   const onDismiss = () => {
     setModals({
       openCreateSection: false,
       openUpdateSection: false,
       openDeleteSection: false,
     });
-    setSelectedSection(undefined);
   }
 
   const updateModals = (key: keyof Modals, value: boolean) => {
@@ -80,7 +77,7 @@ export const ManageOrgSectionsComponent = (props: Props) => {
     <>
       <CreateOrgSectionModal open={modals.openCreateSection} onDismiss={onDismiss} onSuccess={onSectionCreated} org={props.org}/>
       {selectedSection ? <UpdateOrgSectionModal open={modals.openUpdateSection} onDismiss={onDismiss} onSuccess={onSectionUpdated} org={props.org} section={selectedSection}/> : null}
-      <Tile>
+      <Tile style={TileStyle.default}>
         <p>Une section correspond à la catégorie ou vos DoDs seront rangées.</p>
         <p>par exemple: La Section '2.6 Map' correspond au parent de toutes les DoDs 2.6.x</p>
         <p style={{fontStyle: 'italic'}}>Vous avez la possibilité de changer en temps réel le nom des sections depuis la page de votre Pld</p>
@@ -101,8 +98,9 @@ export const ManageOrgSectionsComponent = (props: Props) => {
             }) => (
             <TableContainer>
               <TableToolbar size={"lg"}>
-                <TableToolbarContent>
+                <TableToolbarContent style={{marginBottom: 12}}>
                   <Button
+                    style={ButtonStyle.default}
                     tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                     onClick={() => {updateModals('openCreateSection', true)}}
                     renderIcon={Add}
@@ -126,7 +124,7 @@ export const ManageOrgSectionsComponent = (props: Props) => {
                   {rows.map((row, index) => (
                     <TableRow {...getRowProps({ row })} key={index}>
                       {row.cells.map((cell) => {
-                        return (<TableCell onClick={() => onClickSectionCell(row, cell)} key={cell.id}>{cell.value}</TableCell>)
+                        return (<TableCell style={{cursor: 'pointer'}} onClick={() => onClickSectionCell(row, cell)} key={cell.id}>{cell.value}</TableCell>)
                       })}
                     </TableRow>
                   ))}

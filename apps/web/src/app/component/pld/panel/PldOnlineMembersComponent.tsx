@@ -13,7 +13,7 @@ import {emitBody} from "../../../context/SocketContext";
 
 import {UserOnline, Asleep} from '@carbon/icons-react'
 import {formatLongDate} from "@pld/utils";
-import { TileStyle } from "../../../style/TileStyle";
+import { TileStyle } from "@pld/ui";
 import {useSocket} from "../../../hook/useSocket";
 import {useAuth} from "../../../hook/useAuth";
 

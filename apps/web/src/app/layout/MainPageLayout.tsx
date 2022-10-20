@@ -17,7 +17,7 @@ import {
 
 import {Layer} from '@carbon/react';
 
-import {Dashboard, Legend} from '@carbon/icons-react'
+import {Dashboard, Legend, MessageQueue} from '@carbon/icons-react'
 
 import {UserContext, UserContextProps} from "../context/UserContext";
 import { useLanguage } from "../hook/useLanguage";
@@ -107,6 +107,15 @@ export const MainPageLayout = () => {
                   }}
                   renderIcon={Legend}>
                   {translate('menu.sidebar.faq')}
+                </SideNavLink>
+                <SideNavLink
+                  large
+                  onClick={() => {
+                    onClickSideNavExpand();
+                    navigate(`/changelog`);
+                  }}
+                  renderIcon={MessageQueue}>
+                  {translate('menu.sidebar.changelog')}
                 </SideNavLink>
                 <SideNavDivider/>
                 <UserContext.Consumer>

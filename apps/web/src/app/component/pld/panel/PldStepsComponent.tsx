@@ -6,8 +6,8 @@ import {Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react';
 import {Information, CheckmarkOutline, Incomplete, Classification} from '@carbon/icons-react';
 import { useState } from "react";
 import { UpdatePldTypeModal } from "../../../modal/pld/ChangePldTypeModal";
-import { TileStyle } from "../../../style/TileStyle";
-import { ButtonStyle } from "../../../style/ButtonStyle";
+import { TileStyle } from "@pld/ui";
+import { ButtonStyle } from "@pld/ui";
 
 type Props = {
   pld: Pld;
