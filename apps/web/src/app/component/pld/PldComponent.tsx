@@ -223,8 +223,8 @@ export const PldComponent = (props: Props) => {
           <Stack gap={6}>
             {pld && org ? <PldInfoComponent pld={pld} org={org} loadPld={loadPld}/> : <PldInfoSkeleton/>}
             {/*{pld && org ? <PldDoDsComponents reloadDoDs={() => loadDod()} sections={sections} pld={pld} org={org} dod={dod} dodStatus={dodStatus}/> : <PldDoDsSkeleton/>}
-            <PldDocumentsComponent/>
-            {showButtons()}*/}
+            <PldDocumentsComponent/>*/}
+            {showButtons()}
           </Stack>
         </Column>
         <Column lg={4} md={8} sm={4}>
