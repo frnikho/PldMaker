@@ -20,6 +20,7 @@ import { AuthOtpPage } from "./page/AuthOtpPage";
 import { Abc } from "./util/Page";
 import EditTemplatePage from "./page/organization/template/EditTemplatePage";
 import { ChangelogPage } from "./page/ChangelogPage";
+import { MyCalendarPageComponent } from "./page/calendar/MyCalendarPageComponent";
 
 export function App() {
 
@@ -42,6 +43,9 @@ export function App() {
         </Route>
         <Route path={"/faq"} element={<MainPageLayout />}>
           <Route index element={<FAQPage/>}/>
+        </Route>
+        <Route path={"/calendar"} element={<MainPageLayout />}>
+          <Route index element={<MyCalendarPageComponent/>}/>
         </Route>
         <Route path={"/changelog"} element={<MainPageLayout />}>
           <Route index element={<ChangelogPage/>}/>

@@ -1,6 +1,10 @@
 {
   "menu": {
     "sidebar": {
+      "myCalendar": {
+        "fr": "Mon Calendrier",
+        "en": "My Calendar"
+      },
       "changelog": {
         "en": "Changelog"
       },

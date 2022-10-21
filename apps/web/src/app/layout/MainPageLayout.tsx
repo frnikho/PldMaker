@@ -17,7 +17,7 @@ import {
 
 import {Layer} from '@carbon/react';
 
-import {Dashboard, Legend, MessageQueue} from '@carbon/icons-react'
+import {Dashboard, Legend, MessageQueue, Calendar} from '@carbon/icons-react'
 
 import {UserContext, UserContextProps} from "../context/UserContext";
 import { useLanguage } from "../hook/useLanguage";
@@ -98,6 +98,15 @@ export const MainPageLayout = () => {
                   }}
                   renderIcon={Dashboard}>
                   {translate('menu.sidebar.dashboard')}
+                </SideNavLink>
+                <SideNavLink
+                  large
+                  onClick={() => {
+                    onClickSideNavExpand();
+                    navigate("/calendar");
+                  }}
+                  renderIcon={Calendar}>
+                  {translate('menu.sidebar.myCalendar')}
                 </SideNavLink>
                 <SideNavLink
                   large
