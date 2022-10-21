@@ -222,17 +222,17 @@ export const PldComponent = (props: Props) => {
         <Column lg={12} md={8} sm={4}>
           <Stack gap={6}>
             {pld && org ? <PldInfoComponent pld={pld} org={org} loadPld={loadPld}/> : <PldInfoSkeleton/>}
-            {pld && org ? <PldDoDsComponents reloadDoDs={() => loadDod()} sections={sections} pld={pld} org={org} dod={dod} dodStatus={dodStatus}/> : <PldDoDsSkeleton/>}
+            {/*{pld && org ? <PldDoDsComponents reloadDoDs={() => loadDod()} sections={sections} pld={pld} org={org} dod={dod} dodStatus={dodStatus}/> : <PldDoDsSkeleton/>}
             <PldDocumentsComponent/>
-            {showButtons()}
+            {showButtons()}*/}
           </Stack>
         </Column>
         <Column lg={4} md={8} sm={4}>
           <Stack gap={6}>
-            {/*{pld && org ? <PldQuickInfoComponent pld={pld} org={org}/> : <PldQuickInfoSkeleton/>}
+            {pld && org ? <PldQuickInfoComponent pld={pld} org={org}/> : <PldQuickInfoSkeleton/>}
             {pld ? <PldStateComponent pld={pld}/> : <PldStateSkeleton/>}
             {pld && org ? <PldStepsComponent pld={pld} org={org} onPldStepUpdated={loadPld}/> : <PldStepsSkeleton/>}
-            {org ? <PldOnlineMembersComponent org={org} /> : <PldOnlineMembersSkeleton/>}*/}
+            {org ? <PldOnlineMembersComponent org={org} /> : <PldOnlineMembersSkeleton/>}
           </Stack>
         </Column>
       </Grid>
