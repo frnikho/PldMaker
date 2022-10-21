@@ -229,10 +229,10 @@ export const PldComponent = (props: Props) => {
         </Column>
         <Column lg={4} md={8} sm={4}>
           <Stack gap={6}>
-            {pld && org ? <PldQuickInfoComponent pld={pld} org={org}/> : <PldQuickInfoSkeleton/>}
-            {/*{pld ? <PldStateComponent pld={pld}/> : <PldStateSkeleton/>}*/}
+            {/*{pld && org ? <PldQuickInfoComponent pld={pld} org={org}/> : <PldQuickInfoSkeleton/>}
+            {pld ? <PldStateComponent pld={pld}/> : <PldStateSkeleton/>}
             {pld && org ? <PldStepsComponent pld={pld} org={org} onPldStepUpdated={loadPld}/> : <PldStepsSkeleton/>}
-            {org ? <PldOnlineMembersComponent org={org} /> : <PldOnlineMembersSkeleton/>}
+            {org ? <PldOnlineMembersComponent org={org} /> : <PldOnlineMembersSkeleton/>}*/}
           </Stack>
         </Column>
       </Grid>
