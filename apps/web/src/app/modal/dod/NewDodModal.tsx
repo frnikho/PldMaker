@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import {
   Button,
-  Column, ComboBox, FormLabel,
+  Column, ComboBox,
   Grid,
   Modal,
   TextArea,

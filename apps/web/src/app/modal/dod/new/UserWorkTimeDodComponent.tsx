@@ -1,6 +1,6 @@
 import {
-  Button,
-  MultiSelect, NumberInput,
+  Button, FilterableMultiSelect,
+  NumberInput,
   StructuredListBody,
   StructuredListCell,
   StructuredListHead,
@@ -38,7 +38,7 @@ export const UserWorkTimeDodComponent = (props: Props) => {
             <StructuredListRow key={index} style={{margin: 0}}>
               <StructuredListCell>
                 <div style={{minWidth: 500}}>
-                  <MultiSelect.Filterable
+                  <FilterableMultiSelect
                     id={'user-select-worktime'}
                     placeholder={wt.users.map((user) => user.email).join(', ')}
                     titleText={"Utilisateurs"}
