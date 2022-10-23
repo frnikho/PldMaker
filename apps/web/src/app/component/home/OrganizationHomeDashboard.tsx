@@ -15,7 +15,6 @@ import FullCalendar, { EventClickArg } from "@fullcalendar/react";
 import interactionPlugin from "@fullcalendar/interaction";
 import listGridPlugin from "@fullcalendar/list";
 import { parseEvents } from "../../util/Event";
-import { SERVER_URL_ASSETS } from "../../util/User";
 import {useAuth} from "../../hook/useAuth";
 import {useLanguage} from "../../hook/useLanguage";
 import {useNavigate} from "react-router-dom";
@@ -23,7 +22,7 @@ import {useNavigate} from "react-router-dom";
 export const OrganizationHomeDashboard = () => {
 
   const {accessToken} = useAuth();
-  const {getCurrentLanguage} = useLanguage();
+  const {getCurrentLanguage, translate} = useLanguage();
   const navigate = useNavigate();
   const [orgs, setOrgs] = useState<Organization[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -69,7 +68,7 @@ export const OrganizationHomeDashboard = () => {
   const showNoEvents = () => {
     return (
       <>
-        <p>Vous n'avez pas d'évènements prochainement</p>
+        <p>{translate('home.events.noEvents')}</p>
         <Lottie animationData={require('../../../assets/animations/calendar.json')} style={{width: 300}} loop={true}/>
       </>
     )
@@ -86,7 +85,7 @@ export const OrganizationHomeDashboard = () => {
               <div style={style.cardImageContainer as any}>
                 <img style={style.cardImage} src={org.picture} alt={"Organization Picture"}/>
               </div>
-              <p>Dernière mise à jour: <br/><span style={{fontWeight: 600}}>{formatShortDate(new Date(org.updated_date))}</span></p>
+              <p>{translate('lexical.lastUpdateDate')} <br/><span style={{fontWeight: 600}}>{formatShortDate(new Date(org.updated_date))}</span></p>
             </ClickableTile>
           </Column>
         })}
@@ -123,19 +122,19 @@ export const OrganizationHomeDashboard = () => {
     return (
       <Stack>
         <Lottie animationData={require('../../../assets/animations/organization.json')} loop={true} style={{width: '300px'}}/>
-        <h4>Tu n'a pas rejoint ou créer d'organisations</h4>
-        <h4><Button kind={"ghost"} onClick={onClickCreateOrganization}>Cliquez ici pour en créer une !</Button></h4>
+        <h4>{translate('home.org.noOrgs')}</h4>
+        <h4><Button kind={"ghost"} onClick={onClickCreateOrganization}>{translate('home.org.noOrgCreateButton')}</Button></h4>
       </Stack>)
   }
 
   return (
     <Stack gap={8}>
       <div>
-        <h1 style={style.orgTitle}>Recap</h1>
+        <h1 style={style.orgTitle}>{translate('home.events.title')}</h1>
         {showRecap()}
       </div>
       <div>
-        <h1 style={style.orgTitle}>Mes organisations <Button kind={"ghost"} onClick={onClickCreateOrganization} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h1>
+        <h1 style={style.orgTitle}>{translate('home.org.title')} <Button kind={"ghost"} onClick={onClickCreateOrganization} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h1>
         {showLoading()}
         {showNoOrganizations()}
         {showOrgCards()}

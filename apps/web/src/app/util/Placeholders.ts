@@ -1,5 +1,5 @@
 import { Dod, DodStatus, Organization, OrganizationSection, Pld, PldRevision, User, UserWorkTime } from "@pld/shared";
-import { formatDateNumeric, formatShortDate, months, weeksDay } from "@pld/utils";
+import { formatShortDate, months, weeksDay } from "@pld/utils";
 
 export type PlaceholderType = {
   org?: Organization;
@@ -16,7 +16,7 @@ export type PlaceholderType = {
 }
 
 export const getPlaceholder = (text: string, values?: PlaceholderType): string => {
-  let newText = '';
+  let newText = text;
   newText = values?.org ? getOrgPlaceholders(text, values.org) : newText;
   newText = values?.pld ? getPldPlaceholders(newText, values.pld) : newText;
   newText = values?.dod ? getDodPlaceholders(newText, values.dod) : newText;
@@ -31,8 +31,8 @@ export const getPlaceholder = (text: string, values?: PlaceholderType): string =
 }
 
 export const getRevisionPlaceholders = (text: string, revision: PldRevision) => {
-  let newText = '';
-  newText = text.replaceAll('%revision_comment%', revision.comments ?? '');
+  let newText = text;
+  newText = newText.replaceAll('%revision_comment%', revision.comments ?? '');
   newText = newText.replaceAll('%revision_version%', revision.version.toFixed(1));
   newText = newText.replaceAll('%revision_sections%', revision.sections.join(', '));
   newText = getUserPlaceholders(newText, revision.owner, 'revision_owner_');
@@ -41,8 +41,8 @@ export const getRevisionPlaceholders = (text: string, revision: PldRevision) => 
 }
 
 const getOrgPlaceholders = (text: string, org: Organization): string => {
-  let newText = '';
-  newText = text.replaceAll('%org_name%', org.name);
+  let newText = text;
+  newText = newText.replaceAll('%org_name%', org.name);
   newText = newText.replaceAll('%org_description%', org.description);
   newText = getUserPlaceholders(newText, org.owner, 'org_owner_');
   return newText;

@@ -186,6 +186,7 @@ export const MyCalendarPageComponent = () => {
         })}
       </TileGroup>
       <FullCalendar
+        firstDay={1}
         allDaySlot={false}
         events={(arg, successCallback) => {
           successCallback(events());

@@ -1,6 +1,14 @@
 {
   "menu": {
     "sidebar": {
+      "plds": {
+        "fr": "PLDs",
+        "en": "PLDs"
+      },
+      "organizations": {
+        "fr": "Organisations",
+        "en": "Organizations"
+      },
       "myCalendar": {
         "fr": "Mon Calendrier",
         "en": "My Calendar"
@@ -70,6 +78,58 @@
     }
   },
   "lexical": {
+    "email": {
+      "fr": "Adresse email",
+      "en": "Email address"
+    },
+    "name": {
+      "fr": "Nom",
+      "en": "Name"
+    },
+    "calendars": {
+      "fr": "Calendriers",
+      "en": "Calendars"
+    },
+    "templates": {
+      "fr": "Templates",
+      "en": "Templates"
+    },
+    "versioning": {
+      "fr": "Monté de version",
+      "en": "Versioning"
+    },
+    "description": {
+      "fr": "Description",
+      "en": "Description"
+    },
+    "title": {
+      "fr": "Titre",
+      "en": "Title"
+    },
+    "version": {
+      "fr": "Version",
+      "en": "Version"
+    },
+    "members": {
+      "fr": "Membres",
+      "en": "Members"
+    },
+    "update": {
+      "fr": "Mettre à jour",
+      "en": "Update"
+    },
+    "settings": {
+      "fr": "Paramètres",
+      "en": "Settings"
+    },
+    "createdDate": {
+      "fr": "Date de création:",
+      "en": "Date of creation:"
+    },
+    "lastUpdateDate": {
+      "fr": "Dernière mise à jour:",
+      "en": "Last update:"
+    },
     "loading": {
       "fr": "Chargement...",
       "en": "Loading..."
@@ -129,6 +189,40 @@
     }
   },
   "pages": {
+    "createOrg": {
+      "title": {
+        "fr": "Créer votre organisation",
+        "en": "Create your organization"
+      },
+      "subtitle": {
+        "fr": "Une organisation te permet de créer, de gérer et de générer les documents de vos PLDs en équipe\\nAprès la création de votre organisation, vous pourrez gérer les paramètres liés a la confidentialité",
+        "en": "An organization allows you to create, manage and generate documents for your PLDs as a team\\nAfter the creation of your organization, you will be able to manage the parameters related to the confidentiality"
+      },
+      "createButton": {
+        "fr": "Créer une nouvelle organisation",
+        "en": "Create a new organization"
+      },
+      "addMembers": {
+        "title": {
+          "fr": "Ajouter des utilisateurs dans votre organisation",
+          "en": "Add users to your organization"
+        },
+        "subtitle": {
+          "fr": "vous pouvez dès maintenant inviter des utilisateurs à intégrer votre organisation dès la création de celle-ci",
+          "en": "you can now invite users to join your organization as soon as it is created"
+        }
+      }
+    },
+    "faq": {
+      "suggestion": {
+        "fr": "Si vous avez d'autres questions ou bien des suggestions à faire, n'hésitez pas à contacter",
+        "en": "If you have any further questions or suggestions, please contact"
+      },
+      "admin": {
+        "fr": "votre Administration",
+        "en": "your System Admin"
+      }
+    },
     "myProfile": {
       "title": {
         "fr": "Mon profile",
@@ -168,14 +262,28 @@
     }
   },
   "home": {
-    "welcomeMessage": {
+    "org": {
       "title": {
-        "fr": "",
-        "en": ""
+        "fr": "Mes Organisations",
+        "en": "Organizations"
       },
-      "subTitle": {
-        "fr": "",
-        "en": ""
+      "noOrgs": {
+        "fr": "Tu n'a pas rejoint ou créer d'organisations",
+        "en": "You didn't join or create any organizations"
+      },
+      "noOrgCreateButton": {
+        "fr": "Cliquez ici pour en créer une !",
+        "en": "Click here to create a new one !"
+      }
+    },
+    "events": {
+      "title": {
+        "fr": "Recap",
+        "en": "Events"
+      },
+      "noEvents": {
+        "fr": "Vous n'avez pas d'évènements prochainement",
+        "en": "You don't have any upcoming events"
       }
     },
     "welcomeDashboard": {
@@ -185,7 +293,7 @@
       },
       "subTitle": {
         "fr": "Ici vous pouvez suivre l'avancement des PLDs et de leurs DoDs de vos différentes Organisation",
-        "en": ""
+        "en": "Here you can follow the progress of the PLDs and their DoDs of your different Organizations"
       }
     },
     "createOrganization": {

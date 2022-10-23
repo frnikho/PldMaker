@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { LanguageContext, LanguageContextState } from "../context/LanguageContext";
 import { AvailableLanguages, AvailableLangue, language, LanguageType } from "../language";
+import { getPlaceholder } from "../util/Placeholders";
 
 export type NestedLanguageKeyOf<ObjectType extends object> =
   {[Key in keyof ObjectType & keyof AvailableLanguages]: ObjectType[Key] extends AvailableLanguages
@@ -16,7 +17,7 @@ export function useLanguage() {
     const text = key.split('.').reduce((a, b) => {
       return a[b];
     }, language);
-    return (text[lang] ?? text['en']) as string;
+    return getPlaceholder((text[lang] ?? text['en']) as string, {html: true});
   }
 
   return {

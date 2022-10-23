@@ -5,15 +5,19 @@ import { Organization } from "@pld/shared";
 
 import {Stack} from '@carbon/react';
 import { TileStyle } from "@pld/ui";
+import { useLanguage } from "../../../hook/useLanguage";
 
 type Props = {
   org: Organization;
 };
 export const OrgMembersComponent = (props: Props) => {
+
+  const {translate} = useLanguage();
+
   return (
     <Tile style={TileStyle.default}>
       <Stack>
-        <h4 style={{fontWeight: 600, marginBottom: 10}}>Membres :</h4>
+        <h4 style={{fontWeight: 600, marginBottom: 10}}>{translate('lexical.members')}</h4>
         {[...props.org.members, props.org.owner].map((user, index) => (
           <div key={index} style={{display: 'flex', flexDirection: 'row', justifyContent: 'start'}}>
             <img src={user.profile_picture} style={{borderRadius: '50%', objectFit: 'cover', width: 50, height: 50}}/>

@@ -43,6 +43,8 @@ export type LanguageType = {
   },
   "menu": {
     "sidebar": {
+      "plds": AvailableLangue,
+      "organizations": AvailableLangue,
       "myCalendar": AvailableLangue,
       "changelog": AvailableLangue,
       "faq": AvailableLanguages
@@ -77,10 +79,34 @@ export type LanguageType = {
     dodUpdated: AvailableLangue,
   }
   lexical: {
+    email: AvailableLangue,
+    name: AvailableLangue,
+    versioning: AvailableLangue,
+    description: AvailableLangue
+    title: AvailableLangue,
+    version: AvailableLangue,
+    members: AvailableLangue,
+    update: AvailableLangue,
+    settings: AvailableLangue,
     loading: AvailableLangue,
     useAsDefault: AvailableLangue,
+    lastUpdateDate: AvailableLangue,
+    createdDate: AvailableLangue
   },
   pages: {
+    createOrg: {
+      title: AvailableLangue,
+      subtitle: AvailableLangue,
+      createButton: AvailableLangue,
+      addMembers: {
+        title: AvailableLangue,
+        subtitle: AvailableLangue,
+      }
+    }
+    faq: {
+      suggestion: AvailableLangue,
+      admin: AvailableLangue,
+    },
     myProfile: {
       title: AvailableLangue,
       security: {
@@ -96,6 +122,15 @@ export type LanguageType = {
     }
   },
   home: {
+    events: {
+      title: AvailableLangue,
+      noEvents: AvailableLangue,
+    },
+    org: {
+      title: AvailableLangue,
+      noOrgs: AvailableLangue,
+      noOrgCreateButton: AvailableLangue,
+    },
     welcomeMessage: {
       title: AvailableLangue,
       subTitle: AvailableLangue,

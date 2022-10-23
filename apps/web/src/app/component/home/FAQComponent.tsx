@@ -3,6 +3,7 @@ import faq from '../../../assets/configs/faq.json';
 import {Accordion, AccordionItem, Button, Link, Tile} from "carbon-components-react";
 import {useNavigate} from "react-router-dom";
 import config from '../../../assets/configs/general.json';
+import { useLanguage } from "../../hook/useLanguage";
 
 type Props = {
   home: boolean;
@@ -10,6 +11,7 @@ type Props = {
 
 export const FAQComponent = (props: Props) => {
 
+  const {translate} = useLanguage();
   const navigate = useNavigate();
 
   const getFAQ = () => {
@@ -32,7 +34,7 @@ export const FAQComponent = (props: Props) => {
       </Accordion>
       <Button style={{marginTop: 10, display: props.home ? 'flex' : 'none'}} kind={"ghost"} onClick={() => {navigate('/faq')}}>Voir toutes les questions</Button>
       <Tile style={{display: props.home ? 'none' : 'flex'}}>
-        <p>Si vous avez d'autre questions ou bien des suggestions a faire, n'hésitez pas a contacter <Link target="_blank" href={config.admin.website}>Votre Administrateur 📧</Link></p>
+        <p>{translate('pages.faq.suggestion')} <Link target="_blank" href={config.admin.website}>{translate('pages.faq.admin')}</Link></p>
       </Tile>
     </>
   )

@@ -12,8 +12,9 @@ import { useNavigate } from "react-router-dom";
 import { OrganizationApiController } from "../../../controller/OrganizationApiController";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { TileStyle } from "@pld/ui";
+import { useLanguage } from "../../../hook/useLanguage";
 
 type Props = {
   org: Organization;
@@ -27,8 +28,9 @@ type Form = {
 
 export const OrgInfoComponent = (props: Props) => {
 
+  const {translate} = useLanguage();
   const navigate = useNavigate();
-  const {accessToken, user} = useAuth();
+  const {accessToken} = useAuth();
   const {getValues, setValue, watch} = useForm<Form>({defaultValues: {versionShifting: props.org.versionShifting, description: props.org.description}});
 
   useEffect(() => {
@@ -56,11 +58,11 @@ export const OrgInfoComponent = (props: Props) => {
   return (
     <Tile style={TileStyle.default}>
       <Stack gap={6}>
-        <TextArea rows={4} id={"description"} maxLength={512} labelText={"Description"} value={watch('description')} onChange={(a) => setValue('description', a.currentTarget.value)}/>
-        <NumberInput iconDescription={""} min={0.01} max={2.0} id={"versionShifting"} value={watch('versionShifting')} onChange={(a, {value}) => setValue('versionShifting', value)} label={<RequiredLabel message={"Versioning"}/>}/>
+        <TextArea rows={4} id={"description"} maxLength={512} labelText={translate('lexical.description')} value={watch('description')} onChange={(a) => setValue('description', a.currentTarget.value)}/>
+        <NumberInput iconDescription={""} min={0.01} max={2.0} id={"versionShifting"} value={watch('versionShifting')} onChange={(a, {value}) => setValue('versionShifting', value)} label={<RequiredLabel message={translate('lexical.versioning')}/>}/>
         <div style={{display: 'flex', flexDirection: 'row', gap: 10}}>
-          <Button renderIcon={Renew} iconDescription={"Update"} style={{borderRadius: 8}} onClick={onClickUpdate}>Mettre à jour</Button>
-          <Button onClick={() => navigate('manage')} style={{borderRadius: 8}} renderIcon={Settings} iconDescription={"Settings"}>Paramètre</Button>
+          <Button renderIcon={Renew} iconDescription={"Update"} style={{borderRadius: 8}} onClick={onClickUpdate}>{translate('lexical.update')}</Button>
+          <Button onClick={() => navigate('manage')} style={{borderRadius: 8}} renderIcon={Settings} iconDescription={"Settings"}>{translate('lexical.settings')}</Button>
         </div>
       </Stack>
     </Tile>

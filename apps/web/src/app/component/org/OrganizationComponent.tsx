@@ -35,6 +35,7 @@ import { OrgCalendarItemComponent } from "./item/OrgCalendarItemComponent";
 import { OrgTemplateItemComponent } from "./item/OrgTemplateItemComponent";
 import { OrgListSkeleton } from "./item/OrgItemSkeleton";
 import { OrgCalendarItemSkeleton } from "./item/OrgCalendarItemSkeleton";
+import { useLanguage } from "../../hook/useLanguage";
 
 type Props = {
   orgId: string;
@@ -148,8 +149,10 @@ export const OrganizationComponent = (props: Props) => {
 
           </Column>
           <Column lg={4} xlg={4} md={8} sm={4}>
-            {org ? <OrgQuickInfoComponent org={org}/> : <OrgQuickInfoSkeleton/>}
-            {org ? <OrgMembersComponent org={org}/> : <OrgMembersSkeleton/>}
+            <Stack gap={4}>
+              {org ? <OrgQuickInfoComponent org={org}/> : <OrgQuickInfoSkeleton/>}
+              {org ? <OrgMembersComponent org={org}/> : <OrgMembersSkeleton/>}
+            </Stack>
           </Column>
         </Grid>
       </Stack>

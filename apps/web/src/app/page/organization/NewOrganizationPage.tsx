@@ -28,7 +28,7 @@ export class NewOrganizationPage extends React.Component<NewOrganizationPageProp
     if (authContext.isLogged === LoginState.not_logged) {
       return (<h1>Not logged</h1>)
     } else if (authContext.isLogged === LoginState.logged) {
-      return (<NewOrgComponent userContext={authContext} onOrgCreated={this.onOrgCreate}/>)
+      return (<NewOrgComponent onOrgCreated={this.onOrgCreate}/>)
     }
     return (<Loading style={{margin: 'auto'}} withOverlay={false}/>)
   }

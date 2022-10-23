@@ -32,7 +32,7 @@ export const MainPageLayout = () => {
     if (auth.favours?.pld === undefined || auth.favours.pld.length <= 0)
       return;
     return (
-      <SideNavMenu defaultExpanded title="PLDs" large>
+      <SideNavMenu defaultExpanded title={translate('menu.sidebar.plds')} large>
         {auth.favours?.pld.map((pld, index) => {
           return (
             <SideNavLink key={index} onClick={() => {
@@ -49,7 +49,7 @@ export const MainPageLayout = () => {
     if (auth.favours?.org === undefined || auth.favours.org.length <= 0)
       return;
     return (
-      <SideNavMenu defaultExpanded title="Organisations" large>
+      <SideNavMenu defaultExpanded title={translate('menu.sidebar.organizations')} large>
         {auth.favours?.org.map((org, index) => {
           return (
             <SideNavMenuItem key={index} onClick={() => {
@@ -67,7 +67,7 @@ export const MainPageLayout = () => {
     <HeaderContainer
       render={({ isSideNavExpanded, onClickSideNavExpand }) => (
         <>
-          <Header aria-label="IBM Platform Name">
+          <Header aria-label="PLD Maker">
             <SkipToContent />
             <HeaderMenuButton
               aria-label="Open menu"

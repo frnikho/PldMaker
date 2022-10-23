@@ -1,8 +1,17 @@
+import { Changelog, ChangelogComponent } from "../component/changelog/ChangelogComponent";
+import {Stack} from '@carbon/react';
+import * as React from "react";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+export const changelog = require('../../assets/configs/changelog.json') as Changelog[];
+
 export const ChangelogPage = () => {
+
   return (
-    <div>
+    <Stack gap={8}>
       <h1 style={{fontWeight: 'bold'}}>Changelog</h1>
-      <p>La page du changelog est en cours de création</p>
-    </div>
-  );
+      <Stack gap={6}>
+        {changelog.map((change) => <ChangelogComponent changelog={change}/>)}
+      </Stack>
+    </Stack>
+  )
 };

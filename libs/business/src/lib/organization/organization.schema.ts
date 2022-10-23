@@ -2,7 +2,6 @@ import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, {Document, ObjectId} from "mongoose";
 import {User} from "../user/user.schema";
 import {DatedObjectSchema} from "../utility/datted_object.utility";
-import { DodStatus } from "@pld/shared";
 import {OrgHistoryAction} from "@pld/shared";
 import { OrganizationSection } from "./section/organization-section.schema";
 import { getOrgPicture } from "../utility/picture.utility";
@@ -47,7 +46,7 @@ export class Organization extends DatedObjectSchema {
   @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true})
   owner: User;
 
-  @Prop({required: false, default: () => process.env.NX_SERVER_HOST + 'assets/' + getOrgPicture()})
+  @Prop({required: false, default: () => process.env.NX_SERVER_HOST + getOrgPicture()})
   picture: string;
 
   @Prop({required: false, default: 1.0})
