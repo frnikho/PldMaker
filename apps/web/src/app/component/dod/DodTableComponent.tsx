@@ -299,7 +299,7 @@ export const DodTableComponent = (props: Props) => {
 
   return (
     <>
-      {/*<NewDodModal dod={selectedDod} sections={props.sections} type={type} onSuccess={(d) => onDodCreated(d as Dod)} open={modals.openEdition} onDismiss={() => updateModal('openEdition', false)} pld={props.pld} org={props.org}/>*/}
+      <NewDodModal dod={selectedDod} sections={props.sections} type={type} onSuccess={(d) => onDodCreated(d as Dod)} open={modals.openEdition} onDismiss={() => updateModal('openEdition', false)} pld={props.pld} org={props.org}/>
       {selectedDod !== undefined ? <PreviewDodModal dod={selectedDod} open={modals.openPreview} onDismiss={() => updateModal('openPreview', false)} onSuccess={() => updateModal('openPreview', false)}/> : null}
       {showDatatable()}
     </>
