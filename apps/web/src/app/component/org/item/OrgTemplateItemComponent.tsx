@@ -18,7 +18,7 @@ export const OrgTemplateItemComponent = (props: Props) => {
       <p style={{fontWeight: 600, fontSize: 26}}>{props.template.title}</p>
       <br/>
       <div style={{width: '100%', textAlign: 'center', marginTop: 20, marginBottom: 20}}>
-        <img style={{maxWidth: '100%', height: 160}} src={SERVER_URL_ASSETS + props.template.picture}/>
+        <img style={{maxWidth: '100%', height: 160}} src={props.template.picture}/>
       </div>
       <p>Dernière mise a jour le</p>
       <p style={{fontWeight: 'bold'}}>{formatLongDate(new Date(props.template.updatedDate))}</p>

@@ -10,20 +10,24 @@ import {BrowserRouter} from "react-router-dom";
 
 import {SocketContextProvider} from "./app/context/SocketContext";
 import LanguageContextProvider from "./app/context/LanguageContext";
+import { ErrorBoundary } from "react-error-boundary";
+import { ErrorPage } from "./app/page/ErrorPage";
 
 const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(<BrowserRouter>
   <SocketContextProvider>
     <LanguageContextProvider>
-      <App />
-      <ToastContainer position="bottom-left"
-                      style={{width: '350px'}}
-                      autoClose={5000}
-                      hideProgressBar
-                      newestOnTop
-                      closeOnClick
-                      rtl={false}/>
+      <ErrorBoundary onError={(error, info) => console.log('error', error, info)} FallbackComponent={ErrorPage}>
+        <App />
+        <ToastContainer position="bottom-left"
+                        style={{width: '350px'}}
+                        autoClose={5000}
+                        hideProgressBar
+                        newestOnTop
+                        closeOnClick
+                        rtl={false}/>
+      </ErrorBoundary>
     </LanguageContextProvider>
   </SocketContextProvider>
 

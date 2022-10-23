@@ -18,7 +18,7 @@ export const OrgPldItemComponent = (props: Props) => {
       <p>{props.pld.description.substring(0, 160)}</p>
       <br/>
       <div style={{width: '100%', textAlign: 'center', marginTop: 20, marginBottom: 20}}>
-        <img alt={'pld picture'} style={{maxWidth: '100%', height: 160}} src={SERVER_URL_ASSETS + props.pld.picture}/>
+        <img alt={'pld picture'} style={{maxWidth: '100%', height: 160}} src={props.pld.picture}/>
       </div>
       <p>Dernière mise a jour le</p>
       <p style={{fontWeight: 'bold'}}>{formatLongDate(new Date(props.pld.updated_date))}</p>

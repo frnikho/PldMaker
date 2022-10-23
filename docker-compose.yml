@@ -42,7 +42,7 @@ services:
     networks:
       - pld
     volumes:
-    #   - mongodb:/data/db
+        - mongodb:/data/db
         - ./initdb.d/:/docker-entrypoint-initdb.d/
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DOCKER_MONGO_ROOT_USER}

@@ -1,6 +1,6 @@
 import { RequiredUserContextProps } from "../../../context/UserContext";
 import { User, UserDomain } from "@pld/shared";
-import { Column, FormLabel, Grid, MultiSelect, Select, SelectItem, TextInput, Tile } from "carbon-components-react";
+import { Button, ButtonSet, Column, FormLabel, Grid, MultiSelect, Select, SelectItem, TextInput, Tile } from "carbon-components-react";
 import { formatLongDate, Timezone } from "@pld/utils";
 import { LoadingButtonComponent } from "../../LoadingButton";
 import React, { useCallback, useEffect, useState } from "react";
@@ -11,6 +11,8 @@ import { UserApiController } from "../../../controller/UserApiController";
 import { toast } from "react-toastify";
 import { UploadUserPictureModal } from "../../../modal/UploadUserPictureModal";
 import { UserInfoSkeleton } from "./UserInfoSkeleton";
+import { useAuth } from "../../../hook/useAuth";
+import { errorToast, successToast } from "../../../manager/ToastManager";
 
 type ShowUserInfoProps = {
   user?: User;
@@ -33,6 +35,7 @@ const defaultUserForm: UserForm = {
 
 export function UserInfoComponent(props: ShowUserInfoProps) {
 
+  const {accessToken} = useAuth();
   const {watch, register, getValues, setValue, handleSubmit} = useForm<UserForm>({ defaultValues: defaultUserForm });
   const [modal, setModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -63,6 +66,16 @@ export function UserInfoComponent(props: ShowUserInfoProps) {
       }
       if (user !== null) {
         props.onUpdateUser(user);
+      }
+    });
+  }
+
+  const onClickChangePassword = () => {
+    UserApiController.sendChangePasswordLink(accessToken, (success, error) => {
+      if (success) {
+        successToast('Un email viens de vous être envoyer pour réinitialisé votre mot de passe');
+      } else {
+        errorToast('Une erreur est survenue lors de l\'envoie du mail de réinitialisation du mot de passe')
       }
     });
   }
@@ -126,9 +139,10 @@ export function UserInfoComponent(props: ShowUserInfoProps) {
               setValue('domain', e.selectedItems.map((a) => a.label));
             }}
           />
-          <div style={{marginTop: 24}}>
+          <ButtonSet style={{marginTop: 24}}>
             <LoadingButtonComponent type={"submit"} isloading={loading}>Mettre a jour</LoadingButtonComponent>
-          </div>
+            <Button kind={'ghost'} onClick={onClickChangePassword}>Changer votre mot de passe</Button>
+          </ButtonSet>
         </form>
       </Tile>
     )

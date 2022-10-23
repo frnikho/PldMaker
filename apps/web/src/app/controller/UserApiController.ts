@@ -1,5 +1,5 @@
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
-import { User, UpdateUserBody, AddFavourBody, Favour, Mfa, MfaOtpBody, PayloadLogin, MfaOtpDisableBody } from "@pld/shared";
+import { User, UpdateUserBody, AddFavourBody, Favour, Mfa, MfaOtpBody, PayloadLogin, MfaOtpDisableBody, UpdateUserPassword } from "@pld/shared";
 import {AxiosError, AxiosResponse} from "axios";
 import { CallbackEvents } from "./CalendarApiController";
 
@@ -53,6 +53,22 @@ export class UserApiController {
       return callback(response.data);
     }).catch((err) => {
       return callback(null, err.response?.data);
+    })
+  }
+
+  public static changePassword(body: UpdateUserPassword, callback: CallbackUser) {
+    api.patch<User>(`user/password`, body).then((response) => {
+      return callback(response.data);
+    }).catch((err) => {
+      return callback(null, err.response?.data);
+    })
+  }
+
+  public static sendChangePasswordLink(accessToken: string, callback: (success: boolean, error?: ApiError) => void) {
+    api.post<User>(`user/password`, {}, authorize(accessToken)).then((response) => {
+      return callback(true);
+    }).catch((err) => {
+      return callback(false, err.response?.data);
     })
   }
 

@@ -22,9 +22,17 @@ import { PldHelper } from "../pld/pld.helper";
 import { OrganizationDefinition } from "../organization/organization.schema";
 import { OrganizationHelper } from "../organization/organization.helper";
 import { DodStatusService } from "../dod/status/dod-status.service";
+import { JwtModule } from "@nestjs/jwt";
 
 @Module({
   imports: [
+    JwtModule.registerAsync({
+      useFactory: () => {
+        return ({
+          secret: process.env.JWT_SECRET,
+        })
+      }
+    }),
     BullModule.registerQueue({name: 'user'}),
     MongooseModule.forFeature([DodDefinition, PldDefinition, DodStatusDefinition, UserDefinition, FavourDefinition, CalendarDefinition, CalendarEventDefinition, OrganizationDefinition]),
   ],

@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
-import { UpdateUserBody, AddFavourBody, User, Favour, UpdatePreference } from "@pld/shared";
+import { UpdateUserBody, AddFavourBody, User, Favour, UpdatePreference, UpdateUserPassword } from "@pld/shared";
 import { UserService } from "./user.service";
 import { UserPipe } from "./user.pipe";
 import { FavourPipe } from "./favour.pipe";
@@ -7,6 +7,7 @@ import { CalendarService } from "../organization/calendar/calendar.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Express } from 'express'
 import {Multer} from "multer";
+import { BypassMfa, Public } from "../auth/jwt/public.decorator";
 
 /**
  * @author Nicolas SANS
@@ -46,8 +47,29 @@ export class UserController {
    * @param body UpdatePreference
    */
   @Patch('preference')
-  public async updatePreference(@Request() req, @Body() body: UpdatePreference) {
+  public updatePreference(@Request() req, @Body() body: UpdatePreference) {
     return this.userService.updatePreference(req.user, body);
+  }
+
+  /**
+   * Send user change password email
+   * @param req NestJS Request
+   */
+  @Post('password')
+  public sendChangePasswordEmail(@Request() req) {
+    return this.userService.sendChangePasswordEmail(req.user);
+  }
+
+  /**
+   * Change user password
+   * @param req NestJS Request
+   * @param body UpdateUserPassword
+   */
+  @Public()
+  @BypassMfa()
+  @Patch('password')
+  public changePassword(@Body() body: UpdateUserPassword) {
+    return this.userService.changeUserPassword(body);
   }
 
   @UseInterceptors(FileInterceptor('file'))

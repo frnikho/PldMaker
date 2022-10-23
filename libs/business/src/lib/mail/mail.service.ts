@@ -14,7 +14,11 @@ export class MailService {
   }
 
   public sendInvitationOrg(user: User, org: Organization, invitedByUser: string) {
-    return this.sendInvitationOrg(user, org, invitedByUser);
+    return this.mailHelper.sendInvitationOrg(user, org, invitedByUser);
+  }
+
+  public sendChangePasswordMail(user: User, token: string) {
+    return this.mailHelper.sendChangePasswordMail(user, token);
   }
 
 }

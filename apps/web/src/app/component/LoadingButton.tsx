@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, ButtonProps, InlineLoading } from "carbon-components-react";
+import { ButtonStyle } from "@pld/ui";
 
 export type LoadingButtonProps = {
   isloading: boolean;
@@ -21,7 +22,7 @@ export class LoadingButtonComponent extends React.Component<React.PropsWithChild
   override render() {
     if (this.props.isloading) {
       return (
-        <Button disabled {...this.props}>
+        <Button style={ButtonStyle.default} disabled {...this.props}>
           <InlineLoading description={this.props.message ?? 'Chargement en cours ...'}/>
         </Button>
       )

@@ -1,8 +1,8 @@
 import * as path from "path";
 
-export const ORG_ASSETS_DIR = './org/'
-export const TEMPLATES_ASSETS_DIR = './templates/'
-export const PLD_ASSETS_DIR = './pld/'
+export const ORG_ASSETS_DIR = './assets/org/'
+export const TEMPLATES_ASSETS_DIR = './assets/templates/'
+export const PLD_ASSETS_DIR = './assets/pld/'
 
 export const ORG_PICTURES = ['undraw_at_the_park_-2-e47.svg',
   'undraw_invite_re_rrcp.svg',

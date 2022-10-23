@@ -20,6 +20,7 @@ export type UserContextProps = {
   user?: User;
   favours?: Favour;
   accessToken: string;
+  setAccessToken: (token: string) => void;
   requiredMfa: boolean;
   saveOtpToken: (token: string, callback: (user: User | null, error?: ApiError) => unknown) => void;
 }
@@ -46,6 +47,7 @@ export const UserContext = React.createContext<UserContextProps>({
   accessToken: '',
   saveOtpToken: () => null,
   requiredMfa: false,
+  setAccessToken: () => null,
 });
 
 export type UserContextProviderState = UserContextProps
@@ -70,6 +72,7 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
       refreshFavours: this.refreshFavours.bind(this),
       saveOtpToken: this.saveOtpToken.bind(this),
       requiredMfa: false,
+      setAccessToken: this.setToken.bind(this),
     }
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
@@ -93,6 +96,12 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
         }
       });
     }
+  }
+
+  public setToken(token: string) {
+    this.setState({
+      accessToken: token
+    })
   }
 
   override componentDidMount() {

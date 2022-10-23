@@ -21,6 +21,7 @@ import { Abc } from "./util/Page";
 import EditTemplatePage from "./page/organization/template/EditTemplatePage";
 import { ChangelogPage } from "./page/ChangelogPage";
 import { MyCalendarPageComponent } from "./page/calendar/MyCalendarPageComponent";
+import { ChangePasswordPage } from "./page/user/ChangePasswordPage";
 
 export function App() {
 
@@ -37,6 +38,7 @@ export function App() {
         </Route>
         <Route path={"/profile"} element={<MainPageLayout />}>
           <Route index element={<UserPage/>}/>
+          <Route path={"password"} element={<ChangePasswordPage/>}/>
         </Route>
         <Route path={"/devices"} element={<MainPageLayout />}>
           <Route index element={<DevicePage/>}/>

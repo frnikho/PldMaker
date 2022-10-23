@@ -84,7 +84,7 @@ export const OrganizationHomeDashboard = () => {
               <p style={style.cardTitle}>{org.name}</p>
               <p style={style.cardDescription}>{org.description.substring(0, 120)} {org.description.length > 120 ? '...' : ''}</p>
               <div style={style.cardImageContainer as any}>
-                <img style={style.cardImage} src={SERVER_URL_ASSETS + org.picture} alt={"Organization Picture"}/>
+                <img style={style.cardImage} src={org.picture} alt={"Organization Picture"}/>
               </div>
               <p>Dernière mise à jour: <br/><span style={{fontWeight: 600}}>{formatShortDate(new Date(org.updated_date))}</span></p>
             </ClickableTile>

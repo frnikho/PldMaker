@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Query } from "mongoose";
-import { AddFavourBody, Device, DeviceBody, Favour, FavourType, UpdatePreference, UpdateUserBody, User } from "@pld/shared";
+import { AddFavourBody, ApiErrorsCodes, buildException, Device, DeviceBody, Favour, FavourType, UpdatePreference, UpdateUserBody, UpdateUserPassword, User } from "@pld/shared";
 import { MailService } from "../mail/mail.service";
 import { AvailableMail } from "../mail/mail.list";
 import { EventEmitter2 } from "@nestjs/event-emitter";
@@ -9,8 +9,9 @@ import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
 import { Express } from "express";
 import { randomUUID } from "crypto";
-import * as fs from 'fs';
-import * as path from "path";
+import * as bcrypt from "bcrypt";
+import { JwtService } from "@nestjs/jwt";
+import { ApiException } from "../exception/api.exception";
 
 @Injectable()
 export class UserHelper {
@@ -22,6 +23,7 @@ export class UserHelper {
     @InjectModel('Favour') private favourModel: Model<Favour>,
     private mailService: MailService,
     private eventEmitter: EventEmitter2,
+    private jwtService: JwtService,
     @InjectQueue('user') private userQueue: Queue) {}
 
   public static populateAndExecute<T>(query: Query<T, any>) {
@@ -172,6 +174,23 @@ export class UserHelper {
   public async removeFavour(user: User, favour: Favour, itemToDelete: string) {
     this.logger.debug(`Deleting user favour (${user.email} - ${user._id})`);
     return UserHelper.populateAndExecuteFavour(this.favourModel.findOneAndUpdate({owner: user._id}, {$pull: {org: itemToDelete, pld: itemToDelete}}, {new: true}));
+  }
+
+  public async changeUserPassword(body: UpdateUserPassword) {
+    const user = await this.findByEmail(body.email);
+    if (user === null)
+      throw new ApiException(buildException(ApiErrorsCodes.USER_NOT_FOUND, 'User not found with this email !'));
+    if (!(await bcrypt.compare(user._id.toString(), body.token)))
+      throw new ApiException(buildException(ApiErrorsCodes.UNAUTHORIZED, 'Token non valide !'))
+    const hashedPassword = await bcrypt.hash(body.newPassword, 10);
+    return UserHelper.populateAndExecute(this.userModel.findOneAndUpdate({_id: user._id}, {password: hashedPassword}, {new: true}));
+  }
+
+  public async sendChangePasswordEmail(user: User) {
+    console.log(user._id.toString());
+    const token = await bcrypt.hash(user._id.toString(), 10);
+    this.mailService.sendChangePasswordMail(user, token);
+    return;
   }
 
   public async updatePreference(user: User, body: UpdatePreference) {

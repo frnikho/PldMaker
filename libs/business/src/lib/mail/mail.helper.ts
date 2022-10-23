@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { MailerService } from "@nestjs-modules/mailer";
 import { Organization, User } from "@pld/shared";
 import { AvailableMail } from "./mail.list";
@@ -25,6 +25,22 @@ export class MailHelper {
       })
       .then((info) => console.log(info))
       .catch((err) => console.log(err));
+  }
+
+  public async sendChangePasswordMail(user: User, token: string) {
+    this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Changer votre mot de passe',
+      template: AvailableMail.ChangePassword,
+      context: {
+        email: user.email,
+        link: `${process.env.NX_CLIENT_HOST}/profile/password?token=${token}&email=${user.email}`,
+      }
+    }).then((info) => {
+      Logger.log(info);
+    }).catch((err) => {
+      Logger.error(err);
+    })
   }
 
   public async sendInvitationOrg(user: User, org: Organization, invitedByUser: string) {

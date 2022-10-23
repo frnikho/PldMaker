@@ -1,7 +1,7 @@
 import {Gender} from "./Gender";
 import {Mobile} from "../Mobile";
 import { Timezone } from "@pld/utils";
-import { IsOptional, Length } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, Length, MaxLength, MinLength } from "class-validator";
 
 export class UpdateUserBody {
 
@@ -52,5 +52,25 @@ export class UpdateUserBody {
     this.mobile = mobile;
     this.language = language;
     this.timezone = timezone;
+  }
+}
+
+
+export class UpdateUserPassword {
+
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  token: string;
+
+  @MinLength(6)
+  @MaxLength(128)
+  newPassword: string;
+
+  constructor(email: string, token: string, newPassword: string) {
+    this.newPassword = newPassword;
+    this.email = email;
+    this.token = token;
   }
 }
