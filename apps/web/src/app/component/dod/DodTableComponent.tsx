@@ -174,8 +174,22 @@ export const DodTableComponent = (props: Props) => {
     return dod.status.name;
   }
 
+  const compare = (a: string, b: string) => {
+    const a1 = a.split('.');
+    const b1 = b.split('.');
+    const len = Math.min(a1.length, b1.length);
+    for (let i = 0; i < len; i++) {
+      const a2 = +a1[i] || 0;
+      const b2 = +b1[i] || 0;
+      if (a2 !== b2) {
+        return a2 > b2 ? 1 : -1;
+      }
+    }
+    return a1.length - b1.length;
+  }
+
   const showDatatable = () => {
-    const rowData = props.dods.sort((a, b) => a.version.localeCompare(b.version)).map((dod) =>
+    const rowData = props.dods.sort((a, b) => compare(a.version, b.version)).map((dod) =>
       ({
         ...dod,
         id: dod._id,
@@ -299,7 +313,10 @@ export const DodTableComponent = (props: Props) => {
 
   return (
     <>
-      <NewDodModal dod={selectedDod} sections={props.sections} type={type} onSuccess={(d) => onDodCreated(d as Dod)} open={modals.openEdition} onDismiss={() => updateModal('openEdition', false)} pld={props.pld} org={props.org}/>
+      <NewDodModal dod={selectedDod} sections={props.sections} type={type} onSuccess={(d) => onDodCreated(d as Dod)} open={modals.openEdition} onDismiss={() => {
+        updateModal("openEdition", false);
+        setSelectedDod(undefined);
+      }} pld={props.pld} org={props.org}/>
       {selectedDod !== undefined ? <PreviewDodModal dod={selectedDod} open={modals.openPreview} onDismiss={() => updateModal('openPreview', false)} onSuccess={() => updateModal('openPreview', false)}/> : null}
       {showDatatable()}
     </>

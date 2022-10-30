@@ -73,6 +73,20 @@ export const ManageOrgSectionsComponent = (props: Props) => {
     updateModals('openUpdateSection', true);
   }
 
+  const compare = (a: string, b: string) => {
+    const a1 = a.split('.');
+    const b1 = b.split('.');
+    const len = Math.min(a1.length, b1.length);
+    for (let i = 0; i < len; i++) {
+      const a2 = +a1[i] || 0;
+      const b2 = +b1[i] || 0;
+      if (a2 !== b2) {
+        return a2 > b2 ? 1 : -1;
+      }
+    }
+    return a1.length - b1.length;
+  }
+
   return (
     <>
       <CreateOrgSectionModal open={modals.openCreateSection} onDismiss={onDismiss} onSuccess={onSectionCreated} org={props.org}/>
@@ -81,11 +95,7 @@ export const ManageOrgSectionsComponent = (props: Props) => {
         <p>Une section correspond à la catégorie ou vos DoDs seront rangées.</p>
         <p>par exemple: La Section '2.6 Map' correspond au parent de toutes les DoDs 2.6.x</p>
         <p style={{fontStyle: 'italic'}}>Vous avez la possibilité de changer en temps réel le nom des sections depuis la page de votre Pld</p>
-        <DataTable rows={props.sections.map((s) => ({...s, id: s._id})).sort((a, b) => {
-          if (b.section > a.section)
-            return (-1);
-          return 1;
-        })} headers={sectionHeaderData} isSortable locale={"fr"}>
+        <DataTable rows={props.sections.map((s) => ({...s, id: s._id})).sort((a, b) => compare(a.section, b.section))} headers={sectionHeaderData} isSortable locale={"fr"}>
           {({
               rows,
               headers,

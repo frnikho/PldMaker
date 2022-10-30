@@ -29,9 +29,10 @@ export const MfaModal = (props: Props) => {
     if (props.open) {
       init();
     }
-  }, []);
+  }, [props.open]);
 
   const init = () => {
+    console.log('INIT !');
     UserApiController.enableOtp(accessToken, (mfa, error) => {
       if (error) {
         toast('Une erreur est survenue !', {type: 'error'})

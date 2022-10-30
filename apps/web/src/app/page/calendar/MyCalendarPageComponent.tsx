@@ -13,6 +13,10 @@ import { timezones } from "@pld/shared";
 import { useStorage } from "../../hook/useStorage";
 import { ButtonStyle } from "@pld/ui";
 
+import {Save} from '@carbon/icons-react';
+
+import {Stack} from '@carbon/react';
+
 enum SlotType {
   Available = 'Disponible',
   Busy = 'Occupé',
@@ -30,7 +34,9 @@ type Form = {
   selectedType: SlotType;
   timezone: string;
   options: {
-    seeTitle: boolean;
+    showTitle: boolean;
+    showNowIndicator: boolean;
+    showBusinessHours: boolean;
   }
 }
 
@@ -42,6 +48,8 @@ type AvailableSlotType = {
 type MyCalendarPreferences = {
   timezone: string;
   showTitle: boolean;
+  showNowIndicator: boolean;
+  showBusinessHours: boolean;
   slots: Slot[];
 }
 
@@ -54,7 +62,7 @@ const AvailableSlotsType: AvailableSlotType[] = [
     color: '#797979',
     type: SlotType.Busy,
   }
-  ]
+]
 
 export const MyCalendarPageComponent = () => {
 
@@ -151,7 +159,8 @@ export const MyCalendarPageComponent = () => {
   }
 
   return (
-    <>
+    <Stack gap={4}>
+      <h1 style={{fontWeight: 'bold'}}>Mon calendrier</h1>
       <Select inline id="select-1" value={watch('timezone')} labelText={"Fuseau horaire actuel"} onChange={onChangeTimeZone}>
         {timezones.map((key, index) => <SelectItem
           key={index}
@@ -188,26 +197,34 @@ export const MyCalendarPageComponent = () => {
       <FullCalendar
         firstDay={1}
         allDaySlot={false}
+        businessHours={{
+          daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+          startTime: '08:00',
+          endTime: '20:00',
+        }}
         events={(arg, successCallback) => {
           successCallback(events());
         }}
         selectable={true}
         timeZone={watch('timezone')}
         editable={true}
+        eventOverlap={false}
+        selectOverlap={false}
         dateClick={(arg) => {console.log(arg)}}
         eventResizableFromStart
         eventDrop={onDragEvent}
-        eventOverlap={(stillEvent, movingEvent) => {
-          return true;
-        }}
         eventClick={onClickEvent}
         eventResize={onResizeEvent}
         select={onSelectSlot}
+        scrollTime={'12:00:00'}
+        aspectRatio={2}
+        slotEventOverlap={false}
+        nowIndicator={true}
         locale={'fr'}
         plugins={[ dayGridPlugin, momentTimezonePlugin, timeGridPlugin, interactionPlugin, ]}
         initialView="timeGridWeek"
       />
-      <Button style={ButtonStyle.default} onClick={onCreate}>Créer</Button>
-    </>
+      <Button style={ButtonStyle.default} onClick={onCreate} renderIcon={Save}>Sauvegarder</Button>
+    </Stack>
   );
 };

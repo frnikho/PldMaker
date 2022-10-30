@@ -1,9 +1,11 @@
 import { RequiredUserContextProps } from "../../../context/UserContext";
 import { User, UserDomain } from "@pld/shared";
-import { Button, ButtonSet, Column, FormLabel, Grid, MultiSelect, Select, SelectItem, TextInput, Tile } from "carbon-components-react";
+import { Column, FormLabel, Grid, MultiSelect, Select, SelectItem, TextInput, Tile } from "carbon-components-react";
 import { formatLongDate, Timezone } from "@pld/utils";
-import { LoadingButtonComponent } from "../../LoadingButton";
+import { LoadingButton } from "../../LoadingButton";
 import React, { useCallback, useEffect, useState } from "react";
+
+import {Password, Renew} from '@carbon/icons-react';
 
 import {Stack} from '@carbon/react';
 import { useForm } from "react-hook-form";
@@ -52,7 +54,8 @@ export function UserInfoComponent(props: ShowUserInfoProps) {
     }
   }, [props.user])
 
-  const onUpdate = (form: UserForm) => {
+  const onUpdate = () => {
+    const form = getValues();
     setLoading(true);
     UserApiController.updateUser(props.userContext.accessToken, {
       firstname: form.firstname,
@@ -71,12 +74,14 @@ export function UserInfoComponent(props: ShowUserInfoProps) {
   }
 
   const onClickChangePassword = () => {
+    setLoading(true);
     UserApiController.sendChangePasswordLink(accessToken, (success, error) => {
       if (success) {
         successToast('Un email viens de vous être envoyer pour réinitialisé votre mot de passe');
       } else {
         errorToast('Une erreur est survenue lors de l\'envoie du mail de réinitialisation du mot de passe')
       }
+      setLoading(false);
     });
   }
 
@@ -92,58 +97,58 @@ export function UserInfoComponent(props: ShowUserInfoProps) {
     return (
       <Tile style={style.tile}>
         <UploadUserPictureModal open={modal} onDismiss={() => setModal(false)} onSuccess={onUploadedPicture}/>
-        <form onSubmit={handleSubmit(onUpdate)}>
-          <Grid>
-            <Column xlg={6}>
-              <TextInput id={"created-date-user"} title={'Vous ne pouvez pas changer ce champ !'} labelText={"Date de création"} value={formatLongDate(new Date(props.user.created_date))}/>
-              <TextInput id={"updated-date-user"} title={'Vous ne pouvez pas changer ce champ !'} labelText={"Dernière mise a jour"} value={formatLongDate(new Date(props.user.updated_date))}/>
-              <TextInput id={"email-user"} title={'Vous ne pouvez pas changer ce champ !'} labelText={"Email"} value={props.user.email}/>
-            </Column>
-            <Column xlg={8}>
-              <Stack orientation={"vertical"}>
-                <FormLabel>Photo de profile</FormLabel>
-                <img style={{padding: 12, objectFit: 'cover', width: 200, height: 200}} title={'Mettre à jour'} onClick={() => setModal(true)} src={props.user.profile_picture} alt={""}/>
-              </Stack>
-            </Column>
-          </Grid>
-          <TextInput style={{marginBottom: '20px'}} id={"lastname-input"} labelText={"Nom"} {...register('firstname')}/>
-          <TextInput id={"firstname-input-disabled"} labelText={"Prénom"} {...register('lastname')}/>
-          <Select id={"timezone-input"} labelText={"Timezone"} {...register('timezone')}>
-            {Object.keys(Timezone).sort((a, b) => {
-              if (a > b) {
-                return 1;
-              } else {
-                return -1;
-              }
-            }).map((t, index) => {
-              return (
-                <SelectItem
-                  key={index}
-                  value={t}
-                  text={t}
-                />
-              )
-            })}
-          </Select>
-          <MultiSelect
-            label={getValues('domain').join(', ')}
-            titleText={"Domaines d'application"}
-            id="domain-list"
-            selectedItems={watch('domain').map((a) => ({label: a}))}
-            items={Object.keys(UserDomain).map((d) => {
-              return {
-                label: d.charAt(0).toUpperCase() + d.slice(1).toLowerCase()
-              }
-            }).sort()}
-            onChange={(e) => {
-              setValue('domain', e.selectedItems.map((a) => a.label));
-            }}
-          />
-          <ButtonSet style={{marginTop: 24}}>
-            <LoadingButtonComponent type={"submit"} isloading={loading}>Mettre a jour</LoadingButtonComponent>
-            <Button kind={'ghost'} onClick={onClickChangePassword}>Changer votre mot de passe</Button>
-          </ButtonSet>
-        </form>
+        <Grid>
+          <Column xlg={6}>
+            <TextInput id={"created-date-user"} title={'Vous ne pouvez pas changer ce champ !'} labelText={"Date de création"} value={formatLongDate(new Date(props.user.created_date))}/>
+            <TextInput id={"updated-date-user"} title={'Vous ne pouvez pas changer ce champ !'} labelText={"Dernière mise a jour"} value={formatLongDate(new Date(props.user.updated_date))}/>
+            <TextInput id={"email-user"} title={'Vous ne pouvez pas changer ce champ !'} labelText={"Email"} value={props.user.email}/>
+          </Column>
+          <Column xlg={8}>
+            <Stack orientation={"vertical"}>
+              <FormLabel>Photo de profile</FormLabel>
+              <img style={{padding: 12, objectFit: 'cover', width: 200, height: 200}} title={'Mettre à jour'} onClick={() => setModal(true)} src={props.user.profile_picture} alt={""}/>
+            </Stack>
+          </Column>
+        </Grid>
+        <TextInput style={{marginBottom: '20px'}} id={"lastname-input"} labelText={"Nom"} {...register('firstname')}/>
+        <TextInput id={"firstname-input-disabled"} labelText={"Prénom"} {...register('lastname')}/>
+        <Select id={"timezone-input"} labelText={"Timezone"} {...register('timezone')}>
+          {Object.keys(Timezone).sort((a, b) => {
+            if (a > b) {
+              return 1;
+            } else {
+              return -1;
+            }
+          }).map((t, index) => {
+            return (
+              <SelectItem
+                key={index}
+                value={t}
+                text={t}
+              />
+            )
+          })}
+        </Select>
+        <MultiSelect
+          label={getValues('domain').join(', ')}
+          titleText={"Domaines d'application"}
+          id="domain-list"
+          selectedItems={watch('domain').map((a) => ({label: a}))}
+          items={Object.keys(UserDomain).map((d) => {
+            return {
+              label: d.charAt(0).toUpperCase() + d.slice(1).toLowerCase()
+            }
+          }).sort()}
+          onChange={(e) => {
+            setValue('domain', e.selectedItems.map((a) => a.label));
+          }}
+        />
+        <div style={{marginTop: 12}}>
+          <Stack gap={5} orientation={'horizontal'}>
+            <LoadingButton icon={Renew} loading={loading} onClick={onUpdate}>Mettre à jour</LoadingButton>
+            <LoadingButton kind={'ghost'} loading={loading} onClick={onClickChangePassword} icon={Password}>Changer votre mot de passe</LoadingButton>
+          </Stack>
+        </div>
       </Tile>
     )
   } else {

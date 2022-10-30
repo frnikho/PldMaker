@@ -62,7 +62,7 @@ export const ResumePldModal = (props: Props) => {
       return (
         <TableHeader id={value.user._id} key={value.user._id}>
           <p style={{ fontWeight: 'bold' }}>
-            {value.user.firstname}
+            {`${value.user.firstname} ${value.user.lastname[0]}`}
           </p>
           <p>
             {hours.toFixed(1)} J/H

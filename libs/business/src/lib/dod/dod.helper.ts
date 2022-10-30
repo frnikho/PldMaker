@@ -56,7 +56,7 @@ export class DodHelper {
   }
 
   public async update(user: User, org: Organization, pld: Pld, dod: Dod, body: DodUpdateBody) {
-    const updatedDod = await DodHelper.populateAndExecute(this.dodModel.findOneAndUpdate({_id: dod._id, pldOwner: pld}, {...body}, {new: true}));
+    const updatedDod = await DodHelper.populateAndExecute(this.dodModel.findOneAndUpdate({_id: dod._id, pldOwner: pld}, {...body, updated_date: new Date()}, {new: true}));
     this.eventEmitter.emit('Dod:Update', pld._id);
     this.eventEmitter.emit(DodEvents.onDodUpdate, {editedDod: dod._id, editedBy: user._id, editedFields: this.getEditedFields(dod, updatedDod)} as DodUpdateEvent)
     return updatedDod;
@@ -67,7 +67,7 @@ export class DodHelper {
   }
 
   public async updateDodStatus(user: User, org: Organization, pld: Pld, dod: Dod, body: SetDodStatus) {
-    const updatedDodStatus = await DodHelper.populateAndExecute(this.dodModel.findOneAndUpdate({_id: dod._id, pldOwner: pld}, {status: body.statusId}, {new: true}));
+    const updatedDodStatus = await DodHelper.populateAndExecute(this.dodModel.findOneAndUpdate({_id: dod._id, pldOwner: pld}, {status: body.statusId, updated_date: new Date()}, {new: true}));
     this.eventEmitter.emit('Dod:Update', pld._id);
     const event: DodStatusUpdatedEvent = {
       updatedBy: user,

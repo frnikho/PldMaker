@@ -61,22 +61,26 @@ const defaultForm: Forms = {
 export const NewDodModal = (props: Props) => {
 
   const {accessToken, user} = useAuth();
-  const {register, reset, getValues, clearErrors, setValue, watch, formState: {errors}, setError} = useForm<Forms>({defaultValues: defaultForm});
+  const {register, reset, resetField, getValues, clearErrors, setValue, watch, formState: {errors}, setError} = useForm<Forms>({defaultValues: defaultForm});
 
   useEffect(() => {
-    if (props.dod !== undefined) {
-      setValue('title', props.dod.title);
-      setValue('version', props.dod.version);
-      setValue('skinOf', props.dod.skinOf);
-      setValue('want', props.dod.want);
-      setValue('description', props.dod.description);
-      setValue('descriptionOfDone', props.dod.descriptionOfDone);
-      setValue('estimatedWorkTime', props.dod.estimatedWorkTime.map((wt) => ({
-        value: wt.value,
-        users: wt.users.map((u) => ({ id: u._id, email: u.email })),
-      })));
+    if (props.open) {
+      if (props.dod !== undefined) {
+        setValue('title', props.dod.title);
+        setValue('version', props.dod.version);
+        setValue('skinOf', props.dod.skinOf);
+        setValue('want', props.dod.want);
+        setValue('description', props.dod.description);
+        setValue('descriptionOfDone', props.dod.descriptionOfDone);
+        setValue('estimatedWorkTime', props.dod.estimatedWorkTime.map((wt) => ({
+          value: wt.value,
+          users: wt.users.map((u) => ({ id: u._id, email: u.email })),
+        })));
+      } else {
+        reset(defaultForm);
+      }
     }
-  }, [props.open]);
+  }, [props]);
 
   const addBlankWorkTime = () => {
     const workTime = getValues('estimatedWorkTime');
@@ -161,7 +165,7 @@ export const NewDodModal = (props: Props) => {
         DodApiController.createDod(accessToken, props.org._id, props.pld._id, body, (dod, error) => {
           if (!error && dod !== null) {
             props.onSuccess(dod);
-            reset();
+            reset(defaultForm);
           } else {
             console.error(error);
           }
@@ -170,7 +174,7 @@ export const NewDodModal = (props: Props) => {
         DodApiController.updateDod(accessToken, props.org._id, props.pld._id, props.dod?._id ?? '', body, (dod, error) => {
           if (!error && dod !== null) {
             props.onSuccess(dod);
-            reset();
+            reset(defaultForm);
           } else {
             console.error(error);
           }

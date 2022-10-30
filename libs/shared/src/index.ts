@@ -47,6 +47,8 @@ export * from './lib/template/TemplateColor';
 export * from './lib/template/TemplateText';
 export * from './lib/template/Review';
 
+export * from './lib/calendar/Calendar';
+
 export * from './lib/Object';
 export * from './lib/Template';
 export * from './lib/Mobile'

@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 import {User} from "../user/user.schema";
 import {Pld} from "../pld/pld.schema";
 import { DodStatus } from "@pld/shared";
-
-declare type PropOptions<T = any> = Partial<mongoose.SchemaDefinitionProperty<T>> | mongoose.SchemaType;
+import { PropOptions } from "@nestjs/mongoose";
 
 export type DodRulesType = {
   version: PropOptions;

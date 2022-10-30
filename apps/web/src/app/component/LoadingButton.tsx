@@ -1,5 +1,5 @@
-import React from "react";
-import { Button, ButtonProps, InlineLoading } from "carbon-components-react";
+import React, { ReactNode } from "react";
+import { Button, ButtonKind, ButtonProps, InlineLoading } from "carbon-components-react";
 import { ButtonStyle } from "@pld/ui";
 
 export type LoadingButtonProps = {
@@ -36,3 +36,33 @@ export class LoadingButtonComponent extends React.Component<React.PropsWithChild
   }
 
 }
+
+type Props = {
+  loading: boolean;
+  children: ReactNode;
+  message?: string;
+  icon?: object;
+  style?: React.CSSProperties;
+  kind?: ButtonKind;
+  disabled?: boolean;
+  onClick?: () => void;
+};
+
+export const LoadingButton = (props: Props) => {
+
+  if (props.loading) {
+    return (
+      <Button style={props.style ?? ButtonStyle.default} disabled kind={props.kind ?? 'primary'} renderIcon={props.icon}>
+        <InlineLoading description={props.message ?? 'Chargement en cours ...'}/>
+      </Button>
+    );
+  } else {
+    return (
+      <Button style={props.style ?? ButtonStyle.default} disabled={props.disabled ?? false} renderIcon={props.icon} onClick={props.onClick}>
+        {props.children}
+      </Button>
+    )
+  }
+
+
+};

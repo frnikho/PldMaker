@@ -48,7 +48,7 @@ export const PreviewDodModal = (props: Props) => {
                   {HistoryHelper.replacePlaceholder(history.action, history.owner, props.dod)}
                 </StructuredListCell>
                 {history.editedFields.length > 0 ? <StructuredListCell style={{maxHeight: '100px'}}>
-                  <CodeSnippet aria-multiline={true} style={{height: '100%'}}>
+                  <CodeSnippet hideCopyButton>
                     {history.editedFields.map((field, index) => {
                       return (<div key={index}>
                         {field.name}: <div style={{display: 'inline', color: 'red'}}>[{field.lastValue}]</div>
@@ -72,7 +72,7 @@ export const PreviewDodModal = (props: Props) => {
       open={props.open}
       onRequestClose={props.onDismiss}
       passiveModal
-      modalHeading={`${props.dod.version} - ${props.dod.title}`}>
+      modalHeading={<p style={{fontWeight: 'bold', fontSize: 22}}>{props.dod.version} - {props.dod.title}</p>}>
       <Tabs>
         <TabList aria-label="List of tabs">
           <Tab>Info</Tab>
@@ -90,9 +90,11 @@ export const PreviewDodModal = (props: Props) => {
                   <h4 style={{fontWeight: 'bold'}}>Description</h4>
                   <p>{props.dod.description}</p>
                   <h4 style={{fontWeight: 'bold'}}>Definition Of Done</h4>
-                  {props.dod.descriptionOfDone.map((desc, index) => {
-                    return <p key={index}>{`\t - ${desc}`}</p>
-                  })}
+                  <div>
+                    {props.dod.descriptionOfDone.map((desc, index) => {
+                      return <p key={index}>{`\t - ${desc}`}</p>
+                    })}
+                  </div>
                   <h4 style={{fontWeight: 'bold'}}>Charge estimée:</h4>
                   {props.dod.estimatedWorkTime.map((wt, index) => {
                     console.log(wt);
@@ -104,7 +106,7 @@ export const PreviewDodModal = (props: Props) => {
                           if (user.firstname === undefined || user.lastname === undefined) {
                             return user.email;
                           }
-                          return user.firstname;
+                          return `${user.firstname} ${user.lastname[0]}`;
                         }).join(', ')}</span>
                       </p>)
                   })}
@@ -113,13 +115,13 @@ export const PreviewDodModal = (props: Props) => {
               <Column lg={3}>
                 <Stack gap={4}>
                   <div>
-                    <p style={{fontWeight: 'bold'}}>DoD crée le :</p>
+                    <h4 style={{fontWeight: 'bold'}}>DoD crée le :</h4>
                     <p>{formatLongDate(new Date(props.dod.created_date))}</p>
                     {props.dod.owner.email}
                   </div>
                   <div>
-                    <p style={{fontWeight: 'bold'}}>Mise à jour le :</p>
-                    <p>{formatLongDate(new Date(props.dod.created_date))}</p>
+                    <h4 style={{fontWeight: 'bold'}}>Mise à jour le :</h4>
+                    <p>{formatLongDate(new Date(props.dod.updated_date))}</p>
                     {props.dod.history[props.dod.history.length-1]?.owner?.email}
                   </div>
                 </Stack>

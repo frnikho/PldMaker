@@ -2,6 +2,8 @@ import { Mfa, MfaType } from "@pld/shared";
 import { Button, Tile } from "carbon-components-react";
 import React, { useCallback, useState } from "react";
 
+import {GroupSecurity} from '@carbon/icons-react';
+
 import {Stack} from '@carbon/react';
 import { formatLongDate } from "@pld/utils";
 import { RequiredUserContextProps } from "../../../context/UserContext";
@@ -45,14 +47,15 @@ export function UserSecurityComponent(props: UserSecurityProps) {
       return (
         <>
           <Tile style={style.tile}>Vous n'avez pas activer le TOTP</Tile>
-          <Button style={style.button} onClick={() => setModal({openEnableMfa: true, openDisableMfa: false})}>Ajouter 2FA</Button>
+          <Button renderIcon={GroupSecurity} style={style.button} onClick={() => setModal({openEnableMfa: true, openDisableMfa: false})}>Ajouter 2FA</Button>
         </>
       );
     } else {
-      return (<>
-        <Tile style={style.tile}>OTP actif depuis: {formatLongDate(new Date(mfa.activationDate))}</Tile>
-        <Button style={style.button} kind={"ghost"} onClick={() => setModal({openDisableMfa: true, openEnableMfa: false})}>Désactiver MFA</Button>
-      </>);
+      return (
+        <>
+          <Tile style={style.tile}>OTP actif depuis: {formatLongDate(new Date(mfa.activationDate))}</Tile>
+          <Button renderIcon={GroupSecurity} style={style.button} kind={"ghost"} onClick={() => setModal({openDisableMfa: true, openEnableMfa: false})}>Désactiver MFA</Button>
+        </>);
     }
   }
 
