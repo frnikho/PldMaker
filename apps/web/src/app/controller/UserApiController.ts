@@ -1,5 +1,5 @@
 import api, {ApiError, authorize, ErrorType} from "../util/Api";
-import { User, UpdateUserBody, AddFavourBody, Favour, Mfa, MfaOtpBody, PayloadLogin, MfaOtpDisableBody, UpdateUserPassword } from "@pld/shared";
+import { User, UpdateUserBody, AddFavourBody, Favour, Mfa, MfaOtpBody, MfaOtpDisableBody, UpdateUserPassword, ResetPasswordBody } from "@pld/shared";
 import {AxiosError, AxiosResponse} from "axios";
 import { CallbackEvents } from "./CalendarApiController";
 
@@ -64,8 +64,8 @@ export class UserApiController {
     })
   }
 
-  public static sendChangePasswordLink(accessToken: string, callback: (success: boolean, error?: ApiError) => void) {
-    api.post<User>(`user/password`, {}, authorize(accessToken)).then((response) => {
+  public static sendChangePasswordLink(body: ResetPasswordBody, callback: (success: boolean, error?: ApiError) => void) {
+    api.post<User>(`user/password`, body).then((response) => {
       return callback(true);
     }).catch((err) => {
       return callback(false, err.response?.data);

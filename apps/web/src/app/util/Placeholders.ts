@@ -97,7 +97,6 @@ export const getHTMLPlaceholders = (text: string) => {
 
 export const getDodWorkTimePlaceholders = (text: string, wt: UserWorkTime) => {
   let newText = '';
-  console.log(wt);
   newText = text.replaceAll('%dod_wt_value%', String(wt.value));
   return newText;
 }

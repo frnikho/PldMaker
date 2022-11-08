@@ -32,7 +32,6 @@ export const MfaModal = (props: Props) => {
   }, [props.open]);
 
   const init = () => {
-    console.log('INIT !');
     UserApiController.enableOtp(accessToken, (mfa, error) => {
       if (error) {
         toast('Une erreur est survenue !', {type: 'error'})
@@ -51,7 +50,6 @@ export const MfaModal = (props: Props) => {
       } else if (mfa !== null) {
         props.onMfaEnabled(mfa);
       } else {
-        console.log('gze');
       }
     });
   }

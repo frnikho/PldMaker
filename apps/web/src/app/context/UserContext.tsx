@@ -113,7 +113,6 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   }
 
   public refreshUser(callback: (user: User | null, error?: ApiError) => void) {
-    console.log('Refresh user');
     UserApiController.getMe(this.state.accessToken, (user, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
@@ -140,7 +139,6 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   }
 
   public loadUserFromCookies(cookies: Cookies, callback: (token?: UserToken, error?: string) => void): void {
-    console.log('Load user from cookie');
     const access_token = cookies.get(ACCESS_TOKEN_COOKIE_NS);
     if (access_token !== undefined) {
       const loginBody: LoginToken = {access_token};
@@ -161,17 +159,14 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   }
 
   public saveTokenFromCookies(accessToken: string, cookies: Cookies): void {
-    console.log('save token cookie');
     cookies.set(ACCESS_TOKEN_COOKIE_NS, accessToken, {path: '/'});
   }
 
   public clearTokenFromCookies(cookies: Cookies): void {
-    console.log('clear token cookie');
     cookies.remove(ACCESS_TOKEN_COOKIE_NS, {path: '/'});
   }
 
   public logout() {
-    console.log('logout');
     if (this.props.cookies === undefined)
       return;
     this.clearTokenFromCookies(this.props.cookies);
@@ -182,7 +177,6 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   }
 
   public saveOtpToken(token: string, callback: (user: User | null, error?: ApiError) => unknown) {
-    console.log('save otp token');
     if (!this.props.cookies)
       return;
     UserApiController.getMe(token, (user, error) => {
@@ -207,7 +201,6 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   }
 
   public login(loginBody: LoginBody, callback: (user: User | null, error?: ApiError) => unknown): void {
-    console.log('login');
     if (this.props.cookies === undefined) {
       // TODO check error
       console.log("error cookies")
@@ -249,7 +242,6 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
   }
 
   public register(registerBody: RegisterBody, callback: (user: User | null , error?: ApiError) => unknown): void {
-    console.log('register');
     api.post<RegisterResponse>(`auth/register`, registerBody).then((response) => {
       if (this.props.cookies !== undefined)
         this.saveTokenFromCookies(response.data.accessToken, this.props.cookies);

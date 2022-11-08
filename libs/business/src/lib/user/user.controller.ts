@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Request, UploadedFile, UseInterceptors } from "@nestjs/common";
-import { UpdateUserBody, AddFavourBody, User, Favour, UpdatePreference, UpdateUserPassword } from "@pld/shared";
+import { UpdateUserBody, AddFavourBody, User, Favour, UpdatePreference, UpdateUserPassword, ResetPasswordBody } from "@pld/shared";
 import { UserService } from "./user.service";
 import { UserPipe } from "./user.pipe";
 import { FavourPipe } from "./favour.pipe";
@@ -53,11 +53,13 @@ export class UserController {
 
   /**
    * Send user change password email
-   * @param req NestJS Request
+   * @param body ResetPasswordBody
    */
   @Post('password')
-  public sendChangePasswordEmail(@Request() req) {
-    return this.userService.sendChangePasswordEmail(req.user);
+  @Public()
+  @BypassMfa()
+  public sendChangePasswordEmail(@Body() body: ResetPasswordBody) {
+    return this.userService.sendChangePasswordEmail(body.email);
   }
 
   /**

@@ -72,8 +72,8 @@ export class UserService {
       return this.userHelper.changeUserPassword(body);
     }
 
-    public sendChangePasswordEmail(user: User) {
-      return this.userHelper.sendChangePasswordEmail(user);
+    public sendChangePasswordEmail(email: string) {
+      return this.userHelper.sendChangePasswordEmail(email);
     }
 
     public async updatePreference(user: User, body: UpdatePreference) {

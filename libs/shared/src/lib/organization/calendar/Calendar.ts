@@ -34,12 +34,9 @@ export class NewCalendarBody {
 
   deadline?: Deadline;
 
-  linkedPld: string[];
-
-  constructor(name: string, description: string, deadline: Deadline, linkedPld: string[]) {
+  constructor(name: string, description: string, deadline?: Deadline) {
     this.name = name;
     this.description = description;
     this.deadline = deadline;
-    this.linkedPld = linkedPld;
   }
 }

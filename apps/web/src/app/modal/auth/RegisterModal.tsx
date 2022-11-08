@@ -1,10 +1,13 @@
 import React from "react";
 import {
-  Button,
+  Button, ButtonSet,
   InlineLoading, Link,
   Modal,
   TextInput
 } from "carbon-components-react";
+
+import {GatewayUserAccess} from '@carbon/icons-react';
+
 import {Stack} from '@carbon/react';
 import {RequiredUserContextProps, UserContextProps} from "../../context/UserContext";
 import {FieldData} from "../../util/FieldData";
@@ -112,10 +115,6 @@ export class RegisterModal extends ReactFormValidation<RegisterModalProps, Regis
           <TextInput id="register-email" type={"email"} labelText="Adresse email"
                      invalid={this.state.email.error !== undefined}
                      invalidText={this.state.email.error}
-                     onKeyPress={(e) => {
-                       const form = e.target;
-                       console.log(form);
-                     }}
                      onChange={(event) => this.setState({email: {value: event.target.value}})}/>
           <TextInput.PasswordInput id="register-mdp"
                                    invalid={this.state.password.error !== undefined}
@@ -133,9 +132,11 @@ export class RegisterModal extends ReactFormValidation<RegisterModalProps, Regis
         </Stack>
       <br/>
       <p>Vous avez deja un compte ? <Link onClick={() => this.props.switchToRegister()}>connectez vous ici !</Link></p>
-      <Button style={{marginTop: 18}} onClick={() => this.onClickRegister(this.props.userContext)}>
-        S'inscrire
-      </Button>
+      <ButtonSet style={{marginTop: 18}}>
+        <Button renderIcon={GatewayUserAccess} onClick={() => this.onClickRegister(this.props.userContext)}>
+          S'inscrire
+        </Button>
+      </ButtonSet>
     </Modal>);
   }
 

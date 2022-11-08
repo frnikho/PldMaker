@@ -166,6 +166,10 @@
         "fr": "Connexion",
         "en": "Login"
       },
+      "forgotPassword": {
+        "fr": "Mot de passe oublier",
+        "en": "Reset password"
+      },
       "noAccount": {
         "fr": "Pas encore de compte ? Inscrivez vous ici !",
         "en": "No account ? Create a new account here !"

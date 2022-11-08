@@ -4,7 +4,7 @@ import { NewCalendarComponent } from "../../../component/org/calendar/NewCalenda
 import {CircularProgress} from "../../../component/utils/CircularProgress";
 import {withParams} from "../../../util/Navigation";
 import { RouteMatch } from "react-router-dom";
-
+import { usePage } from "../../../hook/usePage";
 
 export type NewCalendarProps = RouteMatch;
 export type NewCalendarState = unknown;
@@ -23,7 +23,7 @@ export class NewCalendarPage extends React.Component<NewCalendarProps, NewCalend
     } else if (authContext.isLogged === LoginState.loading) {
       return <CircularProgress/>;
     } else {
-      return <NewCalendarComponent userContext={authContext} orgId={this.props.params['id']}/>;
+      return <NewCalendarComponent orgId={this.props.params['id']}/>;
     }
   }
 
@@ -38,3 +38,10 @@ export class NewCalendarPage extends React.Component<NewCalendarProps, NewCalend
 }
 
 export default withParams(NewCalendarPage);
+
+export const NewCalendarPageA = () => {
+
+  const {params, isReady} = usePage();
+
+  return (<NewCalendarComponent orgId={params['id']}/>);
+};

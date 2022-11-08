@@ -97,7 +97,6 @@ export const PreviewDodModal = (props: Props) => {
                   </div>
                   <h4 style={{fontWeight: 'bold'}}>Charge estimée:</h4>
                   {props.dod.estimatedWorkTime.map((wt, index) => {
-                    console.log(wt);
                     return (
                       <p key={index}>
                         - <span style={{fontWeight: 'bold'}}>{wt.value} </span>

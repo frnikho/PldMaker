@@ -2,9 +2,8 @@ import { Injectable } from "@nestjs/common";
 import {Model, Query} from "mongoose";
 import {Calendar} from "./calendar.model";
 import {InjectModel} from "@nestjs/mongoose";
-import { CalendarMember, CalendarMemberStatus, NewCalendarBody, NewCalendarEvent, Organization, User } from "@pld/shared";
+import { CalendarMemberStatus, NewCalendarBody, NewCalendarEvent, Organization, User } from "@pld/shared";
 import {CalendarEvent} from "./calendar_event.model";
-import { CheckOrgPerm, checkOrgPermission } from "../organization.util";
 
 @Injectable()
 export class CalendarHelper {
@@ -29,7 +28,7 @@ export class CalendarHelper {
       name: body.name,
       description: body.description,
       deadline: body.deadline,
-      linkedPld: body.linkedPld,
+      linkedPld: [],
       owner: user,
       org: org,
     });

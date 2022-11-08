@@ -17,11 +17,12 @@ import NewCalendarPage from "./page/organization/calendar/NewCalendarPage";
 import CalendarPage from "./page/organization/calendar/CalendarPage";
 import EventPage from "./page/organization/calendar/event/EventPage";
 import { AuthOtpPage } from "./page/AuthOtpPage";
-import { Abc } from "./util/Page";
 import EditTemplatePage from "./page/organization/template/EditTemplatePage";
 import { ChangelogPage } from "./page/ChangelogPage";
 import { MyCalendarPageComponent } from "./page/calendar/MyCalendarPageComponent";
 import { ChangePasswordPage } from "./page/user/ChangePasswordPage";
+import { ResetPasswordPage } from "./page/auth/ResetPasswordPage";
+import { PageComponent } from "./util/Page";
 
 export function App() {
 
@@ -30,10 +31,7 @@ export function App() {
   return (
     <UserContextProvider>
       <Routes>
-        <Route path={"/abc"} element={<MainPageLayout />}>
-          <Route index element={<Abc/>}/>
-        </Route>
-        <Route path={"/"} element={<MainPageLayout />}>
+        <Route path={"/"} element={<MainPageLayout/>}>
           <Route index element={<HomePage/>}/>
         </Route>
         <Route path={"/profile"} element={<MainPageLayout />}>
@@ -43,17 +41,18 @@ export function App() {
         <Route path={"/devices"} element={<MainPageLayout />}>
           <Route index element={<DevicePage/>}/>
         </Route>
-        <Route path={"/faq"} element={<MainPageLayout />}>
+        <Route path={"/faq"} element={<MainPageLayout redirectIfNotLogged={false}/>}>
           <Route index element={<FAQPage/>}/>
         </Route>
         <Route path={"/calendar"} element={<MainPageLayout />}>
           <Route index element={<MyCalendarPageComponent/>}/>
         </Route>
-        <Route path={"/changelog"} element={<MainPageLayout />}>
+        <Route path={"/changelog"} element={<MainPageLayout redirectIfNotLogged={false}/>}>
           <Route index element={<ChangelogPage/>}/>
         </Route>
-        <Route path={"/auth/otp"} element={<MainPageLayout />}>
-          <Route index element={<AuthOtpPage navigate={navigate}/>}/>
+        <Route path={"/auth"} element={<MainPageLayout redirectIfNotLogged={false}/>}>
+          <Route path={"otp"} element={<AuthOtpPage navigate={navigate}/>}/>
+          <Route path={"reset-password"} element={<ResetPasswordPage/>}></Route>
         </Route>
         <Route path={"/organization"} element={<MainPageLayout />}>
           <Route path={"new"} element={<NewOrganizationPage/>}/>
@@ -75,7 +74,7 @@ export function App() {
             <Route path={":templateId"} element={<EditTemplatePage navigate={navigate}/>}/>
           </Route>
         </Route>
-        <Route path='*' element={<MainPageLayout />}>
+        <Route path='*' element={<MainPageLayout redirectIfNotLogged={false}/>}>
           <Route path={'*'} element={<PageNotFound />}/>
         </Route>
       </Routes>

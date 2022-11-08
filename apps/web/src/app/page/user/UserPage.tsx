@@ -42,7 +42,6 @@ export default function UserPage() {
   const onUserUpdated = (user: User) => {
     toast('Informations de votre profile mis à jour 👍', {type: 'success'});
     userCtx.refreshUser((user, error) => {
-      console.log(user, error);
     });
   }
 

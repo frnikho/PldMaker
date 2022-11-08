@@ -35,7 +35,7 @@ export const ManageOrgMembersComponent = (props: Props) => {
       if (error) {
         console.log(error);
       } else {
-        console.log(org);
+
       }
     });
   }

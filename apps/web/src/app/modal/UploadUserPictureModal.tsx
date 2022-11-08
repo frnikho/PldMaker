@@ -26,7 +26,6 @@ export const UploadUserPictureModal = (props: Props) => {
       if (error) {
         toast('Une erreur est survenue', {type: 'error'});
       } else {
-        console.log(user);
         props.onSuccess();
       }
     });

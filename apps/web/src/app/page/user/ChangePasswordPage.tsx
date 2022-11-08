@@ -31,7 +31,6 @@ export const ChangePasswordPage = () => {
     const email = searchParams.get('email');
     const body = new UpdateUserPassword(email!, token!, getValues('password'));
     UserApiController.changePassword(body, (user, error) => {
-      console.log(user, error);
       if (user !== null) {
         logout();
         successToast('Votre mot de passe a été changé, reconnecter avec votre nouveau mot de passe');

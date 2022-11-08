@@ -56,7 +56,6 @@ export const ResumePldModal = (props: Props) => {
             return parseFloat(wt.value / wt.users.length as unknown as string);
           return 0;
         })
-        console.log(abc);
         return abc;
       }).flat().reduce((a, b) => a + b, 0);
       return (

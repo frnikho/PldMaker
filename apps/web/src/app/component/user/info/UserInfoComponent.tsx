@@ -1,20 +1,21 @@
 import { RequiredUserContextProps } from "../../../context/UserContext";
 import { User, UserDomain } from "@pld/shared";
-import { Column, FormLabel, Grid, MultiSelect, Select, SelectItem, TextInput, Tile } from "carbon-components-react";
+import { Button, Column, Grid, MultiSelect, Select, SelectItem, TextInput } from "carbon-components-react";
 import { formatLongDate, Timezone } from "@pld/utils";
 import { LoadingButton } from "../../LoadingButton";
 import React, { useCallback, useEffect, useState } from "react";
 
-import {Password, Renew} from '@carbon/icons-react';
+import {Password, Renew, Image} from '@carbon/icons-react';
 
 import {Stack} from '@carbon/react';
 import { useForm } from "react-hook-form";
 import { UserApiController } from "../../../controller/UserApiController";
 import { toast } from "react-toastify";
-import { UploadUserPictureModal } from "../../../modal/UploadUserPictureModal";
 import { UserInfoSkeleton } from "./UserInfoSkeleton";
 import { useAuth } from "../../../hook/useAuth";
 import { errorToast, successToast } from "../../../manager/ToastManager";
+import { ButtonStyle } from "@pld/ui";
+import { UploadUserPictureModal } from "../../../modal/UploadUserPictureModal";
 
 type ShowUserInfoProps = {
   user?: User;
@@ -37,8 +38,8 @@ const defaultUserForm: UserForm = {
 
 export function UserInfoComponent(props: ShowUserInfoProps) {
 
-  const {accessToken} = useAuth();
-  const {watch, register, getValues, setValue, handleSubmit} = useForm<UserForm>({ defaultValues: defaultUserForm });
+  const {user} = useAuth();
+  const {watch, register, getValues, setValue} = useForm<UserForm>({ defaultValues: defaultUserForm });
   const [modal, setModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -75,7 +76,7 @@ export function UserInfoComponent(props: ShowUserInfoProps) {
 
   const onClickChangePassword = () => {
     setLoading(true);
-    UserApiController.sendChangePasswordLink(accessToken, (success, error) => {
+    UserApiController.sendChangePasswordLink({ email: user?.email ?? ''}, (success, error) => {
       if (success) {
         successToast('Un email viens de vous être envoyer pour réinitialisé votre mot de passe');
       } else {
@@ -95,8 +96,67 @@ export function UserInfoComponent(props: ShowUserInfoProps) {
 
   if (props.user) {
     return (
-      <Tile style={style.tile}>
+      <Grid style={{marginTop: 40}}>
         <UploadUserPictureModal open={modal} onDismiss={() => setModal(false)} onSuccess={onUploadedPicture}/>
+        <Column xlg={3} md={4}>
+          <Stack orientation={"vertical"} gap={6}>
+            <img style={{padding: 12, objectFit: 'cover', width: 200, height: 200}} title={'Mettre à jour'} onClick={() => setModal(true)} src={props.user.profile_picture} alt={""}/>
+            <Button style={ButtonStyle.default} renderIcon={Image} onClick={() => setModal(true)}>Changer de photo</Button>
+            <div>
+              <p>Dernière mise à jour le</p>
+              <p>{formatLongDate(new Date(props.user.updated_date))}</p>
+            </div>
+          </Stack>
+        </Column>
+        <Column xlg={13} md={6}>
+          <Stack gap={6}>
+            <Stack gap={1}>
+              <h2 style={{fontWeight: 'bold'}}>{props.user.firstname} {props.user.lastname.toUpperCase()}</h2>
+              <p>Créer le {formatLongDate(new Date(props.user.created_date))}</p>
+            </Stack>
+            <Stack gap={4}>
+              <TextInput id={"lastname-input"} labelText={"Nom"} {...register('firstname')}/>
+              <TextInput id={"firstname-input-disabled"} labelText={"Prénom"} {...register('lastname')}/>
+              <Select id={"timezone-input"} labelText={"Timezone"} {...register('timezone')}>
+                {Object.keys(Timezone).sort((a, b) => {
+                  if (a > b) {
+                    return 1;
+                  } else {
+                    return -1;
+                  }
+                }).map((t, index) => {
+                  return (
+                    <SelectItem
+                      key={index}
+                      value={t}
+                      text={t}
+                    />
+                  )
+                })}
+              </Select>
+              <MultiSelect
+                label={getValues('domain').join(', ')}
+                titleText={"Domaines d'application"}
+                id="domain-list"
+                selectedItems={watch('domain').map((a) => ({label: a}))}
+                items={Object.keys(UserDomain).map((d) => ({
+                    label: d.charAt(0).toUpperCase() + d.slice(1).toLowerCase()
+                }))}
+                onChange={(e) => setValue('domain', e.selectedItems.map((a) => a.label))}
+              />
+            </Stack>
+            <div style={{display: 'flex', flexDirection: 'row', gap: 20}}>
+              <LoadingButton icon={Renew} loading={loading} onClick={onUpdate}>Mettre à jour</LoadingButton>
+              <LoadingButton kind={'ghost'} loading={loading} onClick={onClickChangePassword} icon={Password}>Changer votre mot de passe</LoadingButton>
+            </div>
+          </Stack>
+        </Column>
+      </Grid>
+    )
+
+
+    /*return (
+      <Tile style={style.tile}>
         <Grid>
           <Column xlg={6}>
             <TextInput id={"created-date-user"} title={'Vous ne pouvez pas changer ce champ !'} labelText={"Date de création"} value={formatLongDate(new Date(props.user.created_date))}/>
@@ -150,7 +210,7 @@ export function UserInfoComponent(props: ShowUserInfoProps) {
           </Stack>
         </div>
       </Tile>
-    )
+    )*/
   } else {
     return <UserInfoSkeleton/>
   }

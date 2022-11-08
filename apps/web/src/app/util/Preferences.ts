@@ -5,7 +5,6 @@ export const getDodStatusColor = (dodStatus: DodStatus[], status: string) => {
     return dodStatus.name === status
   });
   if (color === undefined) {
-    console.log(status);
     return 'ababab';
   }
   return color.color;

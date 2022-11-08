@@ -55,7 +55,6 @@ type Modals = {
 export const DodTableComponent = (props: Props) => {
 
   const userCtx = useContext<UserContextProps>(UserContext);
-  const {getCurrentLanguage} = useLanguage();
   const [selectedDod, setSelectedDod] = useState<undefined | Dod>(undefined);
   const [modals, setModals] = useState<Modals>({openEdition: false, openPreview: false});
   const [type, setType] = useState<DodType>(DodType.New);
@@ -317,7 +316,13 @@ export const DodTableComponent = (props: Props) => {
         updateModal("openEdition", false);
         setSelectedDod(undefined);
       }} pld={props.pld} org={props.org}/>
-      {selectedDod !== undefined ? <PreviewDodModal dod={selectedDod} open={modals.openPreview} onDismiss={() => updateModal('openPreview', false)} onSuccess={() => updateModal('openPreview', false)}/> : null}
+      {selectedDod !== undefined ? <PreviewDodModal dod={selectedDod} open={modals.openPreview} onDismiss={() => {
+        updateModal("openPreview", false);
+        setSelectedDod(undefined);
+      }} onSuccess={() => {
+        updateModal("openPreview", false);
+        setSelectedDod(undefined);
+      }}/> : null}
       {showDatatable()}
     </>
   );

@@ -22,11 +22,14 @@ import {Dashboard, Legend, MessageQueue, Calendar} from '@carbon/icons-react'
 import {UserContext, UserContextProps} from "../context/UserContext";
 import { useLanguage } from "../hook/useLanguage";
 import { UserMenu } from "./menu/UserMenu";
+import { defaultPageOptions, PageOptions, usePage } from "../hook/usePage";
+import { PageLoadingComponent } from "../component/PageLoadingComponent";
 
-export const MainPageLayout = () => {
+export const MainPageLayout = (options: Partial<PageOptions> = defaultPageOptions()) => {
 
   const {translate} = useLanguage();
   const navigate = useNavigate();
+  const {isReady} = usePage(options);
 
   const showFavoursPld = (auth: UserContextProps, onClickSideNavExpand: () => void) => {
     if (auth.favours?.pld === undefined || auth.favours.pld.length <= 0)
@@ -143,7 +146,7 @@ export const MainPageLayout = () => {
                    }}>
             <Grid condensed={false}>
               <Column sm={4} md={8} lg={16} style={{marginLeft: isSideNavExpanded ? 80 : 0, transition: '0.15s'}}>
-                <Outlet/>
+                {isReady ? <Outlet/> : <PageLoadingComponent/>}
               </Column>
             </Grid>
           </Content>

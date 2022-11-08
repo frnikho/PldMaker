@@ -10,7 +10,6 @@ import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
 import { CheckmarkFilled, Misuse, HelpFilled, Edit, TrashCan, Events} from "@carbon/icons-react";
 
-
 export type EventProps = {
   orgId: string;
   calendarId: string;

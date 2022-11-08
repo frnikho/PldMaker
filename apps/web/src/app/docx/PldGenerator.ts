@@ -1,9 +1,10 @@
-import { Pld, Dod, Organization, DodStatus, Template } from "@pld/shared";
-import {AlignmentType, Document, Header, Packer, Paragraph, TextRun, WidthType} from "docx";
-import {DodDocx} from "./DodDocx";
-import {PldDocx} from "./PldDocx";
-import {ReportDocx} from "./ReportDocx";
+import { Dod, DodStatus, Organization, Pld, Template } from "@pld/shared";
+import { AlignmentType, Document, Header, Packer, Paragraph, TextRun, WidthType } from "docx";
+import { DodDocx } from "./DodDocx";
+import { PldDocx } from "./PldDocx";
+import { ReportDocx } from "./ReportDocx";
 import { ReportForm } from "../modal/pld/GeneratePldModal";
+import { DodResumeDocx } from "./DodResumeDocx";
 
 export const margins = {
   top: 80,
@@ -114,9 +115,13 @@ export class PldGenerator {
           default: this.getHeader(),
         },
         children: [
-          new Paragraph({style: 'Title', children: [new TextRun({text: 'Description du document'})]}),
+          new Paragraph({style: 'Title', alignment: AlignmentType.CENTER, children: [new TextRun({text: 'Description du document', size: '24pt'})]}),
           Space(),
           new PldDocx(this.pld, this.org, this.template).generateDescriptionTable(),
+          Space(),
+          new Paragraph({style: 'Title', children: [new TextRun({text: 'Les cartes de nos livrables'})]}),
+          Space(),
+          ...new DodResumeDocx(this.dod, this.dodStatus).generate(),
           Space(),
           new Paragraph({style: 'Title', children: [new TextRun({text: 'Tableau des révisions'})]}),
           Space(),
@@ -124,7 +129,7 @@ export class PldGenerator {
           Space(),
           new Paragraph({style: 'Title', children: [new TextRun({text: 'DoDs'})]}),
           Space(),
-          ...this.dod.map((d) => new DodDocx(d, this.org, this.pld, this.template).generateTable()),
+          ...this.dod.map((d, index) => [Space(), new DodDocx(d, this.org, this.pld, this.template).generateTable()]).flat(),
           Space(),
           new Paragraph({style: 'Title', children: [new TextRun({text: 'Rapport d’avancement'})]}),
           Space(),

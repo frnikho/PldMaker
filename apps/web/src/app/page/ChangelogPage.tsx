@@ -10,7 +10,7 @@ export const ChangelogPage = () => {
     <Stack gap={8}>
       <h1 style={{fontWeight: 'bold'}}>Changelog</h1>
       <Stack gap={6}>
-        {changelog.map((change) => <ChangelogComponent changelog={change}/>)}
+        {changelog.map((change, index) => <ChangelogComponent key={index} changelog={change}/>)}
       </Stack>
     </Stack>
   )

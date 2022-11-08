@@ -4,6 +4,8 @@ import { LoginState, UserContext, UserContextProps } from "../context/UserContex
 import { CircularProgress } from "../component/utils/CircularProgress";
 import { useSearchParams } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
+import { usePage } from "../hook/usePage";
+import { PageLoadingComponent } from "../component/PageLoadingComponent";
 
 export type PageState = {
   loading: boolean;
@@ -104,19 +106,16 @@ export abstract class Page<T, Z> extends React.Component<PageProps & T, Z> {
   }
 }
 
-export function PageComponent({children}) {
+type Props = {
+  component: JSX.Element;
+};
+export const PageComponent = (props: Props) => {
 
-  return (children);
+  const {isReady} = usePage();
 
-}
-
-export function Abc() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  console.log(searchParams.get('redirect'));
-  return (
-    <PageComponent>
-      <h1>Test abc</h1>
-    </PageComponent>
-  )
-
-}
+  if (!isReady) {
+    return (<PageLoadingComponent/>);
+  } else {
+    return (props.component)
+  }
+};

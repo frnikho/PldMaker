@@ -168,3 +168,14 @@ export class CalendarComponent extends React.Component<CalendarProps, CalendarSt
   }
 
 }
+
+type Props = {
+
+};
+export const CalendarComponentA = (props: Props) => {
+  return (
+    <div>
+
+    </div>
+  );
+};

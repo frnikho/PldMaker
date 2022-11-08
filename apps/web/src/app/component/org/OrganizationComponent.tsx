@@ -35,7 +35,6 @@ import { OrgCalendarItemComponent } from "./item/OrgCalendarItemComponent";
 import { OrgTemplateItemComponent } from "./item/OrgTemplateItemComponent";
 import { OrgListSkeleton } from "./item/OrgItemSkeleton";
 import { OrgCalendarItemSkeleton } from "./item/OrgCalendarItemSkeleton";
-import { useLanguage } from "../../hook/useLanguage";
 
 type Props = {
   orgId: string;
@@ -137,8 +136,8 @@ export const OrganizationComponent = (props: Props) => {
                 </Column>
               )}</Grid>}
             <h2 style={{marginTop: 20, marginBottom: 10}}>Calendriers <Button kind={"ghost"} onClick={() => navigate('calendar/new')} hasIconOnly renderIcon={Add} iconDescription={"Create calendar"}/></h2>
-            {!org ? <OrgCalendarItemSkeleton/> : calendars.map((calendar) =>
-              <OrgCalendarItemComponent calendar={calendar}/>
+            {!org ? <OrgCalendarItemSkeleton/> : calendars.map((calendar, index) =>
+              <OrgCalendarItemComponent key={index} calendar={calendar}/>
             )}
             <h2>Templates <Button kind={"ghost"} onClick={() => navigate('template/new')} hasIconOnly renderIcon={Add} iconDescription={"Créer une nouvelle organisation"}/></h2>
             {!org ? <OrgListSkeleton/> : <Grid>{templates.map((template, index) =>

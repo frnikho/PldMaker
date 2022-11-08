@@ -186,11 +186,13 @@ export class UserHelper {
     return UserHelper.populateAndExecute(this.userModel.findOneAndUpdate({_id: user._id}, {password: hashedPassword}, {new: true}));
   }
 
-  public async sendChangePasswordEmail(user: User) {
-    console.log(user._id.toString());
+  public async sendChangePasswordEmail(email: string) {
+    const user = await this.findByEmail(email);
+    if (user === null) {
+      throw new ApiException(buildException(ApiErrorsCodes.USER_NOT_FOUND, 'User not found with this email !'))
+    }
     const token = await bcrypt.hash(user._id.toString(), 10);
-    this.mailService.sendChangePasswordMail(user, token);
-    return;
+    await this.mailService.sendChangePasswordMail(user, token);
   }
 
   public async updatePreference(user: User, body: UpdatePreference) {

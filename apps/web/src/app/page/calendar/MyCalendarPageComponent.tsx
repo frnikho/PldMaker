@@ -121,7 +121,6 @@ export const MyCalendarPageComponent = () => {
       return;
     const startDelta = event.startDelta;
     const endDelta = event.endDelta;
-    console.log(typeof slot.start);
     if (slot.start instanceof Date)
       slot.start.setTime(slot.start.getTime() + startDelta.milliseconds);
     if (slot.end instanceof Date)

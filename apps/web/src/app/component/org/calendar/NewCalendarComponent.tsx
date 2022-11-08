@@ -1,11 +1,8 @@
 import React from "react";
-import {RequiredUserContextProps} from "../../../context/UserContext";
-import {FieldData, FieldError} from "../../../util/FieldData";
-import {NewCalendarBody, Pld} from "@pld/shared";
-import {PldApiController} from "../../../controller/PldApiController";
-import { Breadcrumb, BreadcrumbItem, Button, ButtonSet, ClickableTile, DatePicker, DatePickerInput, FormLabel, TextArea, TextInput } from "carbon-components-react";
+import {NewCalendarBody} from "@pld/shared";
+import { Breadcrumb, BreadcrumbItem, Button, ButtonSet, DatePicker, DatePickerInput, FormLabel, TextArea, TextInput } from "carbon-components-react";
 
-import {Add, CheckmarkOutline, CircleDash} from '@carbon/icons-react';
+import {Add} from '@carbon/icons-react';
 
 import {Stack} from '@carbon/react';
 import {HelpLabel, RequiredLabel} from "../../../util/Label";
@@ -13,144 +10,83 @@ import {Deadline} from "@pld/utils";
 import { validate } from "class-validator";
 import {CalendarApiController} from "../../../controller/CalendarApiController";
 import {toast} from "react-toastify";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../hook/useAuth";
+import { ButtonStyle } from "@pld/ui";
+import { useForm } from "react-hook-form";
 
-
-type NewCalendarProps = {
+type Props = {
   orgId: string;
-} & RequiredUserContextProps;
-
-type NewCalendarState = {
-  pld: FieldData<Pld[]>
-  selectedPld: FieldData<string[]>
-  errors: FieldError[];
-  redirectUrl?: string;
 }
 
-export class NewCalendarComponent extends React.Component<NewCalendarProps, NewCalendarState> {
+type Form = {
+  name: string;
+  description: string;
+  deadline?: Deadline;
+}
 
-  constructor(props: NewCalendarProps) {
-    super(props);
-    this.state = {
-      errors: [],
-      pld: {
-        loading: true,
-        value: [],
-      },
-      selectedPld: {
-        loading: false,
-        value: []
-      }
-    }
-    this.onSelectPld = this.onSelectPld.bind(this);
-    this.onClickCreate = this.onClickCreate.bind(this);
-  }
+export const NewCalendarComponent = (props: Props) => {
 
-  override componentDidMount() {
-    PldApiController.findOrgPld(this.props.userContext.accessToken, this.props.orgId, (pld, error) => {
-      if (error) {
-        console.log(error);
-      } else {
-        this.setState({
-          pld: {
-            value: pld,
-            loading: false,
-          }
-        })
-      }
-    })
-  }
+  const navigate = useNavigate();
+  const {accessToken} = useAuth();
+  const {watch, setValue, getValues, setError, formState: {errors}} = useForm<Form>({defaultValues: {name: '', description: ''}});
 
-  private onSelectPld(pld: Pld, selected: boolean) {
-    if (!selected) {
-      this.state.selectedPld.value.push(pld._id);
-    } else {
-      const index = this.state.selectedPld.value.findIndex((a) => a === pld._id);
-      this.state.selectedPld.value.splice(index, 1);
-    }
-    this.setState({});
-  }
-
-  private showPld() {
-    if (this.state.pld.value.length === 0) {
-      return <p>Vous n'avez pas de PLD de créer !</p>
-    }
-    return this.state.pld.value.map((value, index) => {
-      const clicked = this.state.selectedPld.value.some((id) => id === value._id)
-      return (
-        <ClickableTile onClick={() => this.onSelectPld(value, clicked)} key={index} style={{display: 'flex', flexDirection: 'row', alignItems: 'center', backgroundColor: clicked ? '#d2d2d2' : ''}}>
-          {clicked ? <CheckmarkOutline color={'#0062fe'} style={{marginRight: 20}} /> : <CircleDash color={'#0062fe'} style={{marginRight: 20}}/>}
-          <h3>{value.title}</h3>
-        </ClickableTile>
-      )
-    })
-  }
-
-  private onClickCreate(event: any) {
-    const title: string = event.currentTarget.form?.elements[0].value;
-    const description: string = event.currentTarget.form?.elements[1].value;
-    const deadlineStart: string = event.currentTarget.form?.elements[2].value;
-    const deadlineEnd: string = event.currentTarget.form?.elements[3].value;
-    const calendar: NewCalendarBody = new NewCalendarBody(title, description, new Deadline(new Date(Date.parse(deadlineStart)), new Date(Date.parse(deadlineEnd))), []);
+  const onClickCreate = () => {
+    const form = getValues();
+    const calendar: NewCalendarBody = new NewCalendarBody(form.name, form.description, form.deadline);
     validate(calendar).then((errors) => {
-      this.setState({
-        errors: errors.map((er): FieldError => ({
-          error: Object.entries(er.constraints ?? {}).map((a) => a[1]).join(', '),
-          loading: false,
-          id: er.property,
-          }
-          )
-        )});
-      return this.state.errors;
-    }).then((errors) => {
-      if (errors.length <= 0) {
-        CalendarApiController.createCalendar(this.props.userContext.accessToken, this.props.orgId, calendar, (calendar, error) => {
-          if (calendar) {
-            toast('Calendrier créer', {type: 'success', icon: '👍'});
-          } else {
-            toast('Une erreur est survenue', {type: 'error', icon: '❌'});
-          }
+      if (errors.length > 0) {
+        return errors.forEach((err) => {
+          const msg = Object.entries(err.constraints ?? {}).map((a) => a[1]);
+          setError(err.property as keyof Form, {message: msg.join(', ')});
         });
       }
+      CalendarApiController.createCalendar(accessToken, props.orgId, calendar, (calendar, error) => {
+        if (calendar) {
+          toast('Calendrier créer', {type: 'success', icon: '👍'});
+          navigate(`/organization/${props.orgId}/calendar/${calendar._id}`);
+        } else {
+          toast('Une erreur est survenue', {type: 'error', icon: '❌'});
+        }
+      });
     });
-
   }
 
-  override render() {
-    return (
-      <form>
-        {this.state.redirectUrl ? <Navigate to={this.state.redirectUrl}/> : null}
-        <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
-          <BreadcrumbItem onClick={() => this.setState({redirectUrl: '/'})}>Dashboard</BreadcrumbItem>
-          <BreadcrumbItem onClick={() => this.setState({redirectUrl: `/organization/${this.props.orgId}`})}>Organisation</BreadcrumbItem>
-          <BreadcrumbItem isCurrentPage>Calendrier</BreadcrumbItem>
-        </Breadcrumb>
-        <Stack gap={4}>
-          <h2>Créer un Calendrier</h2>
-          <h4>Info</h4>
-          <TextInput id={"calendar-title"} labelText={<RequiredLabel message={"Nom"}/>}/>
-          <TextArea id={"calendar-description"} labelText={"Description"}/>
-          <FormLabel>Deadline</FormLabel>
-          <DatePicker datePickerType="range" style={{padding: 4}}>
-            <DatePickerInput
-              id="date-picker-input-id-start"
-              placeholder="mm/dd/yyyy"
-              labelText="Start date"
-            />
-            <DatePickerInput
-              id="date-picker-input-id-finish"
-              placeholder="mm/dd/yyyy"
-              labelText="End date"
-            />
-          </DatePicker>
-          <HelpLabel message={"La deadline d'un calendrier n'est pas obligatoire mais vous permet de vous retrouvez dans l'avancement de votre EIP"}/>
-          <h4>Linker un/des PLD avec le calendrier</h4>
-          {this.showPld()}
-          <ButtonSet style={{marginTop: 10}}>
-            <Button renderIcon={Add} iconDescription={"Add"} onClick={this.onClickCreate}>Créer</Button>
-          </ButtonSet>
-        </Stack>
-      </form>
-    )
-  }
-}
+  return (
+    <>
+      <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
+        <BreadcrumbItem onClick={() => navigate('/')}>Dashboard</BreadcrumbItem>
+        <BreadcrumbItem onClick={() => navigate(`/organization/${props.orgId}`)}>Organisation</BreadcrumbItem>
+        <BreadcrumbItem isCurrentPage>Calendrier</BreadcrumbItem>
+      </Breadcrumb>
+      <Stack gap={4}>
+        <h2 style={{fontWeight: 'bold'}}>Créer un Calendrier</h2>
+        <TextInput id={"calendar-title"} value={watch('name')} invalid={errors?.name?.message !== undefined} invalidText={errors?.name?.message} onChange={(e) => setValue('name', e.currentTarget.value)} labelText={<RequiredLabel message={"Nom"}/>}/>
+        <TextArea id={"calendar-description"} value={watch('description')} invalid={errors?.description?.message !== undefined} invalidText={errors?.description?.message} onChange={(e) => setValue('description', e.currentTarget.value)} labelText={"Description"}/>
+        <FormLabel>Deadline</FormLabel>
+        <DatePicker datePickerType="range" style={{padding: 4}} onChange={(dates) => {
+          if (dates.length === 2) {
+            setValue('deadline', new Deadline(dates[0], dates[1]));
+          } else {
+            setValue('deadline', undefined);
+          }
+        }}>
+          <DatePickerInput
+            id="date-picker-input-id-start"
+            placeholder="mm/dd/yyyy"
+            labelText="Start date"
+          />
+          <DatePickerInput
+            id="date-picker-input-id-finish"
+            placeholder="mm/dd/yyyy"
+            labelText="End date"
+          />
+        </DatePicker>
+        <HelpLabel message={"La deadline d'un calendrier n'est pas obligatoire mais vous permet de vous retrouvez dans l'avancement de votre EIP"}/>
+        <ButtonSet style={{marginTop: 10}}>
+          <Button style={ButtonStyle.default} renderIcon={Add} iconDescription={"Add"} onClick={onClickCreate}>Créer</Button>
+        </ButtonSet>
+      </Stack>
+    </>
+  );
+};

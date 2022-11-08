@@ -44,3 +44,6 @@ Thumbs.db
 yarn.lock
 
 .workspace/obsidian/.obsidian
+
+# Next.js
+.next

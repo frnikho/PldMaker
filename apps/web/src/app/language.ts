@@ -35,6 +35,7 @@ export type LanguageType = {
       cancel: AvailableLangue,
       login: AvailableLangue,
       noAccount: AvailableLangue,
+      forgotPassword: AvailableLangue,
       forms: {
         email: AvailableLangue,
         password: AvailableLangue,

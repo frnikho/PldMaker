@@ -67,8 +67,6 @@ export const CreateTemplateComponent = (props: Props) => {
   }
 
   const onClickCreate = () => {
-    console.log(getValues());
-    console.log(settings);
     const body: NewTemplateBody = new NewTemplateBody(getValues('name'), getValues('useAsDefault'), settings?.color, settings?.dod, settings?.rapport, settings?.revision, settings?.description);
     validate(body).then((err) => {
       if (!org) {

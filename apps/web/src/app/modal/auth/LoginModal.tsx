@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { Button, InlineLoading, Link, Modal, TextInput } from "carbon-components-react";
+import { Button, ButtonSet, Link, Modal, TextInput } from "carbon-components-react";
 import { Stack } from "@carbon/react";
 import { RequiredUserContextProps } from "../../context/UserContext";
 import { LoginBody, User } from "@pld/shared";
 import ErrorManager from "../../manager/ErrorManager";
 import { toast } from "react-toastify";
 import { validate } from "class-validator";
-import { FieldData } from "../../util/FieldData";
 import { ErrorType } from "../../util/Api";
 
-import {Login} from '@carbon/icons-react';
+import {Login, Password} from '@carbon/icons-react';
 import { useForm } from "react-hook-form";
 import { useApiError } from "../../hook/useApiError";
 import { useLanguage } from "../../hook/useLanguage";
+import { useNavigate } from "react-router-dom";
 
 type LoginModalProps = {
   open: boolean;
@@ -28,6 +28,8 @@ type LoginForm = {
 }
 
 export function LoginModal(props: LoginModalProps) {
+
+  const navigate = useNavigate();
   const { translate } = useLanguage();
   const { getError } = useApiError();
   const [loading, setLoading] = useState(false);
@@ -80,7 +82,10 @@ export function LoginModal(props: LoginModalProps) {
       </Stack>
       <br />
       <p><Link onClick={() => props.switchToRegister()}>{translate('modals.login.noAccount')}</Link></p>
-      <Button type={"submit"} renderIcon={Login} style={{ marginTop: 18 }}>{translate('modals.login.login')}</Button>
+      <ButtonSet style={{ marginTop: 18 }}>
+        <Button type={"submit"} renderIcon={Login}>{translate('modals.login.login')}</Button>
+        <Button kind={'ghost'} renderIcon={Password} onClick={() => navigate('/auth/reset-password')}>{translate('modals.login.forgotPassword')}</Button>
+      </ButtonSet>
     </form>
   </Modal>);
 

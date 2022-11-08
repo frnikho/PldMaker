@@ -1,4 +1,11 @@
 
+### 1.0.3
+
+*date: 31/10/2022*
+
+- Changement du sorting pour l'affichage des DoDs et des Sections
+- Ajout de la page du reset du password
+
 ### 1.0.2 Création du système de calendrier personnel
 
 *date: 23/10/2022*
