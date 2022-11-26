@@ -29,12 +29,11 @@ import { DodType, NewDodModal } from "../../modal/dod/NewDodModal";
 import { Dod, DodStatus, Organization, OrganizationSection, Pld, SetDodStatus } from "@pld/shared";
 import { DodApiController } from "../../controller/DodApiController";
 
-import { Add, Edit, ImportExport, TrashCan } from "@carbon/icons-react";
+import { Add, Edit, ImportExport, TrashCan, Filter, Checkmark } from "@carbon/icons-react";
 import { toast } from "react-toastify";
 import { PreviewDodModal } from "../../modal/dod/PreviewDodModal";
 import { formatShortDate } from "@pld/utils";
 import { ButtonStyle } from "@pld/ui";
-import { useLanguage } from "../../hook/useLanguage";
 
 type Props = {
   org: Organization;
@@ -52,12 +51,18 @@ type Modals = {
   openPreview: boolean;
 }
 
+enum Sorting {
+  MyAssignedDoDs,
+  MyCreatedDoDs,
+}
+
 export const DodTableComponent = (props: Props) => {
 
   const userCtx = useContext<UserContextProps>(UserContext);
   const [selectedDod, setSelectedDod] = useState<undefined | Dod>(undefined);
   const [modals, setModals] = useState<Modals>({openEdition: false, openPreview: false});
   const [type, setType] = useState<DodType>(DodType.New);
+  const [filter, setFilter] = useState<undefined | Sorting>(undefined);
 
   const updateModal = (key: keyof Modals, value: boolean) => {
     setModals({
@@ -87,7 +92,7 @@ export const DodTableComponent = (props: Props) => {
     ]
   }
 
-  const onDodCreated = (createdDod: Dod) => {
+  const onDodCreated = () => {
     updateModal('openEdition', false);
     setSelectedDod(undefined);
     props.onCreatedDod();
@@ -173,7 +178,7 @@ export const DodTableComponent = (props: Props) => {
     return dod.status.name;
   }
 
-  const compare = (a: string, b: string) => {
+  const compare = (a: string, b: string): number => {
     const a1 = a.split('.');
     const b1 = b.split('.');
     const len = Math.min(a1.length, b1.length);
@@ -187,15 +192,25 @@ export const DodTableComponent = (props: Props) => {
     return a1.length - b1.length;
   }
 
-  const showDatatable = () => {
-    const rowData = props.dods.sort((a, b) => compare(a.version, b.version)).map((dod) =>
-      ({
+  const showDoDs = () => {
+    let DoDs: Dod[] = props.dods;
+    if (filter === Sorting.MyAssignedDoDs) {
+      DoDs = DoDs.filter((d) => d.estimatedWorkTime.find((wt) => wt.users.find((u) => u._id === userCtx.user?._id)));
+    } else if (filter === Sorting.MyCreatedDoDs) {
+      DoDs = DoDs.filter((d) => d.owner._id === userCtx.user?._id);
+    }
+    return DoDs.sort((a, b) => compare(a.version, b.version)).map((dod) => {
+      return {
         ...dod,
         id: dod._id,
         created_date: formatShortDate(new Date(dod.created_date))
-      }));
+      }
+    });
+  }
+
+  const showDatatable = () => {
     return (
-      <DataTable rows={rowData} headers={getTableHeader()} isSortable locale={'fr'}>
+      <DataTable rows={showDoDs()} headers={getTableHeader()} isSortable locale={'fr'}>
         {({
             rows,
             headers,
@@ -239,8 +254,9 @@ export const DodTableComponent = (props: Props) => {
                   onChange={onInputChange}
                 />
                 <TableToolbarMenu
+                  disabled
                   renderIcon={ImportExport}
-                  iconDescription={"Filter"}
+                  iconDescription={"WIP"}
                   tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
                 >
                   <TableToolbarAction onClick={() => {
@@ -257,6 +273,21 @@ export const DodTableComponent = (props: Props) => {
                     a.click();
                   }}>
                     Exporter
+                  </TableToolbarAction>
+                </TableToolbarMenu>
+                <TableToolbarMenu
+                  renderIcon={Filter}
+                  iconDescription={"Filter"}
+                  tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+                >
+                  <TableToolbarAction onClick={() => setFilter(undefined)}>
+                    {filter === undefined ? <Checkmark style={{marginRight: 5}}/> : ''} Toutes les DoDs
+                  </TableToolbarAction>
+                  <TableToolbarAction onClick={() => setFilter(Sorting.MyAssignedDoDs)}>
+                    {filter === Sorting.MyAssignedDoDs ? <Checkmark style={{marginRight: 5}}/> : ''} Mes DoDs assignés
+                  </TableToolbarAction>
+                  <TableToolbarAction onClick={() => setFilter(Sorting.MyCreatedDoDs)}>
+                    {filter === Sorting.MyCreatedDoDs ? <Checkmark style={{marginRight: 5}}/> : ''} Mes DoDs créer
                   </TableToolbarAction>
                 </TableToolbarMenu>
                 <Button
@@ -312,7 +343,7 @@ export const DodTableComponent = (props: Props) => {
 
   return (
     <>
-      <NewDodModal dod={selectedDod} sections={props.sections} type={type} onSuccess={(d) => onDodCreated(d as Dod)} open={modals.openEdition} onDismiss={() => {
+      <NewDodModal dod={selectedDod} sections={props.sections} type={type} onSuccess={() => onDodCreated()} open={modals.openEdition} onDismiss={() => {
         updateModal("openEdition", false);
         setSelectedDod(undefined);
       }} pld={props.pld} org={props.org}/>
