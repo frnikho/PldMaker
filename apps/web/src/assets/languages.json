@@ -26,7 +26,7 @@
     },
     "user": {
       "profile": {
-        "fr": "Mon profile",
+        "fr": "Mon profil",
         "en": "My profile"
       },
       "devices": {
@@ -66,7 +66,7 @@
   "errors": {
     "cantDisableTOTP": {
       "fr": "Une erreur est survenue lors de la désactivation du TOTP !",
-      "en": "An error occurred when disabling TOTP"
+      "en": "An error occurred when disabling TOTP!"
     }
   },
   "DoDsTable": {
@@ -172,7 +172,7 @@
       },
       "noAccount": {
         "fr": "Pas encore de compte ? Inscrivez vous ici !",
-        "en": "No account ? Create a new account here !"
+        "en": "No account ? Create a new account here!"
       },
       "forms": {
         "email": {
@@ -199,8 +199,8 @@
         "en": "Create your organization"
       },
       "subtitle": {
-        "fr": "Une organisation te permet de créer, de gérer et de générer les documents de vos PLDs en équipe\\nAprès la création de votre organisation, vous pourrez gérer les paramètres liés a la confidentialité",
-        "en": "An organization allows you to create, manage and generate documents for your PLDs as a team\\nAfter the creation of your organization, you will be able to manage the parameters related to the confidentiality"
+        "fr": "Une organisation te permet de créer, de gérer et de générer les documents de vos PLDs en équipe\\nAprès la création de votre organisation, vous pourrez gérer les paramètres liés à la confidentialité.",
+        "en": "An organization allows you to create, manage and generate documents for your PLDs as a team\\nAfter the creation of your organization, you will be able to manage the parameters related to the confidentiality."
       },
       "createButton": {
         "fr": "Créer une nouvelle organisation",
@@ -212,8 +212,8 @@
           "en": "Add users to your organization"
         },
         "subtitle": {
-          "fr": "vous pouvez dès maintenant inviter des utilisateurs à intégrer votre organisation dès la création de celle-ci",
-          "en": "you can now invite users to join your organization as soon as it is created"
+          "fr": "Vous pouvez dès maintenant inviter des utilisateurs à intégrer votre organisation dès la création de celle-ci.",
+          "en": "You can now invite users to join your organization as soon as it is created."
         }
       }
     },
@@ -250,8 +250,8 @@
           "en": "Delete account"
         },
         "hasSomeOrg": {
-          "fr": "Votre compte est actuellement le dirigeant des organisation(s): %orgs%\nVous devez léger ou supprimer ces organisations avant de pouvoir supprimer votre compte.",
-          "en": ""
+          "fr": "Votre compte est actuellement le dirigeant des organisation(s): %orgs%\nVous devez léguer ou supprimer ces organisations avant de pouvoir supprimer votre compte.",
+          "en": "Your account is currently the leader of the following organization(s): %orgs%\nYou must bequeath or delete these organizations before you can delete your account."
         }
       }
     }
@@ -261,7 +261,7 @@
 
     },
     "title": {
-      "fr": "Mon profile",
+      "fr": "Mon profil",
       "en": "My profile"
     }
   },
@@ -269,35 +269,35 @@
     "org": {
       "title": {
         "fr": "Mes Organisations",
-        "en": "Organizations"
+        "en": "My Organizations"
       },
       "noOrgs": {
-        "fr": "Tu n'a pas rejoint ou créer d'organisations",
-        "en": "You didn't join or create any organizations"
+        "fr": "Tu n'as pas rejoint ou créé d'organisations.",
+        "en": "You didn't join or create any organizations."
       },
       "noOrgCreateButton": {
         "fr": "Cliquez ici pour en créer une !",
-        "en": "Click here to create a new one !"
+        "en": "Click here to create a new one!"
       }
     },
     "events": {
       "title": {
-        "fr": "Recap",
+        "fr": "Événements",
         "en": "Events"
       },
       "noEvents": {
-        "fr": "Vous n'avez pas d'évènements prochainement",
-        "en": "You don't have any upcoming events"
+        "fr": "Vous n'avez pas d'évènement prochainement.",
+        "en": "You don't have any upcoming event."
       }
     },
     "welcomeDashboard": {
       "title": {
-        "fr": "Bienvenue sur votre tableau de bord",
-        "en": "Welcome to your dashboard"
+        "fr": "Bienvenue sur votre tableau de bord.",
+        "en": "Welcome to your dashboard."
       },
       "subTitle": {
-        "fr": "Ici vous pouvez suivre l'avancement des PLDs et de leurs DoDs de vos différentes Organisation",
-        "en": "Here you can follow the progress of the PLDs and their DoDs of your different Organizations"
+        "fr": "Ici vous pouvez suivre l'avancement des PLDs et de leurs DoDs de vos différentes organisations.",
+        "en": "Here you can follow the progress of the PLDs and their DoDs of your differents organizations."
       }
     },
     "createOrganization": {
@@ -306,11 +306,11 @@
     },
     "homeCalendarTitle": {
       "fr": "Mes évènements",
-      "en": "Events"
+      "en": "My events"
     },
     "homeOrganizationTitle": {
       "fr": "Mes organizations ",
-      "en": "Organizations"
+      "en": "My Organizations"
     }
   },
   "calendar": {
@@ -331,7 +331,7 @@
       "en": "Day"
     },
     "list": {
-      "fr": "List",
+      "fr": "Liste",
       "en": "List"
     }
   }

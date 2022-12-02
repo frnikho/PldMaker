@@ -3,7 +3,7 @@
     "version": "1.0.3",
     "name": "Génération word",
     "date": "08/10/2022",
-    "contents": "- Ajout de la génération des cartes des livrables\n- Ajout d'un loader lors du chargement de l'utilisateur\n- refonte graphique de la page 'Profile'"
+    "contents": "- Ajout de la génération des cartes des livrables\n- Ajout d'un loader lors du chargement de l'utilisateur\n- Refonte graphique de la page 'Profil'"
   },
   {
     "version": "1.0.2",

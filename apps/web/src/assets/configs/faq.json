@@ -2,27 +2,27 @@
   "data": [
     {
       "title": "Qu'est-ce qu'une Organisation ?",
-      "answers": "Une organisation peut se représenter comme un Workspace commun ou votre groupe d'EIP peut créer, suivre, supprimer des documents, des données pour permettre un suivi plus pousser de votre EIP",
+      "answers": "Une organisation peut se représenter comme un Workspace commun où votre groupe d'EIP peut créer, suivre, supprimer des documents, des données pour permettre un suivi plus poussé de votre EIP.",
       "home": true
     },
     {
-      "title": "Suis-je obligé d'avoir une organisation pour créer un pld ?",
-      "answers": "Oui, pour que le PLD se génère des données de manière automatiquement, il a besoin d'avoir des informations concernant votre organisation",
+      "title": "Suis-je obligé d'avoir une organisation pour créer un PLD ?",
+      "answers": "Oui, pour que le PLD se génère avec des données de manière automatiquement, il a besoin d'avoir des informations concernant votre organisation.",
       "home": true
     },
     {
       "title": "Comment générer un document word de mon PLD ?",
-      "answers": "Pour générer un document word, rendez-vous sur votre PLD et en bas de la page et cliquez sur le bouton 'Télécharger le document'",
+      "answers": "Pour générer un document word, rendez-vous sur votre PLD et en bas de la page et cliquez sur le bouton 'Télécharger le document'.",
       "home": true
     },
     {
       "title": "Comment configurer la génération de mon document word ?",
-      "answers": "Les templates ont été créer dans le but de modifier la génération de votre PLD. Vous pouvez en créer en vous rendant sur votre organisation puis en créer un nouveau template",
+      "answers": "Les templates ont été créer dans le but de modifier la génération de votre PLD. Vous pouvez en créer en vous rendant sur votre organisation puis en créer un nouveau template.",
       "home": true
     },
     {
       "title": "Que faire en cas de bug ?",
-      "answers": "En cas de bug, de problème de parcours ou de traduction, veuillez les remonters a votre administrateur actuel ou bien crée une issue sur le repository officiel du PLD Maker",
+      "answers": "En cas de bug, de problème de parcours ou de traduction, veuillez les remonter à votre administrateur actuel ou bien créez une issue sur le repository officiel du PLD Maker.",
       "home": false
     }
   ]
