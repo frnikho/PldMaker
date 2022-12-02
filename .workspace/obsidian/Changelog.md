@@ -1,4 +1,11 @@
 
+### 1.0.4
+*date: 03/12/2022*
+
+- Rework du dockerfile pour gérer le caching de npm
+- Rework des contexts (passe en fonctionnal components, rajout de fonctions memoized)
+- Avancement sur les personnal calendar (création de rdv)
+
 ### 1.0.3
 
 *date: 31/10/2022*
