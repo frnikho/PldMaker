@@ -15,7 +15,7 @@ import {
   MfaGuard,
   MfaHelper,
   MfaSchema,
-  AlertModule,
+  AlertModule, PersonalCalendarModule
 } from "@pld/business";
 import { MfaService } from "@pld/business";
 import { JwtModule } from "@nestjs/jwt";
@@ -59,6 +59,7 @@ import { BullModule } from "@nestjs/bull";
     GatewayModule,
     DocumentModule,
     AlertModule,
+    PersonalCalendarModule,
     MongooseModule.forFeature([{name: 'Mfa', schema: MfaSchema}]),
   ],
   controllers: [],

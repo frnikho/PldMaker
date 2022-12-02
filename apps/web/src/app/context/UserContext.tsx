@@ -1,13 +1,12 @@
-import React from "react";
-import { Cookies, ReactCookieProps, withCookies } from "react-cookie";
-import api, { ApiError, ErrorType } from "../util/Api";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Favour, LoginBody, LoginToken, RegisterBody, RegisterResponse, User } from "@pld/shared";
-import { AxiosError } from "axios";
+import api, { ApiError, ErrorType } from "../util/Api";
+import { useCookies } from "react-cookie";
 import { UserApiController } from "../controller/UserApiController";
-import { emitBody, SocketContext } from "./SocketContext";
 import { toast } from "react-toastify";
-
-export const ACCESS_TOKEN_COOKIE_NS = 'access_token';
+import { emitBody, SocketContext } from "./SocketContext";
+import { AxiosError } from "axios";
+import * as socketio from "socket.io-client";
 
 export type UserContextProps = {
   init: () => void;
@@ -23,6 +22,10 @@ export type UserContextProps = {
   setAccessToken: (token: string) => void;
   requiredMfa: boolean;
   saveOtpToken: (token: string, callback: (user: User | null, error?: ApiError) => unknown) => void;
+}
+
+export type RequiredUserContextProps = {
+  userContext: UserContextProps
 }
 
 export enum LoginState {
@@ -50,105 +53,55 @@ export const UserContext = React.createContext<UserContextProps>({
   setAccessToken: () => null,
 });
 
-export type UserContextProviderState = UserContextProps
-export type UserContextProviderProps = React.PropsWithChildren<unknown> & ReactCookieProps;
+export default ({children}: React.PropsWithChildren) => {
 
-class UserContextProvider extends React.Component<UserContextProviderProps, UserContextProviderState> {
+  const [accessToken, setAccessToken] = useState<string>('');
+  const [user, setUser] = useState<undefined | User>(undefined);
+  const [isLogged, setLoggedState] = useState(LoginState.loading);
+  const [cookies, setCookie, removeCookie] = useCookies(['access_token']);
+  const [requiredMfa, setMfa] = useState<boolean>(false);
+  const [favours, setFavours] = useState<Favour | undefined>(undefined);
+  const socket = useContext<socketio.Socket>(SocketContext);
 
-  static override contextType = SocketContext;
-  override context!: React.ContextType<typeof SocketContext>;
-
-  constructor(props: UserContextProviderProps) {
-    super(props);
-    this.state = {
-      init: this.init.bind(this),
-      logout: this.logout.bind(this),
-      login: this.login.bind(this),
-      register: this.register.bind(this),
-      isLogged: LoginState.loading,
-      user: undefined,
-      accessToken: '',
-      refreshUser: this.refreshUser.bind(this),
-      refreshFavours: this.refreshFavours.bind(this),
-      saveOtpToken: this.saveOtpToken.bind(this),
-      requiredMfa: false,
-      setAccessToken: this.setToken.bind(this),
-    }
-    this.login = this.login.bind(this);
-    this.register = this.register.bind(this);
-    this.logout = this.logout.bind(this);
-  }
-
-  public init() {
-    if (this.props.cookies !== undefined) {
-      this.loadUserFromCookies(this.props.cookies, (data, error) => {
-        if (data?.user !== undefined && error === undefined) {
-          this.setState({
-            isLogged: LoginState.logged,
-            user: data.user,
-            accessToken: data.accessToken,
-          });
-          this.loadFavour(data.accessToken);
-        } else {
-          this.setState({
-            isLogged: LoginState.not_logged,
-          })
-        }
-      });
-    }
-  }
-
-  public setToken(token: string) {
-    this.setState({
-      accessToken: token
-    })
-  }
-
-  override componentDidMount() {
-    this.init();
-  }
-
-  public refreshFavours() {
-    this.loadFavour();
-  }
-
-  public refreshUser(callback: (user: User | null, error?: ApiError) => void) {
-    UserApiController.getMe(this.state.accessToken, (user, error) => {
+  const refreshUser = (callback: (user: User | null, error?: ApiError) => void) => {
+    UserApiController.getMe(accessToken, (user, error) => {
       if (error) {
         toast(error.message, {type: 'error'});
       } else if (user !== null) {
-        this.setState({
-          user: user,
-        });
+        setUser(user);
         callback(user);
       }
     });
   }
 
-  public loadFavour(accessToken?: string) {
-    UserApiController.getFavour(accessToken ?? this.state.accessToken, (favours, error) => {
+  const loadFavour = useCallback((token?: string) => {
+    UserApiController.getFavour(token ?? accessToken, (favours, error) => {
       if (error) {
         console.log(error);
       }
       if (favours !== null) {
-        this.setState({
-          favours: favours,
-        })
+        setFavours(favours);
       }
     });
-  }
+  }, [accessToken, setFavours]);
 
-  public loadUserFromCookies(cookies: Cookies, callback: (token?: UserToken, error?: string) => void): void {
-    const access_token = cookies.get(ACCESS_TOKEN_COOKIE_NS);
+  const refreshFavours = useCallback(() => {
+    loadFavour();
+  }, [loadFavour]);
+
+  const loadUserFromCookies = useCallback((callback: (token?: UserToken, error?: string) => void): void => {
+    const access_token = cookies.access_token;
     if (access_token !== undefined) {
       const loginBody: LoginToken = {access_token};
       UserApiController.getMe(loginBody.access_token, (user, error) => {
         if (user !== null && error === undefined) {
-          this.context.emit('LoggedUser:New', ...emitBody(loginBody.access_token));
+          socket.emit('LoggedUser:New', ...emitBody(loginBody.access_token));
           return callback({user, accessToken: loginBody.access_token});
         } else {
           if (error?.message === 'MFA_OTP_REQUIRED') {
-            this.setState({isLogged: LoginState.not_logged, accessToken: access_token, requiredMfa: true});
+            setLoggedState(LoginState.not_logged);
+            setAccessToken(accessToken);
+            setMfa(true);
           }
           callback(undefined, 'abc');
         }
@@ -156,119 +109,107 @@ class UserContextProvider extends React.Component<UserContextProviderProps, User
     } else {
       return callback(undefined, 'no cookies !');
     }
-  }
+  }, [accessToken, cookies.access_token, socket]);
 
-  public saveTokenFromCookies(accessToken: string, cookies: Cookies): void {
-    cookies.set(ACCESS_TOKEN_COOKIE_NS, accessToken, {path: '/'});
-  }
+  const saveTokenFromCookies = useCallback((accessToken: string): void => {
+      setCookie('access_token', accessToken, {path: '/'});
+    }
+    , [setCookie]);
 
-  public clearTokenFromCookies(cookies: Cookies): void {
-    cookies.remove(ACCESS_TOKEN_COOKIE_NS, {path: '/'});
-  }
+  const clearTokenFromCookies = useCallback(() => {
+    removeCookie('access_token');
+  }, [removeCookie]);
 
-  public logout() {
-    if (this.props.cookies === undefined)
-      return;
-    this.clearTokenFromCookies(this.props.cookies);
-    this.setState({
-      user: undefined,
-      isLogged: LoginState.not_logged,
-    });
-  }
+  const logout = useCallback(() => {
+      clearTokenFromCookies();
+      setUser(undefined);
+      setLoggedState(LoginState.not_logged);
+    }
+    , [clearTokenFromCookies, setUser, setLoggedState]);
 
-  public saveOtpToken(token: string, callback: (user: User | null, error?: ApiError) => unknown) {
-    if (!this.props.cookies)
-      return;
+  const saveOtpToken = (token: string, callback: (user: User | null, error?: ApiError) => unknown) => {
     UserApiController.getMe(token, (user, error) => {
-      if (user !== null && error === undefined && this.props?.cookies !== undefined) {
-        this.saveTokenFromCookies(token, this.props.cookies);
-        this.setState({
-          user: user,
-          accessToken: token,
-          isLogged: LoginState.logged
-        })
-        this.context.emit('LoggedUser:New', ...emitBody(token));
+      if (user !== null && error === undefined) {
+        saveTokenFromCookies(token);
+        setUser(user);
+        setAccessToken(accessToken);
+        setLoggedState(LoginState.logged);
+        socket.emit('LoggedUser:New', ...emitBody(token));
         return callback(user);
       } else {
-        this.saveTokenFromCookies(token, this.props.cookies!);
-        this.setState({
-          accessToken: token,
-          isLogged: LoginState.logged
-        })
+        saveTokenFromCookies(token);
+        setAccessToken(token);
+        setLoggedState(LoginState.logged);
         return callback(null, {type:ErrorType.MFA_OTP_REQUIRED, message: ['Mfa otp login required !']});
       }
     });
   }
 
-  public login(loginBody: LoginBody, callback: (user: User | null, error?: ApiError) => unknown): void {
-    if (this.props.cookies === undefined) {
-      // TODO check error
-      console.log("error cookies")
-      callback(null);
-      return;
-    }
-    api.post<LoginToken>(`auth/login`, loginBody).then((response) => {
-      if (response.data !== undefined) {
-        UserApiController.getMe(response.data.access_token, (user, error) => {
-          if (user !== null && error === undefined && this.props?.cookies !== undefined) {
-            this.saveTokenFromCookies(response.data.access_token, this.props.cookies);
-            this.setState({
-              user: user,
-              accessToken: response.data.access_token,
-              isLogged: LoginState.logged
-            })
-            this.context.emit('LoggedUser:New', ...emitBody(response.data.access_token));
-            return callback(user);
-          } else {
-            this.saveTokenFromCookies(response.data.access_token, this.props.cookies!);
-            this.setState({
-              accessToken: response.data.access_token,
-              isLogged: LoginState.not_logged
-            })
-            return callback(null, {type:ErrorType.MFA_OTP_REQUIRED, message: ['Mfa otp login required !']});
-          }
-        });
-      } else {
-        console.log("Response is undefined ");
-      }
-    }).catch((err: AxiosError<ApiError>) => {
-      if (err?.response?.data !== undefined) {
-        callback(null, err?.response?.data);
-      } else {
-        console.log("Error Axios", err);
-        toast.error('Une erreur réseaux est survenue !', {icon: '🌐'});
-      }
-    });
-  }
-
-  public register(registerBody: RegisterBody, callback: (user: User | null , error?: ApiError) => unknown): void {
-    api.post<RegisterResponse>(`auth/register`, registerBody).then((response) => {
-      if (this.props.cookies !== undefined)
-        this.saveTokenFromCookies(response.data.accessToken, this.props.cookies);
-      this.setState({
-        isLogged: LoginState.logged,
-        user: response.data.user,
-        accessToken: response.data.accessToken
+  const login = useCallback((loginBody: LoginBody, callback: (user: User | null, error?: ApiError) => unknown): void => {
+      api.post<LoginToken>(`auth/login`, loginBody).then((response) => {
+        if (response.data !== undefined) {
+          UserApiController.getMe(response.data.access_token, (user, error) => {
+            if (user !== null && error === undefined) {
+              saveTokenFromCookies(response.data.access_token);
+              setUser(user);
+              setAccessToken(response.data.access_token);
+              setLoggedState(LoginState.logged);
+              socket.emit('LoggedUser:New', ...emitBody(response.data.access_token));
+              return callback(user);
+            } else {
+              saveTokenFromCookies(response.data.access_token);
+              setAccessToken(response.data.access_token);
+              setLoggedState(LoginState.not_logged);
+              return callback(null, {type:ErrorType.MFA_OTP_REQUIRED, message: ['Mfa otp login required !']});
+            }
+          });
+        } else {
+          console.log("Response is undefined ");
+        }
+      }).catch((err: AxiosError<ApiError>) => {
+        if (err?.response?.data !== undefined) {
+          callback(null, err?.response?.data);
+        } else {
+          console.log("Error Axios", err);
+          toast.error('Une erreur réseaux est survenue !', {icon: '🌐'});
+        }
       });
+    }
+    , [socket, saveTokenFromCookies])
+
+  const register = useCallback((registerBody: RegisterBody, callback: (user: User | null , error?: ApiError) => unknown) => {
+    api.post<RegisterResponse>(`auth/register`, registerBody).then((response) => {
+      saveTokenFromCookies(response.data.accessToken);
+      setUser(response.data.user);
+      setLoggedState(LoginState.logged);
+      setAccessToken(response.data.accessToken);
       return callback(response.data.user);
     }).catch((error: AxiosError<ApiError>) => {
       if (error?.response?.data !== undefined)
         return callback(null, error?.response?.data);
     });
-  }
+  }, [saveTokenFromCookies]);
 
+  const init = useCallback(() => {
+    loadUserFromCookies((data, error) => {
+      if (data?.user !== undefined && error === undefined) {
+        setUser(data.user);
+        setAccessToken(data.accessToken);
+        setLoggedState(LoginState.logged);
+        loadFavour(data.accessToken);
+      } else {
+        setLoggedState(LoginState.not_logged);
+      }
+    });
+  }, [loadFavour, loadUserFromCookies]);
 
-  override render() {
-    return (
-      <UserContext.Provider value={{...this.state}}>
-        {this.props.children}
-      </UserContext.Provider>
-    );
-  }
-}
+  useEffect(() => {
+    init();
+  }, [init]);
 
-export type RequiredUserContextProps = {
-  userContext: UserContextProps
-}
-
-export default withCookies(UserContextProvider);
+  return (
+    <UserContext.Provider value={{refreshUser, refreshFavours, register, login, logout, setAccessToken, saveOtpToken, init, user, accessToken, isLogged, requiredMfa, favours}}>
+      {children}
+    </UserContext.Provider>
+  );
+};

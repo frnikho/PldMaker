@@ -32,3 +32,11 @@ export class PersonalCalendar {
     this.updatedDate = updatedDate;
   }
 }
+
+export class SavePersonalCalendar {
+  events: Event[];
+
+  constructor(events: Event[]) {
+    this.events = events;
+  }
+}

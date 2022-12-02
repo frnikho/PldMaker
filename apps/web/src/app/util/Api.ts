@@ -9,7 +9,6 @@ export default axios.create({
     headers: {
         'App-Language': LANGUAGE
     }
-
 });
 
 export const authorize = (accessToken: string) => {

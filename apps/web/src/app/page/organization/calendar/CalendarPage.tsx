@@ -61,7 +61,7 @@ export class CalendarPage extends React.Component<CalendarPageProps, CalendarPag
       if (this.state.calendar.value === undefined) {
         this.load(authContext)
       }
-      return <CalendarComponent calendarId={this.props.params['calendarId'] ?? ''} orgId={this.props.params['id'] ?? ''} userContext={authContext} calendar={this.state.calendar} org={this.state.org}/>
+      return <CalendarComponent calendarId={this.props.params['calendarId'] ?? ''} orgId={this.props.params['id'] ?? ''} calendar={this.state.calendar} org={this.state.org}/>
     } else if (authContext.isLogged === LoginState.not_logged) {
       return (<h3>Not logged !</h3>)
     } else {

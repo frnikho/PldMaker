@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import io from 'socket.io-client';
 import * as socketio from 'socket.io-client';
 import {WsPayload} from "@pld/shared";
@@ -20,37 +20,31 @@ export const authoriseWs = (accessToken: string): WsPayload => {
   }
 }
 
-export class SocketContextProvider extends React.Component<React.PropsWithChildren<unknown>, unknown> {
+export const SocketContextProvider = ({children}: React.PropsWithChildren) => {
 
-  private readonly socket: socketio.Socket;
+  const [socketV] = useState<socketio.Socket>(socket);
 
-  constructor(props) {
-    super(props);
-    this.socket = socket;
-
-    this.socket.on('connect_error', (error) => {
+  useEffect(() => {
+    socketV.on('connect_error', (error) => {
       console.log(error);
     });
-
-    this.socket.on('disconnect', (a) => {
+    socketV.on('disconnect', (a) => {
       if (a === 'transport close') {
         toast('Connexion perdu 😶', {type: 'error'});
       }
     });
-
-    this.socket.on('exception', (error) => {
+    socketV.on('exception', (error) => {
       console.log(error);
       toast(`Socket exception: ${error.message}`, {type: 'error'})
     });
-  }
+    return () => {
+      socketV.disconnect();
+    };
+  }, [])
 
-
-  override render() {
-    return (
-      <SocketContext.Provider value={this.socket}>
-        {this.props.children}
-      </SocketContext.Provider>
-    );
-  }
-
-}
+  return (
+    <SocketContext.Provider value={socketV}>
+      {children}
+    </SocketContext.Provider>
+  );
+};

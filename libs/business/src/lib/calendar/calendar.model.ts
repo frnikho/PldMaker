@@ -1,6 +1,5 @@
 import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Event, User } from "@pld/shared";
-import { SchemaDefinition } from "mongoose";
 
 @Schema({versionKey: false, collection: 'personalCalendar'})
 export class PersonalCalendar {

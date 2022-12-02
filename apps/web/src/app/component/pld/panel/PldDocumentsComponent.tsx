@@ -8,9 +8,7 @@ export const PldDocumentsComponent = () => {
     <Tile style={TileStyle.default}>
       <h2 style={{fontWeight: 500}}>Documents</h2>
       <p>Pour le moment, les documents ne sont pas encore disponibles.</p>
-      <Lottie>
-        <Lottie animationData={require('../../../../assets/animations/wip.json')} loop={true} style={{width: '200px'}}/>
-      </Lottie>
+      <Lottie animationData={require('../../../../assets/animations/wip.json')} loop={true} style={{width: '200px'}}/>
     </Tile>
   );
 };

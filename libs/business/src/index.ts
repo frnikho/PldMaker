@@ -23,6 +23,12 @@ export * from './lib/organization/organization.schema';
 export * from './lib/pld/pld.schema';
 export * from './lib/organization/calendar/calendar.model';
 
+export * from './lib/calendar/calendar.module';
+export * from './lib/calendar/calendar.controller';
+export * from './lib/calendar/calendar.model';
+export * from './lib/calendar/calendar.service';
+export * from './lib/calendar/calendar.helper';
+
 export * from './lib/alert/alert.module';
 
 export * from './lib/mail/mail.helper';
