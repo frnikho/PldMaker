@@ -4,7 +4,6 @@
     "name": "Rework des contexts et maj docker",
     "date": "03/12/2022",
     "contents": "- Rework du dockerfile pour gérer le caching de npm\n- Rework des contexts (passe en fonctionnal components, rajout de fonctions memoized)\n- Avancement sur les personnal calendar (création de rdv)"
-
   },
   {
     "version": "1.0.3",
