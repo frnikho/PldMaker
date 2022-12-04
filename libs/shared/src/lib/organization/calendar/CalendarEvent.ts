@@ -61,3 +61,17 @@ export class NewCalendarEvent {
     this.deadline = deadline;
   }
 }
+
+export class EventUpdateBody {
+  title?: string;
+  description?: string;
+  color?: string;
+  deadline?: Deadline;
+
+  constructor(title: string, description: string, color: string, deadline: Deadline) {
+    this.title = title;
+    this.description = description;
+    this.color = color;
+    this.deadline = deadline;
+  }
+}

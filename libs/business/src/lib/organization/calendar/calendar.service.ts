@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import {CalendarHelper} from "./calendar.helper";
-import { NewCalendarBody, NewCalendarEvent, Organization, User } from "@pld/shared";
+import { CalendarEvent, Calendar, NewCalendarBody, NewCalendarEvent, Organization, EventUpdateMemberStatusBody, User, EventManageMemberBody, EventUpdateBody } from "@pld/shared";
 import {InjectModel} from "@nestjs/mongoose";
 import {Model} from "mongoose";
-import {Calendar} from "./calendar.model";
 import { CheckOrgPerm } from "../organization.util";
 
 @Injectable()
@@ -29,6 +28,11 @@ export class CalendarService {
   }
 
   @CheckOrgPerm()
+  public deleteCalendar(user: User, org: Organization, calendar: Calendar) {
+    return this.calendarHelper.deleteCalendar(user, org, calendar);
+  }
+
+  @CheckOrgPerm()
   public createEvent(user: User, org: Organization, calendar: Calendar, body: NewCalendarEvent) {
     return this.calendarHelper.createEvent(user, org, calendar, body);
   }
@@ -41,6 +45,31 @@ export class CalendarService {
   @CheckOrgPerm()
   public getEvent(user: User, org: Organization, calendar: Calendar, event: string) {
     return this.calendarHelper.getEvent(user, org, calendar, event);
+  }
+
+  @CheckOrgPerm()
+  public updateMemberStatus(user: User, org: Organization, calendar: Calendar, event: CalendarEvent, body: EventUpdateMemberStatusBody) {
+    return this.calendarHelper.updateMemberStatus(user, org, calendar, event, body);
+  }
+
+  @CheckOrgPerm()
+  public inviteMember(user: User, org: Organization, calendar: Calendar, event: CalendarEvent, body: EventManageMemberBody) {
+    return this.calendarHelper.inviteMember(user, org, calendar, event, body);
+  }
+
+  @CheckOrgPerm()
+  public revokeMember(user: User, org: Organization, calendar: Calendar, event: CalendarEvent, body: EventManageMemberBody) {
+    return this.calendarHelper.revokeMember(user, org, calendar, event, body);
+  }
+
+  @CheckOrgPerm()
+  public updateEvent(user: User, org: Organization, calendar: Calendar, event: CalendarEvent, body: EventUpdateBody) {
+    return this.calendarHelper.updateEvent(user, org, calendar, event, body);
+  }
+
+  @CheckOrgPerm()
+  public deleteEvent(user: User, org: Organization, calendar: Calendar, event: CalendarEvent) {
+    return this.calendarHelper.deleteEvent(user, org, calendar, event);
   }
 
   public getAllEvents(user: User) {

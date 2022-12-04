@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Calendar, Organization, Pld, Template } from "@pld/shared";
+import { useCallback, useMemo, useState } from "react";
+import { Calendar, CalendarEvent, Organization, Pld, Template } from "@pld/shared";
 
 export function useMaker() {
 
@@ -7,16 +7,19 @@ export function useMaker() {
   const [plds, setPlds] = useState<Pld[]>([]);
   const [calendars, setCalendars] = useState<Calendar[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
 
-  const org = orgs[0];
-  const pld = plds[0];
-  const calendar = calendars[0];
-  const template = templates[0];
+  const org = useMemo(() => orgs[0], [orgs]);
+  const pld = useMemo(() => plds[0], [plds]);
+  const calendar = useMemo(() => calendars[0], [calendars]);
+  const template = useMemo(() => templates[0], [templates]);
+  const event = useMemo(() => events[0], [events]);
 
-  const setOrg = (org: Organization) => setOrgs([org]);
-  const setPld = (pld: Pld) => setPlds([pld]);
-  const setCalendar = (calendar: Calendar) => setCalendars([calendar]);
-  const setTemplate = (template: Template) => setTemplates([template]);
+  const setOrg = useCallback((org: Organization) => setOrgs([org]), []);
+  const setPld = useCallback((pld: Pld) => setPlds([pld]), []);
+  const setCalendar = useCallback((calendar: Calendar) => setCalendars([calendar]), []);
+  const setTemplate = useCallback((template: Template) => setTemplates([template]), []);
+  const setEvent = useCallback((event: CalendarEvent) => setEvents([event]), []);
 
   return {
     org,
@@ -27,6 +30,8 @@ export function useMaker() {
     calendars,
     template,
     templates,
+    event,
+    events,
     setOrg,
     setOrgs,
     setPld,
@@ -35,6 +40,8 @@ export function useMaker() {
     setCalendars,
     setTemplate,
     setTemplates,
+    setEvent,
+    setEvents,
   }
 
 }

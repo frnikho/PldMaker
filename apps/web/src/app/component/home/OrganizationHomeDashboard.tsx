@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 import {
   Button, ClickableTile, Column, DataTableSkeleton, Grid,
@@ -28,27 +28,27 @@ export const OrganizationHomeDashboard = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const init = useCallback(() => {
+      OrganizationApiController.getMeOrganizations(accessToken, (orgs, error) => {
+        if (!error) {
+          setOrgs(orgs);
+          setLoading(false);
+        } else {
+          //TODO check error
+        }
+      });
+      UserApiController.getEvents(accessToken, (event, error) => {
+        if (!error) {
+          setEvents(event);
+        } else {
+          //TODO check error
+        }
+      });
+    }, [accessToken]);
+
   useEffect(() => {
     init();
-  }, []);
-
-  const init = () => {
-    OrganizationApiController.getMeOrganizations(accessToken, (orgs, error) => {
-      if (!error) {
-        setOrgs(orgs);
-        setLoading(false);
-      } else {
-        //TODO check error
-      }
-    });
-    UserApiController.getEvents(accessToken, (event, error) => {
-      if (!error) {
-        setEvents(event);
-      } else {
-        //TODO check error
-      }
-    });
-  }
+  }, [init]);
 
   const onClickCreateOrganization = () => {
     navigate('organization/new');
@@ -83,7 +83,7 @@ export const OrganizationHomeDashboard = () => {
               <p style={style.cardTitle}>{org.name}</p>
               <p style={style.cardDescription}>{org.description.substring(0, 120)} {org.description.length > 120 ? '...' : ''}</p>
               <div style={style.cardImageContainer as any}>
-                <img style={style.cardImage} src={org.picture} alt={"Organization Picture"}/>
+                <img style={style.cardImage} src={org.picture} alt={"Organization"}/>
               </div>
               <p>{translate('lexical.lastUpdateDate')} <br/><span style={{fontWeight: 600}}>{formatShortDate(new Date(org.updated_date))}</span></p>
             </ClickableTile>
@@ -97,6 +97,8 @@ export const OrganizationHomeDashboard = () => {
     const event: CalendarEvent | undefined = events.find((evt) => evt._id === eventArg.event.id);
     if (event === undefined)
       return;
+    console.log(event);
+    navigate(`/organization/${event.calendar.org._id}/calendar/${event.calendar._id}/event/${event._id}`);
   }
 
   const showRecap = () => {

@@ -6,7 +6,7 @@ export function useAuth() {
 
   const userCtx = useContext<UserContextProps>(UserContext);
   const [token, setToken] = useState<string | undefined>(undefined);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     const token = searchParams.get('token');

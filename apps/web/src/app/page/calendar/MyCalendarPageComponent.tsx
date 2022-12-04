@@ -3,35 +3,33 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import momentTimezonePlugin from '@fullcalendar/moment-timezone';
 import interactionPlugin, { EventResizeDoneArg } from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { uniqueId } from "docx";
 import { EventDropArg } from "@fullcalendar/core";
 import { useAuth } from "../../hook/useAuth";
-import { RadioTile, Select, TileGroup, SelectItem, Button } from "carbon-components-react";
-import { timezones } from "@pld/shared";
+import { RadioTile, Select, TileGroup, SelectItem, Button, ButtonSet } from "carbon-components-react";
+import { EventType, timezones } from "@pld/shared";
 import { useStorage } from "../../hook/useStorage";
 import { ButtonStyle } from "@pld/ui";
 
-import {Save} from '@carbon/icons-react';
+import {Save, Replicate} from '@carbon/icons-react';
 
 import {Stack} from '@carbon/react';
-
-enum SlotType {
-  Available = 'Disponible',
-  Busy = 'Occupé',
-}
+import { PersonalCalendarApiController } from "../../controller/PersonalCalendarApiController";
+import { errorToast, successToast } from "../../manager/ToastManager";
+import { LoadingButton } from "../../component/utils/LoadingButton";
 
 type Slot = {
   id: string;
   start: Date;
   end: Date;
-  type: SlotType,
+  type: EventType,
 };
 
 type Form = {
   slots: Slot[];
-  selectedType: SlotType;
+  selectedType: EventType;
   timezone: string;
   options: {
     showTitle: boolean;
@@ -41,7 +39,7 @@ type Form = {
 }
 
 type AvailableSlotType = {
-  type: SlotType;
+  type: EventType;
   color: string;
 }
 
@@ -56,41 +54,49 @@ type MyCalendarPreferences = {
 const AvailableSlotsType: AvailableSlotType[] = [
   {
     color: '#2ecc71',
-    type: SlotType.Available,
+    type: EventType.Available,
   },
   {
     color: '#797979',
-    type: SlotType.Busy,
+    type: EventType.Busy,
   }
 ]
 
 export const MyCalendarPageComponent = () => {
 
-  const {user} = useAuth();
+  const {accessToken} = useAuth();
+  const calendar = useRef<FullCalendar | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const {setItem, getItem} = useStorage<MyCalendarPreferences>();
-  const {getValues, setValue, watch} = useForm<Form>({defaultValues: {slots: [], selectedType: SlotType.Available, timezone: 'Europe/Paris'}});
+  const {getValues, setValue, watch} = useForm<Form>({defaultValues: {slots: [], selectedType: EventType.Available, timezone: 'Europe/Paris'}});
+
+  const getEvents = useCallback(() => {
+    PersonalCalendarApiController.getCalendar(accessToken, (calendar) => {
+      if (calendar?.events) {
+        setValue('slots', calendar?.events);
+      }
+      setLoading(false);
+    });
+  }, [accessToken, setValue]);
 
   useEffect(() => {
     const timezone = getItem('timezone');
-    const slots = getItem<Slot[]>('slots');
     if (timezone === null) {
       setItem('timezone', getValues('timezone'));
     } else {
       setValue('timezone', timezone);
     }
-    if (slots !== null) {
-      setValue('slots', slots);
-    }
-  }, []);
+    getEvents();
+  }, [getItem, setItem, getValues, setValue, getEvents]);
 
-  const init = () => {
+/*  const init = () => {
     const timezone = getItem('timezone');
     if (timezone === null) {
       setItem('timezone', getValues('timezone'));
     } else {
       setValue('timezone', timezone);
     }
-  }
+  }*/
 
   const onSelectSlot = (event: DateSelectArg) => {
     const array = getValues('slots');
@@ -138,7 +144,7 @@ export const MyCalendarPageComponent = () => {
 
   const events = (): EventInput[] => {
     return watch('slots').map((slot) => {
-      const type = AvailableSlotsType.find((a) => slot.type === a.type || slot.type === SlotType[a.type]);
+      const type = AvailableSlotsType.find((a) => slot.type === a.type || slot.type === EventType[a.type]);
       return {
         color: type?.color,
         backgroundColor: type?.color,
@@ -154,7 +160,21 @@ export const MyCalendarPageComponent = () => {
     setItem('timezone', event.currentTarget.value);
   }
 
-  const onCreate = () => {
+  const onSave = () => {
+    setLoading(true);
+    PersonalCalendarApiController.saveCalendar(accessToken, {events: getValues('slots')}, (calendar, error) => {
+      if (error) {
+        errorToast('Une erreur est survenue !');
+      } else {
+        successToast('Vos disponibilités ont été enregistré');
+      }
+      setLoading(false);
+    });
+  }
+
+  const onDuplicate = () => {
+    console.log(calendar.current?.getApi().view.currentStart);
+    console.log(calendar.current?.getApi().view.currentEnd);
   }
 
   return (
@@ -171,8 +191,8 @@ export const MyCalendarPageComponent = () => {
         defaultSelected="default-selected"
         valueSelected={watch('selectedType')}
         name="radio tile group"
-        onChange={(value, name, event) => {
-          setValue('selectedType', value as SlotType);
+        onChange={(value) => {
+          setValue('selectedType', value as EventType);
         }}>
         {AvailableSlotsType.map((type, index) => {
           return (
@@ -194,6 +214,7 @@ export const MyCalendarPageComponent = () => {
         })}
       </TileGroup>
       <FullCalendar
+        ref={calendar}
         firstDay={1}
         allDaySlot={false}
         businessHours={{
@@ -220,10 +241,13 @@ export const MyCalendarPageComponent = () => {
         slotEventOverlap={false}
         nowIndicator={true}
         locale={'fr'}
-        plugins={[ dayGridPlugin, momentTimezonePlugin, timeGridPlugin, interactionPlugin, ]}
+        plugins={[dayGridPlugin, momentTimezonePlugin, timeGridPlugin, interactionPlugin]}
         initialView="timeGridWeek"
       />
-      <Button style={ButtonStyle.default} onClick={onCreate} renderIcon={Save}>Sauvegarder</Button>
+      <ButtonSet style={{gap: 10}}>
+        <LoadingButton loading={loading} style={ButtonStyle.default} onClick={onSave} renderIcon={Save}>Sauvegarder</LoadingButton>
+        <Button disabled style={ButtonStyle.default} renderIcon={Replicate} onClick={onDuplicate}>Dupliquer la semaine actuel</Button>
+      </ButtonSet>
     </Stack>
   );
 };

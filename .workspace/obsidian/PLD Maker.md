@@ -1,11 +1,12 @@
 ### To Do:
 
-- [ ] Système de planification de réu (voir réu w/ Victor le 17/10 à 18h30)
+- [x] Système de planification de réu (voir réu w/ Victor le 17/10 à 18h30)
 - [ ] Rework de tout les composants pour passer en function component
     - [x] Modals
     - [ ] Page
     - [ ] Components
     - [ ] Utils
+    - [x] Contexts
 - [x] Test de la génération des documents word sur Windows et MacOS
     - [x] Microsoft word sous windows
     - [x] Microsoft word sous MacOS
@@ -21,7 +22,7 @@
 - [ ] rework du système de domaine
 - [ ] Ajout de l'effet shimmer lors du chargement des données sur le front
 - [ ] ajout de + de placeholder, ajouter aussi des wrappers de style (bold, italic...)
-- [ ] créer un système de changelog
+- [x] créer un système de changelog
  
 ---
 

@@ -10,7 +10,7 @@ export class CalendarController {
   constructor(private calendarService: CalendarService) {
   }
 
-  @Put('save')
+  @Put()
   public saveCalendar(@Request() req, @Body() body: SavePersonalCalendar) {
     return this.calendarService.saveCalendar(req.user, body);
   }

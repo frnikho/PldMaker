@@ -1,4 +1,4 @@
-import {Calendar, CalendarEvent, NewCalendarBody, NewCalendarEvent} from "@pld/shared";
+import { Calendar, CalendarEvent, NewCalendarBody, NewCalendarEvent, EventUpdateMemberStatusBody, EventManageMemberBody, EventUpdateBody } from "@pld/shared";
 import api, {ApiError, authorize} from "../util/Api";
 
 export type CallbackCalendar = (calendar: Calendar | null, error?: ApiError) => void;
@@ -57,4 +57,53 @@ export class CalendarApiController {
       return callback(null, err);
     });
   }
+
+  public static updateMembersStatus(accessToken: string, orgId: string, calendarId: string, eventId: string, body: EventUpdateMemberStatusBody, callback: CallbackEvent) {
+    api.patch<CalendarEvent>(`organization/${orgId}/calendar/${calendarId}/event/${eventId}/member`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: ApiError) => {
+      return callback(null, err);
+    });
+  }
+
+  public static inviteMembersStatus(accessToken: string, orgId: string, calendarId: string, eventId: string, body: EventManageMemberBody, callback: CallbackEvent) {
+    api.post<CalendarEvent>(`organization/${orgId}/calendar/${calendarId}/event/${eventId}/member/add`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: ApiError) => {
+      return callback(null, err);
+    });
+  }
+
+  public static revokeMembersStatus(accessToken: string, orgId: string, calendarId: string, eventId: string, body: EventManageMemberBody, callback: CallbackEvent) {
+    api.post<CalendarEvent>(`organization/${orgId}/calendar/${calendarId}/event/${eventId}/member/revoke`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: ApiError) => {
+      return callback(null, err);
+    });
+  }
+
+  public static update(accessToken: string, orgId: string, calendarId: string, eventId: string, body: EventUpdateBody, callback: CallbackEvent) {
+    api.patch<CalendarEvent>(`organization/${orgId}/calendar/${calendarId}/event/${eventId}`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: ApiError) => {
+      return callback(null, err);
+    });
+  }
+
+  public static deleteEvent(accessToken: string, orgId: string, calendarId: string, eventId: string, callback: CallbackEvent) {
+    api.delete<CalendarEvent>(`organization/${orgId}/calendar/${calendarId}/event/${eventId}`, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: ApiError) => {
+      return callback(null, err);
+    });
+  }
+
+  public static deleteCalendar(accessToken: string, orgId: string, calendarId: string, callback: CallbackCalendar) {
+    api.delete<Calendar>(`organization/${orgId}/calendar/${calendarId}/`, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: ApiError) => {
+      return callback(null, err);
+    });
+  }
+
 }

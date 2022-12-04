@@ -1,8 +1,7 @@
 import {Body, Controller, Delete, Get, Param, Patch, Post, Request} from '@nestjs/common';
-import {NewCalendarBody, NewCalendarEvent, Organization} from "@pld/shared";
+import { CalendarEvent, Calendar, NewCalendarBody, NewCalendarEvent, Organization, EventUpdateMemberStatusBody, EventManageMemberBody, EventUpdateBody } from "@pld/shared";
 import {CalendarService} from "./calendar.service";
-import {CalendarPipe} from "./calendar.pipe";
-import {Calendar} from "./calendar.model";
+import { CalendarEventPipe, CalendarPipe } from "./calendar.pipe";
 import { OrganizationPipe } from "../organization.pipe";
 
 /**
@@ -41,14 +40,39 @@ export class CalendarController {
     return this.calendarService.createCalendar(req.user, org, body);
   }
 
-  @Patch(':calendarId/update')
-  public async updateCalendar() {
-
+  @Patch(':calendarId/event/:eventId/member')
+  public async updateMemberStatus(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId', CalendarPipe) calendar: Calendar, @Param('eventId', CalendarEventPipe) event: CalendarEvent, @Body() body: EventUpdateMemberStatusBody) {
+    return this.calendarService.updateMemberStatus(req.user, org, calendar, event, body);
   }
 
-  @Delete(':calendarId/delete')
-  public async deleteCalendar() {
+  @Post(':calendarId/event/:eventId/member/add')
+  public async inviteMemberStatus(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId', CalendarPipe) calendar: Calendar, @Param('eventId', CalendarEventPipe) event: CalendarEvent, @Body() body: EventManageMemberBody) {
+    return this.calendarService.inviteMember(req.user, org, calendar, event, body);
+  }
 
+  @Post(':calendarId/event/:eventId/member/revoke')
+  public async revokeMemberStatus(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId', CalendarPipe) calendar: Calendar, @Param('eventId', CalendarEventPipe) event: CalendarEvent, @Body() body: EventManageMemberBody) {
+    return this.calendarService.revokeMember(req.user, org, calendar, event, body);
+  }
+
+  @Delete(':calendarId/event/:eventId')
+  public async deleteEvent(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId', CalendarPipe) calendar: Calendar, @Param('eventId', CalendarEventPipe) event: CalendarEvent) {
+    return this.calendarService.deleteEvent(req.user, org, calendar, event);
+  }
+
+  @Patch(':calendarId/event/:eventId')
+  public async updateEvent(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId', CalendarPipe) calendar: Calendar, @Param('eventId', CalendarEventPipe) event: CalendarEvent, @Body() body: EventUpdateBody) {
+    return this.calendarService.updateEvent(req.user, org, calendar, event, body);
+  }
+
+  @Patch(':calendarId/update')
+  public async updateCalendar() {
+    //TODO
+  }
+
+  @Delete(':calendarId')
+  public async deleteCalendar(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId', CalendarPipe) calendar: Calendar) {
+    return this.calendarService.deleteCalendar(req.user, org, calendar);
   }
 
   @Get()
@@ -61,6 +85,5 @@ export class CalendarController {
   public async getCalendar(@Request() req,  @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId') calendarId: string) {
     return this.calendarService.getCalendar(req.user, org, calendarId);
   }
-
 
 }

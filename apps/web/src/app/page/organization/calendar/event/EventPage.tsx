@@ -17,7 +17,7 @@ export class EventPage extends React.Component<EventPageProps, EventPageState> {
 
   private showState(userContext: UserContextProps) {
     if (userContext.isLogged === LoginState.logged) {
-      return <EventComponent orgId={this.props.params['id'] ?? ''} eventId={this.props.params['eventId'] ?? ''} calendarId={this.props.params['calendarId'] ?? ''} userContext={userContext}/>
+      return <EventComponent orgId={this.props.params['id'] ?? ''} eventId={this.props.params['eventId'] ?? ''} calendarId={this.props.params['calendarId'] ?? ''}/>
     } else if (userContext.isLogged === LoginState.not_logged) {
       return <h3>Not logged</h3>
     } else {

@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {Calendar, CalendarEvent, Organization} from "@pld/shared";
 import {Data} from "../../../util/FieldData";
-import FullCalendar, {DateSelectArg, EventClickArg} from "@fullcalendar/react";
+import FullCalendar, {EventClickArg} from "@fullcalendar/react";
 import timeGridPlugin from '@fullcalendar/timegrid';
 import dayGridPlugin from "@fullcalendar/daygrid";
 import listGridPlugin from '@fullcalendar/list';
-import interactionPlugin, {DateClickArg} from "@fullcalendar/interaction";
-import { Breadcrumb, BreadcrumbItem, Button, ButtonSet, Tile } from "carbon-components-react";
+import interactionPlugin from "@fullcalendar/interaction";
+import { Breadcrumb, BreadcrumbItem, Button, ButtonSet } from "carbon-components-react";
 
-import {TrashCan} from '@carbon/icons-react';
+import {TrashCan, CalendarAdd, Edit} from '@carbon/icons-react';
 
 import {Stack} from '@carbon/react';
 import {CalendarApiController} from "../../../controller/CalendarApiController";
@@ -16,7 +16,11 @@ import { useNavigate } from "react-router-dom";
 import {parseEvents} from "../../../util/Event";
 import { useAuth } from "../../../hook/useAuth";
 import { useModals } from "../../../hook/useModals";
-import { CreateEventModal } from "../../../modal/org/calendar/CreateEventModal";
+import { SelectSlotModal } from "../../../modal/org/calendar/event/SelectSlotModal";
+import { CreateMeetupModal } from "../../../modal/org/calendar/event/CreateMeetupModal";
+import { useLanguage } from "../../../hook/useLanguage";
+import { DeleteCalendarModal } from "../../../modal/org/calendar/DeleteCalendarModal";
+import { successToast } from "../../../manager/ToastManager";
 
 type Props = {
   calendarId: string;
@@ -25,64 +29,54 @@ type Props = {
   org: Data<Organization>;
 };
 
+type Modal = {
+  selectSlot: boolean;
+  meetup: boolean;
+  updateCalendar: boolean;
+  deleteCalendar: boolean;
+}
+
 export const CalendarComponent = (props: Props) => {
 
   const navigate = useNavigate();
   const userCtx = useAuth();
-  const {newEvent, updateModals} = useModals({newEvent: false});
+  const {getCurrentLanguage} = useLanguage();
+  const {meetup, selectSlot, deleteCalendar, updateModals, updateAllModals} = useModals<Modal>({selectSlot: false, meetup: false, updateCalendar: false, deleteCalendar: false});
+  const [selectedSlotDate, setSelectedSlotDate] = useState<Date | undefined>(undefined);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [select, setSelect] = useState<DateSelectArg | undefined>(undefined);
-  const [selectDate, setSelectDate] = useState<undefined | Date>(undefined);
+
+  const loadEvents = useCallback(() => {
+      CalendarApiController.getEvents(userCtx.accessToken, props.orgId, props.calendarId, (events, error) => {
+        if (error) {
+          console.log(error);
+        } else {
+          setEvents(events);
+        }
+      });
+    }, [userCtx.accessToken, props.orgId, props.calendarId]);
 
   useEffect(() => {
-    CalendarApiController.getEvents(userCtx.accessToken, props.orgId, props.calendarId, (events, error) => {
-      if (error) {
-        console.log(error);
-      } else {
-        setEvents(events);
-      }
-    });
-  }, []);
+    loadEvents();
+  }, [loadEvents]);
 
-  const onClickNewDate = (date: DateClickArg) => {
-    updateModals('newEvent', true);
-    setSelect(undefined);
-    setSelectDate(date.date);
-  }
+  const onSlotSelected = useCallback((date: Date) => {
+      updateAllModals({selectSlot: false, meetup: true, deleteCalendar: false, updateCalendar: false});
+      setSelectedSlotDate(date);
+    }, [updateAllModals, setSelectedSlotDate]);
 
-  const onClickNewLongEvent = () => {
-    updateModals('newEvent', true);
-    setSelect(undefined);
-  }
-
-  const showAction = () => {
-    return (
-      <Tile>
-        <Button>Créer un event</Button>
-        <Button>Ajouter un bot discord</Button>
-      </Tile>
-    );
-  }
-
-  const showSelectedDate = () => {
-    if (select === undefined) {
-      return;
+  const onNewMeetupClose = (reopenSlot: boolean) => {
+    console.log(reopenSlot);
+    if (reopenSlot) {
+      console.log('REOPEN');
+      updateAllModals({meetup: false, selectSlot: true, deleteCalendar: false, updateCalendar: false});
+    } else {
+      updateAllModals({meetup: false, selectSlot: false, deleteCalendar: false, updateCalendar: false});
     }
-    return (
-      <Tile>
-        <Stack gap={2}>
-          <h4>Dates sélectionnées: </h4>
-          <div>
-            <p>{new Date(select.start).toLocaleDateString('fr')}</p>
-            <p>au</p>
-            <p>{new Date(select.end).toLocaleDateString('fr')}</p>
-          </div>
-          <br/>
-          <Button onClick={onClickNewLongEvent}>Créer un évent</Button>
-          <Button kind={"ghost"} onClick={() => setSelect(undefined)}>Désélectionner les dates</Button>
-        </Stack>
-      </Tile>
-    )
+  }
+
+  const onNewMeetupCreated = () => {
+    updateModals('meetup', false);
+    loadEvents();
   }
 
   const onClickEvent = (eventArg: EventClickArg) => {
@@ -92,52 +86,54 @@ export const CalendarComponent = (props: Props) => {
     navigate(`event/${event._id}`);
   }
 
+  const showModals = useMemo(() => {
+    if (!props.org.value || !props.calendar.value)
+      return;
+    return (
+      <>
+        <DeleteCalendarModal org={props.org.value} calendar={props.calendar.value} open={deleteCalendar} onDismiss={() => updateModals('deleteCalendar', false)} onSuccess={() => {
+          navigate(`/organization/${props.org.value!._id}`);
+          successToast("Calendrier supprimer avec succès !");
+        }}/>
+        <SelectSlotModal org={props.org.value} open={selectSlot} onDismiss={() => updateModals('selectSlot', false)} onSuccess={(d) => onSlotSelected(d as Date)}/>
+      </>
+    )
+  }, [onSlotSelected, selectSlot, deleteCalendar, navigate, updateModals, props.calendar.value, props.org.value]);
+
   return (
     <>
-      {/*{props.org.value !== undefined && props.calendar.value !== undefined ? <NewEventModal org={props.org.value}
-                                                                                            calendar={props.calendar.value}
-                                                                                            userContext={userCtx}
-                                                                                            open={newEvent}
-                                                                                            onSuccess={(event) => {
-                                                                                              updateModals('newEvent', false);
-                                                                                              navigate(`event/${event._id}`);
-                                                                                            }}
-                                                                                            onDismiss={() => updateModals('newEvent', false)}
-                                                                                            type={select ? NewEventType.LONG_EVENT : NewEventType.SIMPLE_EVENT}
-                                                                                            dates={select ? [select.start, select.end] : [selectDate ?? new Date()]}/> : null}*/}
-      <CreateEventModal open={newEvent} onDismiss={() => updateModals('newEvent', false)} onSuccess={() => null}/>
+      {showModals}
+      {props.org.value !== undefined && selectedSlotDate !== undefined ? <CreateMeetupModal calendarId={props.calendarId} date={selectedSlotDate} org={props.org.value} open={meetup} onDismiss={(reopenSlot) => onNewMeetupClose(reopenSlot as boolean)} onSuccess={onNewMeetupCreated}/> : null}
       <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
         <BreadcrumbItem onClick={() => navigate('/')}>Dashboard</BreadcrumbItem>
         <BreadcrumbItem onClick={() => navigate(`/organization/${props.orgId}`)}>Organisation</BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>Calendrier</BreadcrumbItem>
       </Breadcrumb>
-      <h4 style={{fontWeight: 'bold', fontSize: 26}}>{props.org.value?.name}</h4>
-      <p style={{marginBottom: 18}}>{props.calendar.value?.name}</p>
+      <Stack gap={6}>
+        <Stack gap={1}>
+          <h3 style={{fontWeight: 'bold'}}>{props.calendar.value?.description}</h3>
+          <p>{props.calendar.value?.name}</p>
+        </Stack>
+        <Stack gap={2}>
+          <Button style={{marginBottom: 18}} renderIcon={CalendarAdd} onClick={() => updateModals('selectSlot', true)}>Créer une réunion</Button>
+        </Stack>
+      </Stack>
       <div>
-
       </div>
       <FullCalendar
         eventClick={onClickEvent}
         aspectRatio={2}
+        locale={getCurrentLanguage()}
         headerToolbar={{start: 'dayGridMonth,dayGridWeek,listWeek',  center: 'title', end: 'prev,next'}}
         footerToolbar={{right: 'prev,next'}}
         selectable={true}
         events={(arg, successCallback) => {successCallback(parseEvents(events))}}
-        editable={true}
-        dateClick={(arg) => {onClickNewDate(arg)}}
-        select={(arg) => {
-          const diffDays = Math.ceil(Math.abs(arg.end.getTime() - arg.start.getTime()) / (1000 * 60 * 60 * 24));
-          if (diffDays <= 1)
-            return;
-          setSelect(arg);
-          updateModals('newEvent', true);
-        }}
-        locale={'fr'}
         plugins={[ dayGridPlugin, interactionPlugin, timeGridPlugin, listGridPlugin ]}
         initialView="dayGridMonth"
       />
       <ButtonSet>
-        <Button kind={'danger'} renderIcon={TrashCan}>Supprimer</Button>
+        <Button renderIcon={Edit} onClick={() => updateModals('updateCalendar', true)}>Modifier</Button>
+        <Button kind={'danger'} renderIcon={TrashCan} onClick={() => updateModals('deleteCalendar', true)}>Supprimer</Button>
       </ButtonSet>
     </>
   );

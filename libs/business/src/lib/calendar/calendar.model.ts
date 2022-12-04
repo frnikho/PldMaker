@@ -1,18 +1,19 @@
 import { ModelDefinition, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Event, User } from "@pld/shared";
+import { calendarRule } from "./calendar.rule";
 
 @Schema({versionKey: false, collection: 'personalCalendar'})
 export class PersonalCalendar {
-  @Prop()
+  @Prop(calendarRule.owner)
   owner: User;
 
-  @Prop()
+  @Prop(calendarRule.events)
   events: Event[];
 
-  @Prop()
+  @Prop(calendarRule.createdDate)
   createdDate: Date;
 
-  @Prop()
+  @Prop(calendarRule.updatedDate)
   updatedDate: Date;
 }
 

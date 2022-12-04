@@ -15,8 +15,13 @@ export function useModals<T extends Modals>(initial: T) {
     })
   }
 
+  const updateAllModals = (value: T) => {
+    setModals(value);
+  }
+
   return {
     updateModals,
+    updateAllModals,
     ...modals,
   }
 

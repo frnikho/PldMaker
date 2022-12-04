@@ -20,7 +20,7 @@ export class CalendarHelper {
   }
 
   public getOrgCalendars(user: User, org: Organization) {
-    return CalendarHelper.populateAndExecute(this.calendarModel.find({owner: {$in: [...org.members, org.owner]}}));
+    return CalendarHelper.populateAndExecute(this.calendarModel.find({owner: {$in: [...org.members.map((u) => u._id), org.owner._id]}}));
   }
 
   public async saveCalendar(user: User, calendar: SavePersonalCalendar) {

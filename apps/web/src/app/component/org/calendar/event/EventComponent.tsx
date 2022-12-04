@@ -1,139 +1,184 @@
-import React from "react";
-import { Calendar, CalendarEvent, CalendarMemberStatus, Organization } from "@pld/shared";
-import { RequiredUserContextProps } from "../../../../context/UserContext";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { CalendarMember, CalendarMemberStatus } from "@pld/shared";
 import { OrganizationApiController } from "../../../../controller/OrganizationApiController";
 import { CalendarApiController } from "../../../../controller/CalendarApiController";
-import { Breadcrumb, BreadcrumbItem, Button, Column, Grid } from "carbon-components-react";
-import { Navigate } from "react-router-dom";
+import { Breadcrumb, BreadcrumbItem, Button, ButtonSet, Column, Grid, Tile } from "carbon-components-react";
+import { useNavigate } from "react-router-dom";
 import { formatAllDayEventDate, formatLongDate, formatLongDayEventDate, formatShortDate } from "@pld/utils";
-import { toast } from "react-toastify";
 import ReactMarkdown from "react-markdown";
-import { CheckmarkFilled, Misuse, HelpFilled, Edit, TrashCan, Events} from "@carbon/icons-react";
+import { Checkmark, Close, Edit, Events, HelpFilled, Misuse, TrashCan } from "@carbon/icons-react";
+import { useAuth } from "../../../../hook/useAuth";
+import { useMaker } from "../../../../hook/useMaker";
+import { ButtonStyle, TileStyle } from "@pld/ui";
+import { errorToast, successToast } from "../../../../manager/ToastManager";
+import { DeleteEventModal } from "../../../../modal/org/calendar/event/DeleteEventModal";
+import { useModals } from "../../../../hook/useModals";
 
-export type EventProps = {
+type Props = {
   orgId: string;
   calendarId: string;
   eventId: string;
-} & RequiredUserContextProps;
+};
 
-export type EventState = {
-  org?: Organization;
-  calendar?: Calendar;
-  event?: CalendarEvent;
-  redirectUrl?: string;
+type Modals = {
+  updateEvent: boolean;
+  deleteEvent: boolean;
+  inviteMembersEvent: boolean;
 }
 
-export class EventComponent extends React.Component<EventProps, EventState> {
+export const EventComponent = (props: Props) => {
 
-  constructor(props: EventProps) {
-    super(props);
-    this.state = {
-      redirectUrl: undefined,
-    }
-  }
+  const navigate = useNavigate();
+  const {accessToken, user} = useAuth();
+  const {org, setOrg, setCalendar, calendar, event, setEvent} = useMaker();
+  const {deleteEvent, updateModals} = useModals<Modals>({updateEvent: false, deleteEvent: false, inviteMembersEvent: false});
 
-  override componentDidMount() {
-    const accessToken: string = this.props.userContext.accessToken;
-    OrganizationApiController.findOrganizationById(accessToken, this.props.orgId, (org, error) => {
-      if (org) {
-        this.setState({org: org})
-      } else {
-        toast(error?.message[0], {type: 'error'});
-      }
-    })
+  const loadOrg = useCallback(() => {
+    OrganizationApiController.findOrganizationById(accessToken, props.orgId, (org) => {
+      if (org)
+        setOrg(org);
+    });
+  }, [accessToken, setOrg, props.orgId]);
 
-    CalendarApiController.getCalendar(accessToken, this.props.orgId, this.props.calendarId, (calendar, error) => {
-      if (calendar) {
-        this.setState({calendar: calendar})
-      } else {
-        toast(error?.message[0], {type: 'error'});
-      }
-    })
+  const loadCalendar = useCallback(() => {
+    CalendarApiController.getCalendar(accessToken, props.orgId, props.calendarId, (calendar) => {
+      if (calendar)
+        setCalendar(calendar);
+    });
+  }, [accessToken, setCalendar, props.orgId, props.calendarId]);
 
-    CalendarApiController.getEvent(accessToken, this.props.orgId, this.props.calendarId, this.props.eventId, (event, error) => {
+  const loadEvent = useCallback(() => {
+    CalendarApiController.getEvent(accessToken, props.orgId, props.calendarId, props.eventId, (event) => {
       if (event) {
-        this.setState({event: event})
+        setEvent(event);
       } else {
-        toast(error?.message[0], {type: 'error'});
+        errorToast('Impossible de récupérer les infos de la réunion !');
+      }
+    })
+  }, [accessToken, props.calendarId, props.orgId, props.eventId, setEvent])
+
+  useEffect(() => {
+    loadOrg();
+    loadCalendar();
+    loadEvent();
+  }, [loadOrg, loadCalendar, loadEvent]);
+
+  const getEventDates = useMemo(() => {
+      if (!event)
+        return '';
+      if (event.date !== undefined) {
+        if (event.allDay) {
+          return formatShortDate(new Date(event.date));
+        } else {
+          return formatLongDate(new Date(event.date));
+        }
+      } else if (event.deadline !== undefined) {
+        if (event.allDay)
+          return <p style={{fontSize: 20, margin: 0}}>{formatAllDayEventDate(new Date(event.deadline.startDate))}<br/>{formatAllDayEventDate(new Date(event.deadline.endDate))}</p>;
+        return <p style={{fontSize: 20, margin: 0}}>{formatLongDayEventDate(new Date(event.deadline.startDate))}<br/>{formatLongDayEventDate(new Date(event.deadline.endDate))}</p>;
+      }
+      return '';
+    }, [event]);
+
+  const showUserIcon = useCallback((member: CalendarMember) => {
+      if (member.status === CalendarMemberStatus.Declined) {
+        return (<Misuse color={'red'} />)
+      } else if (member.status === CalendarMemberStatus.Accepted) {
+        return (<Checkmark color={'green'}/>)
+      } else {
+        return (<HelpFilled/>)
+      }
+    }, []);
+
+  const showMembers = useMemo(() => {
+      return event?.invitedMembers.map((a, index) => {
+        return (<div key={index} title={a.status !== CalendarMemberStatus.Invited ? formatLongDate(new Date(a.updateStatusDate)) : undefined} style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+          <p style={{marginRight: '0.3em'}} >{a.user.firstname} {a.user.lastname.toUpperCase()}</p>
+           {showUserIcon(a)}
+        </div>);
+      })
+    }, [event, showUserIcon]);
+
+  const onClickAcceptOrDecline = useCallback((accepted: boolean) => {
+    CalendarApiController.updateMembersStatus(accessToken, org._id, calendar._id, event._id, {status: accepted ? CalendarMemberStatus.Accepted : CalendarMemberStatus.Declined}, (event) => {
+      if (event) {
+        successToast(`Vous avez ${accepted ? 'accepter' : 'décliner'} l'invitation à cette réunion.`);
+        loadEvent();
+      } else {
+        errorToast("Une erreur est survenue !");
       }
     });
-  }
+  }, [loadEvent, accessToken, org, calendar, event]);
 
-  private showUserIcon(member: CalendarMemberStatus) {
-    if (member === CalendarMemberStatus.Declined) {
-      return (<Misuse color={'red'}/>)
-    } else if (member === CalendarMemberStatus.Accepted) {
-      return (<CheckmarkFilled color={'green'}/>)
-    } else {
-      return (<HelpFilled/>)
-    }
-  }
-
-  private showMembers() {
-    return this.state.event?.invitedMembers.map((a) => {
-      return (<>
-        {a.user.firstname} {a.user.lastname.toUpperCase()} {this.showUserIcon(a.status)}
-        </>);
-    })
-  }
-
-  private showPage() {
-    if (!this.state.event || !this.state.calendar || !this.state.org)
+  const showAcceptOrDeclineMeetup = useMemo(() => {
+    if (!(event?.invitedMembers.filter((u) => u.status === CalendarMemberStatus.Invited).some((u) => u.user._id === user?._id)))
       return;
     return (
-      <Grid>
-        <Column xlg={4}>
-          <h4 style={{fontWeight: 'bold', fontSize: 26}}>{this.state.event?.title}</h4>
-          <h4 style={{fontSize: 24}}>{this.getEventDates()}</h4>
-          <p style={{fontWeight: 'bold', fontSize: 20, marginTop: 28}}>Membres</p>
-          {this.showMembers()}
-        </Column>
-        <Column xlg={10}>
-          <ReactMarkdown>
-            {this.state.event.description}
-          </ReactMarkdown>
-          Créer par {this.state.event.owner.firstname} {this.state.event.owner.lastname.toUpperCase()} le {formatLongDate(new Date(this.state.event.createdDate))}
-        </Column>
-        <Column xlg={2}>
-          <Button iconDescription={'Inviter des membres'} renderIcon={Events} kind={'ghost'} hasIconOnly/>
-          <Button iconDescription={'Modifier'} renderIcon={Edit} kind={'ghost'} hasIconOnly/>
-          <Button iconDescription={'Supprimer'} renderIcon={TrashCan} kind={'danger'} hasIconOnly/>
-        </Column>
-      </Grid>
-    )
-  }
+      <div style={{marginBottom: '0.6em'}}>
+        <Tile style={TileStyle.default}>
+          <p style={{fontWeight: 'bold', marginBottom: '0.8em'}}>Accepter l'invitation à cette réunion ?</p>
+          <ButtonSet style={{gap: '0.3em'}}>
+            <Button style={ButtonStyle.default} iconDescription={"Accepter"} renderIcon={Checkmark} hasIconOnly onClick={() => onClickAcceptOrDecline(true)}/>
+            <Button style={ButtonStyle.default} iconDescription={"Refuser"} renderIcon={Close} kind={'secondary'} hasIconOnly onClick={() => onClickAcceptOrDecline(false)}/>
+          </ButtonSet>
+        </Tile>
+      </div>
+    );
+  }, [event, user, onClickAcceptOrDecline]);
 
-  private getEventDates() {
-    const event = this.state.event;
-    if (event === undefined)
-      return '';
-    if (event.date !== undefined) {
-      if (event.allDay) {
-        return formatShortDate(new Date(event.date));
-      } else {
-        return formatLongDate(new Date(event.date));
-      }
-    } else if (event.deadline !== undefined) {
-      if (event.allDay)
-        return <p style={{fontSize: 24}}>{formatAllDayEventDate(new Date(event.deadline.startDate))}<br/>{formatAllDayEventDate(new Date(event.deadline.endDate))}</p>;
-      return <p style={{fontSize: 24}}>{formatLongDayEventDate(new Date(event.deadline.startDate))}<br/>{formatLongDayEventDate(new Date(event.deadline.endDate))}</p>;
-    }
-    return '';
-  }
-
-  override render() {
+  const showModals = useMemo(() => {
+    if (!event || !calendar || !org)
+      return;
     return (
-      <>
-        {this.state.redirectUrl !== undefined ? <Navigate to={this.state.redirectUrl}/> : null}
-        <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
-          <BreadcrumbItem onClick={() => this.setState({redirectUrl: `/`})}>Dashboard</BreadcrumbItem>
-          <BreadcrumbItem onClick={() => this.setState({redirectUrl: `/organization/${this.props.orgId}`})}>{this.state.org?.name ?? "Organisation"}</BreadcrumbItem>
-          <BreadcrumbItem onClick={() => this.setState({redirectUrl: `/organization/${this.props.orgId}/calendar/${this.props.calendarId}`})}>Calendrier</BreadcrumbItem>
-          <BreadcrumbItem isCurrentPage>Event</BreadcrumbItem>
-        </Breadcrumb>
-        {this.showPage()}
-      </>
-    )
-  }
+      <DeleteEventModal org={org} calendar={calendar} event={event} open={deleteEvent} onDismiss={() => updateModals('deleteEvent', false)} onSuccess={() => {
+        updateModals('deleteEvent', false);
+        navigate(`/organization/${org._id}/calendar/${calendar._id}`);
+      }}/>
+    );
+  }, [deleteEvent, updateModals, navigate, event, org, calendar]);
 
-}
+  const showPage = useMemo(() => {
+      if (!event || !calendar || !org)
+        return;
+      return (
+        <Grid>
+          <Column xlg={4}>
+            <h4 style={{fontWeight: 'bold', fontSize: 26}}>{event.title}</h4>
+            <h4 style={{fontSize: 24, margin: 0}}>
+              {getEventDates}
+            </h4>
+            <div style={{marginTop: '0.5em'}}>
+              <p>Créer par <span style={{fontWeight: 'bold'}}>{event.owner.firstname} {event.owner.lastname.toUpperCase()}</span></p>
+              <p>le {formatLongDate(new Date(event.createdDate))}</p>
+            </div>
+            <p style={{fontWeight: 'bold', fontSize: 20, marginTop: 28}}>Membres</p>
+            {showMembers}
+          </Column>
+          <Column xlg={10}>
+            <ReactMarkdown>
+              {event.description}
+            </ReactMarkdown>
+          </Column>
+          <Column xlg={2}>
+            <Button iconDescription={'Inviter des membres'} renderIcon={Events} kind={'ghost'} hasIconOnly/>
+            <Button iconDescription={'Modifier'} renderIcon={Edit} kind={'ghost'} hasIconOnly/>
+            <Button iconDescription={'Supprimer'} onClick={() => updateModals('deleteEvent', true)} renderIcon={TrashCan} hasIconOnly/>
+          </Column>
+        </Grid>
+      )
+    }, [calendar, event, org, getEventDates, showMembers, updateModals]);
+
+  return (
+    <div>
+      {showModals}
+      <Breadcrumb noTrailingSlash style={{marginBottom: '40px'}}>
+        <BreadcrumbItem onClick={() => navigate('/')}>Dashboard</BreadcrumbItem>
+        <BreadcrumbItem onClick={() => navigate(`/organization/${props.orgId}`)}>Organisation</BreadcrumbItem>
+        <BreadcrumbItem onClick={() => navigate(`/organization/${props.orgId}/calendar/${props.calendarId}`)}>Calendrier</BreadcrumbItem>
+        <BreadcrumbItem isCurrentPage>Réunion</BreadcrumbItem>
+      </Breadcrumb>
+      {showAcceptOrDeclineMeetup}
+      {showPage}
+    </div>
+  );
+};

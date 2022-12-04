@@ -12,6 +12,9 @@ export class CalendarMember extends Document {
 
   @Prop({enum: CalendarMemberStatus})
   status: string;
+
+  @Prop({default: undefined})
+  updateStatusDate: Date;
 }
 
 @Schema({versionKey: false})

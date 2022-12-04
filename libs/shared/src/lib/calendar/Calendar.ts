@@ -1,6 +1,6 @@
 import { User } from "../user/User";
 
-enum EventType {
+export enum EventType {
   Available = 'Disponible',
   Busy = 'Occupé',
 }
