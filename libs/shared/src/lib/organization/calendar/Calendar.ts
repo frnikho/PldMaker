@@ -43,3 +43,17 @@ export class NewCalendarBody {
     this.deadline = deadline;
   }
 }
+
+export class UpdateCalendarBody {
+
+  @Length(0, 256)
+  name: string;
+
+  @Length(0, 256)
+  description: string;
+
+  constructor(name: string, description: string) {
+    this.name = name;
+    this.description = description;
+  }
+}

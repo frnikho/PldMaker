@@ -21,12 +21,15 @@ import { CreateMeetupModal } from "../../../modal/org/calendar/event/CreateMeetu
 import { useLanguage } from "../../../hook/useLanguage";
 import { DeleteCalendarModal } from "../../../modal/org/calendar/DeleteCalendarModal";
 import { successToast } from "../../../manager/ToastManager";
+import { ButtonStyle } from "@pld/ui";
+import { EditCalendarModal } from "../../../modal/org/calendar/EditCalendarModal";
 
 type Props = {
   calendarId: string;
   orgId: string;
   calendar: Data<Calendar>;
   org: Data<Organization>;
+  loadCalendar: () => void;
 };
 
 type Modal = {
@@ -41,7 +44,7 @@ export const CalendarComponent = (props: Props) => {
   const navigate = useNavigate();
   const userCtx = useAuth();
   const {getCurrentLanguage} = useLanguage();
-  const {meetup, selectSlot, deleteCalendar, updateModals, updateAllModals} = useModals<Modal>({selectSlot: false, meetup: false, updateCalendar: false, deleteCalendar: false});
+  const {meetup, updateCalendar, selectSlot, deleteCalendar, updateModals, updateAllModals} = useModals<Modal>({selectSlot: false, meetup: false, updateCalendar: false, deleteCalendar: false});
   const [selectedSlotDate, setSelectedSlotDate] = useState<Date | undefined>(undefined);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
 
@@ -96,9 +99,13 @@ export const CalendarComponent = (props: Props) => {
           successToast("Calendrier supprimer avec succès !");
         }}/>
         <SelectSlotModal org={props.org.value} open={selectSlot} onDismiss={() => updateModals('selectSlot', false)} onSuccess={(d) => onSlotSelected(d as Date)}/>
+        <EditCalendarModal org={props.org.value} open={updateCalendar} calendar={props.calendar.value} onDismiss={() => updateModals('updateCalendar', false)} onSuccess={() => {
+          updateModals("updateCalendar", false);
+          props.loadCalendar();
+        }}/>
       </>
     )
-  }, [onSlotSelected, selectSlot, deleteCalendar, navigate, updateModals, props.calendar.value, props.org.value]);
+  }, [updateCalendar, onSlotSelected, selectSlot, deleteCalendar, navigate, updateModals, props.calendar.value, props.org.value]);
 
   return (
     <>
@@ -111,15 +118,13 @@ export const CalendarComponent = (props: Props) => {
       </Breadcrumb>
       <Stack gap={6}>
         <Stack gap={1}>
-          <h3 style={{fontWeight: 'bold'}}>{props.calendar.value?.description}</h3>
-          <p>{props.calendar.value?.name}</p>
+          <h3 style={{fontWeight: 'bold'}}>{props.calendar.value?.name}</h3>
+          <p>{props.calendar.value?.description}</p>
         </Stack>
-        <Stack gap={2}>
-          <Button style={{marginBottom: 18}} renderIcon={CalendarAdd} onClick={() => updateModals('selectSlot', true)}>Créer une réunion</Button>
-        </Stack>
+        <div style={{marginBottom: '1em'}}>
+          <Button style={ButtonStyle.default} renderIcon={CalendarAdd} onClick={() => updateModals('selectSlot', true)}>Créer une réunion</Button>
+        </div>
       </Stack>
-      <div>
-      </div>
       <FullCalendar
         eventClick={onClickEvent}
         aspectRatio={2}
@@ -131,9 +136,9 @@ export const CalendarComponent = (props: Props) => {
         plugins={[ dayGridPlugin, interactionPlugin, timeGridPlugin, listGridPlugin ]}
         initialView="dayGridMonth"
       />
-      <ButtonSet>
-        <Button renderIcon={Edit} onClick={() => updateModals('updateCalendar', true)}>Modifier</Button>
-        <Button kind={'danger'} renderIcon={TrashCan} onClick={() => updateModals('deleteCalendar', true)}>Supprimer</Button>
+      <ButtonSet style={{gap: '0.6em'}}>
+        <Button style={ButtonStyle.default} renderIcon={Edit} onClick={() => updateModals('updateCalendar', true)}>Modifier</Button>
+        <Button style={ButtonStyle.default} kind={'danger'} renderIcon={TrashCan} onClick={() => updateModals('deleteCalendar', true)}>Supprimer</Button>
       </ButtonSet>
     </>
   );

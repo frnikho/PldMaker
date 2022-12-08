@@ -2,17 +2,19 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import { CalendarMember, CalendarMemberStatus } from "@pld/shared";
 import { OrganizationApiController } from "../../../../controller/OrganizationApiController";
 import { CalendarApiController } from "../../../../controller/CalendarApiController";
-import { Breadcrumb, BreadcrumbItem, Button, ButtonSet, Column, Grid, Tile } from "carbon-components-react";
+import { Breadcrumb, BreadcrumbItem, Button, ButtonSet, Column, Grid, OverflowMenu, OverflowMenuItem, Tile } from "carbon-components-react";
 import { useNavigate } from "react-router-dom";
-import { formatAllDayEventDate, formatLongDate, formatLongDayEventDate, formatShortDate } from "@pld/utils";
+import { formatAllDayEventDate, formatLongDate, formatLongDayEventDate, formatShortDate, generateGoogleEventLink, generateOutlookEventLink } from "@pld/utils";
 import ReactMarkdown from "react-markdown";
-import { Checkmark, Close, Edit, Events, HelpFilled, Misuse, TrashCan } from "@carbon/icons-react";
+import { Checkmark, CalendarAdd, Close, Edit, Events, HelpFilled, Misuse, TrashCan } from "@carbon/icons-react";
 import { useAuth } from "../../../../hook/useAuth";
 import { useMaker } from "../../../../hook/useMaker";
 import { ButtonStyle, TileStyle } from "@pld/ui";
 import { errorToast, successToast } from "../../../../manager/ToastManager";
 import { DeleteEventModal } from "../../../../modal/org/calendar/event/DeleteEventModal";
 import { useModals } from "../../../../hook/useModals";
+import { UpdateEventModal } from "../../../../modal/org/calendar/event/UpdateEventModal";
+import * as removeMarkdown from 'remove-markdown';
 
 type Props = {
   orgId: string;
@@ -31,7 +33,7 @@ export const EventComponent = (props: Props) => {
   const navigate = useNavigate();
   const {accessToken, user} = useAuth();
   const {org, setOrg, setCalendar, calendar, event, setEvent} = useMaker();
-  const {deleteEvent, updateModals} = useModals<Modals>({updateEvent: false, deleteEvent: false, inviteMembersEvent: false});
+  const {updateEvent, deleteEvent, updateModals} = useModals<Modals>({updateEvent: false, deleteEvent: false, inviteMembersEvent: false});
 
   const loadOrg = useCallback(() => {
     OrganizationApiController.findOrganizationById(accessToken, props.orgId, (org) => {
@@ -126,16 +128,30 @@ export const EventComponent = (props: Props) => {
     );
   }, [event, user, onClickAcceptOrDecline]);
 
+  const disabledMemberButton: boolean = useMemo(() => {
+    if (!event || !org || !user)
+      return true;
+    const invitedMembersIds = event.invitedMembers.map((i) => i.user._id);
+    const members = [...org.members, org.owner].filter((m) => m._id !== user?._id).map((m) => m._id);
+    return invitedMembersIds.length <= members.length;
+  }, [event, org, user]);
+
   const showModals = useMemo(() => {
     if (!event || !calendar || !org)
       return;
     return (
-      <DeleteEventModal org={org} calendar={calendar} event={event} open={deleteEvent} onDismiss={() => updateModals('deleteEvent', false)} onSuccess={() => {
-        updateModals('deleteEvent', false);
-        navigate(`/organization/${org._id}/calendar/${calendar._id}`);
-      }}/>
+      <>
+        <DeleteEventModal org={org} calendar={calendar} event={event} open={deleteEvent} onDismiss={() => updateModals('deleteEvent', false)} onSuccess={() => {
+          updateModals('deleteEvent', false);
+          navigate(`/organization/${org._id}/calendar/${calendar._id}`);
+        }}/>
+        <UpdateEventModal open={updateEvent} event={event} org={org} calendar={calendar} onSuccess={() => {
+            updateModals('updateEvent', false);
+            loadEvent();
+          }} onDismiss={() => updateModals('updateEvent', false)}/>
+      </>
     );
-  }, [deleteEvent, updateModals, navigate, event, org, calendar]);
+  }, [deleteEvent, loadEvent, updateEvent, updateModals, navigate, event, org, calendar]);
 
   const showPage = useMemo(() => {
       if (!event || !calendar || !org)
@@ -151,6 +167,13 @@ export const EventComponent = (props: Props) => {
               <p>Créer par <span style={{fontWeight: 'bold'}}>{event.owner.firstname} {event.owner.lastname.toUpperCase()}</span></p>
               <p>le {formatLongDate(new Date(event.createdDate))}</p>
             </div>
+            <OverflowMenu ariaLabel="overflow-menu" iconDescription={"Ajoutez la réunion à un calendrier"} renderIcon={CalendarAdd}>
+              <OverflowMenuItem itemText="Google" onClick={() => {
+                window.open(generateGoogleEventLink({name: encodeURIComponent(event.title), description: encodeURIComponent(removeMarkdown(event.description)), deadline: event.deadline, location: org.name}), 'blank')
+              }
+              }/>
+              <OverflowMenuItem itemText="Outlook" onClick={() => window.open(generateOutlookEventLink({name: encodeURIComponent(event.title), description: encodeURIComponent(removeMarkdown(event.description)), deadline: event.deadline, location: org.name}), 'blank')}/>
+            </OverflowMenu>
             <p style={{fontWeight: 'bold', fontSize: 20, marginTop: 28}}>Membres</p>
             {showMembers}
           </Column>
@@ -160,13 +183,13 @@ export const EventComponent = (props: Props) => {
             </ReactMarkdown>
           </Column>
           <Column xlg={2}>
-            <Button iconDescription={'Inviter des membres'} renderIcon={Events} kind={'ghost'} hasIconOnly/>
-            <Button iconDescription={'Modifier'} renderIcon={Edit} kind={'ghost'} hasIconOnly/>
+            <Button iconDescription={'Inviter des membres'} renderIcon={Events} kind={'ghost'} hasIconOnly disabled={disabledMemberButton}/>
+            <Button iconDescription={'Modifier'} renderIcon={Edit} kind={'ghost'} hasIconOnly onClick={() => updateModals('updateEvent', true)}/>
             <Button iconDescription={'Supprimer'} onClick={() => updateModals('deleteEvent', true)} renderIcon={TrashCan} hasIconOnly/>
           </Column>
         </Grid>
       )
-    }, [calendar, event, org, getEventDates, showMembers, updateModals]);
+    }, [disabledMemberButton, calendar, event, org, getEventDates, showMembers, updateModals]);
 
   return (
     <div>

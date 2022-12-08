@@ -1,4 +1,4 @@
-import { Calendar, CalendarEvent, NewCalendarBody, NewCalendarEvent, EventUpdateMemberStatusBody, EventManageMemberBody, EventUpdateBody } from "@pld/shared";
+import { Calendar, CalendarEvent, NewCalendarBody, NewCalendarEvent, EventUpdateMemberStatusBody, EventManageMemberBody, EventUpdateBody, UpdateCalendarBody } from "@pld/shared";
 import api, {ApiError, authorize} from "../util/Api";
 
 export type CallbackCalendar = (calendar: Calendar | null, error?: ApiError) => void;
@@ -16,6 +16,14 @@ export class CalendarApiController {
     }).catch((error: ApiError) => {
       return callback(null, error);
     })
+  }
+
+  public static updateCalendar(accessToken: string, orgId: string, calendarId: string, body: UpdateCalendarBody, callback: CallbackCalendar) {
+    api.patch<Calendar>(`organization/${orgId}/calendar/${calendarId}/`, body, authorize(accessToken)).then((response) => {
+      return callback(response.data);
+    }).catch((err: ApiError) => {
+      return callback(null, err);
+    });
   }
 
   public static createEvent(accessToken: string, orgId: string, calendarId: string, body: NewCalendarEvent, callback: CallbackEvent) {
@@ -82,7 +90,7 @@ export class CalendarApiController {
     });
   }
 
-  public static update(accessToken: string, orgId: string, calendarId: string, eventId: string, body: EventUpdateBody, callback: CallbackEvent) {
+  public static updateEvent(accessToken: string, orgId: string, calendarId: string, eventId: string, body: EventUpdateBody, callback: CallbackEvent) {
     api.patch<CalendarEvent>(`organization/${orgId}/calendar/${calendarId}/event/${eventId}`, body, authorize(accessToken)).then((response) => {
       return callback(response.data);
     }).catch((err: ApiError) => {

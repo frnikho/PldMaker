@@ -1,5 +1,5 @@
 import {Body, Controller, Delete, Get, Param, Patch, Post, Request} from '@nestjs/common';
-import { CalendarEvent, Calendar, NewCalendarBody, NewCalendarEvent, Organization, EventUpdateMemberStatusBody, EventManageMemberBody, EventUpdateBody } from "@pld/shared";
+import { CalendarEvent, Calendar, NewCalendarBody, NewCalendarEvent, Organization, EventUpdateMemberStatusBody, EventManageMemberBody, EventUpdateBody, UpdateCalendarBody } from "@pld/shared";
 import {CalendarService} from "./calendar.service";
 import { CalendarEventPipe, CalendarPipe } from "./calendar.pipe";
 import { OrganizationPipe } from "../organization.pipe";
@@ -65,9 +65,9 @@ export class CalendarController {
     return this.calendarService.updateEvent(req.user, org, calendar, event, body);
   }
 
-  @Patch(':calendarId/update')
-  public async updateCalendar() {
-    //TODO
+  @Patch(':calendarId')
+  public async updateCalendar(@Request() req, @Param('orgId', OrganizationPipe) org: Organization, @Param('calendarId', CalendarPipe) calendar: Calendar, @Body() body: UpdateCalendarBody) {
+    return this.calendarService.updateCalendar(req.user, org, calendar, body);
   }
 
   @Delete(':calendarId')

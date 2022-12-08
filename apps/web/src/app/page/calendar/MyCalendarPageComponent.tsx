@@ -71,6 +71,7 @@ export const MyCalendarPageComponent = () => {
   const {getValues, setValue, watch} = useForm<Form>({defaultValues: {slots: [], selectedType: EventType.Available, timezone: 'Europe/Paris'}});
 
   const getEvents = useCallback(() => {
+    console.log('abc');
     PersonalCalendarApiController.getCalendar(accessToken, (calendar) => {
       if (calendar?.events) {
         setValue('slots', calendar?.events);
@@ -87,16 +88,7 @@ export const MyCalendarPageComponent = () => {
       setValue('timezone', timezone);
     }
     getEvents();
-  }, [getItem, setItem, getValues, setValue, getEvents]);
-
-/*  const init = () => {
-    const timezone = getItem('timezone');
-    if (timezone === null) {
-      setItem('timezone', getValues('timezone'));
-    } else {
-      setValue('timezone', timezone);
-    }
-  }*/
+  }, [getItem, setItem, getEvents, getValues, setValue]);
 
   const onSelectSlot = (event: DateSelectArg) => {
     const array = getValues('slots');
@@ -191,7 +183,7 @@ export const MyCalendarPageComponent = () => {
         defaultSelected="default-selected"
         valueSelected={watch('selectedType')}
         name="radio tile group"
-        onChange={(value) => {
+        onChange={(value, name, event) => {
           setValue('selectedType', value as EventType);
         }}>
         {AvailableSlotsType.map((type, index) => {

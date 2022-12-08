@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 import { LanguageContext, LanguageContextState } from "../context/LanguageContext";
 import { AvailableLanguages, AvailableLangue, language, LanguageType } from "../language";
 import { getPlaceholder } from "../util/Placeholders";
@@ -13,12 +13,12 @@ export function useLanguage() {
 
   const languageCtx = useContext<LanguageContextState>(LanguageContext);
 
-  const translate = (key: NestedLanguageKeyOf<LanguageType>, lang = languageCtx.language): string => {
-    const text = key.split('.').reduce((a, b) => {
-      return a[b];
-    }, language);
-    return getPlaceholder((text[lang] ?? text['en']) as string, {html: true});
-  }
+  const translate = useCallback((key: NestedLanguageKeyOf<LanguageType>, lang = languageCtx.language): string => {
+      const text = key.split('.').reduce((a, b) => {
+        return a[b];
+      }, language);
+      return getPlaceholder((text[lang] ?? text['en']) as string, {html: true});
+    }, [languageCtx.language]);
 
   return {
     translate,

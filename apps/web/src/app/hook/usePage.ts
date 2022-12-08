@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 export type PageOptions<T = any> = {
   redirectIfNotLogged: boolean;
-  redirectPage: '/';
+  redirectPage: string;
   params: T;
 }
 

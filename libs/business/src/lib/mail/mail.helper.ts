@@ -1,7 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { MailerService } from "@nestjs-modules/mailer";
-import { Organization, User } from "@pld/shared";
+import { CalendarEvent, Organization, User } from "@pld/shared";
 import { AvailableMail } from "./mail.list";
+import { formatLongDate } from "@pld/utils";
+import * as process from "process";
 
 @Injectable()
 export class MailHelper {
@@ -53,6 +55,21 @@ export class MailHelper {
       }
     })
       .then((info) => console.log(info))
+      .catch((err) => console.log(err));
+  }
+
+  public async sendMeetupInvitation(user: User, orgId: string, calendarId: string, event: CalendarEvent) {
+    this.mailerService.sendMail({
+      to: user.email,
+      subject: `Invitation à la réunion ${event.title}`,
+      template: AvailableMail.MeetupInvitation,
+      context: {
+        firstname: user.firstname,
+        meetup_name: event.title,
+        meetup_date: formatLongDate(new Date(event.deadline.startDate)),
+        meetup_link: process.env.NX_CLIENT_HOST + `/organization/${orgId}/calendar/${calendarId}/event/${event._id.toString()}`,
+      }
+    }).then((info) => console.log(info))
       .catch((err) => console.log(err));
   }
 

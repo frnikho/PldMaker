@@ -1,7 +1,19 @@
 import { Injectable } from "@nestjs/common";
 import {Model, Query} from "mongoose";
 import {InjectModel} from "@nestjs/mongoose";
-import { Calendar, CalendarMemberStatus, NewCalendarBody, NewCalendarEvent, Organization, EventUpdateMemberStatusBody, User, CalendarEvent, EventManageMemberBody, EventUpdateBody } from "@pld/shared";
+import {
+  Calendar,
+  CalendarMemberStatus,
+  NewCalendarBody,
+  NewCalendarEvent,
+  Organization,
+  EventUpdateMemberStatusBody,
+  User,
+  CalendarEvent,
+  EventManageMemberBody,
+  EventUpdateBody,
+  UpdateCalendarBody
+} from "@pld/shared";
 
 @Injectable()
 export class CalendarHelper {
@@ -46,6 +58,10 @@ export class CalendarHelper {
 
   public deleteCalendar(user: User, org: Organization, calendar: Calendar) {
     return CalendarHelper.populateAndExecute(this.calendarModel.findOneAndDelete({_id: calendar._id}, {new: true}));
+  }
+
+  public updateCalendar(user: User, org: Organization, calendar: Calendar, body: UpdateCalendarBody) {
+    return CalendarHelper.populateAndExecute(this.calendarModel.findOneAndUpdate({_id: calendar._id}, {name: body.name, description: body.description}, {new: true}));
   }
 
   /**
@@ -118,7 +134,7 @@ export class CalendarHelper {
   }
 
   public updateEvent(user: User, org: Organization, calendar: Calendar, event: CalendarEvent, body: EventUpdateBody) {
-    return CalendarHelper.populateAndExecuteEvent(this.eventModel.findOneAndUpdate({_id: event._id}, {...body, updatedDate: new Date()}, {new: true}));
+    return CalendarHelper.populateAndExecuteEvent(this.eventModel.findOneAndUpdate({_id: event._id}, {title: body.title, description: body.description, updatedDate: new Date()}, {new: true}));
   }
 
   public deleteEvent(user: User, org: Organization, calendar: Calendar, event: CalendarEvent) {

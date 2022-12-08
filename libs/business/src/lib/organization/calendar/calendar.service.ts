@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import {CalendarHelper} from "./calendar.helper";
-import { CalendarEvent, Calendar, NewCalendarBody, NewCalendarEvent, Organization, EventUpdateMemberStatusBody, User, EventManageMemberBody, EventUpdateBody } from "@pld/shared";
+import { CalendarEvent, Calendar, NewCalendarBody, NewCalendarEvent, Organization, EventUpdateMemberStatusBody, User, EventManageMemberBody, EventUpdateBody, UpdateCalendarBody } from "@pld/shared";
 import {InjectModel} from "@nestjs/mongoose";
 import {Model} from "mongoose";
 import { CheckOrgPerm } from "../organization.util";
+import { MailService } from "../../mail/mail.service";
 
 @Injectable()
 export class CalendarService {
 
   constructor(
     @InjectModel('Calendar') private calendarModel: Model<Calendar>,
-    private calendarHelper: CalendarHelper) {}
+    private calendarHelper: CalendarHelper,
+    private mailService: MailService) {}
 
   @CheckOrgPerm()
   public createCalendar(user: User, org: Organization, body: NewCalendarBody) {
@@ -33,8 +35,10 @@ export class CalendarService {
   }
 
   @CheckOrgPerm()
-  public createEvent(user: User, org: Organization, calendar: Calendar, body: NewCalendarEvent) {
-    return this.calendarHelper.createEvent(user, org, calendar, body);
+  public async createEvent(user: User, org: Organization, calendar: Calendar, body: NewCalendarEvent) {
+    const createdEvent = await this.calendarHelper.createEvent(user, org, calendar, body);
+    createdEvent.invitedMembers.forEach((invitedUser) => this.mailService.sendMeetupInvitation(invitedUser.user, org._id, calendar._id, createdEvent));
+    return createdEvent;
   }
 
   @CheckOrgPerm()
@@ -74,6 +78,10 @@ export class CalendarService {
 
   public getAllEvents(user: User) {
     return this.calendarHelper.getAllEvents(user);
+  }
+
+  public updateCalendar(user: User, org: Organization, calendar: Calendar, body: UpdateCalendarBody) {
+    return this.calendarHelper.updateCalendar(user, org, calendar, body);
   }
 
 }

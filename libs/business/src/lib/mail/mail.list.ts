@@ -3,5 +3,6 @@ export enum AvailableMail {
   OtpEnable = 'OtpEnableMail',
   Goodbye = 'GoodbyeMail',
   OrgInvitation = 'OrgInvitationMail',
-  ChangePassword = 'ChangePasswordMail'
+  ChangePassword = 'ChangePasswordMail',
+  MeetupInvitation = 'MeetupInvitationMail',
 }

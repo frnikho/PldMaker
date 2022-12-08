@@ -64,3 +64,8 @@ Un utilisateur qui souhaite créer un event aura la possibilité de récuperer l
 ### 20/10/2022
 
 - rework de components, ajout de la modification des tags sur la page d'un PLD
+
+
+### 05/12/2022
+
+- Ajout de bouttons ajouter au calendrier (Google Calendar, Discord)

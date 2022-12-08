@@ -51,6 +51,7 @@ specifiers:
   '@types/carbon-components-react': ^7.55.1
   '@types/jest': 28.1.1
   '@types/k6': ^0.39.1
+  '@types/luxon': ^3.1.0
   '@types/multer': ^1.4.7
   '@types/node': 18.11.9
   '@types/passport-jwt': ^3.0.6
@@ -97,6 +98,7 @@ specifiers:
   jest-environment-jsdom: 28.1.1
   log4js: ^6.5.1
   lottie-react: ^2.2.1
+  luxon: ^3.1.1
   moment: ^2.29.4
   moment-timezone: ^0.5.38
   mongodb: ^4.12.1
@@ -124,6 +126,7 @@ specifiers:
   react-toastify: ^9.0.4
   reflect-metadata: ^0.1.13
   regenerator-runtime: 0.13.7
+  remove-markdown: ^0.5.0
   request-ip: ^3.3.0
   rxjs: ^7.0.0
   sass: 1.51.0
@@ -184,6 +187,7 @@ dependencies:
   imagekit: 4.1.1
   log4js: 6.7.0
   lottie-react: 2.3.1_biqbaboplfbrettd7655fr4n2y
+  luxon: 3.1.1
   moment: 2.29.4
   moment-timezone: 0.5.38
   mongodb: 4.12.1
@@ -207,6 +211,7 @@ dependencies:
   react-toastify: 9.1.0_biqbaboplfbrettd7655fr4n2y
   reflect-metadata: 0.1.13
   regenerator-runtime: 0.13.7
+  remove-markdown: 0.5.0
   request-ip: 3.3.0
   rxjs: 7.5.7
   sass: 1.51.0
@@ -245,6 +250,7 @@ devDependencies:
   '@types/carbon-components-react': 7.55.2
   '@types/jest': 28.1.1
   '@types/k6': 0.39.1
+  '@types/luxon': 3.1.0
   '@types/multer': 1.4.7
   '@types/node': 18.11.9
   '@types/passport-jwt': 3.0.7
@@ -5545,6 +5551,10 @@ packages:
     resolution: {integrity: sha512-hgqiGHQEK0JqyJ7u8s3mZhvHIQG3nNIAowGhSSzc7acusdAQHgRoVb5y/pP+Sstb68gw+3ubjOq21lqpnZ6cww==}
     dev: true
 
+  /@types/luxon/3.1.0:
+    resolution: {integrity: sha512-gCd/HcCgjqSxfMrgtqxCgYk/22NBQfypwFUG7ZAyG/4pqs51WLTcUzVp1hqTbieDYeHS3WoVEh2Yv/2l+7B0Vg==}
+    dev: true
+
   /@types/mdast/3.0.10:
     resolution: {integrity: sha512-W864tg/Osz1+9f4lrGTZpCSO5/z4608eUp19tbozkq2HJK6i3z1kT0H9tlADXuYIb1YYOBByU4Jsqkk75q48qA==}
     dependencies:
@@ -7633,7 +7643,7 @@ packages:
     resolution: {integrity: sha512-guZNLMGUgg6z4+eGhmHGw7ft+v6OQeuHzd1gcLxCo9Yg/qoxmG3nindp2/uwGCLizEisf2H0ptqeVXeoCpP6FA==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      luxon: 3.1.0
+      luxon: 3.1.1
     dev: false
 
   /cross-spawn/6.0.5:
@@ -11354,8 +11364,8 @@ packages:
     resolution: {integrity: sha512-EIRtP1GrSJny0dqb50QXRUNBxHJhcpxHC++M5tD7RYbvLLn5KVWKsbyswSSqDuU15UFi3bgTQIY8nhDMeF6aDQ==}
     engines: {node: '>=12'}
 
-  /luxon/3.1.0:
-    resolution: {integrity: sha512-7w6hmKC0/aoWnEsmPCu5Br54BmbmUp5GfcqBxQngRcXJ+q5fdfjEzn7dxmJh2YdDhgW8PccYtlWKSv4tQkrTQg==}
+  /luxon/3.1.1:
+    resolution: {integrity: sha512-Ah6DloGmvseB/pX1cAmjbFvyU/pKuwQMQqz7d0yvuDlVYLTs2WeDHQMpC8tGjm1da+BriHROW/OEIT/KfYg6xw==}
     engines: {node: '>=12'}
     dev: false
 
@@ -14115,6 +14125,10 @@ packages:
       superagent-proxy: 3.0.0_superagent@7.1.5
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /remove-markdown/0.5.0:
+    resolution: {integrity: sha512-x917M80K97K5IN1L8lUvFehsfhR8cYjGQ/yAMRI9E7JIKivtl5Emo5iD13DhMr+VojzMCiYk8V2byNPwT/oapg==}
     dev: false
 
   /request-ip/3.3.0:

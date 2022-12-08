@@ -11,7 +11,7 @@ export class CalendarEvent {
   invitedMembers: CalendarMember[];
   color?: Color;
   date?: Date;
-  deadline?: Deadline;
+  deadline: Deadline;
   allDay: boolean;
   owner: User;
   createdDate: Date;

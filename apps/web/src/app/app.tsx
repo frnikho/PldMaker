@@ -15,14 +15,13 @@ import {DevicePage} from "./page/user/DevicePage";
 import {FAQPage} from "./page/FAQPage";
 import NewCalendarPage from "./page/organization/calendar/NewCalendarPage";
 import CalendarPage from "./page/organization/calendar/CalendarPage";
-import EventPage from "./page/organization/calendar/event/EventPage";
+import { EventPage } from "./page/organization/calendar/event/EventPage";
 import { AuthOtpPage } from "./page/AuthOtpPage";
 import EditTemplatePage from "./page/organization/template/EditTemplatePage";
 import { ChangelogPage } from "./page/ChangelogPage";
 import { MyCalendarPageComponent } from "./page/calendar/MyCalendarPageComponent";
 import { ChangePasswordPage } from "./page/user/ChangePasswordPage";
 import { ResetPasswordPage } from "./page/auth/ResetPasswordPage";
-import { PageComponent } from "./util/Page";
 
 export function App() {
 
