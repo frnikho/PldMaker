@@ -1,11 +1,13 @@
 
-### 1.0.5 Réunion 2.0
-*date: 04/12/2022*
+### 1.0.5 Réunion 2.0 📅
+*date: 09/12/2022*
 
 - Rework des modals concernant les Calendriers et les Réunions
 - Création du systéme pour accepter/refuser les invitations à une réunion
 - Création des différentes vues concernant les slots disponibles selon les membres d'une organisation
 - Création de nouvelles routes API lié aux calendriers/réunion
+- Ajout de la duplication des disponibilités
+- EOW du module de réunion
 
 ### 1.0.4 Reworking FSC
 *date: 03/12/2022*

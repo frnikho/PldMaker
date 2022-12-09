@@ -13,14 +13,16 @@ import { EventType, timezones } from "@pld/shared";
 import { useStorage } from "../../hook/useStorage";
 import { ButtonStyle } from "@pld/ui";
 
-import {Save, Replicate} from '@carbon/icons-react';
+import {Save, Replicate, TrashCan} from '@carbon/icons-react';
 
 import {Stack} from '@carbon/react';
 import { PersonalCalendarApiController } from "../../controller/PersonalCalendarApiController";
 import { errorToast, successToast } from "../../manager/ToastManager";
 import { LoadingButton } from "../../component/utils/LoadingButton";
+import { useModals } from "../../hook/useModals";
+import { DuplicateWeekModal } from "../../modal/calendar/DuplicateWeekModal";
 
-type Slot = {
+export type Slot = {
   id: string;
   start: Date;
   end: Date;
@@ -62,12 +64,17 @@ const AvailableSlotsType: AvailableSlotType[] = [
   }
 ]
 
+type Modals = {
+  duplicate,
+}
+
 export const MyCalendarPageComponent = () => {
 
   const {accessToken} = useAuth();
   const calendar = useRef<FullCalendar | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const {setItem, getItem} = useStorage<MyCalendarPreferences>();
+  const {duplicate, updateModals} = useModals<Modals>({duplicate: false});
   const {getValues, setValue, watch} = useForm<Form>({defaultValues: {slots: [], selectedType: EventType.Available, timezone: 'Europe/Paris'}});
 
   const getEvents = useCallback(() => {
@@ -105,10 +112,10 @@ export const MyCalendarPageComponent = () => {
   const onDragEvent = (event: EventDropArg) => {
     const slots = watch('slots');
     const slot = slots.find((a) => a.id === event.event.id);
-    if (slot === undefined)
+    if (slot === undefined || !event.event.start || !event.event.end)
       return;
-    slot.start = event.event.start!;
-    slot.end = event.event.end!;
+    slot.start = event.event.start;
+    slot.end = event.event.end;
     setValue('slots', slots);
     setItem('slots', watch('slots'));
   }
@@ -164,82 +171,110 @@ export const MyCalendarPageComponent = () => {
     });
   }
 
-  const onDuplicate = () => {
+  const onClickDuplicate = () => {
     console.log(calendar.current?.getApi().view.currentStart);
     console.log(calendar.current?.getApi().view.currentEnd);
+    updateModals('duplicate', true);
+  }
+
+  const onClickReset = () => {
+    getEvents();
+  }
+
+  const onDuplicate = (slots: Slot[]) => {
+    updateModals('duplicate', false);
+    successToast('Semaines dupliquées avec succès !');
+    setTimeout(() => {
+      successToast(`N'oubliez pas d'enregistrer vos modification !`);
+    }, 3000);
+    const a = getValues('slots');
+    a.push(...slots);
+    setValue('slots', a);
+  }
+
+  const showModals = () => {
+    if (calendar?.current === null)
+      return;
+    return (
+      <DuplicateWeekModal open={duplicate} onDismiss={() => updateModals('duplicate', false)} onSuccess={(slots) => onDuplicate(slots as Slot[])} slots={getValues('slots')} window={{start: calendar.current.getApi().view.currentStart, end: calendar.current.getApi().view.currentEnd}}/>
+    )
   }
 
   return (
-    <Stack gap={4}>
-      <h1 style={{fontWeight: 'bold'}}>Mon calendrier</h1>
-      <Select inline id="select-1" value={watch('timezone')} labelText={"Fuseau horaire actuel"} onChange={onChangeTimeZone}>
-        {timezones.map((key, index) => <SelectItem
-          key={index}
-          value={key}
-          text={key}
-        />)}
-      </Select>
-      <TileGroup
-        defaultSelected="default-selected"
-        valueSelected={watch('selectedType')}
-        name="radio tile group"
-        onChange={(value, name, event) => {
-          setValue('selectedType', value as EventType);
-        }}>
-        {AvailableSlotsType.map((type, index) => {
-          return (
-            <RadioTile value={type.type} key={index}>
-              <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                <div className="square" style={{
-                  marginRight: 18,
-                  height: '30px',
-                  width: '30px',
-                  marginLeft: 18,
-                  backgroundColor: type.color,
-                  borderRadius: '50%',
-                  display: 'inline-block',
-                }}/>
-                <p style={{fontWeight: 'bold'}}>{type.type}</p>
-              </div>
-            </RadioTile>
-          )
-        })}
-      </TileGroup>
-      <FullCalendar
-        ref={calendar}
-        firstDay={1}
-        allDaySlot={false}
-        businessHours={{
-          daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
-          startTime: '08:00',
-          endTime: '20:00',
-        }}
-        events={(arg, successCallback) => {
-          successCallback(events());
-        }}
-        selectable={true}
-        timeZone={watch('timezone')}
-        editable={true}
-        eventOverlap={false}
-        selectOverlap={false}
-        dateClick={(arg) => {console.log(arg)}}
-        eventResizableFromStart
-        eventDrop={onDragEvent}
-        eventClick={onClickEvent}
-        eventResize={onResizeEvent}
-        select={onSelectSlot}
-        scrollTime={'12:00:00'}
-        aspectRatio={2}
-        slotEventOverlap={false}
-        nowIndicator={true}
-        locale={'fr'}
-        plugins={[dayGridPlugin, momentTimezonePlugin, timeGridPlugin, interactionPlugin]}
-        initialView="timeGridWeek"
-      />
-      <ButtonSet style={{gap: 10}}>
-        <LoadingButton loading={loading} style={ButtonStyle.default} onClick={onSave} renderIcon={Save}>Sauvegarder</LoadingButton>
-        <Button disabled style={ButtonStyle.default} renderIcon={Replicate} onClick={onDuplicate}>Dupliquer la semaine actuel</Button>
-      </ButtonSet>
-    </Stack>
+    <>
+      {showModals()}
+      <Stack gap={4}>
+        <h1 style={{fontWeight: 'bold'}}>Mon calendrier</h1>
+        <Select inline id="select-1" value={watch('timezone')} labelText={"Fuseau horaire actuel"} onChange={onChangeTimeZone}>
+          {timezones.map((key, index) => <SelectItem
+            key={index}
+            value={key}
+            text={key}
+          />)}
+        </Select>
+        <TileGroup
+          defaultSelected="default-selected"
+          valueSelected={watch('selectedType')}
+          name="radio tile group"
+          onChange={(value) => {
+            setValue('selectedType', value as EventType);
+          }}>
+          {AvailableSlotsType.map((type, index) => {
+            return (
+              <RadioTile value={type.type} key={index}>
+                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                  <div className="square" style={{
+                    marginRight: 18,
+                    height: '30px',
+                    width: '30px',
+                    marginLeft: 18,
+                    backgroundColor: type.color,
+                    borderRadius: '50%',
+                    display: 'inline-block',
+                  }}/>
+                  <p style={{fontWeight: 'bold'}}>{type.type}</p>
+                </div>
+              </RadioTile>
+            )
+          })}
+        </TileGroup>
+        <FullCalendar
+          ref={calendar}
+          firstDay={1}
+          allDaySlot={false}
+          businessHours={{
+            daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+            startTime: '08:00',
+            endTime: '20:00',
+          }}
+          events={(arg, successCallback) => {
+            successCallback(events());
+          }}
+          selectable={true}
+          timeZone={watch('timezone')}
+          editable={true}
+          eventOverlap={false}
+          selectOverlap={false}
+          dateClick={(arg) => {console.log(arg)}}
+          eventResizableFromStart
+          eventDrop={onDragEvent}
+          eventClick={onClickEvent}
+          eventResize={onResizeEvent}
+          select={onSelectSlot}
+          scrollTime={'12:00:00'}
+          aspectRatio={2}
+          slotEventOverlap={false}
+          nowIndicator={true}
+          locale={'fr'}
+          plugins={[dayGridPlugin, momentTimezonePlugin, timeGridPlugin, interactionPlugin]}
+          initialView="timeGridWeek"
+        />
+        <ButtonSet style={{gap: 10}}>
+          <Button kind={'danger'} style={ButtonStyle.default} renderIcon={TrashCan} onClick={onClickReset}>Retirer les nouvelles disponibilitées</Button>
+          <Button style={ButtonStyle.default} renderIcon={Replicate} onClick={onClickDuplicate}>Dupliquer la semaine actuel</Button>
+          <LoadingButton loading={loading} style={ButtonStyle.default} onClick={onSave} renderIcon={Save}>Sauvegarder</LoadingButton>
+        </ButtonSet>
+      </Stack>
+    </>
   );
 };

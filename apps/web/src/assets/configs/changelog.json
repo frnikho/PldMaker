@@ -1,5 +1,11 @@
 [
   {
+    "version": "1.0.5",
+    "name": "Réunion 2.0 📅",
+    "date": "09/12/2022",
+    "contents": "- Rework des modals concernant les Calendriers et les Réunions\n- Création du systéme pour accepter/refuser les invitations à une réunion\n- Création des différentes vues concernant les slots disponibles selon les membres d'une organisation\n- Création de nouvelles routes API lié aux calendriers/réunion\n- Ajout de la duplication des disponibilités\n- EOW du module de réunion"
+  },
+  {
     "version": "1.0.4",
     "name": "Rework des contexts et maj docker",
     "date": "03/12/2022",
