@@ -53,8 +53,8 @@ export const UserWorkTimeDodComponent = (props: Props) => {
                 </div>
               </StructuredListCell>
               <StructuredListCell>
-                <NumberInput min={0} max={50} label={"J/H"} id={"dod-estimated-work-time-time"} iconDescription={""} value={wt.value} onChange={(e) => {
-                  wt.value = e.imaginaryTarget.value;
+                <NumberInput min={0} max={50} label={"J/H"} id={"dod-estimated-work-time-time"} iconDescription={""} value={wt.value} onChange={(evt, {value}) => {
+                  wt.value = Number(value);
                   props.onWtChanged(index, wt);
                 }}/>
               </StructuredListCell>
