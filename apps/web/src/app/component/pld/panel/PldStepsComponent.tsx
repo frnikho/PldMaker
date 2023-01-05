@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Button, ProgressIndicator, ProgressStep, Tile } from "carbon-components-react";
 import { IncompleteStatusIcon } from "../../../icon/IncompleteStatusIcon";
-import { Organization, Pld, PldStatus } from "@pld/shared";
+import { Organization, Pld } from "@pld/shared";
 import {Toggletip, ToggletipButton, ToggletipContent} from '@carbon/react';
 import {Information, CheckmarkOutline, Incomplete, Classification} from '@carbon/icons-react';
 import { useState } from "react";
@@ -67,18 +67,18 @@ export const PldStepsComponent = (props: Props) => {
             const currentIndex = props.pld.steps.findIndex((step) => step === props.pld.currentStep);
             return (<ProgressStep
               key={index}
-              complete={index < currentIndex}
+              complete={index < currentIndex || new Date(props.pld.endingDate).getTime() < new Date().getTime()}
               current={currentIndex === index}
               label={`Édition (${step})`}
             />);
           }).filter((e) => e !== null)}
           <ProgressStep
-            complete={props.pld.status === PldStatus.signed}
+            complete={new Date(props.pld.endingDate).getTime() < new Date().getTime()}
             label="Signé"
           />
         </ProgressIndicator>
         <div style={{marginTop: 18}}>
-          <Button style={ButtonStyle.default} renderIcon={Classification} onClick={() => setModal(true)}>Changer l'état d'avancement</Button>
+          <Button disabled={new Date(props.pld.endingDate).getTime() < new Date().getTime()} style={ButtonStyle.default} renderIcon={Classification} onClick={() => setModal(true)}>Changer l'état d'avancement</Button>
         </div>
       </Tile>
     </>

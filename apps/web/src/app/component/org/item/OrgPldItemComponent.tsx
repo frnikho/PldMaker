@@ -1,7 +1,7 @@
 import { Pld } from "@pld/shared";
 import { ClickableTile } from "carbon-components-react";
 import { formatLongDate } from "@pld/utils";
-import React from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 type Props = {
@@ -11,8 +11,16 @@ export const OrgPldItemComponent = (props: Props) => {
 
   const navigate = useNavigate();
 
+  const opacity = useMemo(() => {
+    if (new Date(props.pld.endingDate).getTime() < new Date().getTime()) {
+      return 0.4
+    } else {
+      return 1;
+    }
+  }, [props.pld])
+
   return (
-    <ClickableTile onClick={() => navigate(`pld/${props.pld._id}`)} style={{borderRadius: 10, marginBottom: 32}}>
+    <ClickableTile onClick={() => navigate(`pld/${props.pld._id}`)} style={{borderRadius: 10, marginBottom: 32, opacity: opacity}}>
       <p style={{fontWeight: 600, fontSize: 26}}>{props.pld.title} (v{props.pld.version})</p>
       <p>{props.pld.description.substring(0, 160)}</p>
       <br/>

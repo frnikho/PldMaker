@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {OrganizationApiController} from "../../controller/OrganizationApiController";
 
 import {
   Breadcrumb,
   BreadcrumbItem,
-  Button,
+  Button, Checkbox,
   Column, Grid, SkeletonText
 } from "carbon-components-react";
 
@@ -50,6 +50,7 @@ export const OrganizationComponent = (props: Props) => {
 
   const {accessToken} = useAuth();
   const {org, setOrg, plds, setPlds, calendars, setCalendars, templates, setTemplates} = useMaker();
+  const [showArchived, setShowArchived] = useState<boolean>(false);
   const {openHistory, openCreateCalendar, updateModals} = useModals<Modals>({openHistory: false, openCreateCalendar: false});
   const navigate = useNavigate();
 
@@ -119,6 +120,27 @@ export const OrganizationComponent = (props: Props) => {
     }
   }
 
+  const showDoDs = useCallback(() => {
+    if (!org) {
+      return (<OrgListSkeleton/>)
+    }
+    return (
+      <Grid>
+        {plds
+          .filter((p) => {
+            if (!showArchived) {
+              return new Date(p.endingDate).getTime() >= new Date().getTime();
+            } else {
+              return true;
+            }
+          })
+          .map((pld, index) =>
+          <Column key={index} sm={4} md={8} lg={5}>
+        <OrgPldItemComponent pld={pld}/>
+      </Column>)}
+      </Grid>)
+  }, [org, plds, showArchived]);
+
   const onClickCreateCalendar = useCallback(() => {
     updateModals('openCreateCalendar', true);
   }, [updateModals]);
@@ -137,11 +159,8 @@ export const OrganizationComponent = (props: Props) => {
           <Column lg={12} xlg={12} md={8} sm={4}>
             {org ? <OrgInfoComponent org={org} onOrgUpdated={() => loadOrg()}/> : <OrgInfoSkeleton/>}
             <h2 style={{marginTop: 20, marginBottom: 10}}>Pld <Button kind={"ghost"} onClick={() => navigate('pld/new')} hasIconOnly renderIcon={Add} iconDescription={"create org"}/></h2>
-            {!org ? <OrgListSkeleton/> : <Grid>{plds.map((pld, index) =>
-                <Column key={index} sm={4} md={8} lg={5}>
-                  <OrgPldItemComponent pld={pld}/>
-                </Column>
-              )}</Grid>}
+            <Checkbox id={"template-default"} labelText={"Archiver ?"} checked={showArchived} onChange={(a, {checked}) => setShowArchived(checked)}/>
+            {showDoDs()}
             <h2 style={{marginTop: 20, marginBottom: 10}}>Calendriers <Button kind={"ghost"} onClick={onClickCreateCalendar} hasIconOnly renderIcon={Add} iconDescription={"Create calendar"}/></h2>
             {!org ? <OrgCalendarItemSkeleton/> : calendars.map((calendar, index) =>
               <OrgCalendarItemComponent key={index} calendar={calendar}/>
