@@ -1,5 +1,11 @@
 [
   {
+    "version": "1.0.6",
+    "name": "Fix mineur + sketch",
+    "date": "20/01/2023",
+    "contents": "- Fix de bugs mineurs (Blank screen lors de la duplication d'un personal calendar)\n- Rajout du mode sketch pour les DoDs (mode brouillon si la DoD n'est pas fini ou valider)\n- Rajout de la première lettre du nom de famille pour la vue de sélection d'un créneau"
+  },
+  {
     "version": "1.0.5",
     "name": "Réunion 2.0 📅",
     "date": "09/12/2022",

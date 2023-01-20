@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import {User} from "../user/user.schema";
 import {Pld} from "../pld/pld.schema";
-import { DodStatus } from "@pld/shared";
 import { PropOptions } from "@nestjs/mongoose";
 
 export type DodRulesType = {
@@ -16,6 +15,7 @@ export type DodRulesType = {
   status: PropOptions;
   owner: PropOptions;
   history: PropOptions;
+  sketch: PropOptions;
 }
 
 export const dodRules: DodRulesType = {
@@ -68,5 +68,10 @@ export const dodRules: DodRulesType = {
     required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: Pld.name
+  },
+  sketch: {
+    required: false,
+    type: Boolean,
+    default: false,
   }
 }

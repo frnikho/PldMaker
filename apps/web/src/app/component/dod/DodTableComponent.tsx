@@ -74,10 +74,6 @@ export const DodTableComponent = (props: Props) => {
   const getTableHeader = () => {
     return [
       {
-        key: 'version',
-        header: 'Version',
-      },
-      {
         key: 'title',
         header: 'Nom',
       },
@@ -308,6 +304,7 @@ export const DodTableComponent = (props: Props) => {
               <TableHead>
                 <TableRow>
                   <TableSelectAll {...getSelectionProps()} />
+                  <TableHeader>Version</TableHeader>
                   {headers.map((header) => (
                     <TableHeader style={{whiteSpace: 'nowrap'}} {...getHeaderProps({ header })}>
                       {header.header}
@@ -321,6 +318,9 @@ export const DodTableComponent = (props: Props) => {
                 {rows.map((row) => (
                   <TableRow {...getRowProps({ row })}>
                     <TableSelectRow {...getSelectionProps({ row })} />
+                    <TableCell key={"version"}>
+                      {`${props.dods.find((dod) => dod._id === row.id)?.version} ${props.dods.find((dod) => dod._id === row.id)?.sketch ? '📝' : ''}`}
+                    </TableCell>
                     {row.cells.map((cell) => {
                       return (<TableCell key={cell.id} style={{cursor: 'pointer'}} onClick={() => onClickPreviewDod(props.dods.find((dod) => dod._id === row.id))}>{cell.value}</TableCell>)
                     })}
@@ -328,7 +328,7 @@ export const DodTableComponent = (props: Props) => {
                       {showSelectStatus(row.id)}
                     </TableCell>
                     <TableCell key={"actions"} style={{minWidth: '100px'}}>
-                      <Link renderIcon={Edit} onClick={() => onClickUpdateDod(props.dods.find((dod) => dod._id === row.id))}/>
+                      <Link style={{cursor: 'pointer'}} renderIcon={Edit} onClick={() => onClickUpdateDod(props.dods.find((dod) => dod._id === row.id))}/>
                     </TableCell>
                   </TableRow>
                 ))}

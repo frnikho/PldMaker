@@ -87,6 +87,9 @@ export class Dod extends DatedObjectSchema {
   @Prop(dodRules.history)
   history: DodHistory[];
 
+  @Prop(dodRules.sketch)
+  sketch: boolean;
+
 }
 
 export const DodSchema = SchemaFactory.createForClass(Dod);

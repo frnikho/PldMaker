@@ -151,7 +151,7 @@ export const PldComponent = (props: Props) => {
       toast('Impossible de récupérer les informations pour générer le document !', {type: 'error'});
       return;
     }
-    const generator = new PldGenerator(org, pld, dod, dodStatus, report, template);
+    const generator = new PldGenerator(org, pld, dod, dodStatus, report, sections, template);
     PldGenerator.getBlobFromDoc(generator.generate(), (blob) => {
       window.open(URL.createObjectURL(blob));
     });

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import {
-  Button,
+  Button, Checkbox,
   Column, ComboBox,
   Grid,
   Modal,
@@ -46,6 +46,7 @@ type Forms = {
   description: string;
   descriptionOfDone: string[];
   estimatedWorkTime: WorkTime[];
+  sketch: boolean;
 };
 
 const defaultForm: Forms = {
@@ -56,12 +57,13 @@ const defaultForm: Forms = {
   description: '',
   descriptionOfDone: [''],
   estimatedWorkTime: [{value: 0, users: []}],
+  sketch: false,
 }
 
 export const NewDodModal = (props: Props) => {
 
   const {accessToken, user} = useAuth();
-  const {register, reset, resetField, getValues, clearErrors, setValue, watch, formState: {errors}, setError} = useForm<Forms>({defaultValues: defaultForm});
+  const {register, reset, getValues, clearErrors, setValue, watch, formState: {errors}, setError} = useForm<Forms>({defaultValues: defaultForm});
 
   useEffect(() => {
     if (props.open) {
@@ -72,6 +74,7 @@ export const NewDodModal = (props: Props) => {
         setValue('want', props.dod.want);
         setValue('description', props.dod.description);
         setValue('descriptionOfDone', props.dod.descriptionOfDone);
+        setValue('sketch', props.dod.sketch);
         setValue('estimatedWorkTime', props.dod.estimatedWorkTime.map((wt) => ({
           value: wt.value,
           users: wt.users.map((u) => ({ id: u._id, email: u.email })),
@@ -148,6 +151,7 @@ export const NewDodModal = (props: Props) => {
       user?._id ?? '',
       form.descriptionOfDone,
       form.estimatedWorkTime.map((a) => ({users: a.users.map((u) => u.id), value: a.value, format: 'J/H'})),
+      form.sketch
     );
     validate(body).then((errors) => {
       console.log(errors);
@@ -263,6 +267,7 @@ export const NewDodModal = (props: Props) => {
         <UserWorkTimeDodComponent workTime={watch('estimatedWorkTime')} org={props.org} onWtChanged={onWtChanged} onWtDeleted={onWtDeleted}/>
         <ErrorLabel show={errors?.estimatedWorkTime?.message !== undefined} message={errors?.estimatedWorkTime?.message}/>
         <Button kind={'ghost'} onClick={addBlankWorkTime}>Ajouter des charges</Button>
+        <Checkbox id={'sketch'} checked={watch('sketch')} onChange={(evt, {checked}) => {setValue('sketch', checked)}} labelText={"Brouillon ?"} title={'Draft'}/>
         <br/>
         <Button onClick={onClickCreate}>{props.type === DodType.New ? 'Créer' : 'Modifier'}</Button>
       </Stack>

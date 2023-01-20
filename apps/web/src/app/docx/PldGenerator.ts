@@ -1,4 +1,4 @@
-import { Dod, DodStatus, Organization, Pld, Template } from "@pld/shared";
+import { Dod, DodStatus, Organization, OrganizationSection, Pld, Template } from "@pld/shared";
 import { AlignmentType, Document, Header, Packer, Paragraph, TextRun, WidthType } from "docx";
 import { DodDocx } from "./DodDocx";
 import { PldDocx } from "./PldDocx";
@@ -32,7 +32,7 @@ export const Space = (): Paragraph => {
 
 export class PldGenerator {
 
-  constructor(private org: Organization, private pld: Pld, private dod: Dod[], private dodStatus: DodStatus[], private report: ReportForm, private template?: Template) {}
+  constructor(private org: Organization, private pld: Pld, private dod: Dod[], private dodStatus: DodStatus[], private report: ReportForm, private sections: OrganizationSection[], private template?: Template, ) {}
 
   private getHeader(): Header {
     return new Header({
@@ -121,7 +121,7 @@ export class PldGenerator {
           Space(),
           new Paragraph({style: 'Title', children: [new TextRun({text: 'Les cartes de nos livrables'})]}),
           Space(),
-          ...new DodResumeDocx(this.dod, this.dodStatus).generate(),
+          ...new DodResumeDocx(this.org, this.dod, this.dodStatus, this.sections).generate(),
           Space(),
           new Paragraph({style: 'Title', children: [new TextRun({text: 'Tableau des révisions'})]}),
           Space(),
@@ -129,7 +129,7 @@ export class PldGenerator {
           Space(),
           new Paragraph({style: 'Title', children: [new TextRun({text: 'DoDs'})]}),
           Space(),
-          ...this.dod.map((d, index) => [Space(), new DodDocx(d, this.org, this.pld, this.template).generateTable()]).flat(),
+          ...this.dod.map((d) => [Space(), new DodDocx(d, this.org, this.pld, this.template).generateTable()]).flat(),
           Space(),
           new Paragraph({style: 'Title', children: [new TextRun({text: 'Rapport d’avancement'})]}),
           Space(),

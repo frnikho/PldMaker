@@ -18,8 +18,9 @@ export class Dod {
   history: DodHistory[];
   created_date: Date;
   updated_date: Date;
+  sketch: boolean;
 
-  constructor(id: string, version: string, title: string, skinOf: string, want: string, description: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[], pldOwner: Pld, owner: User, status: DodStatus, history: DodHistory[], created_date: Date, updated_date: Date) {
+  constructor(id: string, version: string, title: string, skinOf: string, want: string, description: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[], pldOwner: Pld, owner: User, status: DodStatus, history: DodHistory[], created_date: Date, updated_date: Date, sketch: boolean) {
     this._id = id;
     this.version = version;
     this.title = title;
@@ -34,6 +35,7 @@ export class Dod {
     this.history = history;
     this.created_date = created_date;
     this.updated_date = updated_date;
+    this.sketch = sketch;
   }
 }
 

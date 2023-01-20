@@ -84,7 +84,13 @@ export const DuplicateWeekModal = (props: Props) => {
             id="radio-3"
           />
         </RadioButtonGroup>
-        <NumberInput value={watch('period')} onChange={(evt, { value }) => setValue('period', value)} disabled={watch('options') !== DuplicateOptions.Period} id={"interval"} placeholder={"4"} label={"Période"} min={0} helperText={`La semaine actuelle sera dupliquer sur les X prochaine semaines`}/>
+        <NumberInput value={watch('period')} onChange={(evt, { value, direction }) => {
+          if (!isNaN(value)) {
+            setValue("period", value);
+          } else {
+            setValue('period', direction === 'up' ? getValues('period')+1 : getValues('period')-1);
+          }
+        }} disabled={watch('options') !== DuplicateOptions.Period} id={"interval"} placeholder={"4"} label={"Période"} min={1} step={1} helperText={`La semaine actuelle sera dupliquer sur les X prochaine semaines`} invalidText={"Valeur non valide !"}/>
         <Button style={ButtonStyle.default} renderIcon={Replicate} disabled={watch('options') === DuplicateOptions.Period && watch('period') <= 0} onClick={onClickDuplicate}>Dupliquer</Button>
       </Stack>
     </Modal>

@@ -94,6 +94,7 @@ export const createFakeDod = (dod?: Partial<Dod>): Dod => ({
   estimatedWorkTime: dod?.estimatedWorkTime ?? [],
   skinOf: dod?.skinOf ?? 'Développeur',
   want: dod?.want ?? 'Créer un bouton pour se connecter',
+  sketch: false,
 })
 
 export const createFakeWorkTime = (users?: User[]): UserWorkTime => {

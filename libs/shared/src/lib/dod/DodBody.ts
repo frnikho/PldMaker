@@ -45,7 +45,9 @@ export class DodCreateBody {
   @IsValidWorkTimeArray({message: 'Données non valide, vous devez rentrer au minimum une charges avec un utilisateur'})
   estimatedWorkTime: UserWorkTime[];
 
-  constructor(version: string, title: string, skinOf: string, want: string, description: string, pldOwner: string, owner: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[]) {
+  sketch: boolean;
+
+  constructor(version: string, title: string, skinOf: string, want: string, description: string, pldOwner: string, owner: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[], sketch: boolean) {
     this.version = version;
     this.title = title;
     this.skinOf = skinOf;
@@ -55,6 +57,7 @@ export class DodCreateBody {
     this.owner = owner;
     this.descriptionOfDone = descriptionOfDone;
     this.estimatedWorkTime = estimatedWorkTime;
+    this.sketch = sketch;
   }
 }
 
@@ -86,8 +89,9 @@ export class DodUpdateBody {
   owner?: string;
   descriptionOfDone?: string[];
   estimatedWorkTime?: UserWorkTime[];
+  sketch?: boolean;
 
-  constructor(version: string, title: string, skinOf: string, want: string, description: string, pldOwner: string, owner: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[]) {
+  constructor(version: string, title: string, skinOf: string, want: string, description: string, pldOwner: string, owner: string, descriptionOfDone: string[], estimatedWorkTime: UserWorkTime[], sketch: boolean) {
     this.version = version;
     this.title = title;
     this.skinOf = skinOf;
@@ -97,5 +101,6 @@ export class DodUpdateBody {
     this.owner = owner;
     this.descriptionOfDone = descriptionOfDone;
     this.estimatedWorkTime = estimatedWorkTime;
+    this.sketch = sketch;
   }
 }
