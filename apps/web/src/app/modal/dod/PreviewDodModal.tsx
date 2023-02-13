@@ -2,6 +2,7 @@ import React from "react";
 import {ModalProps} from "../../util/Modal";
 import { Dod, User, WorkTimeFormat } from "@pld/shared";
 import {
+  Button,
   CodeSnippet,
   Column,
   Grid,
@@ -15,15 +16,24 @@ import {
 
 import {TabPanel, TabPanels, TabList} from '@carbon/react';
 
+import {Edit} from '@carbon/icons-react';
+
 import {Stack} from '@carbon/react'
 import {formatDateHistory, formatLongDate} from "@pld/utils";
 import {HistoryHelper} from "../../util/HistoryHelper";
 
 type Props = {
   dod: Dod;
+  onClickEdit?: (dod: Dod) => void;
 } & ModalProps;
 
 export const PreviewDodModal = (props: Props) => {
+
+  const onClickEdit = () => {
+    if (props.onClickEdit) {
+      props.onClickEdit(props.dod);
+    }
+  }
 
   const showHistory = () => {
     if (props.dod.history.length === 0) {
@@ -126,6 +136,9 @@ export const PreviewDodModal = (props: Props) => {
                 </Stack>
               </Column>
             </Grid>
+            <Button disabled={props.onClickEdit === undefined} style={{marginTop: '4em'}} renderIcon={Edit} onClick={onClickEdit}>
+              Modifier la DoD
+            </Button>
           </TabPanel>
           <TabPanel>
             {showHistory()}

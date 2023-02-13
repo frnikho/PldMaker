@@ -1,11 +1,14 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "carbon-components-react";
+import { Checkbox, FilterableMultiSelect, Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "carbon-components-react";
 import { Dod, DodStatus, Organization, OrganizationSection, Pld, User } from "@pld/shared";
 import { CreateOrgSectionModal } from "../org/CreateOrgSectionModal";
 import { UpdateOrgSectionModal } from "../org/UpdateOrgSectionModal";
 import { PreviewDodModal } from "../dod/PreviewDodModal";
 import { ModalProps } from "../../util/Modal";
 import { useModals } from "../../hook/useModals";
+
+import {Stack} from '@carbon/react';
+import { useForm } from "react-hook-form";
 
 type UserResume = {
   user: User;
@@ -29,10 +32,18 @@ type Props = {
   reload: () => void;
 } & ModalProps;
 
+type Form = {
+  selectedUser: User[];
+  hideCategory: boolean;
+}
+
 export const ResumePldModal = (props: Props) => {
 
   const {dodPreview, createSection, updateSection, updateModals} = useModals({dodPreview: false, createSection: false, updateSection: false});
   const [selectedDod, setSelectedDod] = useState<Dod | undefined>(undefined);
+
+  const {getValues, setValue, watch} = useForm<Form>({defaultValues: {selectedUser: [...props.org.members, props.org.owner], hideCategory: false}});
+
   const [selectedSection, setSelectedSection] = useState<OrganizationSection | undefined>(undefined);
   const [resume, setResume] = useState<UserResume[]>([]);
 
@@ -49,9 +60,13 @@ export const ResumePldModal = (props: Props) => {
   }
 
   const getTableHeader = () => {
-    return resume.map((value) => {
+    return resume
+      .filter((r) => getValues('selectedUser').find((su) => su._id === r.user._id))
+      .map((value) => {
       const hours: number = value.dod.map((dod) => {
-        const abc = dod.estimatedWorkTime.map((wt) => {
+        const abc = dod.estimatedWorkTime
+          .filter((wt) => wt.users.find((wu) => getValues('selectedUser').find((u) => u._id === wu._id)))
+          .map((wt) => {
           if (wt.users.some((a) => value.user._id === a._id))
             return parseFloat(wt.value / wt.users.length as unknown as string);
           return 0;
@@ -111,6 +126,9 @@ export const ResumePldModal = (props: Props) => {
     return DoDs.map((a, index) => {
       if (a.type === 'dod') {
         const dod = a.dod as Dod;
+        if (!dod.estimatedWorkTime.some((e) => e.users.some((u) => getValues('selectedUser').some((su) => su._id === u._id)))) {
+          return null;
+        }
         const color = props.dodColors.find((a) => dod.status._id === a._id);
         return (
           <Fragment key={index}>
@@ -130,27 +148,32 @@ export const ResumePldModal = (props: Props) => {
                 }} />
                 {dod.version} {dod.title} </TableCell>
               <TableCell>{dod.estimatedWorkTime.map((a) => a.users.map(() => parseFloat(String(a.value / a.users.length)))).flat().reduce((a, b) => a + b, 0).toFixed(1)}</TableCell>
-              {getUsers(props.org).map((user) => {
-                const hours = dod.estimatedWorkTime.map((wt) => {
-                  if (wt.users.some((a) => user._id === a._id))
-                    return parseFloat(wt.value / wt.users.length as unknown as string);
-                  return 0;
-                }).flat().reduce((a, b) => a + b, 0);
-                return (
-                  <TableCell key={dod._id + user._id}>
-                    {hours !== 0 ? hours.toFixed(1) : '-'}
-                  </TableCell>
-                )
-              })}
+              {getUsers(props.org)
+                .filter((u) => getValues('selectedUser').some((s) => s._id === u._id))
+                .map((user) => {
+                  const hours = dod.estimatedWorkTime.map((wt) => {
+                    if (wt.users.some((a) => user._id === a._id))
+                      return parseFloat(wt.value / wt.users.length as unknown as string);
+                    return 0;
+                  }).flat().reduce((a, b) => a + b, 0);
+                  return (
+                    <TableCell key={dod._id + user._id}>
+                      {hours !== 0 ? hours.toFixed(1) : '-'}
+                    </TableCell>
+                  )
+                })}
             </TableRow>
           </Fragment>
         )
       } else {
         const section = a.section as OrganizationSection;
+        if (getValues('hideCategory')) {
+          return null;
+        }
         return <TableRow key={index}>
           {showTableCellSection(section)}
           <TableCell />
-          {getUsers(props.org).map((u, index) => <TableCell key={'user_blank_cell_' + index} />)}
+          {getUsers(props.org).filter((a) => getValues('selectedUser').some((s) => s._id === a._id)).map((u, index) => <TableCell key={'user_blank_cell_' + index} />)}
         </TableRow>
       }
     });
@@ -209,27 +232,43 @@ export const ResumePldModal = (props: Props) => {
         onRequestClose={() => props.onDismiss()}
         passiveModal
         modalHeading="Récapitulatif des J/H">
-        <Table size="md" useZebraStyles={false}>
-          <TableHead>
-            <TableRow id={"DodHeader"} key={"DodHeader"}>
-              <TableHeader id={"DodHeaderName"} key={"DodHeaderName"}>
-                DoDs
-              </TableHeader>
-              <TableHeader>
-                <p style={{ fontWeight: 'bold' }}>
-                  Total
-                </p>
-                <p>
-                  {props.dods.map((dod) => dod.estimatedWorkTime.map((wt) => wt.users.map(() => parseFloat(String(wt.value / wt.users.length)))).flat()).flat().reduce((a, b) => a + b, 0)} J/H
-                </p>
-              </TableHeader>
-              {getTableHeader()}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {getTableBody()}
-          </TableBody>
-        </Table>
+        <Stack gap={4}>
+          <FilterableMultiSelect
+            placeholder={watch('selectedUser').map((user) => user.email).join(', ')}
+            id="user-select"
+            titleText="Filtrer par Utilisateurs"
+            items={[...props.org.members, props.org.owner].map((u) => ({text: u.email, value: u._id}))}
+            itemToString={(item) => (item ? item.text : '')}
+            selectedItems={watch('selectedUser').map((u) => ({text: u.email, value: u._id}))}
+            selectionFeedback="top"
+            onChange={({ selectedItems }) => {
+              setValue('selectedUser', ([...props.org.members, props.org.owner].filter((u) => selectedItems.find((s) => s.value === u._id))));
+            }}/>
+          <Checkbox labelText={`Masquer les catégories`} id="category" checked={watch('hideCategory')} onChange={(evt, {checked}) => setValue('hideCategory', checked)}/>
+          <Table size="md" useZebraStyles={false}>
+            <TableHead>
+              <TableRow id={"DodHeader"} key={"DodHeader"}>
+                <TableHeader id={"DodHeaderName"} key={"DodHeaderName"}>
+                  DoDs
+                </TableHeader>
+                <TableHeader>
+                  <p style={{ fontWeight: 'bold' }}>
+                    Total
+                  </p>
+                  <p>
+                    {props.dods
+                      .filter((d) => d.estimatedWorkTime.some((wt) => wt.users.find((wu) => getValues('selectedUser').find((u) => u._id === wu._id))))
+                      .map((dod) => dod.estimatedWorkTime.map((wt) => wt.users.map(() => parseFloat(String(wt.value / wt.users.length)))).flat()).flat().reduce((a, b) => a + b, 0)} J/H
+                  </p>
+                </TableHeader>
+                {getTableHeader()}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {getTableBody()}
+            </TableBody>
+          </Table>
+        </Stack>
       </Modal>
     </>
   )

@@ -26,7 +26,7 @@ import {
 import { DataTable } from "@carbon/react";
 
 import { DodType, NewDodModal } from "../../modal/dod/NewDodModal";
-import { Dod, DodStatus, Organization, OrganizationSection, Pld, SetDodStatus } from "@pld/shared";
+import { Dod, DodStatus, Organization, OrganizationSection, Pld, SetDodStatus, User } from "@pld/shared";
 import { DodApiController } from "../../controller/DodApiController";
 
 import { Add, Edit, ImportExport, TrashCan, Filter, Checkmark } from "@carbon/icons-react";
@@ -34,6 +34,7 @@ import { toast } from "react-toastify";
 import { PreviewDodModal } from "../../modal/dod/PreviewDodModal";
 import { formatShortDate } from "@pld/utils";
 import { ButtonStyle } from "@pld/ui";
+import { FilterUserDodModal } from "../../modal/pld/FilterUserDodModal";
 
 type Props = {
   org: Organization;
@@ -49,20 +50,23 @@ type Props = {
 type Modals = {
   openEdition: boolean;
   openPreview: boolean;
+  openUserFilterDod: boolean;
 }
 
 enum Sorting {
   MyAssignedDoDs,
   MyCreatedDoDs,
+  UserDoDs,
 }
 
 export const DodTableComponent = (props: Props) => {
 
   const userCtx = useContext<UserContextProps>(UserContext);
   const [selectedDod, setSelectedDod] = useState<undefined | Dod>(undefined);
-  const [modals, setModals] = useState<Modals>({openEdition: false, openPreview: false});
+  const [modals, setModals] = useState<Modals>({openEdition: false, openPreview: false, openUserFilterDod: false});
   const [type, setType] = useState<DodType>(DodType.New);
   const [filter, setFilter] = useState<undefined | Sorting>(undefined);
+  const [filteredUser, setFilteredUser] = useState<User[]>([]);
 
   const updateModal = (key: keyof Modals, value: boolean) => {
     setModals({
@@ -110,6 +114,11 @@ export const DodTableComponent = (props: Props) => {
       setType(DodType.Edit);
       setSelectedDod(dod);
     }
+  }
+
+  const onClickEdit = (dod: Dod) => {
+    setSelectedDod(dod);
+    setModals({openEdition: true, openPreview: false, openUserFilterDod: false});
   }
 
   const onClickPreviewDod = (dod?: Dod) => {
@@ -188,12 +197,25 @@ export const DodTableComponent = (props: Props) => {
     return a1.length - b1.length;
   }
 
+  const onClickFilterByUser = () => {
+    updateModal('openUserFilterDod', true);
+  }
+
+  const onSelectedUserToFilterDoDs = (user: User[]) => {
+    updateModal('openUserFilterDod', false);
+    setFilteredUser(user);
+    setFilter(Sorting.UserDoDs);
+    console.log(user);
+  }
+
   const showDoDs = () => {
     let DoDs: Dod[] = props.dods;
     if (filter === Sorting.MyAssignedDoDs) {
       DoDs = DoDs.filter((d) => d.estimatedWorkTime.find((wt) => wt.users.find((u) => u._id === userCtx.user?._id)));
     } else if (filter === Sorting.MyCreatedDoDs) {
       DoDs = DoDs.filter((d) => d.owner._id === userCtx.user?._id);
+    } else if (filter === Sorting.UserDoDs) {
+      DoDs = DoDs.filter((d) => d.estimatedWorkTime.some((d) => d.users.some((u) => filteredUser.some((fu) => fu._id === u._id))));
     }
     return DoDs.sort((a, b) => compare(a.version, b.version)).map((dod) => {
       return {
@@ -285,6 +307,9 @@ export const DodTableComponent = (props: Props) => {
                   <TableToolbarAction onClick={() => setFilter(Sorting.MyCreatedDoDs)}>
                     {filter === Sorting.MyCreatedDoDs ? <Checkmark style={{marginRight: 5}}/> : ''} Mes DoDs créer
                   </TableToolbarAction>
+                  <TableToolbarAction onClick={() => onClickFilterByUser()}>
+                    {filter === Sorting.UserDoDs ? <Checkmark style={{marginRight: 5}}/> : ''} Par utilisateurs
+                  </TableToolbarAction>
                 </TableToolbarMenu>
                 <Button
                   style={ButtonStyle.default}
@@ -347,7 +372,8 @@ export const DodTableComponent = (props: Props) => {
         updateModal("openEdition", false);
         setSelectedDod(undefined);
       }} pld={props.pld} org={props.org}/>
-      {selectedDod !== undefined ? <PreviewDodModal dod={selectedDod} open={modals.openPreview} onDismiss={() => {
+      <FilterUserDodModal org={props.org} open={modals.openUserFilterDod} onDismiss={() => updateModal('openUserFilterDod', false)} onSuccess={(user) => onSelectedUserToFilterDoDs(user as User[])}/>
+      {selectedDod !== undefined ? <PreviewDodModal onClickEdit={onClickEdit} dod={selectedDod} open={modals.openPreview} onDismiss={() => {
         updateModal("openPreview", false);
         setSelectedDod(undefined);
       }} onSuccess={() => {
